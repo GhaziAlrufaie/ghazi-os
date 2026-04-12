@@ -1,0 +1,55 @@
+name: 📦 Daily Code Backup
+
+on:
+  schedule:
+    # كل يوم الساعة 1:00 صباحاً بتوقيت السعودية (UTC+3) = 22:00 UTC
+    - cron: '0 22 * * *'
+  workflow_dispatch: # تشغيل يدوي عند الحاجة
+
+jobs:
+  backup:
+    runs-on: ubuntu-latest
+    name: Create Daily Code Snapshot
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Create daily backup tag
+        run: |
+          DATE=$(date -u +"%Y-%m-%d")
+          DATETIME=$(date -u +"%Y-%m-%d %H:%M UTC")
+          
+          # إنشاء tag يومي بالتاريخ
+          git config user.name "Ghazi OS Backup Bot"
+          git config user.email "backup@ghazi-os.com"
+          
+          # حذف الـ tag القديم لنفس اليوم لو موجود
+          git tag -d "backup-$DATE" 2>/dev/null || true
+          git push origin --delete "backup-$DATE" 2>/dev/null || true
+          
+          # إنشاء tag جديد
+          git tag -a "backup-$DATE" -m "🗄️ Daily backup - $DATETIME"
+          git push origin "backup-$DATE"
+          
+          echo "✅ Backup tag created: backup-$DATE"
+
+      - name: Keep only last 30 daily backups
+        run: |
+          # احتفظ فقط بآخر 30 نسخة (شهر كامل)
+          TAGS=$(git tag -l "backup-*" | sort | head -n -30)
+          if [ -n "$TAGS" ]; then
+            echo "Removing old backup tags:"
+            echo "$TAGS"
+            for tag in $TAGS; do
+              git tag -d "$tag" 2>/dev/null || true
+              git push origin --delete "$tag" 2>/dev/null || true
+            done
+          else
+            echo "No old tags to remove"
+          fi
+          
+          echo "✅ Cleanup complete. Current backups:"
+          git tag -l "backup-*" | sort

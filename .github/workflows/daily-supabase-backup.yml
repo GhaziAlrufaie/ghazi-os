@@ -1,0 +1,190 @@
+name: 🗄️ Daily Supabase Data Backup
+
+on:
+  schedule:
+    # كل يوم الساعة 1:30 صباحاً بتوقيت السعودية (UTC+3) = 22:30 UTC
+    - cron: '30 22 * * *'
+  workflow_dispatch: # تشغيل يدوي عند الحاجة
+
+jobs:
+  backup:
+    runs-on: ubuntu-latest
+    name: Backup Supabase Data to JSON
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Create backup script
+        run: |
+          cat > backup.js << 'EOF'
+          const https = require('https');
+          const fs = require('fs');
+          const path = require('path');
+
+          const SUPABASE_URL = process.env.SUPABASE_URL;
+          const SUPABASE_KEY = process.env.SUPABASE_KEY;
+
+          // كل الجداول المطلوب نسخها
+          const TABLES = [
+            'brands',
+            'projects', 
+            'tasks',
+            'personal_tasks',
+            'decisions',
+            'employees',
+            'expenses',
+            'biz_expenses',
+            'events',
+            'archive',
+            'salla_orders',
+            'finance_notes',
+            'weekly_focus'
+          ];
+
+          function fetchTable(table) {
+            return new Promise((resolve, reject) => {
+              const url = new URL(`${SUPABASE_URL}/rest/v1/${table}?select=*&limit=10000`);
+              const options = {
+                hostname: url.hostname,
+                path: url.pathname + url.search,
+                method: 'GET',
+                headers: {
+                  'apikey': SUPABASE_KEY,
+                  'Authorization': `Bearer ${SUPABASE_KEY}`,
+                  'Content-Type': 'application/json'
+                }
+              };
+
+              const req = https.request(options, (res) => {
+                let data = '';
+                res.on('data', chunk => data += chunk);
+                res.on('end', () => {
+                  try {
+                    const parsed = JSON.parse(data);
+                    if (Array.isArray(parsed)) {
+                      resolve({ table, data: parsed, count: parsed.length });
+                    } else {
+                      console.warn(`⚠️  Table ${table}: unexpected response`, data.substring(0, 100));
+                      resolve({ table, data: [], count: 0 });
+                    }
+                  } catch (e) {
+                    console.warn(`⚠️  Table ${table}: parse error`);
+                    resolve({ table, data: [], count: 0 });
+                  }
+                });
+              });
+
+              req.on('error', (e) => {
+                console.warn(`⚠️  Table ${table}: request error`, e.message);
+                resolve({ table, data: [], count: 0 });
+              });
+
+              req.end();
+            });
+          }
+
+          async function main() {
+            const date = new Date().toISOString().split('T')[0];
+            const backupDir = path.join('backups', date);
+            
+            fs.mkdirSync(backupDir, { recursive: true });
+
+            console.log(`📦 Starting backup for ${date}...`);
+            
+            const results = [];
+            let totalRecords = 0;
+
+            for (const table of TABLES) {
+              const result = await fetchTable(table);
+              
+              // حفظ كل جدول كملف JSON منفصل
+              const filePath = path.join(backupDir, `${table}.json`);
+              fs.writeFileSync(filePath, JSON.stringify(result.data, null, 2), 'utf8');
+              
+              results.push({ table, count: result.count });
+              totalRecords += result.count;
+              console.log(`  ✅ ${table}: ${result.count} records`);
+            }
+
+            // ملف ملخص النسخة الاحتياطية
+            const summary = {
+              backup_date: date,
+              backup_time: new Date().toISOString(),
+              total_records: totalRecords,
+              tables: results
+            };
+            
+            fs.writeFileSync(
+              path.join(backupDir, '_summary.json'),
+              JSON.stringify(summary, null, 2),
+              'utf8'
+            );
+
+            // تحديث ملف آخر نسخة احتياطية
+            fs.writeFileSync(
+              'backups/LATEST.json',
+              JSON.stringify(summary, null, 2),
+              'utf8'
+            );
+
+            console.log(`\n✅ Backup complete: ${totalRecords} total records saved to backups/${date}/`);
+          }
+
+          main().catch(console.error);
+          EOF
+
+      - name: Run backup
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_KEY: ${{ secrets.SUPABASE_KEY }}
+        run: node backup.js
+
+      - name: Commit backup to repository
+        run: |
+          DATE=$(date -u +"%Y-%m-%d")
+          DATETIME=$(date -u +"%Y-%m-%d %H:%M UTC")
+          
+          git config user.name "Ghazi OS Backup Bot"
+          git config user.email "backup@ghazi-os.com"
+          
+          git add backups/
+          
+          # تحقق إذا فيه تغييرات
+          if git diff --staged --quiet; then
+            echo "No changes to commit"
+          else
+            git commit -m "🗄️ Daily data backup - $DATETIME"
+            git push origin main
+            echo "✅ Backup committed and pushed"
+          fi
+
+      - name: Cleanup old backups (keep last 30 days)
+        run: |
+          DATE=$(date -u +"%Y-%m-%d")
+          
+          # احتفظ بآخر 30 يوم فقط
+          if [ -d "backups" ]; then
+            DIRS=$(ls -d backups/20*/ 2>/dev/null | sort | head -n -30)
+            if [ -n "$DIRS" ]; then
+              echo "Removing old backups:"
+              echo "$DIRS"
+              rm -rf $DIRS
+              
+              git config user.name "Ghazi OS Backup Bot"
+              git config user.email "backup@ghazi-os.com"
+              git add backups/
+              
+              if ! git diff --staged --quiet; then
+                git commit -m "🧹 Remove old backups (keeping last 30 days)"
+                git push origin main
+              fi
+            fi
+          fi
