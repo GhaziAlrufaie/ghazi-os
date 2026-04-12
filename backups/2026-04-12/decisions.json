@@ -1,47 +1,5 @@
 [
   {
-    "id": "d5",
-    "brand_id": "b4",
-    "project_id": "p8",
-    "title": "ذكرني — نموذج الاشتراك",
-    "context": "هل الاشتراك الشهري أم السنوي أفضل للمستخدم؟",
-    "options": [
-      {
-        "id": "o12",
-        "cons": [
-          "churn أعلى"
-        ],
-        "pros": [
-          "سهل التجربة"
-        ],
-        "title": "شهري ٩.٩٩",
-        "estimatedCost": 0,
-        "estimatedRevenue": 120
-      },
-      {
-        "id": "o13",
-        "cons": [
-          "حاجز دخول"
-        ],
-        "pros": [
-          "LTV أعلى",
-          "تدفق نقدي"
-        ],
-        "title": "سنوي ٧٩",
-        "estimatedCost": 0,
-        "estimatedRevenue": 79
-      }
-    ],
-    "chosen_option_id": null,
-    "status": "pending",
-    "impact": "medium",
-    "deadline": "2026-03-10",
-    "decided_at": null,
-    "decided_by": "غازي",
-    "notes": "السنوي يعطي قيمة أفضل",
-    "updated_at": "2026-04-04T20:34:58.460084+00:00"
-  },
-  {
     "id": "x1775078925966swrmx",
     "brand_id": "b1",
     "project_id": null,
@@ -121,6 +79,48 @@
     "decided_at": null,
     "decided_by": "غازي",
     "notes": "",
+    "updated_at": "2026-04-04T20:34:58.460084+00:00"
+  },
+  {
+    "id": "d5",
+    "brand_id": "b4",
+    "project_id": "p8",
+    "title": "ذكرني — نموذج الاشتراك",
+    "context": "هل الاشتراك الشهري أم السنوي أفضل للمستخدم؟",
+    "options": [
+      {
+        "id": "o12",
+        "cons": [
+          "churn أعلى"
+        ],
+        "pros": [
+          "سهل التجربة"
+        ],
+        "title": "شهري ٩.٩٩",
+        "estimatedCost": 0,
+        "estimatedRevenue": 120
+      },
+      {
+        "id": "o13",
+        "cons": [
+          "حاجز دخول"
+        ],
+        "pros": [
+          "LTV أعلى",
+          "تدفق نقدي"
+        ],
+        "title": "سنوي ٧٩",
+        "estimatedCost": 0,
+        "estimatedRevenue": 79
+      }
+    ],
+    "chosen_option_id": null,
+    "status": "pending",
+    "impact": "medium",
+    "deadline": "2026-03-10",
+    "decided_at": null,
+    "decided_by": "غازي",
+    "notes": "السنوي يعطي قيمة أفضل",
     "updated_at": "2026-04-04T20:34:58.460084+00:00"
   },
   {

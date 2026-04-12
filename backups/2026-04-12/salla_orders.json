@@ -901,5 +901,143 @@
     "brand": "غازي بوتيك",
     "created_at": "2026-04-11T12:10:13.711607+00:00",
     "updated_at": "2026-04-11T12:10:12.457+00:00"
+  },
+  {
+    "id": 10,
+    "salla_order_id": "1914449091",
+    "order_number": "1914449091",
+    "status": "pending",
+    "customer_name": "سعيدة",
+    "customer_phone": "+966503101811",
+    "customer_email": "s5392060@bg.moe.gov.sa",
+    "total_amount": 10.01,
+    "currency": "SAR",
+    "items": [
+      {
+        "id": 467603657,
+        "sku": "",
+        "name": "مجموعة ذكرني الكاملة",
+        "price": null,
+        "quantity": 1
+      }
+    ],
+    "raw_payload": {
+      "data": {
+        "id": 1914449091,
+        "tax": {
+          "amount": {
+            "amount": 1.31,
+            "currency": "SAR"
+          },
+          "percent": 15
+        },
+        "date": "2026-04-13 00:50:39",
+        "slug": 1,
+        "type": "Tax Invoice",
+        "uuid": "d839d21a-6e47-4a6b-bc5a-ae5dab6bfd55",
+        "items": [
+          {
+            "id": 467603657,
+            "sku": "",
+            "tax": {
+              "amount": {
+                "amount": 1.31,
+                "currency": "SAR"
+              },
+              "percent": 15
+            },
+            "name": "مجموعة ذكرني الكاملة",
+            "type": "product",
+            "price": {
+              "amount": 8.7,
+              "currency": "SAR"
+            },
+            "total": {
+              "amount": 10.01,
+              "currency": "SAR"
+            },
+            "item_id": 262415861,
+            "discount": {
+              "amount": 0,
+              "currency": "SAR"
+            },
+            "quantity": 1,
+            "product_id": 1625021953,
+            "description": ""
+          }
+        ],
+        "total": {
+          "amount": 10.01,
+          "currency": "SAR"
+        },
+        "company": null,
+        "qr_code": null,
+        "cod_cost": {
+          "amount": 0,
+          "taxable": true,
+          "currency": "SAR"
+        },
+        "customer": {
+          "id": 1578228687,
+          "email": "s5392060@bg.moe.gov.sa",
+          "avatar": "https://cdn.assets.salla.network/prod/admin/cp/assets/images/avatar_male.png",
+          "gender": "",
+          "mobile": 503101811,
+          "address": {
+            "city": "العقيق",
+            "country": "السعودية",
+            "district": "Al Matar",
+            "description": "الحارث بن زهير العكلي,5045,حي جفن,65921, BCDA5045، 5045 الحارث بن زهير العكلي، 9419، حي جفن، العقيق 65921، السعودية, العقيق,السعودية",
+            "postal_code": "65921",
+            "street_name": "الحارث بن زهير العكلي,5045",
+            "building_number": "5045",
+            "additional_number": "9419"
+          },
+          "birthday": null,
+          "currency": "SAR",
+          "last_name": "",
+          "first_name": "سعيدة",
+          "updated_at": {
+            "date": "2026-04-13 00:50:21.000000",
+            "timezone": "Asia/Riyadh",
+            "timezone_type": 3
+          },
+          "mobile_code": "+966",
+          "country_code": "SA"
+        },
+        "discount": {
+          "amount": 0,
+          "currency": "SAR"
+        },
+        "order_id": 920174265,
+        "sub_total": {
+          "amount": 8.7,
+          "currency": "SAR"
+        },
+        "order_options": {
+          "amount": 0,
+          "currency": "SAR"
+        },
+        "shipping_cost": {
+          "amount": 0,
+          "taxable": true,
+          "currency": "SAR"
+        },
+        "invoice_number": 334,
+        "payment_method": "mada",
+        "order_reference_id": 253913886,
+        "invoice_reference_id": null,
+        "shipping_cost_discount": {
+          "amount": 0,
+          "currency": "SAR"
+        }
+      },
+      "event": "invoice.created",
+      "merchant": 1020985111,
+      "created_at": "Mon Apr 13 2026 00:50:39 GMT+0300"
+    },
+    "brand": "غازي بوتيك",
+    "created_at": "2026-04-12T21:50:42.227217+00:00",
+    "updated_at": "2026-04-12T21:50:41+00:00"
   }
 ]

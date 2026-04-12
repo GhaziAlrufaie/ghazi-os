@@ -1,56 +1,5 @@
 [
   {
-    "id": "p1",
-    "brand_id": "b1",
-    "title": "مشروع عنايه مستوحى",
-    "description": "",
-    "status": "active",
-    "priority": "critical",
-    "start_date": "2026-03-01",
-    "target_date": "2026-04-30",
-    "progress": 0,
-    "tags": [
-      "عناية",
-      "منتج جديد"
-    ],
-    "sort_order": 0,
-    "updated_at": "2026-04-06T01:04:56.122476+00:00"
-  },
-  {
-    "id": "p2",
-    "brand_id": "b1",
-    "title": "حل واتساب للعملاء",
-    "description": "",
-    "status": "active",
-    "priority": "high",
-    "start_date": "2026-02-15",
-    "target_date": "2026-03-31",
-    "progress": 0,
-    "tags": [
-      "تسويق",
-      "واتساب"
-    ],
-    "sort_order": 0,
-    "updated_at": "2026-04-06T01:04:56.122476+00:00"
-  },
-  {
-    "id": "p3",
-    "brand_id": "b1",
-    "title": "بكج سدرة الفاخر",
-    "description": "",
-    "status": "planning",
-    "priority": "medium",
-    "start_date": "2026-04-01",
-    "target_date": "2026-05-15",
-    "progress": 0,
-    "tags": [
-      "هدايا",
-      "موسمي"
-    ],
-    "sort_order": 0,
-    "updated_at": "2026-04-06T01:04:56.122476+00:00"
-  },
-  {
     "id": "p4",
     "brand_id": "b2",
     "title": "مشروع بيع براند اودريد",
@@ -166,6 +115,57 @@
     "progress": 0,
     "tags": [],
     "sort_order": 2,
+    "updated_at": "2026-04-06T01:04:56.122476+00:00"
+  },
+  {
+    "id": "p1",
+    "brand_id": "b1",
+    "title": "مشروع عنايه مستوحى",
+    "description": "",
+    "status": "active",
+    "priority": "critical",
+    "start_date": "2026-03-01",
+    "target_date": "2026-04-30",
+    "progress": 0,
+    "tags": [
+      "عناية",
+      "منتج جديد"
+    ],
+    "sort_order": 0,
+    "updated_at": "2026-04-06T01:04:56.122476+00:00"
+  },
+  {
+    "id": "p2",
+    "brand_id": "b1",
+    "title": "حل واتساب للعملاء",
+    "description": "",
+    "status": "active",
+    "priority": "high",
+    "start_date": "2026-02-15",
+    "target_date": "2026-03-31",
+    "progress": 0,
+    "tags": [
+      "تسويق",
+      "واتساب"
+    ],
+    "sort_order": 0,
+    "updated_at": "2026-04-06T01:04:56.122476+00:00"
+  },
+  {
+    "id": "p3",
+    "brand_id": "b1",
+    "title": "بكج سدرة الفاخر",
+    "description": "",
+    "status": "planning",
+    "priority": "medium",
+    "start_date": "2026-04-01",
+    "target_date": "2026-05-15",
+    "progress": 0,
+    "tags": [
+      "هدايا",
+      "موسمي"
+    ],
+    "sort_order": 0,
     "updated_at": "2026-04-06T01:04:56.122476+00:00"
   }
 ]

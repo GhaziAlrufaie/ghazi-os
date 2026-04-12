@@ -1,5 +1,43 @@
 [
   {
+    "id": "emp3",
+    "name": "عمرو محسوب",
+    "role": "محاسب",
+    "brand_ids": [
+      "b1",
+      "b2",
+      "b3",
+      "b4",
+      "b5"
+    ],
+    "salary_type": "fixed",
+    "salary_amount": 1000,
+    "salary_unit": null,
+    "reports_to": null,
+    "status": "active",
+    "created_at": "2025-01-01",
+    "updated_at": "2026-04-04T20:34:59.839055+00:00"
+  },
+  {
+    "id": "emp4",
+    "name": "رحاب مصطفى",
+    "role": "حسابات + موارد بشرية",
+    "brand_ids": [
+      "b1",
+      "b2",
+      "b3",
+      "b4",
+      "b5"
+    ],
+    "salary_type": "fixed",
+    "salary_amount": 950,
+    "salary_unit": null,
+    "reports_to": "emp1",
+    "status": "active",
+    "created_at": "2025-01-01",
+    "updated_at": "2026-04-04T20:34:59.839055+00:00"
+  },
+  {
     "id": "emp5",
     "name": "ياسمين",
     "role": "دعم فني",
@@ -136,44 +174,6 @@
     "salary_amount": 2000,
     "salary_unit": null,
     "reports_to": null,
-    "status": "active",
-    "created_at": "2025-01-01",
-    "updated_at": "2026-04-04T20:34:59.839055+00:00"
-  },
-  {
-    "id": "emp3",
-    "name": "عمرو محسوب",
-    "role": "محاسب",
-    "brand_ids": [
-      "b1",
-      "b2",
-      "b3",
-      "b4",
-      "b5"
-    ],
-    "salary_type": "fixed",
-    "salary_amount": 1000,
-    "salary_unit": null,
-    "reports_to": null,
-    "status": "active",
-    "created_at": "2025-01-01",
-    "updated_at": "2026-04-04T20:34:59.839055+00:00"
-  },
-  {
-    "id": "emp4",
-    "name": "رحاب مصطفى",
-    "role": "حسابات + موارد بشرية",
-    "brand_ids": [
-      "b1",
-      "b2",
-      "b3",
-      "b4",
-      "b5"
-    ],
-    "salary_type": "fixed",
-    "salary_amount": 950,
-    "salary_unit": null,
-    "reports_to": "emp1",
     "status": "active",
     "created_at": "2025-01-01",
     "updated_at": "2026-04-04T20:34:59.839055+00:00"

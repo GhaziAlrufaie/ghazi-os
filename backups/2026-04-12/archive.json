@@ -587,54 +587,6 @@
     "updated_at": "2026-04-04T20:35:00.167253+00:00"
   },
   {
-    "id": "x1774700724089kzsn6",
-    "type": "task",
-    "reason": "manual",
-    "archived_at": "2026-03-28T12:25:24.089Z",
-    "archived_month": 2,
-    "archived_year": 2026,
-    "data": {
-      "id": "task-1774700573947",
-      "links": [],
-      "notes": "",
-      "title": "ا",
-      "status": "todo",
-      "brandId": "b1",
-      "dueDate": null,
-      "priority": "low",
-      "subtasks": [],
-      "checklist": [],
-      "createdAt": "2026-03-28",
-      "projectId": null,
-      "updatedAt": "2026-03-28"
-    },
-    "updated_at": "2026-04-04T20:35:00.167253+00:00"
-  },
-  {
-    "id": "x1774700728229652r2",
-    "type": "task",
-    "reason": "manual",
-    "archived_at": "2026-03-28T12:25:28.229Z",
-    "archived_month": 2,
-    "archived_year": 2026,
-    "data": {
-      "id": "task-1774700459136",
-      "links": [],
-      "notes": "",
-      "title": "رواتب",
-      "status": "todo",
-      "brandId": "b1",
-      "dueDate": null,
-      "priority": "medium",
-      "subtasks": [],
-      "checklist": [],
-      "createdAt": "2026-03-28",
-      "projectId": null,
-      "updatedAt": "2026-03-28"
-    },
-    "updated_at": "2026-04-04T20:35:00.167253+00:00"
-  },
-  {
     "id": "x17747627593042rqr6",
     "type": "decision",
     "reason": "manual",
@@ -780,6 +732,54 @@
       "createdAt": "2026-03-26",
       "projectId": null,
       "updatedAt": "2026-03-26"
+    },
+    "updated_at": "2026-04-04T20:35:00.167253+00:00"
+  },
+  {
+    "id": "x1774700724089kzsn6",
+    "type": "task",
+    "reason": "manual",
+    "archived_at": "2026-03-28T12:25:24.089Z",
+    "archived_month": 2,
+    "archived_year": 2026,
+    "data": {
+      "id": "task-1774700573947",
+      "links": [],
+      "notes": "",
+      "title": "ا",
+      "status": "todo",
+      "brandId": "b1",
+      "dueDate": null,
+      "priority": "low",
+      "subtasks": [],
+      "checklist": [],
+      "createdAt": "2026-03-28",
+      "projectId": null,
+      "updatedAt": "2026-03-28"
+    },
+    "updated_at": "2026-04-04T20:35:00.167253+00:00"
+  },
+  {
+    "id": "x1774700728229652r2",
+    "type": "task",
+    "reason": "manual",
+    "archived_at": "2026-03-28T12:25:28.229Z",
+    "archived_month": 2,
+    "archived_year": 2026,
+    "data": {
+      "id": "task-1774700459136",
+      "links": [],
+      "notes": "",
+      "title": "رواتب",
+      "status": "todo",
+      "brandId": "b1",
+      "dueDate": null,
+      "priority": "medium",
+      "subtasks": [],
+      "checklist": [],
+      "createdAt": "2026-03-28",
+      "projectId": null,
+      "updatedAt": "2026-03-28"
     },
     "updated_at": "2026-04-04T20:35:00.167253+00:00"
   },
