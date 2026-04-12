@@ -2387,6 +2387,14 @@ function applySupabaseData(results) {
       if (s.key === 'PERSONAL_CATS' && s.value) PERSONAL_CATS = s.value;
       if (s.key === 'FINANCE_TASKS' && s.value) FINANCE_TASKS = s.value;
       if (s.key === 'FINANCE_PROJECTS' && s.value) FINANCE_PROJECTS = s.value;
+      if (s.key === 'FIN_BUDGET') state.finBudget = parseInt(s.value) || 0;
+      if (s.key === 'FIN_COMPARE') state.finCompare = (s.value === 1 || s.value === '1' || s.value === true);
+      if (s.key === 'FIN_PREV' && s.value) state.finPrev = s.value;
+      if (s.key === 'FIN_SNAP_MONTH' && s.value) state.finSnapMonth = s.value;
+      if (s.key === 'BIZ_BUDGET') state.bizBudget = parseInt(s.value) || 0;
+      if (s.key === 'BIZ_COMPARE') state.bizCompare = (s.value === 1 || s.value === '1' || s.value === true);
+      if (s.key === 'BIZ_PREV' && s.value) state.bizPrev = s.value;
+      if (s.key === 'BIZ_SNAP_MONTH' && s.value) state.bizSnapMonth = s.value;
       if (s.key === 'FOCUS_STATE' && s.value) {
         var fs = s.value;
         if (fs.focusTaskId !== undefined) state.focusTaskId = fs.focusTaskId;
@@ -2906,7 +2914,15 @@ function syncAllToSupabase() {
     {key:'FINANCE_TASKS', value:FINANCE_TASKS},
     {key:'FINANCE_PROJECTS', value:FINANCE_PROJECTS},
     {key:'FOCUS_STATE', value:{focusTaskId:state.focusTaskId, focusProjectId:state.focusProjectId, focusType:state.focusType, focusTaskIndex:state.focusTaskIndex, focusDetailsOpen:state.focusDetailsOpen}},
-    {key:'APP_STATE', value:{archive:state.archive, useEasternNumerals:state.useEasternNumerals, dashPanels:state.dashPanels, dashOrder:state.dashOrder, activeMonth:state.activeMonth, activeYear:state.activeYear}}
+    {key:'APP_STATE', value:{archive:state.archive, useEasternNumerals:state.useEasternNumerals, dashPanels:state.dashPanels, dashOrder:state.dashOrder, activeMonth:state.activeMonth, activeYear:state.activeYear}},
+    {key:'FIN_BUDGET', value:state.finBudget || 0},
+    {key:'FIN_COMPARE', value:state.finCompare ? 1 : 0},
+    {key:'FIN_PREV', value:state.finPrev || null},
+    {key:'FIN_SNAP_MONTH', value:state.finSnapMonth || null},
+    {key:'BIZ_BUDGET', value:state.bizBudget || 0},
+    {key:'BIZ_COMPARE', value:state.bizCompare ? 1 : 0},
+    {key:'BIZ_PREV', value:state.bizPrev || null},
+    {key:'BIZ_SNAP_MONTH', value:state.bizSnapMonth || null}
   ];
   p.push(_sb.from('app_settings').upsert(settings, {onConflict:'key'}));
   
@@ -7253,10 +7269,9 @@ function expSecColor(idx) { return EXP_SEC_COLORS[idx % EXP_SEC_COLORS.length]; 
 // Build the full finance HTML
 function buildPersonalFinanceHtml() {
   var grandTotal = calcExpenseTotal();
-  var budget = parseInt(localStorage.getItem('ghazi-fin-budget') || '0') || 0;
-  var prevData = null;
-  try { prevData = JSON.parse(localStorage.getItem('ghazi-fin-prev') || 'null'); } catch(e) {}
-  var showCompare = localStorage.getItem('ghazi-fin-compare') === '1';
+  var budget = state.finBudget || 0;
+  var prevData = state.finPrev || null;
+  var showCompare = state.finCompare || false;
 
   // Nav tabs (same structure as kanban tabs)
   var tabsHtml = '<div class="brand-boards-nav">';
@@ -7449,10 +7464,9 @@ function bizExpSecColor(idx) { return BIZ_SEC_COLORS[idx % BIZ_SEC_COLORS.length
 // ── Build Biz Finance HTML ──
 function buildBizFinanceHtml() {
   var grandTotal = calcBizExpenseTotal();
-  var budget = parseInt(localStorage.getItem('ghazi-biz-budget') || '0') || 0;
-  var prevData = null;
-  try { prevData = JSON.parse(localStorage.getItem('ghazi-biz-prev') || 'null'); } catch(e) {}
-  var showCompare = localStorage.getItem('ghazi-biz-compare') === '1';
+  var budget = state.bizBudget || 0;
+  var prevData = state.bizPrev || null;
+  var showCompare = state.bizCompare || false;
   var html = '<div class="fin-wrap" style="margin-top:32px;border-top:2px solid var(--border);padding-top:24px">';
   // Budget input row
   html += '<div class="fin-budget-input-row">';
@@ -7581,20 +7595,19 @@ function buildBizFinanceHtml() {
 
 function finSaveBudget(val) {
   var n = parseInt(String(val).replace(/[^0-9]/g, '')) || 0;
-  localStorage.setItem('ghazi-fin-budget', String(n));
+  state.finBudget = n;
+  saveData();
   renderPersonal();
 }
 
 function finToggleCompare() {
-  var cur = localStorage.getItem('ghazi-fin-compare') === '1';
-  localStorage.setItem('ghazi-fin-compare', cur ? '0' : '1');
-  // Save current as prev if no prev data
-  if (!cur) {
-    var prev = localStorage.getItem('ghazi-fin-prev');
-    if (!prev) {
-      localStorage.setItem('ghazi-fin-prev', JSON.stringify(EXPENSES));
-    }
+  var cur = state.finCompare || false;
+  state.finCompare = !cur;
+  // Save current as prev if enabling compare and no prev data
+  if (!cur && !state.finPrev) {
+    state.finPrev = JSON.parse(JSON.stringify(EXPENSES));
   }
+  saveData();
   renderPersonal();
 }
 
@@ -7699,27 +7712,30 @@ function finDoAddSection() {
 // Auto-save monthly snapshot at end of month
 function finAutoSnapshot() {
   var now = new Date();
-  var lastSnap = localStorage.getItem('ghazi-fin-snap-month');
+  var lastSnap = state.finSnapMonth || null;
   var curMonth = now.getFullYear() + '-' + (now.getMonth() + 1);
   if (lastSnap !== curMonth) {
-    localStorage.setItem('ghazi-fin-prev', JSON.stringify(EXPENSES));
-    localStorage.setItem('ghazi-fin-snap-month', curMonth);
+    state.finPrev = JSON.parse(JSON.stringify(EXPENSES));
+    state.finSnapMonth = curMonth;
+    saveData();
   }
 }
-// Run snapshot check on load
-try { finAutoSnapshot(); } catch(e) {}
+// Run snapshot check on load (after data is loaded)
+function _runFinAutoSnapshot() { try { finAutoSnapshot(); } catch(e) {} }
 // ── Biz Finance action functions ──
 function bizSaveBudget(val) {
   var n = parseInt(String(val).replace(/[^0-9]/g, '')) || 0;
-  localStorage.setItem('ghazi-biz-budget', n);
+  state.bizBudget = n;
+  saveData();
   renderFinance();
 }
 function bizToggleCompare() {
-  var cur = localStorage.getItem('ghazi-biz-compare') === '1';
-  if (!cur) {
-    localStorage.setItem('ghazi-biz-prev', JSON.stringify(BIZ_EXPENSES));
+  var cur = state.bizCompare || false;
+  if (!cur && !state.bizPrev) {
+    state.bizPrev = JSON.parse(JSON.stringify(BIZ_EXPENSES));
   }
-  localStorage.setItem('ghazi-biz-compare', cur ? '0' : '1');
+  state.bizCompare = !cur;
+  saveData();
   renderFinance();
 }
 function bizRenameSection(secId, newName) {
@@ -7833,14 +7849,15 @@ function bizDoAddSection() {
 // Auto-save biz monthly snapshot
 function bizAutoSnapshot() {
   var now = new Date();
-  var lastSnap = localStorage.getItem('ghazi-biz-snap-month');
+  var lastSnap = state.bizSnapMonth || null;
   var curMonth = now.getFullYear() + '-' + (now.getMonth() + 1);
   if (lastSnap !== curMonth) {
-    localStorage.setItem('ghazi-biz-prev', JSON.stringify(BIZ_EXPENSES));
-    localStorage.setItem('ghazi-biz-snap-month', curMonth);
+    state.bizPrev = JSON.parse(JSON.stringify(BIZ_EXPENSES));
+    state.bizSnapMonth = curMonth;
+    saveData();
   }
 }
-try { bizAutoSnapshot(); } catch(e) {}
+function _runBizAutoSnapshot() { try { bizAutoSnapshot(); } catch(e) {} }
 
 
 function renderPersonal() {
@@ -10127,6 +10144,8 @@ var SESSION_KEY = 'ghazi_os_auth';
     loadFromSupabaseAndRefresh();
     // Run migration if needed (localStorage → Supabase)
     setTimeout(function() { migrateLocalToSupabase(); }, 3000);
+    // Run monthly snapshot checks after data is loaded
+    setTimeout(function() { _runFinAutoSnapshot(); _runBizAutoSnapshot(); }, 4000);
   }
 })();
 
