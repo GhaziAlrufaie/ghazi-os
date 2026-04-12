@@ -1,0 +1,32 @@
+name: 🔄 Apply Index Update
+on:
+  workflow_dispatch:
+
+jobs:
+  apply:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Apply index.html from commit 1d759cf
+        run: |
+          git config user.name "Ghazi OS Bot"
+          git config user.email "backup@ghazi-os.com"
+          
+          # جلب الـ commit المحدد
+          git fetch origin main
+          
+          # استخراج index.html من الـ commit المحدد
+          git checkout 1d759cf -- index.html
+          
+          # commit ورفع
+          git add index.html
+          git commit -m "feat: migrate finance budget/compare settings from localStorage to Supabase"
+          git push origin main
+          
+          echo "✅ تم تطبيق التحديث بنجاح"
