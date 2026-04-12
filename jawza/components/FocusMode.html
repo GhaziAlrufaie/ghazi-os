@@ -1,0 +1,498 @@
+<!DOCTYPE html>
+<!--
+  FocusMode.html — وضع التركيز الصباحي لنظام الجوزاء
+  يُدمج في index.html الرئيسي كـ section أو modal
+  
+  التصميم: داكن فاخر، ذهبي، عربي أصيل
+  الخط: Tajawal للعربي، مع لمسات ذهبية
+-->
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>الجوزاء — وضع التركيز</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    
+    :root {
+      --gold: #C9A84C;
+      --gold-light: #E8C97A;
+      --gold-dark: #8B6914;
+      --bg-deep: #0A0A0F;
+      --bg-card: #12121A;
+      --bg-card-hover: #1A1A25;
+      --text-primary: #F0EAD6;
+      --text-secondary: #8A8A9A;
+      --text-muted: #4A4A5A;
+      --accent-red: #C0392B;
+      --accent-green: #27AE60;
+      --accent-blue: #2980B9;
+      --border: rgba(201, 168, 76, 0.15);
+    }
+
+    body {
+      font-family: 'Tajawal', sans-serif;
+      background: var(--bg-deep);
+      color: var(--text-primary);
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    /* ===== FOCUS MODE SCREEN ===== */
+    .focus-screen {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      background: radial-gradient(ellipse at top center, #1A1A2E 0%, var(--bg-deep) 60%);
+      position: relative;
+      overflow: hidden;
+    }
+
+    /* خلفية نجوم */
+    .focus-screen::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background-image: 
+        radial-gradient(1px 1px at 20% 30%, rgba(201,168,76,0.3) 0%, transparent 100%),
+        radial-gradient(1px 1px at 80% 10%, rgba(201,168,76,0.2) 0%, transparent 100%),
+        radial-gradient(1px 1px at 50% 60%, rgba(201,168,76,0.15) 0%, transparent 100%);
+      pointer-events: none;
+    }
+
+    /* ===== HEADER ===== */
+    .focus-header {
+      padding: 24px 32px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid var(--border);
+      backdrop-filter: blur(10px);
+      position: relative;
+      z-index: 10;
+    }
+
+    .brand-logo {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .brand-icon {
+      width: 40px;
+      height: 40px;
+      background: linear-gradient(135deg, var(--gold-dark), var(--gold));
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 20px;
+    }
+
+    .brand-name {
+      font-size: 18px;
+      font-weight: 700;
+      color: var(--gold-light);
+      letter-spacing: 0.5px;
+    }
+
+    .brand-sub {
+      font-size: 11px;
+      color: var(--text-secondary);
+      font-weight: 300;
+    }
+
+    .header-date {
+      text-align: left;
+      font-size: 13px;
+      color: var(--text-secondary);
+    }
+
+    .header-date .hijri {
+      color: var(--gold);
+      font-size: 12px;
+    }
+
+    /* ===== MAIN METRIC ===== */
+    .main-metric-section {
+      padding: 48px 32px 32px;
+      text-align: center;
+      position: relative;
+      z-index: 5;
+    }
+
+    .metric-label {
+      font-size: 13px;
+      color: var(--text-secondary);
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      margin-bottom: 8px;
+    }
+
+    .metric-value {
+      font-size: 56px;
+      font-weight: 900;
+      color: var(--text-primary);
+      line-height: 1;
+      margin-bottom: 8px;
+    }
+
+    .metric-value span {
+      font-size: 24px;
+      color: var(--gold);
+      font-weight: 500;
+    }
+
+    .metric-trend {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 12px;
+      border-radius: 20px;
+      font-size: 13px;
+      font-weight: 500;
+    }
+
+    .metric-trend.up { background: rgba(39,174,96,0.15); color: #2ECC71; }
+    .metric-trend.down { background: rgba(192,57,43,0.15); color: #E74C3C; }
+    .metric-trend.stable { background: rgba(201,168,76,0.15); color: var(--gold); }
+
+    /* ===== SECONDARY METRICS ===== */
+    .secondary-metrics {
+      display: flex;
+      justify-content: center;
+      gap: 24px;
+      padding: 0 32px 32px;
+      flex-wrap: wrap;
+    }
+
+    .sec-metric {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 16px 24px;
+      text-align: center;
+      min-width: 120px;
+    }
+
+    .sec-metric-value {
+      font-size: 22px;
+      font-weight: 700;
+      color: var(--text-primary);
+    }
+
+    .sec-metric-label {
+      font-size: 11px;
+      color: var(--text-secondary);
+      margin-top: 4px;
+    }
+
+    /* ===== CASH INDICATOR ===== */
+    .cash-indicator {
+      margin: 0 32px 24px;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 16px 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+    }
+
+    .cash-level-bar {
+      flex: 1;
+      height: 6px;
+      background: var(--text-muted);
+      border-radius: 3px;
+      overflow: hidden;
+    }
+
+    .cash-level-fill {
+      height: 100%;
+      border-radius: 3px;
+      background: linear-gradient(90deg, var(--gold-dark), var(--gold-light));
+      transition: width 1s ease;
+    }
+
+    .cash-info {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+
+    .cash-label {
+      font-size: 11px;
+      color: var(--text-secondary);
+    }
+
+    .cash-value {
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--gold-light);
+    }
+
+    /* ===== MORNING BRIEFING ===== */
+    .morning-briefing {
+      margin: 0 32px 32px;
+      background: linear-gradient(135deg, rgba(201,168,76,0.08), rgba(201,168,76,0.02));
+      border: 1px solid rgba(201,168,76,0.2);
+      border-radius: 16px;
+      padding: 20px 24px;
+    }
+
+    .briefing-header {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 12px;
+    }
+
+    .briefing-icon {
+      font-size: 18px;
+    }
+
+    .briefing-title {
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--gold);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    .briefing-text {
+      font-size: 14px;
+      color: var(--text-primary);
+      line-height: 1.8;
+      white-space: pre-line;
+    }
+
+    /* ===== COMMANDS COUNT ===== */
+    .commands-preview {
+      margin: 0 32px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .commands-count {
+      font-size: 13px;
+      color: var(--text-secondary);
+    }
+
+    .commands-count strong {
+      color: var(--gold-light);
+      font-size: 16px;
+    }
+
+    .view-commands-btn {
+      background: linear-gradient(135deg, var(--gold-dark), var(--gold));
+      color: var(--bg-deep);
+      border: none;
+      padding: 10px 24px;
+      border-radius: 10px;
+      font-family: 'Tajawal', sans-serif;
+      font-size: 14px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.2s;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .view-commands-btn:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 4px 20px rgba(201,168,76,0.3);
+    }
+
+    /* ===== SEASON BADGE ===== */
+    .season-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: rgba(201,168,76,0.1);
+      border: 1px solid rgba(201,168,76,0.3);
+      color: var(--gold-light);
+      padding: 4px 12px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 500;
+    }
+  </style>
+</head>
+<body>
+
+<div class="focus-screen" id="focusScreen">
+  
+  <!-- Header -->
+  <div class="focus-header">
+    <div class="brand-logo">
+      <div class="brand-icon">🌿</div>
+      <div>
+        <div class="brand-name">بيت الجوزاء</div>
+        <div class="brand-sub">لوحة القيادة</div>
+      </div>
+    </div>
+    <div style="display:flex; align-items:center; gap:12px;">
+      <span class="season-badge" id="seasonBadge">🌙 رمضان المبارك</span>
+      <div class="header-date">
+        <div id="gregorianDate">الأحد، 13 أبريل 2026</div>
+        <div class="hijri" id="hijriDate">15 شوال 1447</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Main Metric -->
+  <div class="main-metric-section">
+    <div class="metric-label">إيراد اليوم</div>
+    <div class="metric-value" id="mainMetricValue">
+      4,800 <span>ريال</span>
+    </div>
+    <div class="metric-trend up" id="metricTrend">
+      ↑ 12% مقارنة بالأمس
+    </div>
+  </div>
+
+  <!-- Secondary Metrics -->
+  <div class="secondary-metrics" id="secondaryMetrics">
+    <div class="sec-metric">
+      <div class="sec-metric-value" id="ordersCount">11</div>
+      <div class="sec-metric-label">الطلبات</div>
+    </div>
+    <div class="sec-metric">
+      <div class="sec-metric-value" id="monthlyProgress">67%</div>
+      <div class="sec-metric-label">هدف الشهر</div>
+    </div>
+    <div class="sec-metric">
+      <div class="sec-metric-value" id="newCustomers">5</div>
+      <div class="sec-metric-label">عملاء جدد</div>
+    </div>
+    <div class="sec-metric">
+      <div class="sec-metric-value" id="abandonedCarts">4</div>
+      <div class="sec-metric-label">سلات متروكة</div>
+    </div>
+  </div>
+
+  <!-- Cash Indicator -->
+  <div class="cash-indicator">
+    <div class="cash-info">
+      <div class="cash-label">مستوى الكاش في السوق</div>
+      <div class="cash-value" id="cashLabel">💰 ذروة — يوم الراتب</div>
+    </div>
+    <div style="flex:1; max-width:200px;">
+      <div class="cash-level-bar">
+        <div class="cash-level-fill" id="cashBar" style="width: 90%"></div>
+      </div>
+    </div>
+    <div style="font-size:13px; color:var(--gold); font-weight:700;" id="cashScore">9/10</div>
+  </div>
+
+  <!-- Morning Briefing -->
+  <div class="morning-briefing">
+    <div class="briefing-header">
+      <span class="briefing-icon">🌅</span>
+      <span class="briefing-title">إحاطة الصباح</span>
+    </div>
+    <div class="briefing-text" id="morningBriefing">
+صباح الخير غازي 👋
+
+أمس: 4,800 ريال من 11 طلب.
+يوم الراتب — الكاش في ذروته اليوم.
+
+عندك 3 أوامر تحتاج قرار.
+    </div>
+  </div>
+
+  <!-- Commands Preview -->
+  <div class="commands-preview">
+    <div class="commands-count">
+      <strong id="commandsCount">3</strong> أوامر تنتظر قرارك
+    </div>
+    <button class="view-commands-btn" onclick="showCommandsPanel()">
+      ⚡ عرض الأوامر
+    </button>
+  </div>
+
+</div>
+
+<script>
+// تحديث البيانات من Supabase
+async function loadFocusData() {
+  const SUPABASE_URL = 'https://xitdxksliphmwonqjnsm.supabase.co';
+  const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhpdGR4a3NsaXBobXdvbnFqbnNtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzUwNDMwNDQsImV4cCI6MjA5MDYxOTA0NH0.lHb9ijDiZwblQMbZ6gcnIa9F2rkaePHgyFDa86-vomc';
+  
+  const today = new Date().toISOString().split('T')[0];
+  
+  try {
+    // جلب بيانات اليوم
+    const [salesResp, commandsResp, contextResp] = await Promise.all([
+      fetch(`${SUPABASE_URL}/rest/v1/jawza_sales_daily?date=eq.${today}&select=*`, {
+        headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` }
+      }),
+      fetch(`${SUPABASE_URL}/rest/v1/jawza_daily_commands?date=eq.${today}&status=eq.pending&select=*`, {
+        headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` }
+      }),
+      fetch(`${SUPABASE_URL}/rest/v1/jawza_saudi_context?date=eq.${today}&select=*`, {
+        headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` }
+      })
+    ]);
+    
+    const sales = await salesResp.json();
+    const commands = await commandsResp.json();
+    const context = await contextResp.json();
+    
+    if (sales.length > 0) {
+      const s = sales[0];
+      document.getElementById('mainMetricValue').innerHTML = 
+        `${s.total_revenue?.toLocaleString('ar-SA') || '0'} <span>ريال</span>`;
+      document.getElementById('ordersCount').textContent = s.total_orders || '0';
+      document.getElementById('newCustomers').textContent = s.new_customers || '0';
+      document.getElementById('abandonedCarts').textContent = s.abandoned_carts || '0';
+    }
+    
+    if (commands.length > 0) {
+      document.getElementById('commandsCount').textContent = commands.length;
+    }
+    
+    if (context.length > 0) {
+      const ctx = context[0];
+      const cashLabels = { peak: '💰 ذروة', high: '📈 عالي', normal: '📊 عادي', low: '🔋 منخفض' };
+      document.getElementById('cashLabel').textContent = `${cashLabels[ctx.cash_level] || '📊'} — ${ctx.notes || ''}`;
+      const score = ctx.season_urgency || 5;
+      document.getElementById('cashBar').style.width = `${score * 10}%`;
+      document.getElementById('cashScore').textContent = `${score}/10`;
+    }
+    
+  } catch (e) {
+    console.log('Using mock data:', e.message);
+  }
+}
+
+// تحديث التاريخ
+function updateDates() {
+  const now = new Date();
+  document.getElementById('gregorianDate').textContent = 
+    now.toLocaleDateString('ar-SA', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+  
+  try {
+    const hijri = new Intl.DateTimeFormat('ar-SA-u-ca-islamic', {
+      day: 'numeric', month: 'long', year: 'numeric'
+    }).format(now);
+    document.getElementById('hijriDate').textContent = hijri;
+  } catch(e) {}
+}
+
+function showCommandsPanel() {
+  // سيتم ربطه بـ CommandsPanel
+  alert('جاري تحميل الأوامر...');
+}
+
+// تشغيل
+updateDates();
+loadFocusData();
+</script>
+</body>
+</html>

@@ -1,0 +1,577 @@
+<!DOCTYPE html>
+<!--
+  CommandsPanel.html — بطاقات الأوامر اليومية لنظام الجوزاء
+  يُدمج في index.html الرئيسي
+-->
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <title>الجوزاء — الأوامر اليومية</title>
+  <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    :root {
+      --gold: #C9A84C; --gold-light: #E8C97A; --gold-dark: #8B6914;
+      --bg-deep: #0A0A0F; --bg-card: #12121A; --bg-card-hover: #1A1A25;
+      --text-primary: #F0EAD6; --text-secondary: #8A8A9A; --text-muted: #4A4A5A;
+      --urgent: #E74C3C; --opportunity: #27AE60; --warning: #F39C12;
+      --insight: #3498DB; --celebration: #9B59B6; --quiet: #7F8C8D;
+      --border: rgba(201,168,76,0.15);
+    }
+    body { font-family: 'Tajawal', sans-serif; background: var(--bg-deep); color: var(--text-primary); }
+
+    /* ===== COMMANDS PANEL ===== */
+    .commands-panel {
+      min-height: 100vh;
+      padding: 24px;
+      background: radial-gradient(ellipse at top, #12121E 0%, var(--bg-deep) 70%);
+    }
+
+    .panel-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 24px;
+    }
+
+    .panel-title {
+      font-size: 20px;
+      font-weight: 700;
+      color: var(--gold-light);
+    }
+
+    .panel-subtitle {
+      font-size: 12px;
+      color: var(--text-secondary);
+      margin-top: 2px;
+    }
+
+    .refresh-btn {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      color: var(--text-secondary);
+      padding: 8px 16px;
+      border-radius: 8px;
+      font-family: 'Tajawal', sans-serif;
+      font-size: 13px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .refresh-btn:hover { color: var(--gold); border-color: var(--gold); }
+
+    /* ===== COMMAND CARD ===== */
+    .command-card {
+      background: var(--bg-card);
+      border-radius: 16px;
+      margin-bottom: 16px;
+      overflow: hidden;
+      border: 1px solid var(--border);
+      transition: all 0.3s;
+      position: relative;
+    }
+
+    .command-card:hover {
+      border-color: rgba(201,168,76,0.3);
+      transform: translateY(-2px);
+      box-shadow: 0 8px 32px rgba(0,0,0,0.4);
+    }
+
+    .command-card.primary {
+      border-color: rgba(201,168,76,0.4);
+      background: linear-gradient(135deg, #15151F, #12121A);
+    }
+
+    /* شريط الأولوية */
+    .priority-bar {
+      height: 3px;
+      width: 100%;
+    }
+
+    .priority-urgent { background: var(--urgent); }
+    .priority-opportunity { background: var(--opportunity); }
+    .priority-warning { background: var(--warning); }
+    .priority-insight { background: var(--insight); }
+    .priority-celebration { background: var(--celebration); }
+    .priority-quiet { background: var(--quiet); }
+
+    .card-body { padding: 20px; }
+
+    /* Header الكارد */
+    .card-header {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 12px;
+    }
+
+    .card-category {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      padding: 3px 10px;
+      border-radius: 20px;
+    }
+
+    .cat-urgent { background: rgba(231,76,60,0.15); color: var(--urgent); }
+    .cat-opportunity { background: rgba(39,174,96,0.15); color: var(--opportunity); }
+    .cat-warning { background: rgba(243,156,18,0.15); color: var(--warning); }
+    .cat-insight { background: rgba(52,152,219,0.15); color: var(--insight); }
+    .cat-celebration { background: rgba(155,89,182,0.15); color: var(--celebration); }
+    .cat-quiet { background: rgba(127,140,141,0.15); color: var(--quiet); }
+
+    .urgency-badge {
+      font-size: 11px;
+      color: var(--text-muted);
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .urgency-dots {
+      display: flex;
+      gap: 2px;
+    }
+
+    .urgency-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--text-muted);
+    }
+
+    .urgency-dot.active { background: var(--gold); }
+
+    .card-title {
+      font-size: 17px;
+      font-weight: 700;
+      color: var(--text-primary);
+      line-height: 1.4;
+      margin-bottom: 8px;
+    }
+
+    .card-context {
+      font-size: 13px;
+      color: var(--text-secondary);
+      line-height: 1.7;
+      margin-bottom: 16px;
+    }
+
+    /* If/Then Section */
+    .if-then-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-bottom: 16px;
+    }
+
+    .if-box {
+      padding: 12px;
+      border-radius: 10px;
+      font-size: 12px;
+    }
+
+    .if-executed {
+      background: rgba(39,174,96,0.08);
+      border: 1px solid rgba(39,174,96,0.2);
+    }
+
+    .if-delayed {
+      background: rgba(231,76,60,0.08);
+      border: 1px solid rgba(231,76,60,0.2);
+    }
+
+    .if-label {
+      font-size: 10px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin-bottom: 4px;
+    }
+
+    .if-executed .if-label { color: var(--opportunity); }
+    .if-delayed .if-label { color: var(--urgent); }
+
+    .if-text { color: var(--text-secondary); line-height: 1.5; }
+
+    /* Saudi Context */
+    .saudi-context {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 11px;
+      color: var(--gold);
+      margin-bottom: 16px;
+      padding: 6px 10px;
+      background: rgba(201,168,76,0.06);
+      border-radius: 8px;
+      border: 1px solid rgba(201,168,76,0.1);
+    }
+
+    /* Magic Buttons */
+    .magic-buttons {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .magic-btn {
+      padding: 10px 18px;
+      border-radius: 10px;
+      font-family: 'Tajawal', sans-serif;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      border: none;
+      transition: all 0.2s;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .magic-btn.primary {
+      background: linear-gradient(135deg, var(--gold-dark), var(--gold));
+      color: var(--bg-deep);
+    }
+
+    .magic-btn.primary:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 4px 16px rgba(201,168,76,0.3);
+    }
+
+    .magic-btn.secondary {
+      background: var(--bg-card-hover);
+      color: var(--text-primary);
+      border: 1px solid var(--border);
+    }
+
+    .magic-btn.secondary:hover { border-color: var(--gold); color: var(--gold); }
+
+    .magic-btn.danger {
+      background: rgba(231,76,60,0.1);
+      color: var(--urgent);
+      border: 1px solid rgba(231,76,60,0.2);
+    }
+
+    /* Dismiss Button */
+    .card-actions {
+      display: flex;
+      justify-content: flex-end;
+      gap: 8px;
+      padding: 12px 20px;
+      border-top: 1px solid var(--border);
+    }
+
+    .dismiss-btn {
+      background: none;
+      border: none;
+      color: var(--text-muted);
+      font-family: 'Tajawal', sans-serif;
+      font-size: 12px;
+      cursor: pointer;
+      padding: 4px 8px;
+      border-radius: 6px;
+      transition: color 0.2s;
+    }
+
+    .dismiss-btn:hover { color: var(--text-secondary); }
+
+    /* Personal Note */
+    .personal-note {
+      font-size: 11px;
+      color: var(--text-muted);
+      font-style: italic;
+      margin-top: 8px;
+    }
+
+    /* Empty State */
+    .empty-state {
+      text-align: center;
+      padding: 60px 24px;
+      color: var(--text-secondary);
+    }
+
+    .empty-icon { font-size: 48px; margin-bottom: 16px; }
+    .empty-title { font-size: 18px; font-weight: 700; color: var(--text-primary); margin-bottom: 8px; }
+    .empty-sub { font-size: 14px; }
+
+    /* Loading */
+    .loading-state {
+      text-align: center;
+      padding: 40px;
+      color: var(--text-secondary);
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.4; }
+    }
+
+    .loading-dot {
+      display: inline-block;
+      width: 8px; height: 8px;
+      border-radius: 50%;
+      background: var(--gold);
+      margin: 0 3px;
+      animation: pulse 1.4s ease-in-out infinite;
+    }
+
+    .loading-dot:nth-child(2) { animation-delay: 0.2s; }
+    .loading-dot:nth-child(3) { animation-delay: 0.4s; }
+  </style>
+</head>
+<body>
+
+<div class="commands-panel">
+  
+  <div class="panel-header">
+    <div>
+      <div class="panel-title">⚡ أوامر اليوم</div>
+      <div class="panel-subtitle" id="commandsDate">الأحد، 13 أبريل 2026</div>
+    </div>
+    <button class="refresh-btn" onclick="loadCommands()">🔄 تحديث</button>
+  </div>
+
+  <div id="commandsList">
+    <div class="loading-state">
+      <span class="loading-dot"></span>
+      <span class="loading-dot"></span>
+      <span class="loading-dot"></span>
+      <div style="margin-top:12px; font-size:13px;">جاري تحميل الأوامر...</div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+const SUPABASE_URL = 'https://xitdxksliphmwonqjnsm.supabase.co';
+const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhpdGR4a3NsaXBobXdvbnFqbnNtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzUwNDMwNDQsImV4cCI6MjA5MDYxOTA0NH0.lHb9ijDiZwblQMbZ6gcnIa9F2rkaePHgyFDa86-vomc';
+
+const CATEGORY_CONFIG = {
+  urgent:      { icon: '🚨', label: 'عاجل',    class: 'cat-urgent',      barClass: 'priority-urgent' },
+  opportunity: { icon: '💡', label: 'فرصة',    class: 'cat-opportunity', barClass: 'priority-opportunity' },
+  warning:     { icon: '⚠️', label: 'تحذير',   class: 'cat-warning',     barClass: 'priority-warning' },
+  insight:     { icon: '🔍', label: 'رؤية',    class: 'cat-insight',     barClass: 'priority-insight' },
+  celebration: { icon: '🎉', label: 'إنجاز',   class: 'cat-celebration', barClass: 'priority-celebration' },
+  quiet:       { icon: '😌', label: 'هادئ',    class: 'cat-quiet',       barClass: 'priority-quiet' },
+};
+
+function renderUrgencyDots(urgency) {
+  let html = '<div class="urgency-dots">';
+  for (let i = 1; i <= 5; i++) {
+    html += `<div class="urgency-dot ${i <= Math.round(urgency/2) ? 'active' : ''}"></div>`;
+  }
+  return html + '</div>';
+}
+
+function renderCommand(cmd, index) {
+  const cat = CATEGORY_CONFIG[cmd.category] || CATEGORY_CONFIG.insight;
+  const buttons = cmd.magic_buttons || [];
+  const ifExec = cmd.if_executed || {};
+  const ifDelay = cmd.if_delayed || {};
+
+  return `
+    <div class="command-card ${cmd.is_primary ? 'primary' : ''}" id="cmd-${cmd.id || index}">
+      <div class="priority-bar ${cat.barClass}"></div>
+      <div class="card-body">
+        <div class="card-header">
+          <span class="card-category ${cat.class}">${cat.icon} ${cat.label}</span>
+          <div class="urgency-badge">
+            ${renderUrgencyDots(cmd.urgency || 5)}
+            <span>${cmd.urgency || 5}/10</span>
+          </div>
+        </div>
+        
+        <div class="card-title">${cmd.command_title || ''}</div>
+        <div class="card-context">${cmd.context || ''}</div>
+        
+        ${ifExec.expectedResult || ifDelay.consequence ? `
+        <div class="if-then-grid">
+          ${ifExec.expectedResult ? `
+          <div class="if-box if-executed">
+            <div class="if-label">✅ لو نفّذت</div>
+            <div class="if-text">${ifExec.timeframe ? `<strong>${ifExec.timeframe}:</strong> ` : ''}${ifExec.expectedResult}</div>
+          </div>` : ''}
+          ${ifDelay.consequence ? `
+          <div class="if-box if-delayed">
+            <div class="if-label">⏰ لو تأخرت</div>
+            <div class="if-text">${ifDelay.risk ? `<strong>خطر ${ifDelay.risk}:</strong> ` : ''}${ifDelay.consequence}</div>
+          </div>` : ''}
+        </div>` : ''}
+        
+        ${cmd.saudi_context_reason ? `
+        <div class="saudi-context">
+          🕌 ${cmd.saudi_context_reason}
+        </div>` : ''}
+        
+        <div class="magic-buttons">
+          ${buttons.map(btn => `
+            <button class="magic-btn ${btn.type || 'secondary'}" 
+              onclick="handleMagicButton('${btn.action}', '${cmd.id || index}')">
+              ${btn.label}
+            </button>
+          `).join('')}
+        </div>
+        
+        ${cmd.personal_note ? `<div class="personal-note">💭 ${cmd.personal_note}</div>` : ''}
+      </div>
+      
+      <div class="card-actions">
+        <button class="dismiss-btn" onclick="dismissCommand('${cmd.id || index}')">تجاهل</button>
+        <button class="dismiss-btn" onclick="snoozeCommand('${cmd.id || index}')">تأجيل</button>
+      </div>
+    </div>
+  `;
+}
+
+async function loadCommands() {
+  const today = new Date().toISOString().split('T')[0];
+  document.getElementById('commandsDate').textContent = 
+    new Date().toLocaleDateString('ar-SA', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+  
+  document.getElementById('commandsList').innerHTML = `
+    <div class="loading-state">
+      <span class="loading-dot"></span><span class="loading-dot"></span><span class="loading-dot"></span>
+      <div style="margin-top:12px; font-size:13px;">جاري تحميل الأوامر...</div>
+    </div>`;
+
+  try {
+    const resp = await fetch(
+      `${SUPABASE_URL}/rest/v1/jawza_daily_commands?date=eq.${today}&status=eq.pending&order=urgency.desc`,
+      { headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` } }
+    );
+    
+    const commands = await resp.json();
+    
+    if (!commands.length) {
+      // استخدام Mock Data
+      renderMockCommands();
+      return;
+    }
+    
+    document.getElementById('commandsList').innerHTML = 
+      commands.map((cmd, i) => renderCommand(cmd, i)).join('');
+      
+  } catch(e) {
+    renderMockCommands();
+  }
+}
+
+function renderMockCommands() {
+  const mockCommands = [
+    {
+      id: 'mock-1',
+      urgency: 9,
+      category: 'urgent',
+      is_primary: true,
+      command_title: 'استرجع 4 سلات متروكة بقيمة 1,500 ريال',
+      context: '4 عملاء أضافوا منتجات ولم يكملوا الشراء. الكاش في ذروته اليوم — فرصة ذهبية.',
+      if_executed: { timeframe: 'خلال ساعتين', expectedResult: 'استرجاع 30-40% = 525 ريال إضافية' },
+      if_delayed: { risk: 'عالي', consequence: 'العملاء يشترون من المنافس خلال 24 ساعة' },
+      saudi_context_reason: 'يوم الراتب — الكاش في ذروته',
+      magic_buttons: [
+        { label: '📱 أرسل رسالة واتساب', action: 'send_whatsapp', type: 'primary' },
+        { label: '🎁 أضف خصم 10%', action: 'add_discount', type: 'secondary' },
+      ],
+      personal_note: 'ابدأ بالسلات الأعلى قيمة',
+    },
+    {
+      id: 'mock-2',
+      urgency: 7,
+      category: 'opportunity',
+      is_primary: false,
+      command_title: 'موسم الشوال — أطلق محتوى ما بعد العيد',
+      context: 'الناس في مزاج الاحتفال والهدايا. أفضل وقت للنشر: 8-10 مساءً.',
+      if_executed: { timeframe: 'اليوم', expectedResult: 'زيادة 20-30% في التفاعل' },
+      if_delayed: { risk: 'متوسط', consequence: 'فوات موجة التفاعل الموسمية' },
+      saudi_context_reason: 'شوال — موسم الهدايا والزيارات',
+      magic_buttons: [
+        { label: '📸 أنشئ محتوى', action: 'create_content', type: 'primary' },
+        { label: '📅 جدوّل منشور', action: 'schedule_post', type: 'secondary' },
+      ],
+      personal_note: 'أفضل وقت للنشر: 8-10 مساءً',
+    },
+    {
+      id: 'mock-3',
+      urgency: 8,
+      category: 'warning',
+      is_primary: false,
+      command_title: '⚠️ عود الكمال يحتاج إعادة طلب — 5 وحدات فقط',
+      context: 'عود الكمال هو أعلى منتجاتك مبيعاً. 5 وحدات لن تكفي أسبوعاً.',
+      if_executed: { timeframe: 'اليوم', expectedResult: 'تجنب نفاد المخزون خلال الموسم' },
+      if_delayed: { risk: 'عالي', consequence: 'خسارة مبيعات بسبب نفاد المخزون' },
+      saudi_context_reason: 'الطلب مرتفع في موسم الشوال',
+      magic_buttons: [
+        { label: '📦 أرسل طلب للمورد', action: 'create_order', type: 'primary' },
+      ],
+      personal_note: 'اطلب 30 وحدة على الأقل',
+    },
+  ];
+  
+  document.getElementById('commandsList').innerHTML = 
+    mockCommands.map((cmd, i) => renderCommand(cmd, i)).join('');
+}
+
+async function handleMagicButton(action, cmdId) {
+  // سيتم ربطه بالأوامر الفعلية
+  const actions = {
+    send_whatsapp: 'سيتم فتح واتساب ويب لإرسال رسائل الاسترجاع',
+    add_discount: 'سيتم إضافة كوبون خصم في سلة',
+    create_content: 'سيتم فتح نموذج إنشاء المحتوى',
+    schedule_post: 'سيتم فتح جدولة المنشورات',
+    create_order: 'سيتم إنشاء طلب شراء للمورد',
+    send_whatsapp_recovery: 'سيتم إرسال رسائل استرجاع السلات',
+    add_recovery_discount: 'سيتم إضافة خصم لسلات الاسترجاع',
+  };
+  
+  alert(`🔧 الزر السحري: ${actions[action] || action}\n\nسيعمل بعد ربط سلة و Claude API`);
+}
+
+async function dismissCommand(cmdId) {
+  if (cmdId.startsWith('mock')) {
+    document.getElementById(`cmd-${cmdId}`)?.remove();
+    return;
+  }
+  
+  await fetch(`${SUPABASE_URL}/rest/v1/jawza_daily_commands?id=eq.${cmdId}`, {
+    method: 'PATCH',
+    headers: {
+      'apikey': SUPABASE_KEY,
+      'Authorization': `Bearer ${SUPABASE_KEY}`,
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({ status: 'dismissed', dismissed_at: new Date().toISOString() }),
+  });
+  
+  document.getElementById(`cmd-${cmdId}`)?.remove();
+}
+
+async function snoozeCommand(cmdId) {
+  if (cmdId.startsWith('mock')) {
+    document.getElementById(`cmd-${cmdId}`)?.style.setProperty('opacity', '0.4');
+    return;
+  }
+  
+  await fetch(`${SUPABASE_URL}/rest/v1/jawza_daily_commands?id=eq.${cmdId}`, {
+    method: 'PATCH',
+    headers: {
+      'apikey': SUPABASE_KEY,
+      'Authorization': `Bearer ${SUPABASE_KEY}`,
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({ status: 'snoozed' }),
+  });
+  
+  document.getElementById(`cmd-${cmdId}`)?.style.setProperty('opacity', '0.4');
+}
+
+// تشغيل
+loadCommands();
+</script>
+</body>
+</html>
