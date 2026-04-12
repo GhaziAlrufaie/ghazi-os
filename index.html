@@ -5234,11 +5234,11 @@ function renderBrandDetail() {
   }
   statsHtml += '</div>';
   var cols = [
-    {id:'ideas',       label:'💡 أفكار',      color:'var(--purple)'},
     {id:'todo',        label:'قيد الانتظار', color:'var(--accent)'},
     {id:'in_progress', label:'جاري التنفيذ',  color:'var(--gold)'},
     {id:'waiting',     label:'معلق',          color:'var(--warning)'},
-    {id:'done',        label:'تم',            color:'var(--success)'}
+    {id:'done',        label:'تم',            color:'var(--success)'},
+    {id:'ideas',       label:'💡 أفكار',      color:'var(--purple)'}
   ];
   var curBoard = {type:'brand', id:'all'};
   function buildBoardCols(tasks, boardId) {
@@ -5364,16 +5364,15 @@ function renderBrandDetail() {
   }
   statsHtml += '</div>';
 
-  // ── Kanban columns — RTL order: أفكار ← قيد الانتظار ← جاري ← معلق ← تم ──
+  // ── Kanban columns — RTL order: قيد الانتظار ← جاري ← معلق ← تم ← أفكار ──
   var cols = [
-    {id:'ideas',       label:'💡 أفكار',      color:'var(--purple)'},
     {id:'todo',        label:'قيد الانتظار', color:'var(--accent)'},
     {id:'in_progress', label:'جاري التنفيذ',  color:'var(--gold)'},
     {id:'waiting',     label:'معلق',          color:'var(--warning)'},
-    {id:'done',        label:'تم',            color:'var(--success)'}
+    {id:'done',        label:'تم',            color:'var(--success)'},
+    {id:'ideas',       label:'💡 أفكار',      color:'var(--purple)'}
   ];
-
-  // لوحة واحدة موحدة لجميع مهام البراند
+  // لوحة واحدة موحدة لجميع مهام البراندد
   var curBoard = {type:'brand', id:'all'};
 
   function buildBoardCols(tasks, boardId) {
