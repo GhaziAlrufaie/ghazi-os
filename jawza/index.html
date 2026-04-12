@@ -1,0 +1,1049 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>الجوزاء — المدير التنفيذي الافتراضي</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@300;400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    /* ==============================
+       DESIGN SYSTEM — الجوزاء
+       خلفية داكنة #0a1628 + ذهبي #C9963B
+       Typography: IBM Plex Sans Arabic
+       ============================== */
+    :root {
+      --bg-deep:    #0a1628;
+      --bg-card:    #0f1e38;
+      --bg-hover:   #142240;
+      --gold:       #C9963B;
+      --gold-light: #E8C068;
+      --gold-dim:   rgba(201,150,59,0.15);
+      --white:      #ffffff;
+      --white-80:   rgba(255,255,255,0.80);
+      --white-50:   rgba(255,255,255,0.50);
+      --white-20:   rgba(255,255,255,0.20);
+      --white-08:   rgba(255,255,255,0.08);
+      --mono:       'IBM Plex Mono', monospace;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'IBM Plex Sans Arabic', sans-serif;
+      background: var(--bg-deep);
+      color: var(--white);
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    /* ── TOAST ── */
+    #toast {
+      position: fixed;
+      top: 1.5rem;
+      left: 50%;
+      transform: translateX(-50%) translateY(-80px);
+      background: #10b981;
+      color: #fff;
+      padding: .7rem 1.6rem;
+      border-radius: 2rem;
+      font-size: .95rem;
+      font-weight: 600;
+      z-index: 9999;
+      transition: transform .35s cubic-bezier(.34,1.56,.64,1);
+      white-space: nowrap;
+      box-shadow: 0 8px 32px rgba(16,185,129,.4);
+    }
+    #toast.show { transform: translateX(-50%) translateY(0); }
+
+    /* ── HEADER ── */
+    header {
+      border-bottom: 1px solid var(--white-08);
+      padding: 1rem 2rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: sticky;
+      top: 0;
+      background: rgba(10,22,40,.92);
+      backdrop-filter: blur(12px);
+      z-index: 100;
+    }
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: .75rem;
+    }
+    .logo-icon {
+      width: 36px; height: 36px;
+      background: var(--gold-dim);
+      border: 1px solid var(--gold);
+      border-radius: 10px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.1rem;
+    }
+    .logo-text { font-size: 1.1rem; font-weight: 700; color: var(--gold); }
+    .logo-sub  { font-size: .75rem; color: var(--white-50); margin-top: 1px; }
+
+    .header-meta {
+      display: flex;
+      align-items: center;
+      gap: 1.5rem;
+    }
+    .ghost-mode {
+      display: flex; align-items: center; gap: .5rem;
+      font-size: .8rem; color: var(--white-50);
+      padding: .35rem .9rem;
+      border: 1px solid var(--white-20);
+      border-radius: 2rem;
+    }
+    .ghost-dot {
+      width: 7px; height: 7px; border-radius: 50%;
+      background: var(--gold);
+      animation: pulse 2s infinite;
+    }
+    @keyframes pulse {
+      0%,100% { opacity:1; transform:scale(1); }
+      50%      { opacity:.4; transform:scale(1.4); }
+    }
+
+    /* ── CASH WIDGET ── */
+    .cash-widget {
+      background: var(--bg-card);
+      border: 1px solid var(--white-08);
+      border-radius: 14px;
+      padding: 1.2rem 1.5rem;
+      margin: 1.5rem 2rem;
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr auto;
+      gap: 1.5rem;
+      align-items: center;
+    }
+    .cash-item { display: flex; flex-direction: column; gap: .4rem; }
+    .cash-label { font-size: .75rem; color: var(--white-50); }
+    .cash-value { font-size: .95rem; font-weight: 600; color: var(--white); }
+    .cash-bar {
+      height: 5px;
+      background: var(--white-08);
+      border-radius: 3px;
+      overflow: hidden;
+    }
+    .cash-fill {
+      height: 100%;
+      border-radius: 3px;
+      transition: width .8s ease;
+    }
+    .cash-fill.high   { background: #10b981; }
+    .cash-fill.medium { background: var(--gold); }
+    .cash-fill.low    { background: #ef4444; }
+    .cash-alert {
+      background: rgba(201,150,59,.12);
+      border: 1px solid rgba(201,150,59,.3);
+      border-radius: 10px;
+      padding: .6rem 1rem;
+      font-size: .8rem;
+      color: var(--gold-light);
+      text-align: center;
+      line-height: 1.5;
+    }
+
+    /* ── FOCUS MODE ── */
+    #focus-mode {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(10,22,40,.97);
+      z-index: 200;
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+      gap: 2rem;
+      padding: 2rem;
+    }
+    #focus-mode.active { display: flex; }
+    .focus-header { text-align: center; }
+    .focus-greeting { font-size: 2rem; font-weight: 700; color: var(--gold); margin-bottom: .5rem; }
+    .focus-date { font-size: 1rem; color: var(--white-50); }
+    .focus-divider { width: 100%; max-width: 600px; height: 1px; background: var(--white-08); }
+    .focus-label { font-size: .85rem; color: var(--white-50); text-align: center; letter-spacing: .05em; }
+    .focus-card-wrap { width: 100%; max-width: 600px; }
+    .focus-actions {
+      display: flex; gap: 1rem;
+    }
+    .btn-focus-done {
+      background: #10b981;
+      color: #fff;
+      border: none;
+      padding: .8rem 2rem;
+      border-radius: 10px;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      font-family: inherit;
+      transition: transform .15s, box-shadow .15s;
+    }
+    .btn-focus-done:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(16,185,129,.4); }
+    .btn-focus-more {
+      background: var(--white-08);
+      color: var(--white-80);
+      border: 1px solid var(--white-20);
+      padding: .8rem 2rem;
+      border-radius: 10px;
+      font-size: 1rem;
+      cursor: pointer;
+      font-family: inherit;
+      transition: background .15s;
+    }
+    .btn-focus-more:hover { background: var(--white-20); }
+
+    /* ── MAIN LAYOUT ── */
+    .main-wrap {
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 0 1.5rem 4rem;
+    }
+
+    /* ── SECTION HEADER ── */
+    .section-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin: 2rem 0 1.2rem;
+    }
+    .section-title {
+      font-size: 1rem;
+      font-weight: 600;
+      color: var(--white-50);
+      letter-spacing: .08em;
+      text-transform: uppercase;
+    }
+    .section-count {
+      font-size: .8rem;
+      color: var(--white-50);
+      background: var(--white-08);
+      padding: .2rem .7rem;
+      border-radius: 2rem;
+    }
+
+    /* ── COMMAND CARD ── */
+    .cmd-card {
+      border-radius: 16px;
+      border: 1px solid;
+      padding: 1.5rem;
+      margin-bottom: 1rem;
+      position: relative;
+      overflow: hidden;
+      animation: slideIn .4s cubic-bezier(.34,1.2,.64,1) both;
+      transition: transform .2s, box-shadow .2s;
+    }
+    .cmd-card:hover { transform: translateY(-2px); }
+
+    @keyframes slideIn {
+      from { opacity:0; transform: translateX(30px); }
+      to   { opacity:1; transform: translateX(0); }
+    }
+
+    /* glow on entry */
+    .cmd-card::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      border-radius: 16px;
+      opacity: 0;
+      transition: opacity 1.5s;
+      pointer-events: none;
+    }
+    .cmd-card.glow::before { opacity: 1; }
+
+    /* card types */
+    .card-urgent      { background: rgba(239,68,68,.08);   border-color: #ef4444; }
+    .card-urgent::before { box-shadow: 0 0 30px rgba(239,68,68,.2) inset; }
+    .card-opportunity { background: rgba(245,158,11,.08);  border-color: #f59e0b; }
+    .card-opportunity::before { box-shadow: 0 0 30px rgba(245,158,11,.2) inset; }
+    .card-planning    { background: rgba(16,185,129,.06);  border-color: #10b981; }
+    .card-celebration { background: rgba(201,150,59,.12);  border-color: #C9963B; }
+    .card-warning     { background: rgba(249,115,22,.08);  border-color: #f97316; }
+    .card-waiting     { background: rgba(148,163,184,.05); border-color: #64748b; }
+    .card-info        { background: rgba(59,130,246,.06);  border-color: #3b82f6; }
+
+    /* card header row */
+    .card-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 1rem;
+    }
+    .card-badge {
+      display: flex; align-items: center; gap: .5rem;
+      font-size: .8rem; font-weight: 600;
+    }
+    .badge-dot { font-size: 1rem; }
+    .badge-urgency {
+      font-family: var(--mono);
+      font-size: .75rem;
+      padding: .2rem .6rem;
+      border-radius: 2rem;
+      background: var(--white-08);
+      color: var(--white-50);
+    }
+    .card-timing {
+      font-size: .78rem;
+      color: var(--white-50);
+      display: flex; align-items: center; gap: .3rem;
+    }
+
+    /* title */
+    .card-title {
+      font-size: 1.2rem;
+      font-weight: 700;
+      color: var(--white);
+      line-height: 1.5;
+      margin-bottom: .8rem;
+    }
+
+    /* context */
+    .card-context {
+      font-size: .9rem;
+      color: var(--white-80);
+      line-height: 1.7;
+      margin-bottom: 1rem;
+    }
+    .card-context .num {
+      font-family: var(--mono);
+      color: var(--gold);
+      font-weight: 500;
+    }
+
+    /* divider */
+    .card-divider {
+      height: 1px;
+      background: var(--white-08);
+      margin: 1rem 0;
+    }
+
+    /* outcome rows */
+    .card-outcomes { display: flex; flex-direction: column; gap: .5rem; margin-bottom: 1rem; }
+    .outcome-row { display: flex; gap: .6rem; font-size: .88rem; line-height: 1.5; }
+    .outcome-icon { flex-shrink: 0; margin-top: .1rem; }
+    .outcome-if   { color: #6ee7b7; }
+    .outcome-else { color: #fca5a5; }
+
+    /* saudi context tag */
+    .saudi-tag {
+      display: inline-flex; align-items: center; gap: .4rem;
+      font-size: .78rem;
+      background: rgba(201,150,59,.1);
+      border: 1px solid rgba(201,150,59,.25);
+      color: var(--gold-light);
+      padding: .3rem .8rem;
+      border-radius: 2rem;
+      margin-bottom: 1rem;
+    }
+
+    /* action buttons */
+    .card-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: .6rem;
+      margin-top: .5rem;
+    }
+    .btn {
+      display: inline-flex; align-items: center; gap: .4rem;
+      padding: .55rem 1.1rem;
+      border-radius: 9px;
+      font-size: .85rem;
+      font-weight: 600;
+      cursor: pointer;
+      border: none;
+      font-family: inherit;
+      transition: transform .15s, box-shadow .15s, opacity .15s;
+    }
+    .btn:hover { transform: translateY(-1px); }
+    .btn:active { transform: translateY(0) scale(.97); }
+
+    .btn-magic {
+      background: var(--gold);
+      color: #0a1628;
+    }
+    .btn-magic:hover { box-shadow: 0 6px 20px rgba(201,150,59,.5); }
+
+    .btn-magic-2 {
+      background: rgba(201,150,59,.15);
+      color: var(--gold-light);
+      border: 1px solid rgba(201,150,59,.3);
+    }
+    .btn-magic-2:hover { background: rgba(201,150,59,.25); }
+
+    .btn-done {
+      background: rgba(16,185,129,.15);
+      color: #6ee7b7;
+      border: 1px solid rgba(16,185,129,.3);
+    }
+    .btn-done:hover { background: rgba(16,185,129,.25); }
+
+    .btn-snooze {
+      background: var(--white-08);
+      color: var(--white-50);
+      border: 1px solid var(--white-20);
+    }
+    .btn-snooze:hover { background: var(--white-20); }
+
+    .btn-remind {
+      background: rgba(59,130,246,.12);
+      color: #93c5fd;
+      border: 1px solid rgba(59,130,246,.25);
+    }
+
+    /* expand section */
+    .card-expand {
+      margin-top: 1rem;
+      border-top: 1px solid var(--white-08);
+      padding-top: .8rem;
+    }
+    .expand-toggle {
+      background: none;
+      border: none;
+      color: var(--white-50);
+      font-size: .82rem;
+      cursor: pointer;
+      font-family: inherit;
+      display: flex; align-items: center; gap: .4rem;
+      padding: 0;
+      transition: color .15s;
+    }
+    .expand-toggle:hover { color: var(--white-80); }
+    .expand-content {
+      display: none;
+      margin-top: .8rem;
+      font-size: .85rem;
+      color: var(--white-50);
+      line-height: 1.7;
+      background: var(--white-08);
+      border-radius: 8px;
+      padding: .8rem 1rem;
+    }
+    .expand-content.open { display: block; }
+
+    /* executed/snoozed states */
+    .cmd-card.executed {
+      animation: shrinkOut .5s ease forwards;
+    }
+    .cmd-card.snoozed {
+      opacity: .45;
+      transform: scale(.98);
+      transition: opacity .4s, transform .4s;
+    }
+    @keyframes shake {
+      0%,100% { transform: translateX(0); }
+      20%      { transform: translateX(-6px); }
+      40%      { transform: translateX(6px); }
+      60%      { transform: translateX(-4px); }
+      80%      { transform: translateX(4px); }
+    }
+    @keyframes shrinkOut {
+      to { opacity:0; transform: scale(.9); max-height:0; padding:0; margin:0; overflow:hidden; }
+    }
+
+    /* ── TOP CONTROLS ── */
+    .top-controls {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      margin: 1.5rem 0 0;
+    }
+    .btn-focus-open {
+      background: var(--gold-dim);
+      border: 1px solid rgba(201,150,59,.4);
+      color: var(--gold);
+      padding: .55rem 1.2rem;
+      border-radius: 9px;
+      font-size: .88rem;
+      font-weight: 600;
+      cursor: pointer;
+      font-family: inherit;
+      display: flex; align-items: center; gap: .5rem;
+      transition: background .15s;
+    }
+    .btn-focus-open:hover { background: rgba(201,150,59,.2); }
+
+    .filter-tabs {
+      display: flex;
+      gap: .5rem;
+      flex-wrap: wrap;
+    }
+    .filter-tab {
+      background: var(--white-08);
+      border: 1px solid var(--white-20);
+      color: var(--white-50);
+      padding: .4rem .9rem;
+      border-radius: 2rem;
+      font-size: .8rem;
+      cursor: pointer;
+      font-family: inherit;
+      transition: all .15s;
+    }
+    .filter-tab.active, .filter-tab:hover {
+      background: var(--gold-dim);
+      border-color: rgba(201,150,59,.4);
+      color: var(--gold);
+    }
+
+    /* ── SCROLLBAR ── */
+    ::-webkit-scrollbar { width: 6px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: var(--white-20); border-radius: 3px; }
+
+    /* ── RESPONSIVE ── */
+    @media (max-width: 600px) {
+      .cash-widget { grid-template-columns: 1fr 1fr; }
+      .card-title { font-size: 1rem; }
+      header { padding: .8rem 1rem; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- TOAST -->
+<div id="toast">✓ تم النسخ</div>
+
+<!-- FOCUS MODE OVERLAY -->
+<div id="focus-mode">
+  <div class="focus-header">
+    <div class="focus-greeting" id="focus-greeting">صباح الخير يا غازي ☀️</div>
+    <div class="focus-date" id="focus-date"></div>
+  </div>
+  <div class="focus-divider"></div>
+  <div class="focus-label">⬇ قرار اليوم الذي لا يُؤجّل</div>
+  <div class="focus-card-wrap" id="focus-card-wrap"></div>
+  <div class="focus-actions">
+    <button class="btn-focus-done" onclick="closeFocus(true)">نفّذت ✅</button>
+    <button class="btn-focus-more" onclick="closeFocus(false)">عرض باقي القرارات ←</button>
+  </div>
+</div>
+
+<!-- HEADER -->
+<header>
+  <div class="logo">
+    <div class="logo-icon">🌙</div>
+    <div>
+      <div class="logo-text">الجوزاء</div>
+      <div class="logo-sub">المدير التنفيذي الافتراضي — بيت الجوزاء</div>
+    </div>
+  </div>
+  <div class="header-meta">
+    <div class="ghost-mode">
+      <div class="ghost-dot"></div>
+      الجوزاء يراقب...
+    </div>
+  </div>
+</header>
+
+<!-- CASH WIDGET -->
+<div style="max-width:900px;margin:0 auto;padding:0 1.5rem;">
+  <div class="cash-widget">
+    <div class="cash-item">
+      <div class="cash-label">💰 الرواتب</div>
+      <div class="cash-value">بعد <span style="color:var(--gold);font-family:var(--mono)">3</span> أيام</div>
+      <div class="cash-bar"><div class="cash-fill high" style="width:85%"></div></div>
+    </div>
+    <div class="cash-item">
+      <div class="cash-label">🏦 حساب المواطن</div>
+      <div class="cash-value">بعد <span style="color:var(--gold);font-family:var(--mono)">15</span> يوم</div>
+      <div class="cash-bar"><div class="cash-fill medium" style="width:40%"></div></div>
+    </div>
+    <div class="cash-item">
+      <div class="cash-label">🌙 العيد</div>
+      <div class="cash-value">بعد <span style="color:var(--gold);font-family:var(--mono)">12</span> يوم</div>
+      <div class="cash-bar"><div class="cash-fill high" style="width:70%"></div></div>
+    </div>
+    <div class="cash-alert">
+      🔥 فرصة ذهبية<br>
+      الرواتب + العيد = ذروة الإنفاق
+    </div>
+  </div>
+</div>
+
+<!-- MAIN -->
+<div class="main-wrap">
+
+  <!-- TOP CONTROLS -->
+  <div class="top-controls">
+    <button class="btn-focus-open" onclick="openFocus()">☀️ وضع التركيز الصباحي</button>
+    <div class="filter-tabs">
+      <button class="filter-tab active" onclick="filterCards('all', this)">الكل</button>
+      <button class="filter-tab" onclick="filterCards('urgent', this)">🔴 عاجل</button>
+      <button class="filter-tab" onclick="filterCards('opportunity', this)">🟡 فرصة</button>
+      <button class="filter-tab" onclick="filterCards('planning', this)">🟢 تخطيط</button>
+      <button class="filter-tab" onclick="filterCards('waiting', this)">⚪ انتظار</button>
+    </div>
+  </div>
+
+  <div class="section-header">
+    <div class="section-title">أوامر الجوزاء اليوم</div>
+    <div class="section-count" id="cards-count">15 قرار</div>
+  </div>
+
+  <!-- CARDS CONTAINER -->
+  <div id="cards-container"></div>
+
+</div>
+
+<script>
+/* ==============================
+   MOCK DATA — 15 سيناريو
+   ============================== */
+const scenarios = [
+  {
+    id: 1,
+    type: 'urgent',
+    badge: '🔴 عاجل',
+    urgency: '9/10',
+    timing: 'اليوم',
+    title: 'يا غازي، اطلب ٥٠٠ وحدة من "إصدار خاص القديم" الآن',
+    context: 'يبيع <span class="num">٣ قطع/يوم</span>. المخزون <span class="num">١٥ قطعة = ٥ أيام</span>. المصنع يحتاج <span class="num">٧ أيام</span>. الفجوة يومين. رمضان بعد <span class="num">٣ أسابيع</span> = ذروة المبيعات.',
+    ifExecuted: 'ربح متوقع <span class="num">١٩,٢٥٠ ريال</span> خلال ٣٣ يوم — مخزون جاهز قبل ذروة رمضان',
+    ifDelayed: 'نفاد مخزون + خسارة <span class="num">٦,٠٠٠ ريال</span> مبيعات فائتة + عميلات يروحون للمنافس',
+    saudiTag: '🇸🇦 الرواتب بعد ٣ أيام + رمضان قريب',
+    buttons: [
+      { label: '⚡ نسخ رسالة المصنع', type: 'magic', text: 'السلام عليكم ورحمة الله وبركاته أستاذ محمد،\n\nأحتاج دفعة جديدة عاجلة:\n• المنتج: بخاخ "إصدار خاص القديم"\n• الكمية: ٥٠٠ وحدة\n• المواصفات: نفس السابقة (تركيز ٢٠%، حجم ١٠٠ مل)\n• موعد التسليم المطلوب: خلال ٧ أيام\n• الدفع: نفس الاتفاق السابق\n\nالموسم على الأبواب والمخزون قارب ينفد.\nالرجاء التأكيد وإعطائي تاريخ التسليم.\n\nشاكر تعاونكم،\nغازي' },
+      { label: '📞 اتصل بأبو محمد', type: 'magic-2', text: null },
+      { label: '✅ نفّذت', type: 'done' },
+      { label: '💤 ذكرني بكرة', type: 'snooze' }
+    ],
+    why: 'قاعدة الجوزاء: المخزون يكفي ٥ أيام، المصنع يحتاج ٧. الفجوة يومين تعني نفاد مؤكد قبل وصول الشحنة. رمضان يضاعف الطلب ٣ مرات. القرار واضح.'
+  },
+  {
+    id: 2,
+    type: 'opportunity',
+    badge: '🟡 فرصة',
+    urgency: '8/10',
+    timing: 'هذا الأسبوع',
+    title: 'يا غازي، "التوباكو المستوحى" انفجر — ضاعف استثمارك فيه',
+    context: 'من <span class="num">٥ قطع/أسبوع</span> إلى <span class="num">١٨ قطعة (+٢٦٠%)</span>. المخزون <span class="num">٤٠ قطعة = أسبوعين</span> بالسرعة الحالية. هامش الربح <span class="num">٥٥%</span> (الأعلى في محفظتك).',
+    ifExecuted: 'زيادة مخزون ٣٠٠ وحدة = ربح <span class="num">٢٤,٧٥٠ ريال</span> — محتوى سناب يضخّم الترند',
+    ifDelayed: 'نفاد خلال <span class="num">١٢ يوم</span> — تخسر الموجة والمنتج يبرد',
+    saudiTag: '🇸🇦 الموجة في بدايتها — اركبها الآن',
+    buttons: [
+      { label: '⚡ نسخ رسالة المصنع', type: 'magic', text: 'هاي أم كحيلان 🌸\n\nمحتاج محتوى سناب لعطر التوباكو المستوحى، عندنا موجة قوية عليه هذا الأسبوع.\n\nالأفكار:\n1. فيديو ASMR — رش العطر مع خلفية شتوية\n2. "اللي جرّبه ما ودّه يتركه" — reviews العميلات الأخيرات\n3. مقارنة غير مباشرة مع الأصلي\n\nالمطلوب: ٣ ريلز + ٥ ستوريز خلال أسبوع.\nالميزانية: مفتوحة لأن المنتج يستحق.\n\nغازي 🤎' },
+      { label: '⚡ نسخ بريف محتوى سناب', type: 'magic-2', text: '🌿 عطر التوباكو المستوحى\n\nالعطر اللي ما تقدر تتركه بعد أول رشة ✨\n\nدفء التوباكو + عمق الخشب\nثبات يدوم ٨+ ساعات\n\nاطلبيه الآن — الكمية محدودة\n🔗 [رابط المتجر]' },
+      { label: '✅ نفّذت', type: 'done' }
+    ],
+    why: 'نمو ٢٦٠% في أسبوع واحد مؤشر قوي جداً. الهامش ٥٥% يعني كل ريال تستثمره يرجع ريالاً وربع. الموجة في بدايتها — الاستثمار الآن أرخص بكثير من بعد أسبوعين.'
+  },
+  {
+    id: 3,
+    type: 'opportunity',
+    badge: '🟡 فرصة',
+    urgency: '8/10',
+    timing: 'الليلة',
+    title: 'يا غازي، الرواتب بعد ٣ أيام — شغّل حملة "عيديتك جاهزة" الليلة',
+    context: 'الرواتب تنزل بعد <span class="num">٣ أيام</span>. العيد بعد <span class="num">١٢ يوم</span>. النافذة الذهبية: <span class="num">٤٨ ساعة</span> بعد الراتب = أعلى معدل شراء في الشهر.',
+    ifExecuted: 'إيراد متوقع <span class="num">٨,٠٠٠-١٢,٠٠٠ ريال</span> خلال ٥ أيام من الحملة',
+    ifDelayed: 'تخسر النافذة الذهبية — الناس تنفق في أماكن ثانية',
+    saudiTag: '🇸🇦 الرواتب + العيد = أعلى إنفاق في السنة',
+    buttons: [
+      { label: '⚡ نسخ كابشن سناب', type: 'magic', text: '🌙 العيد بعد ١٢ يوم\nخلي هديتك تحكي قبلك 🤎\n\n⚡ خصم ٢٥% على عطور الهدايا\nالكود: EID25\n\n⏰ ينتهي الليلة\n🔗 [رابط المتجر]' },
+      { label: '⚡ نسخ إعلان انستقرام', type: 'magic-2', text: 'هديتك هذا العيد تستحق الاختيار الصح ✨\n\nبيت الجوزاء — عطور تحكي قصتك\n\n🎁 خصم ٢٥% على كل الهدايا\nالكود: EID25\nالعرض ينتهي الليلة\n\n#بيت_الجوزاء #عطور_سعودية #عيد_الفطر' },
+      { label: '✅ نفّذت', type: 'done' },
+      { label: '💤 لاحقاً', type: 'snooze' }
+    ],
+    why: 'البيانات التاريخية تثبت: أعلى مبيعات في الشهر تأتي خلال ٤٨-٧٢ ساعة بعد نزول الرواتب. مع قرب العيد، الناس في وضع "شراء هدايا" — الحملة الآن تصطاد في الوقت الصح.'
+  },
+  {
+    id: 4,
+    type: 'opportunity',
+    badge: '🟡 فرصة',
+    urgency: '7/10',
+    timing: 'هذا الأسبوع',
+    title: 'يا غازي، صفحة "عطر التوباكو" تخسر ٨٠% من زوارها — غيّر ترتيب العناصر',
+    context: '<span class="num">٨٠%</span> من زوار الصفحة يغادرون قبل الشراء. اكتشفت السبب: السعر يظهر قبل الوصف والمميزات. الزائر يرى الرقم قبل ما يقتنع بالقيمة.',
+    ifExecuted: 'معدل التحويل يرتفع من <span class="num">٢%</span> إلى <span class="num">٥-٧%</span> = <span class="num">٣-٥ مبيعات إضافية/يوم</span>',
+    ifDelayed: 'كل يوم تأخير = خسارة <span class="num">٣-٥ مبيعات</span> مضمونة',
+    saudiTag: '🇸🇦 قبل رمضان — حسّن التحويل الآن',
+    buttons: [
+      { label: '⚡ نسخ تعليمات المطور', type: 'magic', text: 'التعديل المطلوب على صفحة "عطر التوباكو المستوحى":\n\n1. نقل السعر من أعلى الصفحة إلى ما بعد الوصف\n2. الترتيب الجديد:\n   - اسم المنتج\n   - الوصف الشعري (٣-٤ أسطر)\n   - المميزات (ثبات، نوع، حجم)\n   - صور المنتج\n   - السعر + زر الشراء\n\nالسبب: الزوار يغادرون عند رؤية السعر قبل الاقتناع بالقيمة.\nالهدف: رفع معدل التحويل من ٢% إلى ٥%+' },
+      { label: '✅ نفّذت', type: 'done' }
+    ],
+    why: 'هذا تعديل بسيط لا يكلف شيئاً ويضاعف المبيعات. البيانات واضحة: ٨٠% معدل خروج = مشكلة في الصفحة وليس في المنتج.'
+  },
+  {
+    id: 5,
+    type: 'opportunity',
+    badge: '🟡 فرصة',
+    urgency: '8/10',
+    timing: 'هذا الأسبوع',
+    title: 'يا غازي، عميلة VIP ما اشترت منذ ٤٥ يوم — استعيدها قبل ما تنسى',
+    context: '<span class="num">٣ عميلات VIP</span> (كل منهن اشترت <span class="num">٤+ مرات</span>) لم يشترن منذ <span class="num">٤٥-٦٠ يوم</span>. المعدل الطبيعي لهن: شراء كل <span class="num">٣٠ يوم</span>.',
+    ifExecuted: 'استرداد <span class="num">٢-٣ عميلات</span> = إيراد متوقع <span class="num">٢,٤٠٠-٣,٦٠٠ ريال</span>',
+    ifDelayed: 'كل أسبوع تأخير = احتمال خسارة العميلة يرتفع <span class="num">١٥%</span>',
+    saudiTag: '🇸🇦 قبل العيد — العميلات يبحثن عن هدايا',
+    buttons: [
+      { label: '⚡ نسخ رسالة استعادة', type: 'magic', text: 'أهلاً [الاسم] 🤎\n\nوحشتينا — ما شفناك منذ فترة.\n\nعندنا وصلتنا تشكيلة جديدة ما نزلت على المتجر بعد، وأول من يعرف عنها هن عميلاتنا المميزات.\n\nحجزتلك عينة مجانية من إصدارنا الجديد مع أي طلب.\n\nبانتظارك 🌸\n— بيت الجوزاء' },
+      { label: '✅ نفّذت', type: 'done' },
+      { label: '💤 لاحقاً', type: 'snooze' }
+    ],
+    why: 'تكلفة استعادة عميلة قديمة أقل بـ٥ مرات من اكتساب عميلة جديدة. العميلات الـ٣ لهن تاريخ شراء ممتاز — رسالة شخصية واحدة قد تجلب ٣,٠٠٠ ريال.'
+  },
+  {
+    id: 6,
+    type: 'planning',
+    badge: '🟢 تخطيط',
+    urgency: '6/10',
+    timing: 'هذا الأسبوع',
+    title: 'يا غازي، مخزون "عطر الشعر الورد" وصل للحد الأدنى — راجع الطلب',
+    context: 'المخزون: <span class="num">٢٢ قطعة</span>. معدل المبيعات: <span class="num">٤ قطع/أسبوع</span>. يكفي <span class="num">٥-٦ أسابيع</span>. المصنع يحتاج <span class="num">٣ أسابيع</span>. الهامش الآمن: أسبوعان.',
+    ifExecuted: 'طلب <span class="num">٢٠٠ وحدة</span> الآن = مخزون كافٍ حتى بعد رمضان',
+    ifDelayed: 'لو أجّلت أسبوعين = تدخل في المنطقة الحمراء',
+    saudiTag: '🇸🇦 رمضان يرفع الطلب على عطور الشعر ٤٠%',
+    buttons: [
+      { label: '⚡ نسخ رسالة الطلب', type: 'magic', text: 'السلام عليكم،\n\nأحتاج طلب جديد:\n• المنتج: عطر شعر الورد\n• الكمية: ٢٠٠ وحدة\n• المواصفات: نفس السابقة\n• موعد التسليم: خلال ٣ أسابيع\n\nشكراً،\nغازي' },
+      { label: '✅ نفّذت', type: 'done' },
+      { label: '💤 لاحقاً', type: 'snooze' }
+    ],
+    why: 'ليس عاجلاً الآن، لكن التخطيط المبكر يمنع الأزمات. رمضان يرفع الطلب على عطور الشعر بشكل ملحوظ.'
+  },
+  {
+    id: 7,
+    type: 'opportunity',
+    badge: '🟡 فرصة',
+    urgency: '7/10',
+    timing: 'هذا الأسبوع',
+    title: 'يا غازي، منتجك الأبطأ يسرق مساحة من النجوم — أوقفه أو طوّره',
+    context: '"بخور الفل" يبيع <span class="num">٢ قطعة/شهر</span> منذ <span class="num">٤ أشهر</span>. المخزون <span class="num">٨٠ قطعة = ٤٠ شهر</span>. رأس المال المجمّد: <span class="num">٤,٠٠٠ ريال</span>.',
+    ifExecuted: 'تصفية بخصم ٤٠% = استرداد <span class="num">٢,٤٠٠ ريال</span> + تحرير مساحة للنجوم',
+    ifDelayed: 'رأس مال ميت يكلفك فرصة بديلة كل شهر',
+    saudiTag: '🇸🇦 قبل رمضان — نظّف المخزون',
+    buttons: [
+      { label: '⚡ نسخ كابشن تصفية', type: 'magic', text: '🌸 تصفية نهاية الموسم\n\nبخور الفل الأصيل\nخصم ٤٠% — الكمية محدودة\n\nالسعر الأصلي: ٨٥ ريال\nسعر التصفية: ٥١ ريال فقط\n\n🔗 [رابط المتجر]\n\n#تصفية #بيت_الجوزاء' },
+      { label: '✅ نفّذت', type: 'done' }
+    ],
+    why: 'المنتج البطيء لا يضر فقط بالمخزون — يضر بالتركيز والطاقة. تحرير رأس المال المجمّد يسمح بالاستثمار في النجوم.'
+  },
+  {
+    id: 8,
+    type: 'opportunity',
+    badge: '🟡 فرصة',
+    urgency: '8/10',
+    timing: 'الآن',
+    title: 'يا غازي، ١,٦٤٠ ريال معلّقة في ٨ سلات الليلة',
+    context: '<span class="num">٨ سلات متروكة</span>. قيمة إجمالية <span class="num">١,٦٤٠ ريال</span>. متوسط القيمة: <span class="num">٢٠٥ ريال</span> (أعلى من المعتاد). <span class="num">٣ منها</span> لعميلات اشترين سابقاً.',
+    ifExecuted: 'إرسال تذكير الآن + خصم ١٠% = احتمال استرداد <span class="num">٣٥-٤٠%</span> = <span class="num">٥٧٤-٦٥٦ ريال</span>',
+    ifDelayed: 'إرسال بكرة الصبح = الاحتمال ينزل لـ <span class="num">١٥-٢٠%</span>',
+    saudiTag: '🇸🇦 النافذة الذهبية: ٢-٤ ساعات بعد الترك',
+    buttons: [
+      { label: '⚡ نسخ رسالة استرداد', type: 'magic', text: 'أهلاً [الاسم] 🤎\n\nشفت إنك اخترتِ [المنتج] بس ما أكملتِ الطلب.\nحجزتِلك المنتج لمدة ٢٤ ساعة.\n\n🎁 خصم ١٠% حصري لك\nالكود: COMEBACK10\n\nرابطك المباشر: [link]\n\nلو عندك أي سؤال عن العطر، أنا هنا.\n— بيت الجوزاء' },
+      { label: '⚡ إرسال جماعي (٨ عميلات)', type: 'magic-2', text: null },
+      { label: '✅ نفّذت', type: 'done' }
+    ],
+    why: 'بيانات التجارة الإلكترونية تثبت: ٧٠% من قرارات الاسترداد تحدث خلال ٤ ساعات من الترك. بعدها تنخفض بشكل حاد.'
+  },
+  {
+    id: 9,
+    type: 'urgent',
+    badge: '💎 طلب استثنائي',
+    urgency: '9/10',
+    timing: 'الآن',
+    title: 'يا غازي، طلب بـ٢,٣٥٠ ريال وصل الآن — عميل جديد يستحق اهتمامك الشخصي',
+    context: 'القيمة: <span class="num">٢,٣٥٠ ريال (٥x المعدل)</span>. العميل: جديد (أول طلب). عدد المنتجات: <span class="num">١٢ منتج</span> (مزيج فئات). المدينة: جدة.',
+    ifExecuted: 'تواصل شخصي الآن = احتمال <span class="num">٦٠%</span> يصير عميل متكرر — LTV متوقع <span class="num">١٠,٠٠٠+ ريال/سنة</span>',
+    ifDelayed: 'تخسر فرصة تحويله لـ B2B أو VIP — يتعامل معه كطلب عادي',
+    saudiTag: '🇸🇦 طلبات الشركات والمناسبات تأتي من جدة',
+    buttons: [
+      { label: '⚡ نسخ رسالة تواصل شخصي', type: 'magic', text: 'أهلاً وسهلاً بك في بيت الجوزاء،\n\nوصلنا طلبك المميز، وحبيت أتواصل معك شخصياً — غازي، صاحب البراند.\n\nطلبك الكبير جذب انتباهي، وحبيت أسألك:\n• هل الطلب لاستخدام شخصي، هدايا، أو لعمل تجاري؟\n• تبي تغليف عادي، أو تغليف هدايا خاص؟\n• أي ملاحظات عن تفضيلاتك أو مواعيد خاصة؟\n\nعندنا خيارات خاصة لعملاء المناسبات والشركات، ويسعدني أخدمك فيها.\n\nبانتظار ردك،\nغازي' },
+      { label: '⚡ نسخ تعليمات تغليف مميز', type: 'magic-2', text: 'تعليمات تغليف الطلب رقم [XXX]:\n\n✨ تغليف هدايا فاخر\n• علبة سوداء مع ريبون ذهبي\n• كارد مكتوب بخط اليد: "شكراً على ثقتك"\n• عينة مجانية من آخر إصدار\n• كارد بطاقة VIP للطلب القادم\n\nملاحظة: هذا عميل مميز — اهتم بالتفاصيل' },
+      { label: '✅ نفّذت', type: 'done' }
+    ],
+    why: 'طلب بـ٥ أضعاف المعدل من عميل جديد = إشارة قوية. إما شركة، موزع، أو عميل ثري. تحويله لـ VIP أو B2B يساوي ١٠,٠٠٠+ ريال سنوياً.'
+  },
+  {
+    id: 10,
+    type: 'planning',
+    badge: '🟢 تخطيط',
+    urgency: '7/10',
+    timing: 'هذا الشهر',
+    title: 'يا غازي، اليوم الوطني بعد ٤ أسابيع — وقت إطلاق إصدارك المحدود',
+    context: 'العام الماضي: بعنا <span class="num">٣٢٠ قطعة "إصدار وطني"</span> في <span class="num">١٠ أيام</span>. الربح: <span class="num">١٤,٤٠٠ ريال</span>. المنافسون بدأوا يعلنون قبل أسبوعين.',
+    ifExecuted: 'تكرار نجاح العام الماضي +٢٠% = ربح متوقع <span class="num">١٧,٠٠٠-٢٠,٠٠٠ ريال</span>',
+    ifDelayed: 'المصنع ما يلحق — المنافسون يسبقونك في الـ mindshare',
+    saudiTag: '🇸🇦 اليوم الوطني = أعلى مبيعات في الربع الثالث',
+    buttons: [
+      { label: '⚡ نسخ بريف المصنع', type: 'magic', text: 'السلام عليكم،\n\nنحتاج تجهيز "الإصدار الوطني ٢٠٢٦":\n\n• المنتج: بخاخ عطر خاص باليوم الوطني\n• الكمية: ١٠٠٠ وحدة\n• العبوة: تصميم أخضر/ذهبي مع شعار اليوم الوطني\n• موعد التسليم: خلال أسبوعين\n• الدفع: ٥٠% مقدم، ٥٠% عند التسليم\n\nالتصميم سيصلكم خلال ٣ أيام.\n\nغازي' },
+      { label: '⚡ نسخ تعليمات التصوير', type: 'magic-2', text: 'بريف تصوير "الإصدار الوطني":\n\n🎨 الهوية البصرية:\n• ألوان: أخضر + ذهبي + أبيض\n• خلفية: صحراء أو سماء زرقاء\n• إضاءة: طبيعية، ذهبية\n\n📸 المطلوب:\n• ٥ صور منتج على خلفيات مختلفة\n• فيديو ١٥ ثانية للريلز\n• ٣ صور "lifestyle" مع عبايات وطنية\n\nالموعد: خلال أسبوع' },
+      { label: '✅ نفّذت', type: 'done' }
+    ],
+    why: 'الجدول الزمني: أسبوع تصميم + أسبوعان تصنيع + أسبوع محتوى = ٤ أسابيع بالضبط. التأخير يوم واحد يعني إما تأخير الإطلاق أو إطلاق بدون محتوى.'
+  },
+  {
+    id: 11,
+    type: 'waiting',
+    badge: '⚪ انتظار',
+    urgency: '5/10',
+    timing: 'أسبوعين',
+    title: 'يا غازي، "بخور الصندل" لسا مو واضح — ما أقدر أحكم. انتظر أسبوعين',
+    context: 'الشهر الأول: <span class="num">٢٥ قطعة</span> (أغلبها أسبوع الإطلاق). بعد موجة الإطلاق: <span class="num">٨ قطع فقط</span> في ٣ أسابيع.',
+    ifExecuted: 'بعد أسبوعين: لو باع <span class="num">١٥+ قطعة</span> = منتج قابل للحياة',
+    ifDelayed: 'لو باع أقل من <span class="num">٥ قطع</span> = أوقفه بلا تردد',
+    saudiTag: '🇸🇦 أفضل الجنرالات يعرفون متى لا يقاتلون',
+    buttons: [
+      { label: '⏰ ذكّرني بعد أسبوعين', type: 'remind' },
+      { label: '📊 عرض التفاصيل', type: 'snooze' }
+    ],
+    why: 'القرار المتسرع هنا أخطر من الانتظار. موجة الإطلاق طبيعية لكل منتج — الحكم الحقيقي يكون بعد ٤-٦ أسابيع من الإطلاق.'
+  },
+  {
+    id: 12,
+    type: 'urgent',
+    badge: '🔴 حرج',
+    urgency: '10/10',
+    timing: 'الآن',
+    title: 'يا غازي، عميلة VIP تشتكي — لا تتأخر ساعة واحدة',
+    context: 'العميلة: [الاسم]، <span class="num">٦ طلبات</span>، <span class="num">٣,٢٠٠ ريال</span>. الشكوى: "العطر ما يثبت" — على Instagram. المنتج: عطر المسك الأبيض.',
+    ifExecuted: 'تواصل الآن = تنقذ العلاقة + العميلة تمدح علناً — تحافظ على LTV <span class="num">١٠,٠٠٠+ ريال</span>',
+    ifDelayed: 'تأخير أكثر من ساعتين = الشكوى تتحول لمراجعة سلبية دائمة',
+    saudiTag: '🇸🇦 القاعدة: كل شكوى عامة تُحل في أقل من ساعة',
+    buttons: [
+      { label: '⚡ نسخ رد الاعتذار', type: 'magic', text: '[الاسم]، قرأت تعليقك وأزعجني جداً.\n\nأنتِ من عميلاتنا الأوفياء، وتجربتك يجب أن تكون مثالية.\n\nسأرسل لك اليوم:\n🎁 زجاجة جديدة من عطر أعلى ثباتاً — مجاناً\n🎁 كارد فيه نصائح تطبيق العطر\n🎁 خصم ٢٥% على طلبك القادم\n\nأرسلي لي عنوانك وأرتب الشحن اليوم.\n\nغازي — بيت الجوزاء' },
+      { label: '⚡ نسخ عرض تعويض', type: 'magic-2', text: 'تعويض عميلة VIP [الاسم]:\n\n• إرسال عطر بديل (أعلى ثباتاً) مجاناً\n• خصم ٢٥% على الطلب القادم\n• كارد شخصي مكتوب بخط اليد\n• متابعة بعد أسبوع: "كيف التجربة؟"\n\nالتكلفة: ~١٥٠ ريال\nالعائد المتوقع: الحفاظ على عميلة بـ LTV ١٠,٠٠٠+ ريال' },
+      { label: '📞 اتصال مباشر', type: 'magic-2', text: null },
+      { label: '✅ نفّذت', type: 'done' }
+    ],
+    why: 'عميلة بـ٦ طلبات و٣,٢٠٠ ريال = VIP بامتياز. تكلفة إرضائها ١٥٠ ريال مقابل خسارة ١٠,٠٠٠+ ريال LTV. الحساب بسيط.'
+  },
+  {
+    id: 13,
+    type: 'opportunity',
+    badge: '🟡 فرصة',
+    urgency: '7/10',
+    timing: 'هذا الأسبوع',
+    title: 'يا غازي، نمط اكتشفته في بياناتك — أنشئ bundle يضاعف متوسط السلة',
+    context: '<span class="num">٤٠%</span> من عميلات "بخور الصندل" اشترين أيضاً "عطر شعر" خلال <span class="num">٣٠ يوم</span>.',
+    ifExecuted: 'bundle "طقم العروس": متوسط قيمة الطلب يرتفع من <span class="num">١٢٠ → ١٨٠ ريال</span> = ربح إضافي <span class="num">٣,٠٠٠-٤,٠٠٠ ريال/شهر</span>',
+    ifDelayed: 'العميلات يواصلن الشراء منفصلاً — تخسر فرصة رفع AOV بدون تكلفة',
+    saudiTag: '🇸🇦 النمط موجود مجاناً في البيانات — استغلّه',
+    buttons: [
+      { label: '⚡ نسخ وصف الـBundle', type: 'magic', text: 'طقم العروس — بيت الجوزاء 🌸\n\nبخور الصندل + عطر الشعر الورد\nاثنان يكملان بعضهما\n\nالسعر منفصل: ٢٥٠ ريال\nسعر الطقم: ٢٢٥ ريال (وفّري ٢٥ ريال)\n\nمثالي للعرائس والمناسبات\n🔗 [رابط المتجر]' },
+      { label: '⚡ نسخ كابشن إطلاق', type: 'magic-2', text: '✨ جديد — طقم العروس\n\nبخور الصندل + عطر الشعر الورد\nثنائي لا يكتمل إلا معاً 🌸\n\n💫 وفّري ٢٥ ريال مع الطقم\n\nمحدود — اطلبي الآن\n🔗 [رابط المتجر]\n\n#بيت_الجوزاء #طقم_عروس #عطور_سعودية' },
+      { label: '✅ نفّذت', type: 'done' }
+    ],
+    why: 'Bundle لا يكلف شيئاً إضافياً — فقط تجميع منتجين موجودين. النمط في البيانات يثبت أن العميلات يريدونهما معاً أصلاً.'
+  },
+  {
+    id: 14,
+    type: 'warning',
+    badge: '⚠️ تنبيه نظام',
+    urgency: '6/10',
+    timing: 'الآن',
+    title: 'يا غازي، عندي مشكلة في البيانات — ما أقدر أعطيك قرار موثوق اليوم',
+    context: 'بيانات المخزون في النظام لا تطابق سلة. <span class="num">٣ منتجات</span> فيها تعارض في الأرقام. أعدت المزامنة تلقائياً قبل <span class="num">٥ دقايق</span>.',
+    ifExecuted: 'تشغيل مزامنة يدوية = حل المشكلة في <span class="num">٢-٣ دقائق</span>',
+    ifDelayed: 'قراراتي اليوم معلّقة حتى يستقر الوضع',
+    saudiTag: '🇸🇦 الصدق أفضل من توصية مبنية على بيانات خاطئة',
+    buttons: [
+      { label: '🔄 تشغيل مزامنة يدوية', type: 'done' },
+      { label: '📋 عرض تفاصيل التعارض', type: 'snooze' }
+    ],
+    why: 'الجوزاء يعترف بمحدوديته. لا يختلق توصيات من بيانات تالفة. هذا السلوك يبني الثقة.'
+  },
+  {
+    id: 15,
+    type: 'celebration',
+    badge: '🎉 إنجاز',
+    urgency: null,
+    timing: 'هذا الأسبوع',
+    title: 'يا غازي، توقف لحظة — حققت ٨٠% من هدفك في ٢٠ يوم فقط',
+    context: 'الإيراد: <span class="num">٤٠,٠٠٠ ريال</span>. الباقي للهدف: <span class="num">١٠,٠٠٠ ريال</span>. الأيام المتبقية: <span class="num">١٠ يوم</span>. المطلوب يومياً: <span class="num">١,٠٠٠ ريال</span> (سهل).',
+    ifExecuted: 'ارفع الهدف لـ <span class="num">٦٠,٠٠٠ ريال</span> — عندك زخم استغلّه',
+    ifDelayed: 'الاستمرار على <span class="num">٥٠,٠٠٠ ريال</span> — أيضاً إنجاز',
+    saudiTag: '🇸🇦 الأرقام تؤكد: قراراتك هذا الشهر كانت صحيحة',
+    buttons: [
+      { label: '🚀 رفع الهدف لـ ٦٠K', type: 'done' },
+      { label: '✅ الاستمرار على ٥٠K', type: 'snooze' }
+    ],
+    why: 'الزخم حقيقي. ما نجح: إعادة طلب "إصدار خاص" في الوقت، حملة الرواتب + العيد، استرداد ٦٥% من السلات المتروكة.'
+  }
+];
+
+/* ==============================
+   RENDER ENGINE
+   ============================== */
+function renderCard(s, delay = 0) {
+  const card = document.createElement('div');
+  card.className = `cmd-card card-${s.type}`;
+  card.id = `card-${s.id}`;
+  card.style.animationDelay = `${delay}ms`;
+  card.dataset.type = s.type;
+
+  const urgencyBadge = s.urgency
+    ? `<span class="badge-urgency">${s.urgency}</span>`
+    : '';
+
+  const saudiTag = s.saudiTag
+    ? `<div class="saudi-tag">🇸🇦 ${s.saudiTag.replace('🇸🇦 ','')}</div>`
+    : '';
+
+  const buttonsHtml = s.buttons.map(b => {
+    let cls = 'btn ';
+    if (b.type === 'magic')   cls += 'btn-magic';
+    else if (b.type === 'magic-2') cls += 'btn-magic-2';
+    else if (b.type === 'done')    cls += 'btn-done';
+    else if (b.type === 'snooze')  cls += 'btn-snooze';
+    else if (b.type === 'remind')  cls += 'btn-remind';
+
+    const onclick = b.text
+      ? `copyText(${JSON.stringify(b.text)}, this)`
+      : b.type === 'done'
+        ? `markDone(${s.id})`
+        : b.type === 'snooze'
+          ? `markSnoozed(${s.id})`
+          : '';
+
+    return `<button class="${cls}" onclick="${onclick}">${b.label}</button>`;
+  }).join('');
+
+  card.innerHTML = `
+    <div class="card-top">
+      <div class="card-badge">
+        <span class="badge-dot">${s.badge.split(' ')[0]}</span>
+        <span>${s.badge.split(' ').slice(1).join(' ')}</span>
+        ${urgencyBadge}
+      </div>
+      <div class="card-timing">⏱️ ${s.timing}</div>
+    </div>
+    <div class="card-title">${s.title}</div>
+    <div class="card-context">${s.context}</div>
+    <div class="card-divider"></div>
+    <div class="card-outcomes">
+      <div class="outcome-row outcome-if">
+        <span class="outcome-icon">✅</span>
+        <span><strong>لو نفّذت:</strong> ${s.ifExecuted}</span>
+      </div>
+      <div class="outcome-row outcome-else">
+        <span class="outcome-icon">⚠️</span>
+        <span><strong>لو تأخرت:</strong> ${s.ifDelayed}</span>
+      </div>
+    </div>
+    ${saudiTag}
+    <div class="card-actions">${buttonsHtml}</div>
+    <div class="card-expand">
+      <button class="expand-toggle" onclick="toggleExpand(this)">▼ لماذا هذا القرار؟</button>
+      <div class="expand-content">${s.why}</div>
+    </div>
+  `;
+
+  // glow on entry
+  setTimeout(() => card.classList.add('glow'), 100 + delay);
+
+  return card;
+}
+
+function renderAll(filter = 'all') {
+  const container = document.getElementById('cards-container');
+  container.innerHTML = '';
+  const filtered = filter === 'all' ? scenarios : scenarios.filter(s => s.type === filter);
+  filtered.forEach((s, i) => container.appendChild(renderCard(s, i * 60)));
+  document.getElementById('cards-count').textContent = `${filtered.length} قرار`;
+}
+
+/* ==============================
+   INTERACTIONS
+   ============================== */
+function copyText(text, btn) {
+  navigator.clipboard.writeText(text).then(() => {
+    showToast('✓ تم النسخ — الصق وأرسل');
+    // shake animation on card
+    const card = btn.closest('.cmd-card');
+    card.style.animation = 'shake .4s ease';
+    setTimeout(() => card.style.animation = '', 400);
+    // confirm after 3s
+    setTimeout(() => {
+      if (confirm('هل أرسلت الرسالة؟')) {
+        markDone(parseInt(card.id.replace('card-','')));
+      }
+    }, 3000);
+  }).catch(() => {
+    // fallback
+    const ta = document.createElement('textarea');
+    ta.value = text;
+    document.body.appendChild(ta);
+    ta.select();
+    document.execCommand('copy');
+    document.body.removeChild(ta);
+    showToast('✓ تم النسخ');
+  });
+}
+
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2800);
+}
+
+function markDone(id) {
+  const card = document.getElementById(`card-${id}`);
+  if (!card) return;
+  card.classList.add('executed');
+  showToast('✅ تم تسجيل القرار كمنفّذ');
+  setTimeout(() => card.remove(), 500);
+}
+
+function markSnoozed(id) {
+  const card = document.getElementById(`card-${id}`);
+  if (!card) return;
+  card.classList.add('snoozed');
+  showToast('💤 سيُذكّرك الجوزاء لاحقاً');
+}
+
+function toggleExpand(btn) {
+  const content = btn.nextElementSibling;
+  content.classList.toggle('open');
+  btn.textContent = content.classList.contains('open')
+    ? '▲ إخفاء التفاصيل'
+    : '▼ لماذا هذا القرار؟';
+}
+
+function filterCards(type, btn) {
+  document.querySelectorAll('.filter-tab').forEach(t => t.classList.remove('active'));
+  btn.classList.add('active');
+  renderAll(type);
+}
+
+/* ==============================
+   FOCUS MODE
+   ============================== */
+function openFocus() {
+  const fm = document.getElementById('focus-mode');
+  fm.classList.add('active');
+
+  // set date
+  const now = new Date();
+  const days = ['الأحد','الاثنين','الثلاثاء','الأربعاء','الخميس','الجمعة','السبت'];
+  document.getElementById('focus-date').textContent =
+    `${days[now.getDay()]} ${now.toLocaleDateString('ar-SA-u-ca-islamic', {day:'numeric',month:'long',year:'numeric'})}`;
+
+  // set greeting
+  const h = now.getHours();
+  const greeting = h < 12 ? 'صباح الخير يا غازي ☀️'
+                 : h < 17 ? 'مساء الخير يا غازي 🌤️'
+                 :           'مساء النور يا غازي 🌙';
+  document.getElementById('focus-greeting').textContent = greeting;
+
+  // render top priority card
+  const wrap = document.getElementById('focus-card-wrap');
+  wrap.innerHTML = '';
+  const topCard = renderCard(scenarios[0], 0);
+  wrap.appendChild(topCard);
+}
+
+function closeFocus(done) {
+  document.getElementById('focus-mode').classList.remove('active');
+  if (done) markDone(scenarios[0].id);
+}
+
+/* ==============================
+   INIT
+   ============================== */
+renderAll();
+</script>
+</body>
+</html>
