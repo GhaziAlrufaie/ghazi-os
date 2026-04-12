@@ -1,1 +1,173 @@
-[]
+[
+  {
+    "id": "biz-sec-3",
+    "title": "أقساط وديون",
+    "type": "loans",
+    "color": "var(--danger)",
+    "items": [
+      {
+        "id": "biz-3-1",
+        "kind": "fixed",
+        "name": "بنك التنمية",
+        "note": "",
+        "cycle": "monthly",
+        "amount": 12000
+      },
+      {
+        "id": "biz-3-2",
+        "kind": "fixed",
+        "name": "مصنع ابتكار الروائح",
+        "note": "",
+        "cycle": "monthly",
+        "amount": 8000
+      }
+    ],
+    "updated_at": "2026-04-04T20:35:00.986006+00:00"
+  },
+  {
+    "id": "biz-sec-1",
+    "title": "رواتب الفريق",
+    "type": "salaries",
+    "color": "var(--gold)",
+    "items": [
+      {
+        "id": "biz-1-1",
+        "kind": "fixed",
+        "name": "بشرى نبيل",
+        "note": "مديرة المتاجر",
+        "cycle": "monthly",
+        "amount": 1500
+      },
+      {
+        "id": "biz-1-2",
+        "kind": "fixed",
+        "name": "أحمد عقل",
+        "note": "محاسب + مشتريات",
+        "cycle": "monthly",
+        "amount": 2000
+      },
+      {
+        "id": "biz-1-3",
+        "kind": "fixed",
+        "name": "عمرو محسوب",
+        "note": "محاسب",
+        "cycle": "monthly",
+        "amount": 1000
+      },
+      {
+        "id": "biz-1-4",
+        "kind": "fixed",
+        "name": "رحاب مصطفى",
+        "note": "حسابات + موارد بشرية",
+        "cycle": "monthly",
+        "amount": 950
+      },
+      {
+        "id": "biz-1-5",
+        "kind": "fixed",
+        "name": "ياسمين",
+        "note": "دعم فني",
+        "cycle": "monthly",
+        "amount": 600
+      },
+      {
+        "id": "biz-1-6",
+        "kind": "fixed",
+        "name": "يمنى",
+        "note": "خدمة عملاء",
+        "cycle": "monthly",
+        "amount": 650
+      },
+      {
+        "id": "biz-1-7",
+        "kind": "variable",
+        "name": "المقداد",
+        "note": "٢ ريال/عطر — إنتاج + مستودع",
+        "cycle": "monthly",
+        "amount": 2
+      },
+      {
+        "id": "biz-1-8",
+        "kind": "fixed",
+        "name": "مكتب نظم",
+        "note": "مراجع خارجي",
+        "cycle": "monthly",
+        "amount": 1000
+      },
+      {
+        "id": "biz-1-9",
+        "kind": "variable",
+        "name": "محمد مصطفى",
+        "note": "مصمم جرافيك — فريلانس",
+        "cycle": "monthly",
+        "amount": 0
+      }
+    ],
+    "updated_at": "2026-04-04T20:35:00.986006+00:00"
+  },
+  {
+    "id": "biz-sec-2",
+    "title": "اشتراكات تقنية",
+    "type": "subscriptions",
+    "color": "var(--accent)",
+    "items": [
+      {
+        "id": "biz-2-1",
+        "kind": "fixed",
+        "name": "Google Workspace (5 seats)",
+        "note": "",
+        "cycle": "monthly",
+        "amount": 495
+      },
+      {
+        "id": "biz-2-2",
+        "kind": "fixed",
+        "name": "AI Ultra Access (2 seats)",
+        "note": "",
+        "cycle": "monthly",
+        "amount": 1470
+      },
+      {
+        "id": "biz-2-3",
+        "kind": "fixed",
+        "name": "Manus",
+        "note": "",
+        "cycle": "monthly",
+        "amount": 305
+      },
+      {
+        "id": "biz-2-4",
+        "kind": "fixed",
+        "name": "واتساب كرزون (غازي بوتيك)",
+        "note": "",
+        "cycle": "monthly",
+        "amount": 1000
+      },
+      {
+        "id": "biz-2-5",
+        "kind": "fixed",
+        "name": "Claude Pro",
+        "note": "",
+        "cycle": "monthly",
+        "amount": 431
+      },
+      {
+        "id": "biz-2-6",
+        "kind": "fixed",
+        "name": "Canva",
+        "note": "",
+        "cycle": "monthly",
+        "amount": 50
+      },
+      {
+        "id": "biz-2-7",
+        "kind": "fixed",
+        "name": "CapCut Pro",
+        "note": "",
+        "cycle": "monthly",
+        "amount": 100
+      }
+    ],
+    "updated_at": "2026-04-04T20:35:00.986006+00:00"
+  }
+]

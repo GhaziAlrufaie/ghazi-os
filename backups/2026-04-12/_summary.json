@@ -1,59 +1,22 @@
 {
   "backup_date": "2026-04-12",
-  "backup_time": "2026-04-12T03:53:37.119Z",
-  "total_records": 0,
-  "tables": [
-    {
-      "table": "brands",
-      "count": 0
-    },
-    {
-      "table": "projects",
-      "count": 0
-    },
-    {
-      "table": "tasks",
-      "count": 0
-    },
-    {
-      "table": "personal_tasks",
-      "count": 0
-    },
-    {
-      "table": "decisions",
-      "count": 0
-    },
-    {
-      "table": "employees",
-      "count": 0
-    },
-    {
-      "table": "expenses",
-      "count": 0
-    },
-    {
-      "table": "biz_expenses",
-      "count": 0
-    },
-    {
-      "table": "events",
-      "count": 0
-    },
-    {
-      "table": "archive",
-      "count": 0
-    },
-    {
-      "table": "salla_orders",
-      "count": 0
-    },
-    {
-      "table": "finance_notes",
-      "count": 0
-    },
-    {
-      "table": "weekly_focus",
-      "count": 0
-    }
-  ]
+  "backup_time": "2026-04-12T04:19:02.566Z",
+  "tables_discovered": 13,
+  "tables": {
+    "tasks": 78,
+    "brands": 8,
+    "projects": 11,
+    "personal_tasks": 18,
+    "expenses": 3,
+    "biz_expenses": 3,
+    "employees": 10,
+    "decisions": 9,
+    "events": 7,
+    "archive": 26,
+    "weekly_focus": 12,
+    "salla_orders": 8,
+    "metrics": 8
+  },
+  "total_records": 201,
+  "status": "success"
 }
