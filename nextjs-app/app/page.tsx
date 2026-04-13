@@ -1,3 +1,4 @@
+export const dynamic = 'force-dynamic';
 /*
  * Ghazi OS — Legendary Edition
  * Dashboard Page: لوحة القيادة

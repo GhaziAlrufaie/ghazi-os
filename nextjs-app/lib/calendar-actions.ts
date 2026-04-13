@@ -57,6 +57,52 @@ export async function addEvent(
   return { event };
 }
 
+interface UpdateEventInput {
+  id: string;
+  title: string;
+  day: number;
+  month: number;
+  year: number;
+  brandId: string | null;
+  type: string;
+}
+
+export async function updateEvent(
+  input: UpdateEventInput
+): Promise<{ event?: CalEvent; error?: string }> {
+  const supabase = createServerClient();
+
+  const { data, error } = await supabase
+    .from('events')
+    .update({
+      title: input.title,
+      day: input.day,
+      month: input.month,
+      year: input.year,
+      brand_id: input.brandId,
+      type: input.type,
+    })
+    .eq('id', input.id)
+    .select()
+    .single();
+
+  if (error) return { error: error.message };
+
+  revalidatePath('/calendar');
+
+  const event: CalEvent = {
+    id: data.id,
+    title: data.title,
+    day: data.day,
+    month: data.month,
+    year: data.year,
+    brandId: data.brand_id ?? null,
+    type: data.type ?? 'event',
+  };
+
+  return { event };
+}
+
 export async function deleteEvent(id: string): Promise<{ error?: string }> {
   const supabase = createServerClient();
   const { error } = await supabase.from('events').delete().eq('id', id);

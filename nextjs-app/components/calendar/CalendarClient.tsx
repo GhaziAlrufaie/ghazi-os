@@ -1,10 +1,10 @@
 'use client';
 // Legendary Edition — Calendar Client Component
-// عرض تقويم شهري تفاعلي + أحداث الشهر + عد تنازلي للمناسبات
+// عرض تقويم شهري تفاعلي + CRUD كامل للأحداث + عد تنازلي
 
-import { useState, useCallback } from 'react';
+import React, { useState, useCallback } from 'react';
 import type { CalEvent, CalTask, Brand } from '@/app/calendar/page';
-import { addEvent, deleteEvent } from '@/lib/calendar-actions';
+import { addEvent, updateEvent, deleteEvent } from '@/lib/calendar-actions';
 
 // ─── ثوابت ───────────────────────────────────────────────────────────────────
 const MONTHS = [
@@ -26,6 +26,13 @@ const RECURRING = [
   'شهري — بشرى + المصنع',
 ];
 
+const EVENT_TYPES = [
+  { value: 'event',    label: 'حدث عام' },
+  { value: 'meeting',  label: 'اجتماع' },
+  { value: 'deadline', label: 'موعد نهائي' },
+  { value: 'reminder', label: 'تذكير' },
+];
+
 function pad(n: number) { return n < 10 ? `0${n}` : `${n}`; }
 
 // ─── Props ───────────────────────────────────────────────────────────────────
@@ -35,6 +42,125 @@ interface Props {
   brands: Brand[];
 }
 
+// ─── EventFormModal (Add + Edit) ─────────────────────────────────────────────
+interface EventFormModalProps {
+  brands: Brand[];
+  editEvent?: CalEvent | null;
+  defaultDate?: { day: number; month: number; year: number };
+  onClose: () => void;
+  onSave: (e: CalEvent, isEdit: boolean) => void;
+}
+
+function EventFormModal({ brands, editEvent, defaultDate, onClose, onSave }: EventFormModalProps) {
+  const isEdit = !!editEvent;
+
+  const initDate = editEvent
+    ? `${editEvent.year}-${pad(editEvent.month + 1)}-${pad(editEvent.day)}`
+    : defaultDate
+    ? `${defaultDate.year}-${pad(defaultDate.month + 1)}-${pad(defaultDate.day)}`
+    : '';
+
+  const [title,   setTitle]   = useState(editEvent?.title ?? '');
+  const [date,    setDate]    = useState(initDate);
+  const [brand,   setBrand]   = useState(editEvent?.brandId ?? '');
+  const [type,    setType]    = useState(editEvent?.type ?? 'event');
+  const [loading, setLoading] = useState(false);
+  const [error,   setError]   = useState('');
+
+  async function handleSubmit(ev: React.FormEvent) {
+    ev.preventDefault();
+    if (!title.trim() || !date) { setError('أدخل الاسم والتاريخ'); return; }
+    setLoading(true);
+    setError('');
+
+    const d = new Date(date);
+    const payload = {
+      title: title.trim(),
+      day:   d.getDate(),
+      month: d.getMonth(),
+      year:  d.getFullYear(),
+      brandId: brand || null,
+      type,
+    };
+
+    if (isEdit && editEvent) {
+      const result = await updateEvent({ id: editEvent.id, ...payload });
+      setLoading(false);
+      if (result.error) { setError(result.error); return; }
+      if (result.event) onSave(result.event, true);
+    } else {
+      const result = await addEvent(payload);
+      setLoading(false);
+      if (result.error) { setError(result.error); return; }
+      if (result.event) onSave(result.event, false);
+    }
+    onClose();
+  }
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4" style={{ background: 'rgba(0,0,0,0.75)' }}>
+      <div className="rounded-xl p-6 w-full max-w-sm relative" style={{ background: '#0d1117', border: '1px solid rgba(201,150,59,0.25)' }}>
+        <button onClick={onClose} className="absolute top-4 left-4 text-gray-400 hover:text-white text-lg">✕</button>
+        <h2 className="text-lg font-bold mb-5" style={{ color: '#C9963B' }}>
+          {isEdit ? '✏ تعديل الحدث' : '+ حدث جديد'}
+        </h2>
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <div>
+            <label className="block text-xs text-gray-400 mb-1">عنوان الحدث</label>
+            <input
+              value={title}
+              onChange={e => setTitle(e.target.value)}
+              placeholder="مثال: اجتماع فريق"
+              className="w-full rounded-lg px-3 py-2 text-sm text-white outline-none"
+              style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(201,150,59,0.15)' }}
+            />
+          </div>
+          <div>
+            <label className="block text-xs text-gray-400 mb-1">التاريخ</label>
+            <input
+              type="date"
+              value={date}
+              onChange={e => setDate(e.target.value)}
+              className="w-full rounded-lg px-3 py-2 text-sm text-white outline-none"
+              style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(201,150,59,0.15)', colorScheme: 'dark' }}
+            />
+          </div>
+          <div>
+            <label className="block text-xs text-gray-400 mb-1">نوع الحدث</label>
+            <select
+              value={type}
+              onChange={e => setType(e.target.value)}
+              className="w-full rounded-lg px-3 py-2 text-sm text-white outline-none"
+              style={{ background: '#0d1117', border: '1px solid rgba(201,150,59,0.15)' }}
+            >
+              {EVENT_TYPES.map(t => <option key={t.value} value={t.value}>{t.label}</option>)}
+            </select>
+          </div>
+          <div>
+            <label className="block text-xs text-gray-400 mb-1">البراند (اختياري)</label>
+            <select
+              value={brand}
+              onChange={e => setBrand(e.target.value)}
+              className="w-full rounded-lg px-3 py-2 text-sm text-white outline-none"
+              style={{ background: '#0d1117', border: '1px solid rgba(201,150,59,0.15)' }}
+            >
+              <option value="">بدون براند</option>
+              {brands.map(b => <option key={b.id} value={b.id}>{b.name}</option>)}
+            </select>
+          </div>
+          {error && <p className="text-red-400 text-xs">{error}</p>}
+          <div className="flex gap-3 pt-2">
+            <button type="button" onClick={onClose} className="flex-1 py-2 rounded-lg text-sm text-gray-400 border" style={{ borderColor: 'rgba(255,255,255,0.1)' }}>إلغاء</button>
+            <button type="submit" disabled={loading} className="flex-1 py-2 rounded-lg text-sm font-semibold transition-opacity" style={{ background: '#C9963B', color: '#05070d', opacity: loading ? 0.6 : 1 }}>
+              {loading ? '...' : isEdit ? 'حفظ' : '+ أضف'}
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  );
+}
+
 // ─── DayPanel ────────────────────────────────────────────────────────────────
 interface DayPanelProps {
   day: number; month: number; year: number;
@@ -42,9 +168,10 @@ interface DayPanelProps {
   brands: Brand[];
   onClose: () => void;
   onDelete: (id: string) => void;
+  onEdit: (e: CalEvent) => void;
 }
 
-function DayPanel({ day, month, year, events, tasks, brands, onClose, onDelete }: DayPanelProps) {
+function DayPanel({ day, month, year, events, tasks, brands, onClose, onDelete, onEdit }: DayPanelProps) {
   const brandsMap: Record<string, Brand> = {};
   brands.forEach(b => { brandsMap[b.id] = b; });
 
@@ -54,8 +181,12 @@ function DayPanel({ day, month, year, events, tasks, brands, onClose, onDelete }
     return d.getDate() === day && d.getMonth() === month && d.getFullYear() === year;
   });
 
+  const typeLabel: Record<string, string> = {
+    event: 'حدث', meeting: 'اجتماع', deadline: 'موعد نهائي', reminder: 'تذكير',
+  };
+
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4" style={{ background: 'rgba(0,0,0,0.7)' }}>
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4" style={{ background: 'rgba(0,0,0,0.75)' }}>
       <div className="rounded-xl p-6 w-full max-w-sm relative" style={{ background: '#0d1117', border: '1px solid rgba(201,150,59,0.2)' }}>
         <button onClick={onClose} className="absolute top-4 left-4 text-gray-400 hover:text-white text-lg">✕</button>
         <h2 className="text-lg font-bold mb-4" style={{ color: '#C9963B' }}>
@@ -68,12 +199,22 @@ function DayPanel({ day, month, year, events, tasks, brands, onClose, onDelete }
             {dayEvents.map(e => {
               const b = e.brandId ? brandsMap[e.brandId] : null;
               return (
-                <div key={e.id} className="flex items-center justify-between py-2 border-b" style={{ borderColor: 'rgba(255,255,255,0.06)' }}>
-                  <div>
-                    <div className="text-sm font-medium text-white">{e.title}</div>
-                    {b && <span className="text-xs px-2 py-0.5 rounded-full mt-1 inline-block" style={{ background: `${b.color}22`, color: b.color }}>{b.name}</span>}
+                <div key={e.id} className="py-2 border-b" style={{ borderColor: 'rgba(255,255,255,0.06)' }}>
+                  <div className="flex items-start justify-between gap-2">
+                    <div className="flex-1 min-w-0">
+                      <div className="text-sm font-medium text-white">{e.title}</div>
+                      <div className="flex items-center gap-2 mt-1 flex-wrap">
+                        <span className="text-xs px-1.5 py-0.5 rounded" style={{ background: 'rgba(201,150,59,0.1)', color: 'rgba(201,150,59,0.7)' }}>
+                          {typeLabel[e.type] ?? e.type}
+                        </span>
+                        {b && <span className="text-xs px-2 py-0.5 rounded-full" style={{ background: `${b.color}22`, color: b.color }}>{b.name}</span>}
+                      </div>
+                    </div>
+                    <div className="flex gap-2 flex-shrink-0">
+                      <button onClick={() => { onEdit(e); onClose(); }} className="text-xs text-blue-400 hover:text-blue-300">تعديل</button>
+                      <button onClick={() => onDelete(e.id)} className="text-xs text-red-400 hover:text-red-300">حذف</button>
+                    </div>
                   </div>
-                  <button onClick={() => onDelete(e.id)} className="text-xs text-red-400 hover:text-red-300 mr-2">حذف</button>
                 </div>
               );
             })}
@@ -105,66 +246,6 @@ function DayPanel({ day, month, year, events, tasks, brands, onClose, onDelete }
   );
 }
 
-// ─── AddEventModal ────────────────────────────────────────────────────────────
-interface AddEventModalProps {
-  brands: Brand[];
-  onClose: () => void;
-  onAdd: (e: CalEvent) => void;
-}
-
-function AddEventModal({ brands, onClose, onAdd }: AddEventModalProps) {
-  const [title, setTitle]   = useState('');
-  const [date,  setDate]    = useState('');
-  const [brand, setBrand]   = useState('');
-  const [loading, setLoading] = useState(false);
-  const [error, setError]   = useState('');
-
-  async function handleSubmit(ev: React.FormEvent) {
-    ev.preventDefault();
-    if (!title.trim() || !date) { setError('أدخل الاسم والتاريخ'); return; }
-    setLoading(true);
-    const d = new Date(date);
-    const result = await addEvent({ title: title.trim(), day: d.getDate(), month: d.getMonth(), year: d.getFullYear(), brandId: brand || null, type: 'event' });
-    setLoading(false);
-    if (result.error) { setError(result.error); return; }
-    if (result.event) onAdd(result.event);
-    onClose();
-  }
-
-  return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4" style={{ background: 'rgba(0,0,0,0.7)' }}>
-      <div className="rounded-xl p-6 w-full max-w-sm relative" style={{ background: '#0d1117', border: '1px solid rgba(201,150,59,0.2)' }}>
-        <button onClick={onClose} className="absolute top-4 left-4 text-gray-400 hover:text-white text-lg">✕</button>
-        <h2 className="text-lg font-bold mb-4" style={{ color: '#C9963B' }}>+ حدث جديد</h2>
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div>
-            <label className="block text-xs text-gray-400 mb-1">عنوان الحدث</label>
-            <input value={title} onChange={e => setTitle(e.target.value)} placeholder="مثال: اجتماع فريق" className="w-full rounded-lg px-3 py-2 text-sm text-white outline-none" style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(201,150,59,0.15)' }} />
-          </div>
-          <div>
-            <label className="block text-xs text-gray-400 mb-1">التاريخ</label>
-            <input type="date" value={date} onChange={e => setDate(e.target.value)} className="w-full rounded-lg px-3 py-2 text-sm text-white outline-none" style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(201,150,59,0.15)', colorScheme: 'dark' }} />
-          </div>
-          <div>
-            <label className="block text-xs text-gray-400 mb-1">البراند (اختياري)</label>
-            <select value={brand} onChange={e => setBrand(e.target.value)} className="w-full rounded-lg px-3 py-2 text-sm text-white outline-none" style={{ background: '#0d1117', border: '1px solid rgba(201,150,59,0.15)' }}>
-              <option value="">بدون براند</option>
-              {brands.map(b => <option key={b.id} value={b.id}>{b.name}</option>)}
-            </select>
-          </div>
-          {error && <p className="text-red-400 text-xs">{error}</p>}
-          <div className="flex gap-3 pt-2">
-            <button type="button" onClick={onClose} className="flex-1 py-2 rounded-lg text-sm text-gray-400 border" style={{ borderColor: 'rgba(255,255,255,0.1)' }}>إلغاء</button>
-            <button type="submit" disabled={loading} className="flex-1 py-2 rounded-lg text-sm font-semibold transition-opacity" style={{ background: '#C9963B', color: '#05070d', opacity: loading ? 0.6 : 1 }}>
-              {loading ? '...' : '+ أضف'}
-            </button>
-          </div>
-        </form>
-      </div>
-    </div>
-  );
-}
-
 // ─── Main Component ───────────────────────────────────────────────────────────
 export default function CalendarClient({ initialEvents, initialTasks, brands }: Props) {
   const now = new Date();
@@ -172,7 +253,9 @@ export default function CalendarClient({ initialEvents, initialTasks, brands }: 
   const [curMonth, setCurMonth]     = useState(now.getMonth());
   const [curYear,  setCurYear]      = useState(now.getFullYear());
   const [dayPanel, setDayPanel]     = useState<{ day: number; month: number; year: number } | null>(null);
-  const [showAdd,  setShowAdd]      = useState(false);
+  const [showForm, setShowForm]     = useState(false);
+  const [editTarget, setEditTarget] = useState<CalEvent | null>(null);
+  const [formDefault, setFormDefault] = useState<{ day: number; month: number; year: number } | undefined>();
 
   const brandsMap: Record<string, Brand> = {};
   brands.forEach(b => { brandsMap[b.id] = b; });
@@ -188,13 +271,29 @@ export default function CalendarClient({ initialEvents, initialTasks, brands }: 
   }
 
   // ── Handlers ────────────────────────────────────────────────────────────────
-  const handleAddEvent = useCallback((e: CalEvent) => {
-    setEvents(prev => [...prev, e]);
+  const handleSaveEvent = useCallback((e: CalEvent, isEdit: boolean) => {
+    if (isEdit) {
+      setEvents(prev => prev.map(ev => ev.id === e.id ? e : ev));
+    } else {
+      setEvents(prev => [...prev, e]);
+    }
   }, []);
 
   const handleDeleteEvent = useCallback(async (id: string) => {
     await deleteEvent(id);
     setEvents(prev => prev.filter(e => e.id !== id));
+  }, []);
+
+  const openAddForDay = useCallback((day: number, month: number, year: number) => {
+    setEditTarget(null);
+    setFormDefault({ day, month, year });
+    setShowForm(true);
+  }, []);
+
+  const openEdit = useCallback((e: CalEvent) => {
+    setEditTarget(e);
+    setFormDefault(undefined);
+    setShowForm(true);
   }, []);
 
   // ── Calendar Grid ────────────────────────────────────────────────────────────
@@ -204,9 +303,8 @@ export default function CalendarClient({ initialEvents, initialTasks, brands }: 
     const isCurrentMonth = now.getMonth() === curMonth && now.getFullYear() === curYear;
     const today = isCurrentMonth ? now.getDate() : -1;
 
-    const cells: JSX.Element[] = [];
+    const cells: React.ReactElement[] = [];
 
-    // Empty cells before first day
     for (let i = 0; i < firstDay; i++) {
       cells.push(<td key={`e${i}`} />);
     }
@@ -224,6 +322,7 @@ export default function CalendarClient({ initialEvents, initialTasks, brands }: 
         <td
           key={d}
           onClick={() => setDayPanel({ day: d, month: curMonth, year: curYear })}
+          onDoubleClick={() => openAddForDay(d, curMonth, curYear)}
           style={{
             padding: '6px 2px',
             fontSize: '11px',
@@ -236,7 +335,7 @@ export default function CalendarClient({ initialEvents, initialTasks, brands }: 
             fontWeight: isToday || hasItems ? 700 : 400,
             transition: 'background 0.2s',
           }}
-          title={[...dayEvents.map(e => e.title), ...dayTasks.map(t => t.title)].join(', ')}
+          title={[...dayEvents.map(e => e.title), ...dayTasks.map(t => t.title)].join(', ') || `انقر مرتين لإضافة حدث`}
         >
           {pad(d)}
           {hasItems && !isToday && (
@@ -246,14 +345,12 @@ export default function CalendarClient({ initialEvents, initialTasks, brands }: 
       );
     }
 
-    // Fill remaining
     const remaining = 7 - ((firstDay + daysInMonth) % 7);
     if (remaining < 7) {
       for (let j = 0; j < remaining; j++) cells.push(<td key={`r${j}`} />);
     }
 
-    // Split into rows
-    const rows: JSX.Element[][] = [];
+    const rows: React.ReactElement[][] = [];
     for (let i = 0; i < cells.length; i += 7) rows.push(cells.slice(i, i + 7));
 
     return (
@@ -300,7 +397,7 @@ export default function CalendarClient({ initialEvents, initialTasks, brands }: 
             </p>
           </div>
           <button
-            onClick={() => setShowAdd(true)}
+            onClick={() => { setEditTarget(null); setFormDefault(undefined); setShowForm(true); }}
             className="flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-semibold transition-all hover:opacity-90"
             style={{ background: 'rgba(201,150,59,0.15)', border: '1px solid rgba(201,150,59,0.3)', color: '#C9963B' }}
           >
@@ -322,6 +419,7 @@ export default function CalendarClient({ initialEvents, initialTasks, brands }: 
                 <button onClick={prevMonth} className="w-8 h-8 rounded-lg flex items-center justify-center text-sm transition-colors hover:bg-white/10" style={{ color: '#C9963B' }}>←</button>
               </div>
               {buildGrid()}
+              <p className="text-center text-xs mt-3" style={{ color: 'rgba(255,255,255,0.2)' }}>انقر مرة للتفاصيل · انقر مرتين لإضافة حدث</p>
             </div>
 
             {/* Countdowns */}
@@ -359,8 +457,19 @@ export default function CalendarClient({ initialEvents, initialTasks, brands }: 
                         <span className="text-xs font-bold mt-0.5 w-6 flex-shrink-0" style={{ color: '#C9963B' }}>{pad(e.day)}</span>
                         <div className="flex-1 min-w-0">
                           <div className="text-sm font-medium text-white truncate">{e.title}</div>
-                          {b && <span className="text-xs px-2 py-0.5 rounded-full mt-1 inline-block" style={{ background: `${b.color}22`, color: b.color }}>{b.name}</span>}
+                          <div className="flex items-center gap-2 mt-0.5 flex-wrap">
+                            <span className="text-xs" style={{ color: 'rgba(255,255,255,0.3)' }}>
+                              {EVENT_TYPES.find(t => t.value === e.type)?.label ?? e.type}
+                            </span>
+                            {b && <span className="text-xs px-2 py-0.5 rounded-full" style={{ background: `${b.color}22`, color: b.color }}>{b.name}</span>}
+                          </div>
                         </div>
+                        <button
+                          onClick={() => openEdit(e)}
+                          className="text-xs flex-shrink-0"
+                          style={{ color: 'rgba(255,255,255,0.3)' }}
+                          title="تعديل"
+                        >✏</button>
                       </div>
                     );
                   })}
@@ -389,15 +498,18 @@ export default function CalendarClient({ initialEvents, initialTasks, brands }: 
           brands={brands}
           onClose={() => setDayPanel(null)}
           onDelete={handleDeleteEvent}
+          onEdit={openEdit}
         />
       )}
 
-      {/* Add Event Modal */}
-      {showAdd && (
-        <AddEventModal
+      {/* Add / Edit Event Modal */}
+      {showForm && (
+        <EventFormModal
           brands={brands}
-          onClose={() => setShowAdd(false)}
-          onAdd={handleAddEvent}
+          editEvent={editTarget}
+          defaultDate={formDefault}
+          onClose={() => { setShowForm(false); setEditTarget(null); }}
+          onSave={handleSaveEvent}
         />
       )}
     </div>

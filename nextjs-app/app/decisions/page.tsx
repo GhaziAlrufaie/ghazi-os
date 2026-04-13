@@ -1,3 +1,4 @@
+export const dynamic = 'force-dynamic';
 // Ghazi OS — Legendary Edition
 // قسم القرارات — Server Component يجلب البيانات من Supabase
 

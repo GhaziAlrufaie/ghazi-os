@@ -1,3 +1,4 @@
+export const dynamic = 'force-dynamic';
 // Ghazi OS — Legendary Edition
 // قسم الأرشيف — Server Component يجلب البيانات من Supabase
 // الهوية: #05070d | ذهبي #C9963B | RTL كامل
