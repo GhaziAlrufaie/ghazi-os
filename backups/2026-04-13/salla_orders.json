@@ -1,0 +1,1181 @@
+[
+  {
+    "id": 1,
+    "salla_order_id": "TEST001",
+    "order_number": "ORD-TEST-001",
+    "status": "pending",
+    "customer_name": "عميل تجريبي",
+    "customer_phone": "+966500000000",
+    "customer_email": "",
+    "total_amount": 750,
+    "currency": "SAR",
+    "items": [
+      {
+        "sku": "",
+        "name": "منتج تجريبي",
+        "price": 375,
+        "quantity": 2
+      }
+    ],
+    "raw_payload": {
+      "data": {
+        "id": "TEST001",
+        "items": [
+          {
+            "name": "منتج تجريبي",
+            "amounts": {
+              "total": {
+                "amount": 375
+              }
+            },
+            "quantity": 2
+          }
+        ],
+        "status": {
+          "slug": "pending"
+        },
+        "amounts": {
+          "total": {
+            "amount": 750
+          }
+        },
+        "currency": "SAR",
+        "customer": {
+          "name": "عميل تجريبي",
+          "mobile": "+966500000000"
+        },
+        "reference_id": "ORD-TEST-001"
+      },
+      "event": "order.created"
+    },
+    "brand": "غازي بوتيك",
+    "created_at": "2026-04-05T00:35:26.664815+00:00",
+    "updated_at": "2026-04-05T00:35:24.722+00:00"
+  },
+  {
+    "id": 3,
+    "salla_order_id": "TEST002",
+    "order_number": "ORD-TEST-002",
+    "status": "completed",
+    "customer_name": "محمد العتيبي",
+    "customer_phone": "+966512345678",
+    "customer_email": "",
+    "total_amount": 1250,
+    "currency": "SAR",
+    "items": [
+      {
+        "sku": "",
+        "name": "عطر غازي الرفيعي",
+        "price": 800,
+        "quantity": 1
+      },
+      {
+        "sku": "",
+        "name": "حقيبة بيت الجوزاء",
+        "price": 450,
+        "quantity": 1
+      }
+    ],
+    "raw_payload": {
+      "data": {
+        "id": "TEST002",
+        "items": [
+          {
+            "name": "عطر غازي الرفيعي",
+            "amounts": {
+              "total": {
+                "amount": 800
+              }
+            },
+            "quantity": 1
+          },
+          {
+            "name": "حقيبة بيت الجوزاء",
+            "amounts": {
+              "total": {
+                "amount": 450
+              }
+            },
+            "quantity": 1
+          }
+        ],
+        "status": {
+          "slug": "completed"
+        },
+        "amounts": {
+          "total": {
+            "amount": 1250
+          }
+        },
+        "currency": "SAR",
+        "customer": {
+          "name": "محمد العتيبي",
+          "mobile": "+966512345678"
+        },
+        "reference_id": "ORD-TEST-002"
+      },
+      "event": "order.created"
+    },
+    "brand": "غازي بوتيك",
+    "created_at": "2026-04-05T00:36:56.045811+00:00",
+    "updated_at": "2026-04-05T00:36:55.637+00:00"
+  },
+  {
+    "id": 4,
+    "salla_order_id": "9988776655",
+    "order_number": "55001",
+    "status": "under_review",
+    "customer_name": "غازي العتيبي",
+    "customer_phone": "+966562122212",
+    "customer_email": "ghazi@test.com",
+    "total_amount": 600,
+    "currency": "SAR",
+    "items": [
+      {
+        "id": 70815337,
+        "sku": "PERF-001",
+        "name": "عطر غازي الرفيعي",
+        "price": 521,
+        "quantity": 1
+      }
+    ],
+    "raw_payload": {
+      "data": {
+        "id": 9988776655,
+        "items": [
+          {
+            "id": 70815337,
+            "sku": "PERF-001",
+            "name": "عطر غازي الرفيعي",
+            "amounts": {
+              "price": {
+                "amount": 521,
+                "currency": "SAR"
+              },
+              "total": {
+                "amount": 521,
+                "currency": "SAR"
+              }
+            },
+            "currency": "SAR",
+            "quantity": 1
+          }
+        ],
+        "status": {
+          "id": 1,
+          "name": "قيد المراجعة",
+          "slug": "under_review"
+        },
+        "amounts": {
+          "tax": {
+            "amount": 78.15,
+            "percent": "15.00",
+            "currency": "SAR"
+          },
+          "total": {
+            "amount": 600,
+            "currency": "SAR"
+          },
+          "sub_total": {
+            "amount": 521,
+            "currency": "SAR"
+          },
+          "shipping_cost": {
+            "amount": 0,
+            "currency": "SAR"
+          }
+        },
+        "currency": "SAR",
+        "customer": {
+          "id": 225167971,
+          "email": "ghazi@test.com",
+          "mobile": 562122212,
+          "last_name": "العتيبي",
+          "first_name": "غازي",
+          "mobile_code": "+966"
+        },
+        "reference_id": 55001
+      },
+      "event": "order.created",
+      "merchant": 1305146709,
+      "created_at": "Sun Apr 05 2026 10:00:00 GMT+0300"
+    },
+    "brand": "غازي بوتيك",
+    "created_at": "2026-04-05T01:08:47.009869+00:00",
+    "updated_at": "2026-04-05T01:08:46.207+00:00"
+  },
+  {
+    "id": 5,
+    "salla_order_id": "1405616180",
+    "order_number": "1405616180",
+    "status": "pending",
+    "customer_name": "غاززي الشمري",
+    "customer_phone": "+966562122212",
+    "customer_email": "Ghazi.alshammeri11@gmail.com",
+    "total_amount": 10.01,
+    "currency": "SAR",
+    "items": [
+      {
+        "id": 635946130,
+        "sku": "",
+        "name": "مجموعة ذكرني الكاملة",
+        "price": null,
+        "quantity": 1
+      }
+    ],
+    "raw_payload": {
+      "data": {
+        "id": 1405616180,
+        "tax": {
+          "amount": {
+            "amount": 1.31,
+            "currency": "SAR"
+          },
+          "percent": 15
+        },
+        "date": "2026-04-05 04:54:59",
+        "slug": 1,
+        "type": "Tax Invoice",
+        "uuid": "dfff0122-6451-430f-a9e8-602adb348f49",
+        "items": [
+          {
+            "id": 635946130,
+            "sku": "",
+            "tax": {
+              "amount": {
+                "amount": 1.31,
+                "currency": "SAR"
+              },
+              "percent": 15
+            },
+            "name": "مجموعة ذكرني الكاملة",
+            "type": "product",
+            "price": {
+              "amount": 8.7,
+              "currency": "SAR"
+            },
+            "total": {
+              "amount": 10.01,
+              "currency": "SAR"
+            },
+            "item_id": 1975589976,
+            "discount": {
+              "amount": 0,
+              "currency": "SAR"
+            },
+            "quantity": 1,
+            "product_id": 1625021953,
+            "description": ""
+          }
+        ],
+        "total": {
+          "amount": 10.01,
+          "currency": "SAR"
+        },
+        "company": null,
+        "qr_code": null,
+        "cod_cost": {
+          "amount": 0,
+          "taxable": true,
+          "currency": "SAR"
+        },
+        "customer": {
+          "id": 1637396082,
+          "email": "Ghazi.alshammeri11@gmail.com",
+          "avatar": "https://cdn.assets.salla.network/prod/admin/cp/assets/images/avatar_male.png",
+          "gender": "male",
+          "mobile": 562122212,
+          "address": {
+            "city": "الخرج",
+            "country": "السعودية",
+            "district": "Al Kharj Industrial City",
+            "description": null,
+            "postal_code": "16255",
+            "street_name": "جامع قرطبة,8197",
+            "building_number": "8197",
+            "additional_number": "2775"
+          },
+          "birthday": {
+            "date": "2010-12-04 00:00:00.000000",
+            "timezone": "Asia/Riyadh",
+            "timezone_type": 3
+          },
+          "currency": "SAR",
+          "last_name": "الشمري",
+          "first_name": "غاززي",
+          "updated_at": {
+            "date": "2026-04-05 04:54:08.000000",
+            "timezone": "Asia/Riyadh",
+            "timezone_type": 3
+          },
+          "mobile_code": "+966",
+          "country_code": "SA"
+        },
+        "discount": {
+          "amount": 0,
+          "currency": "SAR"
+        },
+        "order_id": 920190618,
+        "sub_total": {
+          "amount": 8.7,
+          "currency": "SAR"
+        },
+        "order_options": {
+          "amount": 0,
+          "currency": "SAR"
+        },
+        "shipping_cost": {
+          "amount": 0,
+          "taxable": true,
+          "currency": "SAR"
+        },
+        "invoice_number": 329,
+        "payment_method": "bank",
+        "order_reference_id": 252455487,
+        "invoice_reference_id": null,
+        "shipping_cost_discount": {
+          "amount": 0,
+          "currency": "SAR"
+        }
+      },
+      "event": "invoice.created",
+      "merchant": 1020985111,
+      "created_at": "Sun Apr 05 2026 04:55:00 GMT+0300"
+    },
+    "brand": "غازي بوتيك",
+    "created_at": "2026-04-05T01:55:02.887207+00:00",
+    "updated_at": "2026-04-05T01:55:01.686+00:00"
+  },
+  {
+    "id": 6,
+    "salla_order_id": "1923672634",
+    "order_number": "1923672634",
+    "status": "pending",
+    "customer_name": "امينه",
+    "customer_phone": "+966531932291",
+    "customer_email": "",
+    "total_amount": 10.01,
+    "currency": "SAR",
+    "items": [
+      {
+        "id": 2034223348,
+        "sku": "",
+        "name": "مجموعة ذكرني الكاملة",
+        "price": null,
+        "quantity": 1
+      }
+    ],
+    "raw_payload": {
+      "data": {
+        "id": 1923672634,
+        "tax": {
+          "amount": {
+            "amount": 1.31,
+            "currency": "SAR"
+          },
+          "percent": 15
+        },
+        "date": "2026-04-11 02:42:06",
+        "slug": 1,
+        "type": "Tax Invoice",
+        "uuid": "717a922e-6cd7-4c21-9e09-42ab44c21dc5",
+        "items": [
+          {
+            "id": 2034223348,
+            "sku": "",
+            "tax": {
+              "amount": {
+                "amount": 1.31,
+                "currency": "SAR"
+              },
+              "percent": 15
+            },
+            "name": "مجموعة ذكرني الكاملة",
+            "type": "product",
+            "price": {
+              "amount": 8.7,
+              "currency": "SAR"
+            },
+            "total": {
+              "amount": 10.01,
+              "currency": "SAR"
+            },
+            "item_id": 157522613,
+            "discount": {
+              "amount": 0,
+              "currency": "SAR"
+            },
+            "quantity": 1,
+            "product_id": 1625021953,
+            "description": ""
+          }
+        ],
+        "total": {
+          "amount": 10.01,
+          "currency": "SAR"
+        },
+        "company": null,
+        "qr_code": null,
+        "cod_cost": {
+          "amount": 0,
+          "taxable": true,
+          "currency": "SAR"
+        },
+        "customer": {
+          "id": 1019317972,
+          "email": "",
+          "avatar": "https://cdn.assets.salla.network/prod/admin/cp/assets/images/avatar_female.png",
+          "gender": "female",
+          "mobile": 531932291,
+          "address": {
+            "city": "بدر",
+            "country": "السعودية",
+            "district": "Al Ghazwah",
+            "description": "6458 الغزوة 9 - حي الغزوة, بدر 46357 - 3884",
+            "postal_code": "46357",
+            "street_name": "الغزوة 9",
+            "building_number": "6458",
+            "additional_number": "3884"
+          },
+          "birthday": {
+            "date": "1988-09-30 00:00:00.000000",
+            "timezone": "Asia/Riyadh",
+            "timezone_type": 3
+          },
+          "currency": "SAR",
+          "last_name": "",
+          "first_name": "امينه",
+          "updated_at": {
+            "date": "2026-04-11 01:35:09.000000",
+            "timezone": "Asia/Riyadh",
+            "timezone_type": 3
+          },
+          "mobile_code": "+966",
+          "country_code": "SA"
+        },
+        "discount": {
+          "amount": 0,
+          "currency": "SAR"
+        },
+        "order_id": 1340919208,
+        "sub_total": {
+          "amount": 8.7,
+          "currency": "SAR"
+        },
+        "order_options": {
+          "amount": 0,
+          "currency": "SAR"
+        },
+        "shipping_cost": {
+          "amount": 0,
+          "taxable": true,
+          "currency": "SAR"
+        },
+        "invoice_number": 330,
+        "payment_method": "mada",
+        "order_reference_id": 253578509,
+        "invoice_reference_id": null,
+        "shipping_cost_discount": {
+          "amount": 0,
+          "currency": "SAR"
+        }
+      },
+      "event": "invoice.created",
+      "merchant": 1020985111,
+      "created_at": "Sat Apr 11 2026 02:42:06 GMT+0300"
+    },
+    "brand": "غازي بوتيك",
+    "created_at": "2026-04-10T23:42:08.034924+00:00",
+    "updated_at": "2026-04-10T23:42:06.771+00:00"
+  },
+  {
+    "id": 7,
+    "salla_order_id": "995040935",
+    "order_number": "995040935",
+    "status": "pending",
+    "customer_name": "تالين",
+    "customer_phone": "+966541090608",
+    "customer_email": "kzkz5809@gmail.com",
+    "total_amount": 10.01,
+    "currency": "SAR",
+    "items": [
+      {
+        "id": 1130115083,
+        "sku": "",
+        "name": "مجموعة ذكرني الكاملة",
+        "price": null,
+        "quantity": 1
+      }
+    ],
+    "raw_payload": {
+      "data": {
+        "id": 995040935,
+        "tax": {
+          "amount": {
+            "amount": 1.31,
+            "currency": "SAR"
+          },
+          "percent": 15
+        },
+        "date": "2026-04-11 03:06:49",
+        "slug": 1,
+        "type": "Tax Invoice",
+        "uuid": "d3d85043-27bc-4bd3-90b2-f425de70ab83",
+        "items": [
+          {
+            "id": 1130115083,
+            "sku": "",
+            "tax": {
+              "amount": {
+                "amount": 1.31,
+                "currency": "SAR"
+              },
+              "percent": 15
+            },
+            "name": "مجموعة ذكرني الكاملة",
+            "type": "product",
+            "price": {
+              "amount": 8.7,
+              "currency": "SAR"
+            },
+            "total": {
+              "amount": 10.01,
+              "currency": "SAR"
+            },
+            "item_id": 1499469308,
+            "discount": {
+              "amount": 0,
+              "currency": "SAR"
+            },
+            "quantity": 1,
+            "product_id": 1625021953,
+            "description": ""
+          }
+        ],
+        "total": {
+          "amount": 10.01,
+          "currency": "SAR"
+        },
+        "company": null,
+        "qr_code": null,
+        "cod_cost": {
+          "amount": 0,
+          "taxable": true,
+          "currency": "SAR"
+        },
+        "customer": {
+          "id": 969769591,
+          "email": "kzkz5809@gmail.com",
+          "avatar": "https://cdn.assets.salla.network/prod/stores/themes/default/assets/images/avatar_male.png",
+          "gender": "",
+          "mobile": 541090608,
+          "address": {
+            "city": "المدينة المنورة",
+            "country": "السعودية",
+            "district": "Al Qaswa",
+            "description": "حي القصواء شارع ثابت بن عبدالله DMWB6894",
+            "postal_code": "42391",
+            "street_name": "ثابت ابن عبدالله,6912",
+            "building_number": "6912",
+            "additional_number": "5145"
+          },
+          "birthday": null,
+          "currency": "SAR",
+          "last_name": "",
+          "first_name": "تالين",
+          "updated_at": {
+            "date": "2026-04-11 03:06:19.000000",
+            "timezone": "Asia/Riyadh",
+            "timezone_type": 3
+          },
+          "mobile_code": "+966",
+          "country_code": "SA"
+        },
+        "discount": {
+          "amount": 0,
+          "currency": "SAR"
+        },
+        "order_id": 251816268,
+        "sub_total": {
+          "amount": 8.7,
+          "currency": "SAR"
+        },
+        "order_options": {
+          "amount": 0,
+          "currency": "SAR"
+        },
+        "shipping_cost": {
+          "amount": 0,
+          "taxable": true,
+          "currency": "SAR"
+        },
+        "invoice_number": 331,
+        "payment_method": "credit_card",
+        "order_reference_id": 253580777,
+        "invoice_reference_id": null,
+        "shipping_cost_discount": {
+          "amount": 0,
+          "currency": "SAR"
+        }
+      },
+      "event": "invoice.created",
+      "merchant": 1020985111,
+      "created_at": "Sat Apr 11 2026 03:06:49 GMT+0300"
+    },
+    "brand": "غازي بوتيك",
+    "created_at": "2026-04-11T00:06:50.900056+00:00",
+    "updated_at": "2026-04-11T00:06:49.773+00:00"
+  },
+  {
+    "id": 8,
+    "salla_order_id": "578469541",
+    "order_number": "578469541",
+    "status": "pending",
+    "customer_name": "أم إبراهيم",
+    "customer_phone": "+966563351646",
+    "customer_email": "",
+    "total_amount": 10.01,
+    "currency": "SAR",
+    "items": [
+      {
+        "id": 788632235,
+        "sku": "",
+        "name": "مجموعة ذكرني الكاملة",
+        "price": null,
+        "quantity": 1
+      }
+    ],
+    "raw_payload": {
+      "data": {
+        "id": 578469541,
+        "tax": {
+          "amount": {
+            "amount": 1.31,
+            "currency": "SAR"
+          },
+          "percent": 15
+        },
+        "date": "2026-04-11 14:16:18",
+        "slug": 1,
+        "type": "Tax Invoice",
+        "uuid": "564974b8-03e1-49ca-bb51-4f351776134a",
+        "items": [
+          {
+            "id": 788632235,
+            "sku": "",
+            "tax": {
+              "amount": {
+                "amount": 1.31,
+                "currency": "SAR"
+              },
+              "percent": 15
+            },
+            "name": "مجموعة ذكرني الكاملة",
+            "type": "product",
+            "price": {
+              "amount": 8.7,
+              "currency": "SAR"
+            },
+            "total": {
+              "amount": 10.01,
+              "currency": "SAR"
+            },
+            "item_id": 1557087911,
+            "discount": {
+              "amount": 0,
+              "currency": "SAR"
+            },
+            "quantity": 1,
+            "product_id": 1625021953,
+            "description": ""
+          }
+        ],
+        "total": {
+          "amount": 10.01,
+          "currency": "SAR"
+        },
+        "company": null,
+        "qr_code": null,
+        "cod_cost": {
+          "amount": 0,
+          "taxable": true,
+          "currency": "SAR"
+        },
+        "customer": {
+          "id": 426112070,
+          "email": "",
+          "avatar": "https://cdn.assets.salla.network/prod/admin/cp/assets/images/avatar_male.png",
+          "gender": "",
+          "mobile": 563351646,
+          "address": {
+            "city": "حائل",
+            "country": "السعودية",
+            "district": "Al Mahattah",
+            "description": "فله",
+            "postal_code": "55421",
+            "street_name": "شارع الدمام",
+            "building_number": null,
+            "additional_number": null
+          },
+          "birthday": null,
+          "currency": "SAR",
+          "last_name": "إبراهيم",
+          "first_name": "أم",
+          "updated_at": {
+            "date": "2026-04-11 14:15:59.000000",
+            "timezone": "Asia/Riyadh",
+            "timezone_type": 3
+          },
+          "mobile_code": "+966",
+          "country_code": "SA"
+        },
+        "discount": {
+          "amount": 0,
+          "currency": "SAR"
+        },
+        "order_id": 2147060622,
+        "sub_total": {
+          "amount": 8.7,
+          "currency": "SAR"
+        },
+        "order_options": {
+          "amount": 0,
+          "currency": "SAR"
+        },
+        "shipping_cost": {
+          "amount": 0,
+          "taxable": true,
+          "currency": "SAR"
+        },
+        "invoice_number": 332,
+        "payment_method": "mada",
+        "order_reference_id": 253636907,
+        "invoice_reference_id": null,
+        "shipping_cost_discount": {
+          "amount": 0,
+          "currency": "SAR"
+        }
+      },
+      "event": "invoice.created",
+      "merchant": 1020985111,
+      "created_at": "Sat Apr 11 2026 14:16:18 GMT+0300"
+    },
+    "brand": "غازي بوتيك",
+    "created_at": "2026-04-11T11:16:19.988025+00:00",
+    "updated_at": "2026-04-11T11:16:18.645+00:00"
+  },
+  {
+    "id": 9,
+    "salla_order_id": "916150501",
+    "order_number": "916150501",
+    "status": "pending",
+    "customer_name": "جواهر العطوي",
+    "customer_phone": "+966538103793",
+    "customer_email": "",
+    "total_amount": 10.01,
+    "currency": "SAR",
+    "items": [
+      {
+        "id": 1236149139,
+        "sku": "",
+        "name": "مجموعة ذكرني الكاملة",
+        "price": null,
+        "quantity": 1
+      }
+    ],
+    "raw_payload": {
+      "data": {
+        "id": 916150501,
+        "tax": {
+          "amount": {
+            "amount": 1.31,
+            "currency": "SAR"
+          },
+          "percent": 15
+        },
+        "date": "2026-04-11 15:10:09",
+        "slug": 1,
+        "type": "Tax Invoice",
+        "uuid": "6e84a146-8a3c-4610-b358-a1fbb0f89070",
+        "items": [
+          {
+            "id": 1236149139,
+            "sku": "",
+            "tax": {
+              "amount": {
+                "amount": 1.31,
+                "currency": "SAR"
+              },
+              "percent": 15
+            },
+            "name": "مجموعة ذكرني الكاملة",
+            "type": "product",
+            "price": {
+              "amount": 8.7,
+              "currency": "SAR"
+            },
+            "total": {
+              "amount": 10.01,
+              "currency": "SAR"
+            },
+            "item_id": 1566277144,
+            "discount": {
+              "amount": 0,
+              "currency": "SAR"
+            },
+            "quantity": 1,
+            "product_id": 1625021953,
+            "description": ""
+          }
+        ],
+        "total": {
+          "amount": 10.01,
+          "currency": "SAR"
+        },
+        "company": null,
+        "qr_code": null,
+        "cod_cost": {
+          "amount": 0,
+          "taxable": true,
+          "currency": "SAR"
+        },
+        "customer": {
+          "id": 1312270583,
+          "email": "",
+          "avatar": "https://cdn.assets.salla.network/prod/admin/cp/assets/images/avatar_male.png",
+          "gender": "",
+          "mobile": 538103793,
+          "address": {
+            "city": "الحديثة",
+            "country": "السعودية",
+            "district": null,
+            "description": "المزارع",
+            "postal_code": "77657",
+            "street_name": "سامي محمد الجابري الحربي,6896",
+            "building_number": "6896",
+            "additional_number": "3056"
+          },
+          "birthday": null,
+          "currency": "SAR",
+          "last_name": "",
+          "first_name": "جواهر العطوي",
+          "updated_at": {
+            "date": "2026-04-11 15:09:36.000000",
+            "timezone": "Asia/Riyadh",
+            "timezone_type": 3
+          },
+          "mobile_code": "+966",
+          "country_code": "SA"
+        },
+        "discount": {
+          "amount": 0,
+          "currency": "SAR"
+        },
+        "order_id": 1537594324,
+        "sub_total": {
+          "amount": 8.7,
+          "currency": "SAR"
+        },
+        "order_options": {
+          "amount": 0,
+          "currency": "SAR"
+        },
+        "shipping_cost": {
+          "amount": 0,
+          "taxable": true,
+          "currency": "SAR"
+        },
+        "invoice_number": 333,
+        "payment_method": "mada",
+        "order_reference_id": 253645681,
+        "invoice_reference_id": null,
+        "shipping_cost_discount": {
+          "amount": 0,
+          "currency": "SAR"
+        }
+      },
+      "event": "invoice.created",
+      "merchant": 1020985111,
+      "created_at": "Sat Apr 11 2026 15:10:11 GMT+0300"
+    },
+    "brand": "غازي بوت��ك",
+    "created_at": "2026-04-11T12:10:13.711607+00:00",
+    "updated_at": "2026-04-11T12:10:12.457+00:00"
+  },
+  {
+    "id": 10,
+    "salla_order_id": "1914449091",
+    "order_number": "1914449091",
+    "status": "pending",
+    "customer_name": "سعيدة",
+    "customer_phone": "+966503101811",
+    "customer_email": "s5392060@bg.moe.gov.sa",
+    "total_amount": 10.01,
+    "currency": "SAR",
+    "items": [
+      {
+        "id": 467603657,
+        "sku": "",
+        "name": "مجموعة ذكرني الكاملة",
+        "price": null,
+        "quantity": 1
+      }
+    ],
+    "raw_payload": {
+      "data": {
+        "id": 1914449091,
+        "tax": {
+          "amount": {
+            "amount": 1.31,
+            "currency": "SAR"
+          },
+          "percent": 15
+        },
+        "date": "2026-04-13 00:50:39",
+        "slug": 1,
+        "type": "Tax Invoice",
+        "uuid": "d839d21a-6e47-4a6b-bc5a-ae5dab6bfd55",
+        "items": [
+          {
+            "id": 467603657,
+            "sku": "",
+            "tax": {
+              "amount": {
+                "amount": 1.31,
+                "currency": "SAR"
+              },
+              "percent": 15
+            },
+            "name": "مجموعة ذكرني الكاملة",
+            "type": "product",
+            "price": {
+              "amount": 8.7,
+              "currency": "SAR"
+            },
+            "total": {
+              "amount": 10.01,
+              "currency": "SAR"
+            },
+            "item_id": 262415861,
+            "discount": {
+              "amount": 0,
+              "currency": "SAR"
+            },
+            "quantity": 1,
+            "product_id": 1625021953,
+            "description": ""
+          }
+        ],
+        "total": {
+          "amount": 10.01,
+          "currency": "SAR"
+        },
+        "company": null,
+        "qr_code": null,
+        "cod_cost": {
+          "amount": 0,
+          "taxable": true,
+          "currency": "SAR"
+        },
+        "customer": {
+          "id": 1578228687,
+          "email": "s5392060@bg.moe.gov.sa",
+          "avatar": "https://cdn.assets.salla.network/prod/admin/cp/assets/images/avatar_male.png",
+          "gender": "",
+          "mobile": 503101811,
+          "address": {
+            "city": "العقيق",
+            "country": "السعودية",
+            "district": "Al Matar",
+            "description": "الحارث بن زهير العكلي,5045,حي جفن,65921, BCDA5045، 5045 الحارث بن زهير العكلي، 9419، حي جفن، العقيق 65921، السعودية, العقيق,السعودية",
+            "postal_code": "65921",
+            "street_name": "الحارث بن زهير العكلي,5045",
+            "building_number": "5045",
+            "additional_number": "9419"
+          },
+          "birthday": null,
+          "currency": "SAR",
+          "last_name": "",
+          "first_name": "سعيدة",
+          "updated_at": {
+            "date": "2026-04-13 00:50:21.000000",
+            "timezone": "Asia/Riyadh",
+            "timezone_type": 3
+          },
+          "mobile_code": "+966",
+          "country_code": "SA"
+        },
+        "discount": {
+          "amount": 0,
+          "currency": "SAR"
+        },
+        "order_id": 920174265,
+        "sub_total": {
+          "amount": 8.7,
+          "currency": "SAR"
+        },
+        "order_options": {
+          "amount": 0,
+          "currency": "SAR"
+        },
+        "shipping_cost": {
+          "amount": 0,
+          "taxable": true,
+          "currency": "SAR"
+        },
+        "invoice_number": 334,
+        "payment_method": "mada",
+        "order_reference_id": 253913886,
+        "invoice_reference_id": null,
+        "shipping_cost_discount": {
+          "amount": 0,
+          "currency": "SAR"
+        }
+      },
+      "event": "invoice.created",
+      "merchant": 1020985111,
+      "created_at": "Mon Apr 13 2026 00:50:39 GMT+0300"
+    },
+    "brand": "غازي بوتيك",
+    "created_at": "2026-04-12T21:50:42.227217+00:00",
+    "updated_at": "2026-04-12T21:50:41+00:00"
+  },
+  {
+    "id": 11,
+    "salla_order_id": "729410824",
+    "order_number": "729410824",
+    "status": "pending",
+    "customer_name": "عبدالله",
+    "customer_phone": "+966506639041",
+    "customer_email": "wnmm8090@gmail.com",
+    "total_amount": 10.01,
+    "currency": "SAR",
+    "items": [
+      {
+        "id": 1455440557,
+        "sku": "",
+        "name": "مجموعة ذكرني الكاملة",
+        "price": null,
+        "quantity": 1
+      }
+    ],
+    "raw_payload": {
+      "data": {
+        "id": 729410824,
+        "tax": {
+          "amount": {
+            "amount": 1.31,
+            "currency": "SAR"
+          },
+          "percent": 15
+        },
+        "date": "2026-04-14 02:27:03",
+        "slug": 1,
+        "type": "Tax Invoice",
+        "uuid": "f2d3a232-a35f-402a-a427-40959d23a206",
+        "items": [
+          {
+            "id": 1455440557,
+            "sku": "",
+            "tax": {
+              "amount": {
+                "amount": 1.31,
+                "currency": "SAR"
+              },
+              "percent": 15
+            },
+            "name": "مجموعة ذكرني الكاملة",
+            "type": "product",
+            "price": {
+              "amount": 8.7,
+              "currency": "SAR"
+            },
+            "total": {
+              "amount": 10.01,
+              "currency": "SAR"
+            },
+            "item_id": 1648058019,
+            "discount": {
+              "amount": 0,
+              "currency": "SAR"
+            },
+            "quantity": 1,
+            "product_id": 1625021953,
+            "description": ""
+          }
+        ],
+        "total": {
+          "amount": 10.01,
+          "currency": "SAR"
+        },
+        "company": null,
+        "qr_code": null,
+        "cod_cost": {
+          "amount": 0,
+          "taxable": true,
+          "currency": "SAR"
+        },
+        "customer": {
+          "id": 866601628,
+          "email": "wnmm8090@gmail.com",
+          "avatar": "https://cdn.assets.salla.network/prod/admin/cp/assets/images/avatar_male.png",
+          "gender": "male",
+          "mobile": 506639041,
+          "address": {
+            "city": "الدمام",
+            "country": "السعودية",
+            "district": "Taibah",
+            "description": "EDSA7368، 7368 بلال بن رباح، 4537، حي طيبة، الدمام 32273، السعودية",
+            "postal_code": "32273",
+            "street_name": "بلال بن رباح,7368",
+            "building_number": "7368",
+            "additional_number": "4537"
+          },
+          "birthday": null,
+          "currency": "SAR",
+          "last_name": "",
+          "first_name": "عبدالله",
+          "updated_at": {
+            "date": "2026-04-14 02:17:07.000000",
+            "timezone": "Asia/Riyadh",
+            "timezone_type": 3
+          },
+          "mobile_code": "+966",
+          "country_code": "SA"
+        },
+        "discount": {
+          "amount": 0,
+          "currency": "SAR"
+        },
+        "order_id": 455174374,
+        "sub_total": {
+          "amount": 8.7,
+          "currency": "SAR"
+        },
+        "order_options": {
+          "amount": 0,
+          "currency": "SAR"
+        },
+        "shipping_cost": {
+          "amount": 0,
+          "taxable": true,
+          "currency": "SAR"
+        },
+        "invoice_number": 335,
+        "payment_method": "mada",
+        "order_reference_id": 254098499,
+        "invoice_reference_id": null,
+        "shipping_cost_discount": {
+          "amount": 0,
+          "currency": "SAR"
+        }
+      },
+      "event": "invoice.created",
+      "merchant": 1020985111,
+      "created_at": "Tue Apr 14 2026 02:27:03 GMT+0300"
+    },
+    "brand": "غازي بوتيك",
+    "created_at": "2026-04-13T23:27:05.974476+00:00",
+    "updated_at": "2026-04-13T23:27:04.874+00:00"
+  }
+]
