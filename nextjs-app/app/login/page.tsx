@@ -1,5 +1,10 @@
 'use client';
-
+/*
+ * Ghazi OS — Legendary Edition
+ * Login Page: صفحة تسجيل الدخول
+ * خلفية: #05070d + Aurora + Noise
+ * البطاقة: glass morphism ذهبي
+ */
 import { useState, FormEvent } from 'react';
 import { useRouter } from 'next/navigation';
 
@@ -31,7 +36,7 @@ export default function LoginPage() {
       } else {
         setError(data.error || 'خطأ في تسجيل الدخول');
         setShake(true);
-        setTimeout(() => setShake(false), 500);
+        setTimeout(() => setShake(false), 600);
         setPassword('');
       }
     } catch {
@@ -46,55 +51,84 @@ export default function LoginPage() {
       dir="rtl"
       style={{
         minHeight: '100vh',
-        background: '#0a0a0a',
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
-        fontFamily: "'IBM Plex Sans Arabic', sans-serif",
+        padding: '20px',
+        position: 'relative',
+        zIndex: 10,
       }}
     >
       <div
         style={{
-          background: '#141414',
-          border: '1px solid rgba(201,168,76,0.2)',
-          borderRadius: '16px',
-          padding: '48px 40px',
           width: '100%',
-          maxWidth: '400px',
-          boxShadow: '0 0 60px rgba(201,168,76,0.08)',
+          maxWidth: 400,
+          background: 'rgba(8, 11, 20, 0.85)',
+          border: '1px solid rgba(201, 150, 59, 0.2)',
+          borderRadius: 24,
+          padding: '48px 40px',
+          backdropFilter: 'blur(40px)',
+          WebkitBackdropFilter: 'blur(40px)',
+          boxShadow: '0 40px 80px rgba(0,0,0,0.5), 0 0 60px rgba(201,150,59,0.06)',
           transform: shake ? 'translateX(8px)' : 'none',
           transition: 'transform 0.1s ease',
+          position: 'relative',
+          overflow: 'hidden',
         }}
       >
+        {/* Corner glow */}
+        <div
+          style={{
+            position: 'absolute',
+            top: -60,
+            right: -60,
+            width: 180,
+            height: 180,
+            background: 'radial-gradient(circle, rgba(201,150,59,0.1) 0%, transparent 70%)',
+            pointerEvents: 'none',
+          }}
+        />
+
         {/* Logo */}
-        <div style={{ textAlign: 'center', marginBottom: '32px' }}>
+        <div style={{ textAlign: 'center', marginBottom: 36 }}>
           <div
             style={{
-              fontSize: '32px',
-              fontWeight: '800',
-              color: '#C9A84C',
-              letterSpacing: '-1px',
-              marginBottom: '4px',
+              fontSize: 36,
+              fontWeight: 200,
+              letterSpacing: '-0.04em',
+              background: 'linear-gradient(135deg, #E8C068, #C9963B)',
+              WebkitBackgroundClip: 'text',
+              WebkitTextFillColor: 'transparent',
+              backgroundClip: 'text',
+              marginBottom: 6,
+              lineHeight: 1,
             }}
           >
             Ghazi OS
           </div>
-          <div style={{ fontSize: '13px', color: '#666', fontWeight: '500' }}>
+          <div
+            style={{
+              fontSize: 11,
+              color: 'rgba(255,255,255,0.28)',
+              letterSpacing: '0.12em',
+              textTransform: 'uppercase',
+            }}
+          >
             نظام إدارة الأعمال
           </div>
         </div>
 
         <form onSubmit={handleSubmit}>
-          {/* حقل اسم المستخدم */}
-          <div style={{ marginBottom: '16px' }}>
+          {/* اسم المستخدم */}
+          <div style={{ marginBottom: 16 }}>
             <label
               style={{
                 display: 'block',
-                fontSize: '12px',
-                color: '#888',
-                marginBottom: '6px',
-                fontWeight: '600',
-                letterSpacing: '0.5px',
+                fontSize: 11,
+                color: 'rgba(255,255,255,0.4)',
+                marginBottom: 6,
+                letterSpacing: '0.08em',
+                textTransform: 'uppercase',
               }}
             >
               اسم المستخدم
@@ -108,32 +142,38 @@ export default function LoginPage() {
               required
               style={{
                 width: '100%',
-                background: '#1e1e1e',
-                border: '1px solid #2a2a2a',
-                borderRadius: '8px',
-                padding: '12px 14px',
-                color: '#fff',
-                fontSize: '14px',
-                fontFamily: 'inherit',
+                background: 'rgba(255,255,255,0.04)',
+                border: '1px solid rgba(255,255,255,0.10)',
+                borderRadius: 10,
+                padding: '11px 14px',
+                color: 'rgba(255,255,255,0.92)',
+                fontSize: 14,
+                fontFamily: 'IBM Plex Sans Arabic, sans-serif',
                 outline: 'none',
                 boxSizing: 'border-box',
-                transition: 'border-color 0.2s',
+                transition: 'border-color 0.3s, box-shadow 0.3s',
               }}
-              onFocus={(e) => (e.target.style.borderColor = '#C9A84C')}
-              onBlur={(e) => (e.target.style.borderColor = '#2a2a2a')}
+              onFocus={(e) => {
+                e.target.style.borderColor = 'rgba(201,150,59,0.4)';
+                e.target.style.boxShadow = '0 0 0 3px rgba(201,150,59,0.08)';
+              }}
+              onBlur={(e) => {
+                e.target.style.borderColor = 'rgba(255,255,255,0.10)';
+                e.target.style.boxShadow = 'none';
+              }}
             />
           </div>
 
-          {/* حقل كلمة المرور */}
-          <div style={{ marginBottom: '24px' }}>
+          {/* كلمة المرور */}
+          <div style={{ marginBottom: 24 }}>
             <label
               style={{
                 display: 'block',
-                fontSize: '12px',
-                color: '#888',
-                marginBottom: '6px',
-                fontWeight: '600',
-                letterSpacing: '0.5px',
+                fontSize: 11,
+                color: 'rgba(255,255,255,0.4)',
+                marginBottom: 6,
+                letterSpacing: '0.08em',
+                textTransform: 'uppercase',
               }}
             >
               كلمة المرور
@@ -147,19 +187,25 @@ export default function LoginPage() {
               required
               style={{
                 width: '100%',
-                background: '#1e1e1e',
-                border: '1px solid #2a2a2a',
-                borderRadius: '8px',
-                padding: '12px 14px',
-                color: '#fff',
-                fontSize: '14px',
-                fontFamily: 'inherit',
+                background: 'rgba(255,255,255,0.04)',
+                border: '1px solid rgba(255,255,255,0.10)',
+                borderRadius: 10,
+                padding: '11px 14px',
+                color: 'rgba(255,255,255,0.92)',
+                fontSize: 14,
+                fontFamily: 'IBM Plex Sans Arabic, sans-serif',
                 outline: 'none',
                 boxSizing: 'border-box',
-                transition: 'border-color 0.2s',
+                transition: 'border-color 0.3s, box-shadow 0.3s',
               }}
-              onFocus={(e) => (e.target.style.borderColor = '#C9A84C')}
-              onBlur={(e) => (e.target.style.borderColor = '#2a2a2a')}
+              onFocus={(e) => {
+                e.target.style.borderColor = 'rgba(201,150,59,0.4)';
+                e.target.style.boxShadow = '0 0 0 3px rgba(201,150,59,0.08)';
+              }}
+              onBlur={(e) => {
+                e.target.style.borderColor = 'rgba(255,255,255,0.10)';
+                e.target.style.boxShadow = 'none';
+              }}
             />
           </div>
 
@@ -167,13 +213,13 @@ export default function LoginPage() {
           {error && (
             <div
               style={{
-                background: 'rgba(239,68,68,0.1)',
-                border: '1px solid rgba(239,68,68,0.3)',
-                borderRadius: '8px',
+                background: 'rgba(231,76,60,0.08)',
+                border: '1px solid rgba(231,76,60,0.25)',
+                borderRadius: 10,
                 padding: '10px 14px',
-                color: '#ef4444',
-                fontSize: '13px',
-                marginBottom: '16px',
+                color: '#e74c3c',
+                fontSize: 13,
+                marginBottom: 16,
                 textAlign: 'center',
               }}
             >
@@ -187,23 +233,59 @@ export default function LoginPage() {
             disabled={loading}
             style={{
               width: '100%',
-              background: loading ? '#2a2a2a' : 'linear-gradient(135deg, #C9A84C, #E8C97A)',
+              background: loading
+                ? 'rgba(255,255,255,0.05)'
+                : 'linear-gradient(135deg, #C9963B, #8B6914)',
               border: 'none',
-              borderRadius: '8px',
+              borderRadius: 12,
               padding: '13px',
-              color: loading ? '#666' : '#0a0a0a',
-              fontSize: '15px',
-              fontWeight: '700',
-              fontFamily: 'inherit',
+              color: loading ? 'rgba(255,255,255,0.3)' : '#05070d',
+              fontSize: 14,
+              fontWeight: 600,
+              fontFamily: 'IBM Plex Sans Arabic, sans-serif',
               cursor: loading ? 'not-allowed' : 'pointer',
-              transition: 'all 0.2s',
-              letterSpacing: '0.3px',
+              transition: 'all 0.3s cubic-bezier(0.16,1,0.3,1)',
+              boxShadow: loading ? 'none' : '0 4px 20px rgba(201,150,59,0.3)',
+              letterSpacing: '0.02em',
+            }}
+            onMouseEnter={(e) => {
+              if (!loading) {
+                (e.currentTarget as HTMLButtonElement).style.boxShadow = '0 8px 30px rgba(201,150,59,0.45)';
+                (e.currentTarget as HTMLButtonElement).style.transform = 'translateY(-1px)';
+              }
+            }}
+            onMouseLeave={(e) => {
+              if (!loading) {
+                (e.currentTarget as HTMLButtonElement).style.boxShadow = '0 4px 20px rgba(201,150,59,0.3)';
+                (e.currentTarget as HTMLButtonElement).style.transform = 'translateY(0)';
+              }
             }}
           >
             {loading ? 'جاري الدخول...' : 'دخول'}
           </button>
         </form>
+
+        {/* Version */}
+        <div
+          style={{
+            textAlign: 'center',
+            marginTop: 24,
+            fontSize: 10,
+            color: 'rgba(255,255,255,0.15)',
+            letterSpacing: '0.06em',
+          }}
+        >
+          Ghazi OS v9 — Legendary Edition
+        </div>
       </div>
+
+      <style>{`
+        @keyframes shake {
+          0%, 100% { transform: translateX(0); }
+          20%, 60% { transform: translateX(-8px); }
+          40%, 80% { transform: translateX(8px); }
+        }
+      `}</style>
     </div>
   );
 }

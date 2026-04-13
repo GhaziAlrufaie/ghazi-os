@@ -1,101 +1,153 @@
-import Sidebar from '@/components/Sidebar';
+/*
+ * Ghazi OS — Legendary Edition
+ * Dashboard Page: لوحة القيادة
+ * Server Component — يقرأ البيانات من Supabase مباشرة
+ */
+import { createServerClient } from '@/lib/supabase';
 
-export default function DashboardPage() {
+async function getDashboardData() {
+  try {
+    const supabase = createServerClient();
+    const [tasksRes, brandsRes, decisionsRes] = await Promise.all([
+      supabase.from('tasks').select('id, status', { count: 'exact' }).neq('status', 'done'),
+      supabase.from('brands').select('id', { count: 'exact' }).eq('status', 'active'),
+      supabase.from('decisions').select('id', { count: 'exact' }).eq('status', 'pending'),
+    ]);
+    return {
+      activeTasks: tasksRes.count ?? 0,
+      activeBrands: brandsRes.count ?? 0,
+      pendingDecisions: decisionsRes.count ?? 0,
+    };
+  } catch {
+    return { activeTasks: 0, activeBrands: 0, pendingDecisions: 0 };
+  }
+}
+
+export default async function DashboardPage() {
+  const data = await getDashboardData();
+
+  const stats = [
+    { label: 'المهام النشطة', value: String(data.activeTasks).padStart(2, '0'), color: 'var(--info)' },
+    { label: 'البراندات النشطة', value: String(data.activeBrands).padStart(2, '0'), color: 'var(--gold)' },
+    { label: 'القرارات المعلقة', value: String(data.pendingDecisions).padStart(2, '0'), color: 'var(--warning)' },
+  ];
+
   return (
-    <div className="app-layout">
-      <Sidebar />
-      <main className="main-content" style={{ padding: '32px' }}>
-        <div style={{ maxWidth: '900px' }}>
-          {/* Header */}
-          <div style={{ marginBottom: '32px' }}>
-            <h1
-              style={{
-                fontSize: '26px',
-                fontWeight: '800',
-                color: 'var(--txt)',
-                letterSpacing: '-0.5px',
-              }}
-            >
-              لوحة القيادة
-            </h1>
-            <p style={{ color: 'var(--txt2)', fontSize: '14px', marginTop: '4px' }}>
-              مرحباً يا غازي — نظام إدارة الأعمال جاهز
-            </p>
-          </div>
+    <>
+      {/* Page Header */}
+      <div className="page-header">
+        <h1
+          style={{
+            fontSize: 28,
+            fontWeight: 200,
+            letterSpacing: '-0.03em',
+            background: 'linear-gradient(135deg, rgba(255,255,255,0.92) 0%, rgba(255,255,255,0.55) 100%)',
+            WebkitBackgroundClip: 'text',
+            WebkitTextFillColor: 'transparent',
+            backgroundClip: 'text',
+            marginBottom: 4,
+          }}
+        >
+          لوحة القيادة
+        </h1>
+        <p style={{ fontSize: 13, color: 'var(--txt3)' }}>
+          مرحباً يا غازي — نظام إدارة الأعمال جاهز
+        </p>
+      </div>
 
-          {/* Status Cards */}
-          <div
-            style={{
-              display: 'grid',
-              gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))',
-              gap: '16px',
-              marginBottom: '32px',
-            }}
-          >
-            {[
-              { label: 'المهام النشطة', value: '—', color: 'var(--accent)' },
-              { label: 'البراندات', value: '—', color: 'var(--gold)' },
-              { label: 'مبيعات اليوم', value: '—', color: 'var(--success)' },
-              { label: 'القرارات المعلقة', value: '—', color: 'var(--warning)' },
-            ].map((card) => (
-              <div key={card.label} className="card">
-                <div
-                  style={{
-                    fontSize: '11px',
-                    color: 'var(--txt3)',
-                    fontWeight: '600',
-                    letterSpacing: '0.5px',
-                    marginBottom: '8px',
-                    textTransform: 'uppercase',
-                  }}
-                >
-                  {card.label}
-                </div>
-                <div
-                  style={{
-                    fontSize: '28px',
-                    fontWeight: '800',
-                    color: card.color,
-                  }}
-                >
-                  {card.value}
-                </div>
-              </div>
-            ))}
-          </div>
-
-          {/* Migration Notice */}
-          <div
-            style={{
-              background: 'rgba(201,168,76,0.06)',
-              border: '1px solid var(--gold-b)',
-              borderRadius: '12px',
-              padding: '20px 24px',
-            }}
-          >
+      {/* Stats Cards */}
+      <div
+        className="stagger"
+        style={{
+          display: 'grid',
+          gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))',
+          gap: 16,
+          marginBottom: 32,
+        }}
+      >
+        {stats.map((stat) => (
+          <div key={stat.label} className="card">
             <div
               style={{
-                fontSize: '14px',
-                fontWeight: '700',
-                color: 'var(--gold)',
-                marginBottom: '8px',
+                fontSize: 11,
+                color: 'var(--txt3)',
+                letterSpacing: '0.10em',
+                textTransform: 'uppercase',
+                marginBottom: 12,
               }}
             >
-              🚀 مرحلة التأسيس مكتملة
+              {stat.label}
             </div>
-            <div style={{ fontSize: '13px', color: 'var(--txt2)', lineHeight: '1.7' }}>
-              تم تأسيس Next.js 15 بنجاح مع:
-              <ul style={{ marginTop: '8px', paddingRight: '20px' }}>
-                <li>نظام مصادقة آمن (Server-side + Session Cookie)</li>
-                <li>Supabase client منفصل للـ Server والـ Client</li>
-                <li>Middleware لحماية كل المسارات</li>
-                <li>Sidebar مطابق لـ Ghazi OS</li>
-                <li>الخطوة التالية: تفعيل RLS على Supabase</li>
-              </ul>
+            <div
+              style={{
+                fontSize: 40,
+                fontWeight: 200,
+                color: stat.color,
+                fontFamily: 'JetBrains Mono, monospace',
+                letterSpacing: '-0.02em',
+                lineHeight: 1,
+              }}
+            >
+              {stat.value}
             </div>
           </div>
+        ))}
+      </div>
+
+      {/* Status Banner */}
+      <div
+        className="card animate-fade-up"
+        style={{
+          background: 'rgba(201,150,59,0.04)',
+          borderColor: 'rgba(201,150,59,0.15)',
+        }}
+      >
+        <div
+          style={{
+            fontSize: 11,
+            fontWeight: 500,
+            color: 'var(--gold)',
+            letterSpacing: '0.12em',
+            textTransform: 'uppercase',
+            marginBottom: 12,
+          }}
+        >
+          حالة النظام
         </div>
-      </main>
-    </div>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+          {[
+            { label: 'Next.js 15 (App Router)', status: 'يعمل' },
+            { label: 'Supabase PostgreSQL', status: 'متصل' },
+            { label: 'نظام المصادقة (Server-side)', status: 'آمن' },
+            { label: 'قسم الإعدادات', status: 'مكتمل' },
+          ].map((item) => (
+            <div
+              key={item.label}
+              style={{
+                display: 'flex',
+                justifyContent: 'space-between',
+                alignItems: 'center',
+                padding: '6px 0',
+                borderBottom: '1px solid var(--brd)',
+              }}
+            >
+              <span style={{ fontSize: 13, color: 'var(--txt2)' }}>{item.label}</span>
+              <span
+                style={{
+                  fontSize: 11,
+                  color: 'var(--success)',
+                  background: 'rgba(46,204,113,0.1)',
+                  padding: '2px 10px',
+                  borderRadius: 20,
+                  border: '1px solid rgba(46,204,113,0.2)',
+                }}
+              >
+                {item.status}
+              </span>
+            </div>
+          ))}
+        </div>
+      </div>
+    </>
   );
 }
