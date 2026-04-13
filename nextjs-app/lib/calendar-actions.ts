@@ -1,7 +1,7 @@
 'use server';
 // Server Actions — Calendar (events table)
 
-import { createClient } from '@/lib/supabase';
+import { createServerClient } from '@/lib/supabase';
 import type { CalEvent } from '@/app/calendar/page';
 import { revalidatePath } from 'next/cache';
 
@@ -21,7 +21,7 @@ interface AddEventInput {
 export async function addEvent(
   input: AddEventInput
 ): Promise<{ event?: CalEvent; error?: string }> {
-  const supabase = createClient();
+  const supabase = createServerClient();
   const id = genId();
 
   const row = {
@@ -58,7 +58,7 @@ export async function addEvent(
 }
 
 export async function deleteEvent(id: string): Promise<{ error?: string }> {
-  const supabase = createClient();
+  const supabase = createServerClient();
   const { error } = await supabase.from('events').delete().eq('id', id);
   if (error) return { error: error.message };
   revalidatePath('/calendar');

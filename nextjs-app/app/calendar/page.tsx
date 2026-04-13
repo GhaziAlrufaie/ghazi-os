@@ -1,7 +1,7 @@
 // Legendary Edition — Calendar Page (Server Component)
 // جلب الأحداث والمهام ذات التواريخ من Supabase ثم تسليمها للـ Client
 
-import { createClient } from '@/lib/supabase';
+import { createServerClient } from '@/lib/supabase';
 import CalendarClient from '@/components/calendar/CalendarClient';
 
 export const dynamic = 'force-dynamic';
@@ -33,7 +33,7 @@ export interface Brand {
 }
 
 export default async function CalendarPage() {
-  const supabase = createClient();
+  const supabase = createServerClient();
 
   const [eventsRes, tasksRes, brandsRes] = await Promise.all([
     supabase.from('events').select('*').order('day'),
