@@ -18,7 +18,7 @@
 
 ---
 
-## قائمة الجداول (17 جدول)
+## قائمة الجداول (27 جدول)
 
 | # | اسم الجدول | الوظيفة | يُستخدم في |
 |---|-----------|---------|-----------|
@@ -39,6 +39,21 @@
 | 15 | `team_contacts` | جهات اتصال الفريق | الإعدادات، WhatsApp |
 | 16 | `daily_messages` | الرسائل اليومية المجدولة | الإعدادات، WhatsApp |
 | 17 | `archive` | الأرشيف | الأرشيف |
+| 18 | `metrics` | مؤشرات الأداء اليومية | الأداء |
+| 19 | `campaigns` | الحملات التسويقية | البراندات |
+| 20 | `worlds_family_tasks` | مهام العائلة | عوالمي |
+| 21 | `jawza_abandoned_carts` | سلات مهجورة (Salla) | (jawza - غير مستخدم) |
+| 22 | `jawza_alerts` | تنبيهات jawza | (jawza - غير مستخدم) |
+| 23 | `jawza_customers` | عملاء jawza | (jawza - غير مستخدم) |
+| 24 | `jawza_daily_commands` | أوامر jawza اليومية | (jawza - غير مستخدم) |
+| 25 | `jawza_monthly_goals` | أهداف jawza الشهرية | (jawza - غير مستخدم) |
+| 26 | `jawza_product_metrics` | مقاييس منتجات jawza | (jawza - غير مستخدم) |
+| 27 | `jawza_products` | منتجات jawza | (jawza - غير مستخدم) |
+| 28 | `jawza_sales_daily` | مبيعات jawza اليومية | (jawza - غير مستخدم) |
+| 29 | `jawza_saudi_context` | السياق السعودي jawza | (jawza - غير مستخدم) |
+| 30 | `jawza_sync_log` | سجل مزامنة jawza | (jawza - غير مستخدم) |
+
+> **ملاحظة:** جداول `jawza_*` (10 جداول) تعود لمشروع jawza-app المُجمَّد. لا تُستخدم في Ghazi OS الحالي ويمكن تجاهلها.
 
 ---
 
@@ -245,17 +260,24 @@ biz_expenses (
 
 ```sql
 salla_orders (
-  id              TEXT PRIMARY KEY,
-  salla_order_id  TEXT,
-  order_number    TEXT,
-  created_at      TIMESTAMPTZ,
-  -- أعمدة إضافية يُرجَّح وجودها بناءً على الاستخدام:
-  -- total_amount, status, customer_name, items, brand_id
-  -- (يُنصح بالتحقق من Supabase مباشرة)
+  id              BIGINT PRIMARY KEY,       -- auto-increment
+  salla_order_id  TEXT,                     -- معرّف الطلب في Salla
+  order_number    TEXT,                     -- رقم الطلب (مثل: ORD-TEST-001)
+  status          TEXT,                     -- 'pending' | 'completed' | 'cancelled' | ...
+  customer_name   TEXT,
+  customer_phone  TEXT,
+  customer_email  TEXT,
+  total_amount    NUMERIC,
+  currency        TEXT DEFAULT 'SAR',
+  items           JSONB DEFAULT '[]',       -- [{name, price, quantity, sku}]
+  raw_payload     JSONB,                    -- الـ payload الكامل من Salla Webhook
+  brand           TEXT,                     -- اسم البراند (مثل: 'غازي بوتيك')
+  created_at      TIMESTAMPTZ DEFAULT now(),
+  updated_at      TIMESTAMPTZ DEFAULT now()
 )
 ```
 
-**ملاحظة:** هذا الجدول يُملأ عبر Salla Webhook ولا يُكتب منه من الكود مباشرة. الكود يقرأ منه فقط.
+**ملاحظة:** هذا الجدول يُملأ عبر Salla Webhook تلقائياً. الكود يقرأ منه فقط عبر `loadSalesData()` و`wfGetTodaySales()`. الـ `id` هنا `BIGINT` وليس `TEXT` كبقية الجداول.
 
 ---
 
@@ -359,14 +381,68 @@ daily_messages (
 
 ```sql
 archive (
-  -- الهيكل الدقيق غير موثّق بالكامل في الكود
-  -- يُرجَّح وجود الأعمدة التالية:
-  id          TEXT PRIMARY KEY,
-  type        TEXT,           -- 'task' | 'decision' | 'project'
-  original_id TEXT,
-  data        JSONB,          -- البيانات الأصلية
-  reason      TEXT,           -- سبب الأرشفة
-  archived_at TIMESTAMPTZ DEFAULT now()
+  id              TEXT PRIMARY KEY,
+  type            TEXT,               -- 'task' | 'decision' | 'project'
+  reason          TEXT,               -- سبب الأرشفة
+  archived_at     TIMESTAMPTZ DEFAULT now(),
+  archived_month  INTEGER,
+  archived_year   INTEGER,
+  data            JSONB,              -- البيانات الأصلية كاملة
+  updated_at      TIMESTAMPTZ DEFAULT now()
+)
+```
+
+---
+
+### 18. جدول `metrics` — مؤشرات الأداء
+
+```sql
+metrics (
+  id               TEXT PRIMARY KEY,
+  brand_id         TEXT REFERENCES brands(id),
+  date             DATE,
+  revenue          NUMERIC,
+  orders           INTEGER,
+  avg_order_value  NUMERIC,
+  ad_spend         NUMERIC,
+  roas             NUMERIC,
+  custom_metrics   JSONB DEFAULT '{}',
+  updated_at       TIMESTAMPTZ DEFAULT now()
+)
+```
+
+---
+
+### 19. جدول `campaigns` — الحملات التسويقية
+
+```sql
+campaigns (
+  id              TEXT PRIMARY KEY,
+  brand_id        TEXT REFERENCES brands(id),
+  title           TEXT NOT NULL,
+  type            TEXT,               -- 'email' | 'social' | 'ads' | ...
+  status          TEXT DEFAULT 'draft',
+  start_date      DATE,
+  end_date        DATE,
+  budget          NUMERIC,
+  actual_spend    NUMERIC,
+  channels        JSONB DEFAULT '[]',
+  target_metrics  JSONB DEFAULT '{}',
+  actual_metrics  JSONB DEFAULT '{}',
+  tasks           JSONB DEFAULT '[]',
+  notes           TEXT,
+  updated_at      TIMESTAMPTZ DEFAULT now()
+)
+```
+
+---
+
+### 20. جدول `worlds_family_tasks` — مهام العائلة
+
+```sql
+worlds_family_tasks (
+  -- الجدول فارغ حالياً، الهيكل الدقيق يحتاج تحقق
+  -- يُرجَّح أنه مشابه لـ personal_tasks
 )
 ```
 
