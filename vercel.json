@@ -1,0 +1,5 @@
+{
+  "rootDirectory": "nextjs-app",
+  "framework": "nextjs",
+  "buildCommand": "npm run build"
+}
