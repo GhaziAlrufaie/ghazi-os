@@ -1,0 +1,284 @@
+[
+  {
+    "id": "exp-sec-2",
+    "title": "أقساط وديون",
+    "type": "debt",
+    "color": "var(--danger)",
+    "items": [
+      {
+        "id": "exp-2-1",
+        "kind": "fixed",
+        "name": "بنك التنمية",
+        "amount": 12000,
+        "totalDebt": 500000
+      },
+      {
+        "id": "exp-2-2",
+        "kind": "fixed",
+        "name": "مصنع ابتكار الروائح",
+        "amount": 8000,
+        "totalDebt": 350000
+      }
+    ],
+    "updated_at": "2026-04-14T05:01:32.868+00:00"
+  },
+  {
+    "id": "exp-sec-3",
+    "title": "اشتراكات تقنية",
+    "type": "tech",
+    "color": "var(--accent)",
+    "items": [
+      {
+        "id": "exp-3-1",
+        "kind": "fixed",
+        "name": "Google Workspace (5 seats)",
+        "amount": 495
+      },
+      {
+        "id": "exp-3-2",
+        "kind": "fixed",
+        "name": "AI Ultra Access (2 seats)",
+        "amount": 1470
+      },
+      {
+        "id": "exp-3-3",
+        "kind": "fixed",
+        "name": "Manus",
+        "amount": 305
+      },
+      {
+        "id": "exp-3-4",
+        "kind": "fixed",
+        "name": "واتساب كرزون (غازي بوتيك)",
+        "amount": 1000
+      },
+      {
+        "id": "exp-3-5",
+        "kind": "fixed",
+        "name": "Claude Pro",
+        "amount": 431
+      },
+      {
+        "id": "exp-3-6",
+        "kind": "fixed",
+        "name": "Canva",
+        "amount": 50
+      },
+      {
+        "id": "exp-3-7",
+        "kind": "fixed",
+        "name": "CapCut",
+        "amount": 79
+      },
+      {
+        "id": "exp-3-8",
+        "kind": "fixed",
+        "name": "iCloud",
+        "amount": 44
+      },
+      {
+        "id": "exp-3-9",
+        "kind": "fixed",
+        "name": "YouTube Music",
+        "amount": 28
+      },
+      {
+        "id": "exp-3-10",
+        "kind": "fixed",
+        "name": "سلة (٤ متاجر)",
+        "amount": 996
+      },
+      {
+        "id": "exp-3-11",
+        "kind": "fixed",
+        "name": "قيود المحاسبي (غازي + Odred)",
+        "amount": 414
+      }
+    ],
+    "updated_at": "2026-04-14T02:30:34.096731+00:00"
+  },
+  {
+    "id": "exp-sec-salaries",
+    "title": "رواتب وأجور",
+    "type": "salaries",
+    "color": "var(--gold)",
+    "items": [
+      {
+        "id": "exp-1-1",
+        "kind": "fixed",
+        "name": "خادمة شخصية",
+        "amount": 2000
+      },
+      {
+        "id": "exp-1-2",
+        "kind": "fixed",
+        "name": "خادمة أمي",
+        "amount": 2000
+      },
+      {
+        "id": "exp-1-3",
+        "kind": "fixed",
+        "name": "سائق",
+        "amount": 1900
+      },
+      {
+        "id": "exp-1-4",
+        "kind": "fixed",
+        "name": "عامل المزرعة",
+        "amount": 1500
+      }
+    ],
+    "updated_at": "2026-04-04T20:35:00.561576+00:00"
+  },
+  {
+    "id": "exp-sec-family",
+    "title": "معيشة وأسرة",
+    "type": "family",
+    "color": "var(--acc2)",
+    "items": [
+      {
+        "id": "exp-1-5",
+        "kind": "fixed",
+        "name": "مصروف الأهل",
+        "amount": 2000
+      },
+      {
+        "id": "exp-1-6",
+        "kind": "fixed",
+        "name": "مصروف البيت",
+        "amount": 1000
+      },
+      {
+        "id": "exp-1-10",
+        "kind": "fixed",
+        "name": "تعليم (دانه + حمودي)",
+        "note": "٢٥,٠٠٠ سنوياً",
+        "amount": 2083
+      }
+    ],
+    "updated_at": "2026-04-04T20:35:00.561576+00:00"
+  },
+  {
+    "id": "exp-sec-utilities",
+    "title": "فواتير ومرافق",
+    "type": "utilities",
+    "color": "var(--acc3)",
+    "items": [
+      {
+        "id": "exp-1-7",
+        "kind": "fixed",
+        "name": "كهرباء",
+        "amount": 1000
+      },
+      {
+        "id": "exp-1-8",
+        "kind": "fixed",
+        "name": "فاتورة الجوال",
+        "amount": 500
+      },
+      {
+        "id": "exp-1-9",
+        "kind": "fixed",
+        "name": "فاتورة النت",
+        "amount": 300
+      },
+      {
+        "id": "exp-1-11",
+        "kind": "fixed",
+        "name": "تأمين سيارتين",
+        "note": "١,٢٠٠ سنوياً",
+        "amount": 100
+      },
+      {
+        "id": "exp-1-12",
+        "kind": "variable",
+        "name": "بنزين + زيت",
+        "amount": 50
+      }
+    ],
+    "updated_at": "2026-04-04T20:35:00.561576+00:00"
+  },
+  {
+    "id": "exp-sec-1",
+    "title": "معيشة وأسرة",
+    "type": "living",
+    "color": "var(--txt1)",
+    "items": [
+      {
+        "id": "exp-1-1",
+        "kind": "fixed",
+        "name": "خادمة شخصية",
+        "amount": 2000
+      },
+      {
+        "id": "exp-1-2",
+        "kind": "fixed",
+        "name": "خادمة أمي",
+        "amount": 2000
+      },
+      {
+        "id": "exp-1-3",
+        "kind": "fixed",
+        "name": "سائق",
+        "amount": 1900
+      },
+      {
+        "id": "exp-1-4",
+        "kind": "fixed",
+        "name": "عامل المزرعة",
+        "amount": 1500
+      },
+      {
+        "id": "exp-1-5",
+        "kind": "fixed",
+        "name": "مصروف الأهل",
+        "amount": 1500
+      },
+      {
+        "id": "exp-1-6",
+        "kind": "fixed",
+        "name": "مصروف البيت",
+        "amount": 1000
+      },
+      {
+        "id": "exp-1-7",
+        "kind": "fixed",
+        "name": "كهرباء",
+        "amount": 1000
+      },
+      {
+        "id": "exp-1-8",
+        "kind": "fixed",
+        "name": "فاتورة الجوال",
+        "amount": 500
+      },
+      {
+        "id": "exp-1-9",
+        "kind": "fixed",
+        "name": "فاتورة النت",
+        "amount": 300
+      },
+      {
+        "id": "exp-1-10",
+        "kind": "fixed",
+        "name": "تعليم (دانه + حمودي)",
+        "note": "٢٥,٠٠٠ سنوياً",
+        "amount": 2083
+      },
+      {
+        "id": "exp-1-11",
+        "kind": "fixed",
+        "name": "تأمين سيارتين",
+        "note": "١,٢٠٠ سنوياً",
+        "amount": 100
+      },
+      {
+        "id": "exp-1-12",
+        "kind": "variable",
+        "name": "بنزين + زيت",
+        "amount": 800
+      }
+    ],
+    "updated_at": "2026-04-14T02:30:34.096731+00:00"
+  }
+]
