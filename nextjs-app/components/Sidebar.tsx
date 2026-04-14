@@ -11,9 +11,9 @@ import { usePathname, useRouter } from 'next/navigation';
 
 const NAV_ITEMS = [
   {
-    id: 'cmd',
+    id: 'leadership',
     label: 'القيادة',
-    href: '/',
+    href: '/leadership',
     icon: (
       <svg viewBox="0 0 24 24" stroke="currentColor" fill="none" strokeWidth={1.5} strokeLinecap="round" strokeLinejoin="round">
         <circle cx="12" cy="12" r="10" />
