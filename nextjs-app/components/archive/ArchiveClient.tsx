@@ -30,8 +30,9 @@ interface Props {
 }
 
 const TYPE_LABELS: Record<string, string> = {
-  project: 'مهمة',
-  task: 'مهمة فرعية',
+  project: 'مشروع',
+  task: 'مهمة',
+  personal_task: 'مهمة شخصية',
   subtask: 'مهمة فرعية',
   decision: 'قرار',
 };
@@ -193,8 +194,9 @@ export default function ArchiveClient({ initialArchive, archivedBrands, activeBr
               onChange={(e) => setFilterType(e.target.value)}
             >
               <option value="all">كل الأنواع</option>
-              <option value="project">مهام</option>
-              <option value="task">مهام فرعية</option>
+              <option value="project">مشاريع</option>
+              <option value="task">مهام عامة</option>
+              <option value="personal_task">مهام شخصية</option>
               <option value="decision">قرارات</option>
             </select>
             <select

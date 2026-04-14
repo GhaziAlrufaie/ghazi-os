@@ -126,3 +126,41 @@ export async function deleteTask(id: string): Promise<{ error?: string }> {
   revalidatePath('/tasks');
   return {};
 }
+
+export async function archiveTask(
+  task: Task
+): Promise<{ error?: string }> {
+  const supabase = createServerClient();
+  const now = new Date();
+
+  // 1. أدرج في جدول archive
+  const archiveRow = {
+    id: `arc_tsk_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`,
+    type: 'task',
+    reason: 'manual',
+    archived_at: now.toISOString(),
+    archived_month: now.getMonth() + 1,
+    archived_year: now.getFullYear(),
+    data: {
+      id: task.id,
+      title: task.title,
+      description: task.description,
+      status: task.status,
+      priority: task.priority,
+      dueDate: task.dueDate,
+      brandId: task.brandId,
+      projectId: task.projectId,
+    },
+  };
+
+  const { error: archErr } = await supabase.from('archive').insert(archiveRow);
+  if (archErr) return { error: archErr.message };
+
+  // 2. احذف من tasks
+  const { error: delErr } = await supabase.from('tasks').delete().eq('id', task.id);
+  if (delErr) return { error: delErr.message };
+
+  revalidatePath('/tasks');
+  revalidatePath('/archive');
+  return {};
+}

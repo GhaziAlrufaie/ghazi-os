@@ -109,6 +109,43 @@ export async function deletePersonalTask(id: string): Promise<{ error?: string }
   return {};
 }
 
+export async function archivePersonalTask(
+  task: PersonalTask
+): Promise<{ error?: string }> {
+  const supabase = createServerClient();
+  const now = new Date();
+
+  // 1. أدرج في archive
+  const archiveRow = {
+    id: `arc_pt_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`,
+    type: 'personal_task',
+    reason: 'manual',
+    archived_at: now.toISOString(),
+    archived_month: now.getMonth() + 1,
+    archived_year: now.getFullYear(),
+    data: {
+      id: task.id,
+      title: task.title,
+      description: task.description,
+      status: task.status,
+      priority: task.priority,
+      category: task.category,
+      dueDate: task.dueDate,
+    },
+  };
+
+  const { error: archErr } = await supabase.from('archive').insert(archiveRow);
+  if (archErr) return { error: archErr.message };
+
+  // 2. احذف من personal_tasks
+  const { error: delErr } = await supabase.from('personal_tasks').delete().eq('id', task.id);
+  if (delErr) return { error: delErr.message };
+
+  revalidatePath('/personal');
+  revalidatePath('/archive');
+  return {};
+}
+
 function mapRow(row: {
   id: string;
   title: string;

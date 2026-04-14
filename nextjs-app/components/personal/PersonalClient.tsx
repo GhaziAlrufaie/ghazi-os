@@ -6,6 +6,7 @@ import {
   addPersonalTask,
   updatePersonalTask,
   deletePersonalTask,
+  archivePersonalTask,
   type PersonalTask,
   type TaskStatus,
   type TaskPriority,
@@ -71,11 +72,13 @@ function TaskCard({
   task,
   onStatusChange,
   onDelete,
+  onArchive,
   onEdit,
 }: {
   task: PersonalTask;
   onStatusChange: (id: string, s: TaskStatus) => void;
   onDelete: (id: string) => void;
+  onArchive: (t: PersonalTask) => void;
   onEdit: (t: PersonalTask) => void;
 }) {
   const pm = PRIORITY_META[task.priority];
@@ -86,8 +89,9 @@ function TaskCard({
       <div className="flex items-start justify-between gap-2">
         <p className="text-sm text-gray-200 flex-1 leading-snug">{task.title}</p>
         <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-          <button onClick={() => onEdit(task)} className="text-gray-500 hover:text-blue-400 text-xs px-1">✏</button>
-          <button onClick={() => onDelete(task.id)} className="text-gray-500 hover:text-red-400 text-xs px-1">✕</button>
+          <button onClick={() => onEdit(task)} title="تعديل" className="text-gray-500 hover:text-blue-400 text-xs px-1">✏</button>
+          <button onClick={() => onArchive(task)} title="أرشفة" className="text-gray-500 hover:text-yellow-400 text-xs px-1">📦</button>
+          <button onClick={() => onDelete(task.id)} title="حذف نهائي" className="text-gray-500 hover:text-red-400 text-xs px-1">✕</button>
         </div>
       </div>
 
@@ -248,6 +252,16 @@ export default function PersonalClient({ initialTasks }: Props) {
     startTransition(async () => { await deletePersonalTask(id); });
   }
 
+  function handleArchive(task: PersonalTask) {
+    setTasks((prev) => prev.filter((t) => t.id !== task.id));
+    startTransition(async () => {
+      const res = await archivePersonalTask(task);
+      if (res.error) {
+        setTasks((prev) => [task, ...prev]);
+      }
+    });
+  }
+
   function handleSaveEdit(patch: Partial<PersonalTask>) {
     if (!editingTask) return;
     const id = editingTask.id;
@@ -368,6 +382,7 @@ export default function PersonalClient({ initialTasks }: Props) {
                     task={task}
                     onStatusChange={handleStatusChange}
                     onDelete={handleDelete}
+                    onArchive={handleArchive}
                     onEdit={setEditingTask}
                   />
                 ))}

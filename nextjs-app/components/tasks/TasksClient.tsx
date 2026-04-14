@@ -6,6 +6,7 @@ import {
   addTask,
   updateTask,
   deleteTask,
+  archiveTask,
   type Task,
   type TaskStatus,
   type TaskPriority,
@@ -61,18 +62,20 @@ interface TaskCardProps {
   task: Task;
   onStatusChange: (id: string, s: TaskStatus) => void;
   onDelete: (id: string) => void;
+  onArchive: (task: Task) => void;
   onEdit: (task: Task) => void;
 }
 
-function TaskCard({ task, onStatusChange, onDelete, onEdit }: TaskCardProps) {
+function TaskCard({ task, onStatusChange, onDelete, onArchive, onEdit }: TaskCardProps) {
   const pm = PRIORITY_META[task.priority];
   return (
     <div className="bg-[#1a1a2e] border border-white/8 rounded-lg p-3 group hover:border-white/20 transition-all">
       <div className="flex items-start justify-between gap-2">
         <p className="text-sm text-gray-200 flex-1 leading-snug">{task.title}</p>
         <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-          <button onClick={() => onEdit(task)} className="text-gray-500 hover:text-blue-400 text-xs px-1">✏</button>
-          <button onClick={() => onDelete(task.id)} className="text-gray-500 hover:text-red-400 text-xs px-1">✕</button>
+          <button onClick={() => onEdit(task)} title="تعديل" className="text-gray-500 hover:text-blue-400 text-xs px-1">✏</button>
+          <button onClick={() => onArchive(task)} title="أرشفة" className="text-gray-500 hover:text-yellow-400 text-xs px-1">📦</button>
+          <button onClick={() => onDelete(task.id)} title="حذف نهائي" className="text-gray-500 hover:text-red-400 text-xs px-1">✕</button>
         </div>
       </div>
 
@@ -215,6 +218,17 @@ export default function TasksClient({ initialTasks, brands }: Props) {
     });
   }
 
+  function handleArchive(task: Task) {
+    setTasks((prev) => prev.filter((t) => t.id !== task.id));
+    startTransition(async () => {
+      const res = await archiveTask(task);
+      if (res.error) {
+        // استعادة المهمة في حالة الخطأ
+        setTasks((prev) => [task, ...prev]);
+      }
+    });
+  }
+
   function handleSaveEdit(patch: Partial<Task>) {
     if (!editingTask) return;
     const id = editingTask.id;
@@ -312,6 +326,7 @@ export default function TasksClient({ initialTasks, brands }: Props) {
                     task={task}
                     onStatusChange={handleStatusChange}
                     onDelete={handleDelete}
+                    onArchive={handleArchive}
                     onEdit={setEditingTask}
                   />
                 ))}
