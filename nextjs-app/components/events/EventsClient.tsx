@@ -2,7 +2,7 @@
 // Client Component — Events (قسم الأحداث)
 // عرض الأحداث بصيغة جدول + CRUD كامل (إضافة / تعديل / حذف)
 import React, { useState } from 'react';
-import type { EventRow } from '@/lib/events-actions';
+import type { EventRow } from '@/lib/events-types';
 import { addEventRow, updateEventRow, deleteEventRow } from '@/lib/events-actions';
 
 // ─── Types ────────────────────────────────────────────────────────────────────

@@ -2,9 +2,10 @@
 // Client Component — Projects (قسم المشاريع)
 // عرض المشاريع مجمّعة حسب الحالة + CRUD كامل
 import React, { useState } from 'react';
-import type { ProjectRow } from '@/lib/projects-actions';
-import { addProject, updateProject, deleteProject, STATUS_LABELS, PRIORITY_LABELS } from '@/lib/projects-actions';
-import type { BrandRow } from '@/lib/brands-actions';
+import type { ProjectRow } from '@/lib/projects-types';
+import { STATUS_LABELS, PRIORITY_LABELS } from '@/lib/projects-types';
+import { addProject, updateProject, deleteProject } from '@/lib/projects-actions';
+import type { BrandRow } from '@/lib/brands-types';
 
 // ─── Priority colors ──────────────────────────────────────────────────────────
 const PRIORITY_COLORS: Record<string, string> = {
@@ -101,7 +102,7 @@ function ProjectForm({ edit, brands, onClose, onSave }: FormProps) {
           <div className="grid grid-cols-2 gap-3">
             <div>
               <label className="block text-xs text-gray-400 mb-1">الحالة</label>
-              <select value={status} onChange={e => setStatus(e.target.value)}
+              <select value={status} onChange={e => setStatus(e.target.value as 'planning' | 'active' | 'paused' | 'done' | 'archived')}
                 className="w-full rounded-lg px-3 py-2 text-sm text-white outline-none"
                 style={{ background: '#0d1117', border: '1px solid rgba(201,150,59,0.15)' }}>
                 <option value="planning">تخطيط</option>
@@ -113,7 +114,7 @@ function ProjectForm({ edit, brands, onClose, onSave }: FormProps) {
             </div>
             <div>
               <label className="block text-xs text-gray-400 mb-1">الأولوية</label>
-              <select value={priority} onChange={e => setPriority(e.target.value)}
+              <select value={priority} onChange={e => setPriority(e.target.value as 'low' | 'medium' | 'high' | 'critical')}
                 className="w-full rounded-lg px-3 py-2 text-sm text-white outline-none"
                 style={{ background: '#0d1117', border: '1px solid rgba(201,150,59,0.15)' }}>
                 <option value="low">منخفض</option>

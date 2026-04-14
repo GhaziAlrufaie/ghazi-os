@@ -2,18 +2,7 @@
 // Server Actions — Events (events table)
 import { createServerClient } from '@/lib/supabase';
 import { revalidatePath } from 'next/cache';
-
-export interface EventRow {
-  id: string;
-  title: string;
-  day: number;
-  month: number;
-  year: number;
-  brandId: string | null;
-  brandName: string | null;
-  brandColor: string | null;
-  type: string;
-}
+import type { EventRow } from '@/lib/events-types';
 
 function genId(): string {
   return `ev-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`;

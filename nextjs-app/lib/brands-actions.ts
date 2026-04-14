@@ -2,26 +2,7 @@
 // Server Actions — Brands (brands table)
 import { createServerClient } from '@/lib/supabase';
 import { revalidatePath } from 'next/cache';
-
-export interface BrandRow {
-  id: string;
-  name: string;
-  nameEn: string;
-  color: string;
-  icon: string;
-  status: 'active' | 'paused' | 'archived';
-  healthScore: number;
-  description: string;
-  productionDays: number;
-  navOrder: number;
-  mainTabLabel: string | null;
-}
-
-const STATUS_LABELS: Record<string, string> = {
-  active: 'نشط',
-  paused: 'متوقف',
-  archived: 'مؤرشف',
-};
+import type { BrandRow } from '@/lib/brands-types';
 
 function mapRow(r: Record<string, unknown>): BrandRow {
   return {
@@ -117,4 +98,4 @@ export async function deleteBrand(id: string): Promise<{ error?: string }> {
   return {};
 }
 
-export { STATUS_LABELS };
+
