@@ -4,6 +4,7 @@ import { getInboxTasks } from '@/lib/inbox-actions';
 import { createServerClient } from '@/lib/supabase';
 import LeadershipClient from '@/components/leadership/LeadershipClient';
 import type { WeeklyFocusEntry, FocusTargetType } from '@/lib/weekly-focus-actions';
+import { unstable_noStore as noStore } from 'next/cache';
 export const dynamic = 'force-dynamic';
 export const revalidate = 0;
 export const fetchCache = 'force-no-store';
@@ -18,6 +19,7 @@ export async function generateMetadata() {
 }
 
 async function fetchWeeklyFocus(): Promise<WeeklyFocusEntry[]> {
+  noStore();
   const supabase = createServerClient();
   const from = new Date();
   from.setDate(from.getDate() - 1);
