@@ -9,14 +9,6 @@ export const dynamic = 'force-dynamic';
 export const revalidate = 0;
 export const fetchCache = 'force-no-store';
 
-export async function generateMetadata() {
-  return {
-    other: {
-      'Cache-Control': 'no-store, no-cache, must-revalidate',
-      'CDN-Cache-Control': 'no-store',
-    },
-  };
-}
 
 async function fetchWeeklyFocus(): Promise<WeeklyFocusEntry[]> {
   noStore();
