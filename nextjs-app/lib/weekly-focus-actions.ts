@@ -78,6 +78,7 @@ export async function setDayFocus(
 
   if (error || !data) return { error: error?.message ?? 'no data' };
   revalidatePath('/weekly-focus');
+  revalidatePath('/leadership');
 
   return { entry: mapRow(data) };
 }
@@ -90,6 +91,7 @@ export async function clearDayFocus(date: string): Promise<{ error?: string }> {
     .eq('focus_date', date);
   if (error) return { error: error.message };
   revalidatePath('/weekly-focus');
+  revalidatePath('/leadership');
   return {};
 }
 
