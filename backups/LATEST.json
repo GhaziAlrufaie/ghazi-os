@@ -1,6 +1,6 @@
 {
-  "backup_date": "2026-04-16",
-  "backup_time": "2026-04-16T23:11:44.916Z",
+  "backup_date": "2026-04-17",
+  "backup_time": "2026-04-17T23:09:09.099Z",
   "tables_discovered": 13,
   "tables": {
     "tasks": 100,
@@ -10,14 +10,14 @@
     "expenses": 6,
     "biz_expenses": 3,
     "employees": 10,
-    "decisions": 13,
+    "decisions": 14,
     "events": 7,
     "archive": 26,
-    "weekly_focus": 12,
-    "salla_orders": 30,
+    "weekly_focus": 16,
+    "salla_orders": 57,
     "metrics": 8
   },
-  "total_records": 256,
+  "total_records": 288,
   "status": "success",
-  "backup_folder": "backups/2026-04-16"
+  "backup_folder": "backups/2026-04-17"
 }
