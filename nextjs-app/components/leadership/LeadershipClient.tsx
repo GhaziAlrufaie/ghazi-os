@@ -3,7 +3,7 @@
 // 8 Elements: TopBar, WeekCompass, FocusNow, DailyFixed, Decisions, Calendar, Inbox, BottomNav
 import { useState, useTransition, useRef, useEffect } from 'react';
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import {
   addDecision, updateDecision, deleteDecision,
   addEmployee, updateEmployee, deleteEmployee,
@@ -105,6 +105,7 @@ function WeekCompass({
   brands: Brand[];
   onFocusChange: (entries: WeeklyFocusEntry[]) => void;
 }) {
+  const router = useRouter();
   const [modalDate, setModalDate] = useState<string | null>(null);
   const [targetType, setTargetType] = useState<FocusTargetType>('brand');
   const [selectedBrandId, setSelectedBrandId] = useState('');
@@ -142,6 +143,7 @@ function WeekCompass({
       const result = await setDayFocus({ focusDate: date, targetType, targetId, targetName, targetColor, notes });
       if (result.entry) {
         onFocusChange([...weeklyFocus.filter(e => e.focusDate !== date), result.entry!]);
+        router.refresh();
       }
     });
     setModalDate(null);
@@ -152,7 +154,10 @@ function WeekCompass({
     const date = modalDate;
     onFocusChange(weeklyFocus.filter(e => e.focusDate !== date));
     setModalDate(null);
-    startTransition(async () => { await clearDayFocus(date); });
+    startTransition(async () => {
+      await clearDayFocus(date);
+      router.refresh();
+    });
   }
 
   return (
