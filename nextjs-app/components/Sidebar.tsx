@@ -1,23 +1,23 @@
 'use client';
 /*
- * Ghazi OS — Sidebar
- * مطابق للأصل: light theme, IBM Plex Sans Arabic
- * CSS classes من globals.css: .side, .sn, .sn-brand, etc.
+ * Ghazi OS — Sidebar (Client Component)
+ * يستقبل brands من SidebarServer (Supabase)
+ * يعرض تاريخ اليوم ديناميكياً
  */
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 
-const BRANDS = [
-  { id: 'b1', label: 'سيارة', color: '#007AFF' },
-  { id: 'b2', label: 'ذكرني', color: '#FF9500' },
-  { id: 'b3', label: 'ميكانيكي', color: '#34C759' },
-  { id: 'b4', label: 'مطعم', color: '#FF3B30' },
-  { id: 'b5', label: 'عقار', color: '#AF52DE' },
-  { id: 'b6', label: 'استشارات', color: '#C9A84C' },
-  { id: 'b7', label: 'تقنية', color: '#5AC8FA' },
-  { id: 'b8', label: 'تجارة', color: '#FF2D55' },
-];
+interface Brand {
+  id: string;
+  name: string;
+  color: string;
+  icon: string;
+}
+
+interface SidebarProps {
+  brands?: Brand[];
+}
 
 const NAV_ITEMS = [
   {
@@ -143,10 +143,23 @@ const NAV_ITEMS = [
   },
 ];
 
-export default function Sidebar() {
+const DAYS_AR = ['الأحد', 'الاثنين', 'الثلاثاء', 'الأربعاء', 'الخميس', 'الجمعة', 'السبت'];
+const MONTHS_AR = ['يناير', 'فبراير', 'مارس', 'أبريل', 'مايو', 'يونيو', 'يوليو', 'أغسطس', 'سبتمبر', 'أكتوبر', 'نوفمبر', 'ديسمبر'];
+
+function getTodayStr() {
+  const today = new Date();
+  return `${DAYS_AR[today.getDay()]} ${today.getDate()} ${MONTHS_AR[today.getMonth()]}`;
+}
+
+export default function Sidebar({ brands = [] }: SidebarProps) {
   const pathname = usePathname();
   const router = useRouter();
   const [brandsOpen, setBrandsOpen] = useState(false);
+  const [dateStr, setDateStr] = useState('');
+
+  useEffect(() => {
+    setDateStr(getTodayStr());
+  }, []);
 
   async function handleLogout() {
     await fetch('/api/auth/logout', { method: 'POST' });
@@ -161,7 +174,7 @@ export default function Sidebar() {
         <div className="logo-box">G</div>
         <div className="logo-txt">
           <h1>Ghazi OS</h1>
-          <div className="sub">نظام إدارة الأعمال</div>
+          <div className="sub">{dateStr || 'نظام إدارة الأعمال'}</div>
         </div>
       </div>
 
@@ -187,18 +200,22 @@ export default function Sidebar() {
                 </div>
                 <div
                   className="sn-brand-group"
-                  style={{ maxHeight: brandsOpen ? `${BRANDS.length * 36}px` : '0' }}
+                  style={{ maxHeight: brandsOpen ? `${brands.length * 36 + 8}px` : '0' }}
                 >
-                  {BRANDS.map((brand) => (
-                    <Link
-                      key={brand.id}
-                      href={`/brands/${brand.id}`}
-                      className={`sn-brand${(pathname ?? '').includes(`/brands/${brand.id}`) ? ' on' : ''}`}
-                    >
-                      <span className="dot" style={{ backgroundColor: brand.color }} />
-                      <span>{brand.label}</span>
-                    </Link>
-                  ))}
+                  {brands.length === 0 ? (
+                    <div style={{ padding: '6px 28px', fontSize: 11, color: 'var(--txt3)' }}>لا توجد براندات</div>
+                  ) : (
+                    brands.map((brand) => (
+                      <Link
+                        key={brand.id}
+                        href={`/brands/${brand.id}`}
+                        className={`sn-brand${(pathname ?? '').includes(`/brands/${brand.id}`) ? ' on' : ''}`}
+                      >
+                        <span className="dot" style={{ backgroundColor: brand.color }} />
+                        <span>{brand.icon} {brand.name}</span>
+                      </Link>
+                    ))
+                  )}
                 </div>
               </div>
             );

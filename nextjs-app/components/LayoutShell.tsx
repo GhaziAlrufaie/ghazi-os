@@ -1,12 +1,17 @@
 'use client';
 /*
  * Ghazi OS — LayoutShell
+ * يستقبل sidebar كـ prop (Server Component) لتجاوز Server/Client boundary
  * يستخدم CSS classes من globals.css: .side, .main
  */
 import { useEffect, useState } from 'react';
-import Sidebar from '@/components/Sidebar';
 
-export default function LayoutShell({ children }: { children: React.ReactNode }) {
+interface LayoutShellProps {
+  children: React.ReactNode;
+  sidebar: React.ReactNode;
+}
+
+export default function LayoutShell({ children, sidebar }: LayoutShellProps) {
   const [isLoggedIn, setIsLoggedIn] = useState<boolean | null>(null);
 
   useEffect(() => {
@@ -28,7 +33,7 @@ export default function LayoutShell({ children }: { children: React.ReactNode })
 
       {isLoggedIn ? (
         <>
-          <Sidebar />
+          {sidebar}
           <div className="main">
             {children}
           </div>

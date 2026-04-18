@@ -8,11 +8,16 @@ const LayoutShell = nextDynamic(() => import('@/components/LayoutShell'), {
   loading: () => <></>,
 });
 
-export default function LayoutShellWrapper({ children }: { children: React.ReactNode }) {
+interface LayoutShellWrapperProps {
+  children: React.ReactNode;
+  sidebar: React.ReactNode;
+}
+
+export default function LayoutShellWrapper({ children, sidebar }: LayoutShellWrapperProps) {
   return (
     <ToastProvider>
       <MonthNavProvider>
-        <LayoutShell>{children}</LayoutShell>
+        <LayoutShell sidebar={sidebar}>{children}</LayoutShell>
       </MonthNavProvider>
     </ToastProvider>
   );

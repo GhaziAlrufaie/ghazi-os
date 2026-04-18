@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import './globals.css';
 import LayoutShellWrapper from '@/components/LayoutShellWrapper';
+import SidebarServer from '@/components/SidebarServer';
 
 export const dynamic = 'force-dynamic';
 
@@ -19,7 +20,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         />
       </head>
       <body>
-        <LayoutShellWrapper>{children}</LayoutShellWrapper>
+        <LayoutShellWrapper sidebar={<SidebarServer />}>
+          {children}
+        </LayoutShellWrapper>
       </body>
     </html>
   );

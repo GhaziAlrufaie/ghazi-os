@@ -34,21 +34,10 @@ export default async function DashboardPage() {
   ];
 
   return (
-    <>
+    <div>
       {/* Page Header */}
-      <div className="page-header">
-        <h1
-          style={{
-            fontSize: 28,
-            fontWeight: 200,
-            letterSpacing: '-0.03em',
-            background: 'linear-gradient(135deg, rgba(255,255,255,0.92) 0%, rgba(255,255,255,0.55) 100%)',
-            WebkitBackgroundClip: 'text',
-            WebkitTextFillColor: 'transparent',
-            backgroundClip: 'text',
-            marginBottom: 4,
-          }}
-        >
+      <div style={{ padding: '32px 24px 0', marginBottom: 24 }}>
+        <h1 style={{ fontSize: 22, fontWeight: 700, color: 'var(--txt)', marginBottom: 4 }}>
           لوحة القيادة
         </h1>
         <p style={{ fontSize: 13, color: 'var(--txt3)' }}>
@@ -58,12 +47,12 @@ export default async function DashboardPage() {
 
       {/* Stats Cards */}
       <div
-        className="stagger"
         style={{
           display: 'grid',
           gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))',
           gap: 16,
           marginBottom: 32,
+          padding: '0 24px',
         }}
       >
         {stats.map((stat) => (
@@ -84,7 +73,6 @@ export default async function DashboardPage() {
                 fontSize: 40,
                 fontWeight: 200,
                 color: stat.color,
-                fontFamily: 'JetBrains Mono, monospace',
                 letterSpacing: '-0.02em',
                 lineHeight: 1,
               }}
@@ -97,10 +85,11 @@ export default async function DashboardPage() {
 
       {/* Status Banner */}
       <div
-        className="card animate-fade-up"
+        className="card"
         style={{
-          background: 'rgba(201,150,59,0.04)',
-          borderColor: 'rgba(201,150,59,0.15)',
+          background: 'rgba(201,168,76,0.04)',
+          borderColor: 'rgba(201,168,76,0.15)',
+          margin: '0 24px',
         }}
       >
         <div
@@ -149,6 +138,6 @@ export default async function DashboardPage() {
           ))}
         </div>
       </div>
-    </>
+    </div>
   );
 }
