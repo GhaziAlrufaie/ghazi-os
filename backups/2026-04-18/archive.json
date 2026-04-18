@@ -1,0 +1,959 @@
+[
+  {
+    "id": "x1774845510282jwats",
+    "type": "subtask",
+    "reason": "manual",
+    "archived_at": "2026-03-30T04:38:30.282Z",
+    "archived_month": 2,
+    "archived_year": 2026,
+    "data": {
+      "id": "x1774761820998h69lv",
+      "desc": "",
+      "tags": [],
+      "notes": "",
+      "title": "غازي",
+      "status": "done",
+      "brandId": null,
+      "dueDate": "2026-03-29",
+      "priority": "medium",
+      "projectId": null,
+      "sortOrder": 63,
+      "completedAt": "2026-03-29T05:23:43.180Z"
+    },
+    "updated_at": "2026-04-04T20:35:00.167253+00:00"
+  },
+  {
+    "id": "x1774701789980pp8bc",
+    "type": "subtask",
+    "reason": "manual",
+    "archived_at": "2026-03-28T12:43:09.980Z",
+    "archived_month": 2,
+    "archived_year": 2026,
+    "data": {
+      "id": "t31",
+      "desc": "",
+      "tags": [
+        "شخصي"
+      ],
+      "notes": "",
+      "title": "عطور الشيخ",
+      "status": "todo",
+      "brandId": null,
+      "dueDate": null,
+      "category": "personal",
+      "priority": "medium",
+      "projectId": null,
+      "sortOrder": 31,
+      "completedAt": null
+    },
+    "updated_at": "2026-04-04T20:35:00.167253+00:00"
+  },
+  {
+    "id": "x1774703483818jk3tq",
+    "type": "task",
+    "reason": "manual",
+    "archived_at": "2026-03-28T13:11:23.818Z",
+    "archived_month": 2,
+    "archived_year": 2026,
+    "data": {
+      "id": "t14",
+      "desc": "",
+      "tags": [],
+      "links": [],
+      "notes": "",
+      "title": "تجهيز كتالوج المنتجات",
+      "status": "todo",
+      "brandId": "b2",
+      "dueDate": "2026-03-10",
+      "priority": "medium",
+      "subtasks": [],
+      "checklist": [],
+      "projectId": "p4",
+      "sortOrder": 13,
+      "completedAt": null
+    },
+    "updated_at": "2026-04-04T20:35:00.167253+00:00"
+  },
+  {
+    "id": "x1774701779764y7cpr",
+    "type": "subtask",
+    "reason": "manual",
+    "archived_at": "2026-03-28T12:42:59.764Z",
+    "archived_month": 2,
+    "archived_year": 2026,
+    "data": {
+      "id": "t29",
+      "desc": "",
+      "tags": [
+        "إداري"
+      ],
+      "notes": "",
+      "title": "أبو إياد — كيلو",
+      "status": "todo",
+      "brandId": null,
+      "dueDate": null,
+      "category": "admin",
+      "priority": "medium",
+      "projectId": null,
+      "sortOrder": 29,
+      "completedAt": null
+    },
+    "updated_at": "2026-04-04T20:35:00.167253+00:00"
+  },
+  {
+    "id": "x1774696107993ycr3w",
+    "type": "subtask",
+    "reason": "manual",
+    "archived_at": "2026-03-28T11:08:27.993Z",
+    "archived_month": 2,
+    "archived_year": 2026,
+    "data": {
+      "id": "task-1774527717549",
+      "links": [],
+      "notes": "",
+      "title": "مهمة جديدة",
+      "status": "todo",
+      "brandId": "b1",
+      "dueDate": null,
+      "priority": "medium",
+      "subtasks": [],
+      "checklist": [],
+      "createdAt": "2026-03-26",
+      "projectId": null,
+      "updatedAt": "2026-03-26"
+    },
+    "updated_at": "2026-04-04T20:35:00.167253+00:00"
+  },
+  {
+    "id": "x1774696109911180y2",
+    "type": "subtask",
+    "reason": "manual",
+    "archived_at": "2026-03-28T11:08:29.911Z",
+    "archived_month": 2,
+    "archived_year": 2026,
+    "data": {
+      "id": "task-1774529889223",
+      "links": [],
+      "notes": "",
+      "title": "مهمة جديدة",
+      "status": "todo",
+      "brandId": "b1",
+      "dueDate": null,
+      "priority": "medium",
+      "subtasks": [],
+      "checklist": [],
+      "createdAt": "2026-03-26",
+      "projectId": null,
+      "updatedAt": "2026-03-26"
+    },
+    "updated_at": "2026-04-04T20:35:00.167253+00:00"
+  },
+  {
+    "id": "x17746961168564o7xa",
+    "type": "subtask",
+    "reason": "manual",
+    "archived_at": "2026-03-28T11:08:36.856Z",
+    "archived_month": 2,
+    "archived_year": 2026,
+    "data": {
+      "id": "task-1774530191846",
+      "links": [],
+      "notes": "",
+      "title": "غازي",
+      "status": "todo",
+      "brandId": "b1",
+      "dueDate": null,
+      "priority": "medium",
+      "subtasks": [],
+      "checklist": [],
+      "createdAt": "2026-03-26",
+      "projectId": null,
+      "updatedAt": "2026-03-26"
+    },
+    "updated_at": "2026-04-04T20:35:00.167253+00:00"
+  },
+  {
+    "id": "x1774762764643gyecu",
+    "type": "decision",
+    "reason": "manual",
+    "archived_at": "2026-03-29T05:39:24.643Z",
+    "archived_month": 2,
+    "archived_year": 2026,
+    "data": {
+      "id": "d4",
+      "notes": "نبدأ بحراج ونبني المتجر بالتوازي",
+      "title": "أودريد — قناة التوزيع",
+      "impact": "medium",
+      "status": "pending",
+      "brandId": "b2",
+      "context": "هل نركز على حراج أم نبني متجر مستقل؟",
+      "options": [
+        {
+          "id": "o10",
+          "cons": [
+            "عمولة",
+            "تبعية"
+          ],
+          "pros": [
+            "سريع",
+            "جمهور جاهز"
+          ],
+          "title": "حراج فقط",
+          "estimatedCost": 500,
+          "estimatedRevenue": 8000
+        },
+        {
+          "id": "o11",
+          "cons": [
+            "وقت أطول",
+            "تكلفة"
+          ],
+          "pros": [
+            "استقلالية",
+            "بناء براند"
+          ],
+          "title": "متجر مستقل",
+          "estimatedCost": 5000,
+          "estimatedRevenue": 15000
+        }
+      ],
+      "deadline": "2026-03-15",
+      "decidedAt": null,
+      "decidedBy": "غازي",
+      "projectId": "p4",
+      "chosenOptionId": null
+    },
+    "updated_at": "2026-04-04T20:35:00.167253+00:00"
+  },
+  {
+    "id": "x1775078888790buwlk",
+    "type": "decision",
+    "reason": "manual",
+    "archived_at": "2026-04-01T21:28:08.790Z",
+    "archived_month": 3,
+    "archived_year": 2026,
+    "data": {
+      "id": "x1775078814871chntl",
+      "notes": "",
+      "title": "موظفات جوزاء — وقف دانيا — انتظر يقدمون حقين مستقل",
+      "impact": "medium",
+      "status": "pending",
+      "brandId": "b1",
+      "context": "انتظر يقدمون حقين مستقل",
+      "options": [
+        {
+          "id": "x1775078814871b58eh",
+          "cons": [],
+          "pros": [],
+          "title": "ميزانية",
+          "estimatedCost": null,
+          "estimatedRevenue": null
+        },
+        {
+          "id": "x1775078814871a1c4s",
+          "cons": [],
+          "pros": [],
+          "title": "شخص",
+          "estimatedCost": null,
+          "estimatedRevenue": null
+        },
+        {
+          "id": "x1775078814871tpslh",
+          "cons": [],
+          "pros": [],
+          "title": "وقت",
+          "estimatedCost": null,
+          "estimatedRevenue": null
+        }
+      ],
+      "deadline": null,
+      "decidedAt": null,
+      "decidedBy": "غازي",
+      "projectId": null,
+      "chosenOptionId": null
+    },
+    "updated_at": "2026-04-04T20:35:00.167253+00:00"
+  },
+  {
+    "id": "x1775077993651aghbo",
+    "type": "decision",
+    "reason": "manual",
+    "archived_at": "2026-04-01T21:13:13.651Z",
+    "archived_month": 3,
+    "archived_year": 2026,
+    "data": {
+      "id": "x1775064961151im9d8",
+      "notes": "",
+      "title": "موظفات جوزاء — وقف دانيا — وش وقفك؟",
+      "impact": "medium",
+      "status": "pending",
+      "brandId": "b1",
+      "context": "",
+      "options": [
+        {
+          "id": "x1775064961151vyfma",
+          "cons": [],
+          "pros": [],
+          "title": "ميزانية",
+          "estimatedCost": null,
+          "estimatedRevenue": null
+        },
+        {
+          "id": "x1775064961151mslnj",
+          "cons": [],
+          "pros": [],
+          "title": "شخص",
+          "estimatedCost": null,
+          "estimatedRevenue": null
+        },
+        {
+          "id": "x1775064961151te9rw",
+          "cons": [],
+          "pros": [],
+          "title": "وقت",
+          "estimatedCost": null,
+          "estimatedRevenue": null
+        }
+      ],
+      "deadline": null,
+      "decidedAt": null,
+      "decidedBy": "غازي",
+      "projectId": null,
+      "chosenOptionId": null
+    },
+    "updated_at": "2026-04-04T20:35:00.167253+00:00"
+  },
+  {
+    "id": "x1774845512779g5lff",
+    "type": "subtask",
+    "reason": "manual",
+    "archived_at": "2026-03-30T04:38:32.779Z",
+    "archived_month": 2,
+    "archived_year": 2026,
+    "data": {
+      "id": "x1774761826584nz7cl",
+      "desc": "",
+      "tags": [],
+      "notes": "",
+      "title": "غازي",
+      "status": "done",
+      "brandId": null,
+      "dueDate": "2026-03-29",
+      "priority": "medium",
+      "projectId": null,
+      "sortOrder": 64,
+      "completedAt": "2026-03-29T05:23:50.636Z"
+    },
+    "updated_at": "2026-04-04T20:35:00.167253+00:00"
+  },
+  {
+    "id": "x1774762756918o73cp",
+    "type": "decision",
+    "reason": "manual",
+    "archived_at": "2026-03-29T05:39:16.918Z",
+    "archived_month": 2,
+    "archived_year": 2026,
+    "data": {
+      "id": "d1",
+      "notes": "",
+      "title": "توم فورد — خاص أم مستوحى؟",
+      "impact": "high",
+      "status": "pending",
+      "brandId": "b1",
+      "context": "العميل يطلب توم فورد، هل نوفره خاصاً أم نقدم مستوحى؟",
+      "options": [
+        {
+          "id": "o1",
+          "cons": [
+            "تكلفة أعلى",
+            "وقت أطول"
+          ],
+          "pros": [
+            "هامش أعلى",
+            "تميز"
+          ],
+          "title": "خاص",
+          "estimatedCost": 8000,
+          "estimatedRevenue": 15000
+        },
+        {
+          "id": "o2",
+          "cons": [
+            "هامش أقل"
+          ],
+          "pros": [
+            "سريع",
+            "تكلفة أقل"
+          ],
+          "title": "مستوحى",
+          "estimatedCost": 2000,
+          "estimatedRevenue": 6000
+        },
+        {
+          "id": "o3",
+          "cons": [
+            "خسارة فرصة"
+          ],
+          "pros": [
+            "لا مخاطرة"
+          ],
+          "title": "نتركه",
+          "estimatedCost": 0,
+          "estimatedRevenue": 0
+        }
+      ],
+      "deadline": "2026-03-26",
+      "decidedAt": null,
+      "decidedBy": "غازي",
+      "projectId": "p7",
+      "chosenOptionId": null
+    },
+    "updated_at": "2026-04-04T20:35:00.167253+00:00"
+  },
+  {
+    "id": "x17751351373180hxzv",
+    "type": "decision",
+    "reason": "manual",
+    "archived_at": "2026-04-02T13:05:37.318Z",
+    "archived_month": 3,
+    "archived_year": 2026,
+    "data": {
+      "id": "x1775134210061sj2r9",
+      "notes": "",
+      "title": "سياره ابو ايادددددددد — بلالبيسش",
+      "impact": "medium",
+      "status": "pending",
+      "brandId": null,
+      "context": "بلالبيسش",
+      "options": [
+        {
+          "id": "x1775134210061rriu0",
+          "cons": [],
+          "pros": [],
+          "title": "ميزانية",
+          "estimatedCost": null,
+          "estimatedRevenue": null
+        },
+        {
+          "id": "x1775134210061hsc6w",
+          "cons": [],
+          "pros": [],
+          "title": "شخص",
+          "estimatedCost": null,
+          "estimatedRevenue": null
+        },
+        {
+          "id": "x17751342100616m5bm",
+          "cons": [],
+          "pros": [],
+          "title": "وقت",
+          "estimatedCost": null,
+          "estimatedRevenue": null
+        }
+      ],
+      "deadline": null,
+      "decidedAt": null,
+      "decidedBy": "غازي",
+      "projectId": null,
+      "chosenOptionId": null
+    },
+    "updated_at": "2026-04-04T20:35:00.167253+00:00"
+  },
+  {
+    "id": "x1775045331472ppfzn",
+    "type": "task",
+    "reason": "manual",
+    "archived_at": "2026-04-01T12:08:51.472Z",
+    "archived_month": 3,
+    "archived_year": 2026,
+    "data": {
+      "id": "t12",
+      "desc": "تجهيز العرض التجاري الكامل",
+      "tags": [
+        "مبيعات"
+      ],
+      "links": [],
+      "notes": "",
+      "title": "إعداد عرض التجار",
+      "status": "done",
+      "brandId": "b2",
+      "dueDate": "2026-03-20",
+      "priority": "high",
+      "subtasks": [],
+      "checklist": [],
+      "projectId": "p4",
+      "sortOrder": 11,
+      "updatedAt": "2026-03-31",
+      "completedAt": "2026-03-31T21:14:28.565Z"
+    },
+    "updated_at": "2026-04-04T20:35:00.167253+00:00"
+  },
+  {
+    "id": "x1775130473954pftvq",
+    "type": "decision",
+    "reason": "manual",
+    "archived_at": "2026-04-02T11:47:53.954Z",
+    "archived_month": 3,
+    "archived_year": 2026,
+    "data": {
+      "id": "x17751304618601uo16",
+      "notes": "",
+      "title": "موظفات جوزاء — وقف دانيا — وش وقفك؟",
+      "impact": "medium",
+      "status": "pending",
+      "brandId": "b1",
+      "context": "",
+      "options": [
+        {
+          "id": "x1775130461860hulbf",
+          "cons": [],
+          "pros": [],
+          "title": "ميزانية",
+          "estimatedCost": null,
+          "estimatedRevenue": null
+        },
+        {
+          "id": "x1775130461860udplf",
+          "cons": [],
+          "pros": [],
+          "title": "شخص",
+          "estimatedCost": null,
+          "estimatedRevenue": null
+        },
+        {
+          "id": "x1775130461860bztqt",
+          "cons": [],
+          "pros": [],
+          "title": "وقت",
+          "estimatedCost": null,
+          "estimatedRevenue": null
+        }
+      ],
+      "deadline": null,
+      "decidedAt": null,
+      "decidedBy": "غازي",
+      "projectId": null,
+      "chosenOptionId": null
+    },
+    "updated_at": "2026-04-04T20:35:00.167253+00:00"
+  },
+  {
+    "id": "x1775077995315dm6go",
+    "type": "decision",
+    "reason": "manual",
+    "archived_at": "2026-04-01T21:13:15.315Z",
+    "archived_month": 3,
+    "archived_year": 2026,
+    "data": {
+      "id": "x17750702593923xwaj",
+      "notes": "",
+      "title": "موظفات جوزاء — وقف دانيا — انتظر رد مستقل",
+      "impact": "medium",
+      "status": "pending",
+      "brandId": "b1",
+      "context": "انتظر رد مستقل",
+      "options": [
+        {
+          "id": "x17750702593924cmld",
+          "cons": [],
+          "pros": [],
+          "title": "ميزانية",
+          "estimatedCost": null,
+          "estimatedRevenue": null
+        },
+        {
+          "id": "x1775070259392kvxtf",
+          "cons": [],
+          "pros": [],
+          "title": "شخص",
+          "estimatedCost": null,
+          "estimatedRevenue": null
+        },
+        {
+          "id": "x177507025939214wk2",
+          "cons": [],
+          "pros": [],
+          "title": "وقت",
+          "estimatedCost": null,
+          "estimatedRevenue": null
+        }
+      ],
+      "deadline": null,
+      "decidedAt": null,
+      "decidedBy": "غازي",
+      "projectId": null,
+      "chosenOptionId": null
+    },
+    "updated_at": "2026-04-04T20:35:00.167253+00:00"
+  },
+  {
+    "id": "x1774701667218qkwhs",
+    "type": "subtask",
+    "reason": "manual",
+    "archived_at": "2026-03-28T12:41:07.218Z",
+    "archived_month": 2,
+    "archived_year": 2026,
+    "data": {
+      "id": "t32",
+      "desc": "",
+      "tags": [
+        "شخصي"
+      ],
+      "notes": "",
+      "title": "بطن حمودي",
+      "status": "todo",
+      "brandId": null,
+      "dueDate": "2026-03-22",
+      "category": "personal",
+      "priority": "high",
+      "projectId": null,
+      "sortOrder": 24,
+      "completedAt": null
+    },
+    "updated_at": "2026-04-04T20:35:00.167253+00:00"
+  },
+  {
+    "id": "x1774696118371gqzoa",
+    "type": "subtask",
+    "reason": "manual",
+    "archived_at": "2026-03-28T11:08:38.371Z",
+    "archived_month": 2,
+    "archived_year": 2026,
+    "data": {
+      "id": "task-1774530376675",
+      "links": [],
+      "notes": "",
+      "title": "مهمة جديدة",
+      "status": "todo",
+      "brandId": "b1",
+      "dueDate": null,
+      "priority": "medium",
+      "subtasks": [],
+      "checklist": [],
+      "createdAt": "2026-03-26",
+      "projectId": null,
+      "updatedAt": "2026-03-26"
+    },
+    "updated_at": "2026-04-04T20:35:00.167253+00:00"
+  },
+  {
+    "id": "x1774700724089kzsn6",
+    "type": "task",
+    "reason": "manual",
+    "archived_at": "2026-03-28T12:25:24.089Z",
+    "archived_month": 2,
+    "archived_year": 2026,
+    "data": {
+      "id": "task-1774700573947",
+      "links": [],
+      "notes": "",
+      "title": "ا",
+      "status": "todo",
+      "brandId": "b1",
+      "dueDate": null,
+      "priority": "low",
+      "subtasks": [],
+      "checklist": [],
+      "createdAt": "2026-03-28",
+      "projectId": null,
+      "updatedAt": "2026-03-28"
+    },
+    "updated_at": "2026-04-04T20:35:00.167253+00:00"
+  },
+  {
+    "id": "x17747627593042rqr6",
+    "type": "decision",
+    "reason": "manual",
+    "archived_at": "2026-03-29T05:39:19.304Z",
+    "archived_month": 2,
+    "archived_year": 2026,
+    "data": {
+      "id": "d2",
+      "notes": "",
+      "title": "بكج سدرة — أكمل أم ألغي؟",
+      "impact": "high",
+      "status": "pending",
+      "brandId": "b1",
+      "context": "بكج سدرة بقيمة ٧٠٠٠ ريال، العميل متردد",
+      "options": [
+        {
+          "id": "o4",
+          "cons": [
+            "وقت وجهد"
+          ],
+          "pros": [
+            "عائد جيد",
+            "علاقة عميل"
+          ],
+          "title": "أكمل",
+          "estimatedCost": 3000,
+          "estimatedRevenue": 7000
+        },
+        {
+          "id": "o5",
+          "cons": [
+            "خسارة العميل"
+          ],
+          "pros": [
+            "توفير وقت"
+          ],
+          "title": "ألغي",
+          "estimatedCost": 0,
+          "estimatedRevenue": 0
+        }
+      ],
+      "deadline": "2026-03-28",
+      "decidedAt": null,
+      "decidedBy": "غازي",
+      "projectId": "p3",
+      "chosenOptionId": null
+    },
+    "updated_at": "2026-04-04T20:35:00.167253+00:00"
+  },
+  {
+    "id": "x17746961191810osoq",
+    "type": "subtask",
+    "reason": "manual",
+    "archived_at": "2026-03-28T11:08:39.181Z",
+    "archived_month": 2,
+    "archived_year": 2026,
+    "data": {
+      "id": "task-1774530378428",
+      "links": [],
+      "notes": "",
+      "title": "مهمة جديدة",
+      "status": "todo",
+      "brandId": "b1",
+      "dueDate": null,
+      "priority": "medium",
+      "subtasks": [],
+      "checklist": [],
+      "createdAt": "2026-03-26",
+      "projectId": null,
+      "updatedAt": "2026-03-26"
+    },
+    "updated_at": "2026-04-04T20:35:00.167253+00:00"
+  },
+  {
+    "id": "x1774700728229652r2",
+    "type": "task",
+    "reason": "manual",
+    "archived_at": "2026-03-28T12:25:28.229Z",
+    "archived_month": 2,
+    "archived_year": 2026,
+    "data": {
+      "id": "task-1774700459136",
+      "links": [],
+      "notes": "",
+      "title": "رواتب",
+      "status": "todo",
+      "brandId": "b1",
+      "dueDate": null,
+      "priority": "medium",
+      "subtasks": [],
+      "checklist": [],
+      "createdAt": "2026-03-28",
+      "projectId": null,
+      "updatedAt": "2026-03-28"
+    },
+    "updated_at": "2026-04-04T20:35:00.167253+00:00"
+  },
+  {
+    "id": "x1774701642799dmaxd",
+    "type": "subtask",
+    "reason": "manual",
+    "archived_at": "2026-03-28T12:40:42.799Z",
+    "archived_month": 2,
+    "archived_year": 2026,
+    "data": {
+      "id": "task-1774701139616",
+      "links": [],
+      "notes": "",
+      "title": "غازي",
+      "status": "todo",
+      "brandId": "b1",
+      "dueDate": null,
+      "priority": "low",
+      "subtasks": [],
+      "checklist": [],
+      "createdAt": "2026-03-28",
+      "projectId": null,
+      "sortOrder": 32,
+      "updatedAt": "2026-03-28"
+    },
+    "updated_at": "2026-04-04T20:35:00.167253+00:00"
+  },
+  {
+    "id": "x17750779924840d9qj",
+    "type": "decision",
+    "reason": "manual",
+    "archived_at": "2026-04-01T21:13:12.484Z",
+    "archived_month": 3,
+    "archived_year": 2026,
+    "data": {
+      "id": "x1775075916071m51qv",
+      "notes": "",
+      "title": "موظفات جوزاء — وقف دانيا — وش وقفك؟",
+      "impact": "medium",
+      "status": "pending",
+      "brandId": "b1",
+      "context": "",
+      "options": [
+        {
+          "id": "x1775075916071kl8c3",
+          "cons": [],
+          "pros": [],
+          "title": "ميزانية",
+          "estimatedCost": null,
+          "estimatedRevenue": null
+        },
+        {
+          "id": "x17750759160717r0ue",
+          "cons": [],
+          "pros": [],
+          "title": "شخص",
+          "estimatedCost": null,
+          "estimatedRevenue": null
+        },
+        {
+          "id": "x1775075916071xuxoy",
+          "cons": [],
+          "pros": [],
+          "title": "وقت",
+          "estimatedCost": null,
+          "estimatedRevenue": null
+        }
+      ],
+      "deadline": null,
+      "decidedAt": null,
+      "decidedBy": "غازي",
+      "projectId": null,
+      "chosenOptionId": null
+    },
+    "updated_at": "2026-04-04T20:35:00.167253+00:00"
+  },
+  {
+    "id": "x1774762754959jfeah",
+    "type": "decision",
+    "reason": "manual",
+    "archived_at": "2026-03-29T05:39:14.959Z",
+    "archived_month": 2,
+    "archived_year": 2026,
+    "data": {
+      "id": "d3",
+      "notes": "",
+      "title": "خط العناية — نبدأ بإيش؟",
+      "impact": "high",
+      "status": "pending",
+      "brandId": "b1",
+      "context": "لدينا ٣ منتجات: بودرة، معطر، زيت — أيهم نبدأ؟",
+      "options": [
+        {
+          "id": "o6",
+          "cons": [
+            "منافسة"
+          ],
+          "pros": [
+            "طلب عالي",
+            "سهل التسويق"
+          ],
+          "title": "بودرة",
+          "estimatedCost": 5000,
+          "estimatedRevenue": 12000
+        },
+        {
+          "id": "o7",
+          "cons": [
+            "تعقيد أكثر"
+          ],
+          "pros": [
+            "هامش أعلى"
+          ],
+          "title": "معطر",
+          "estimatedCost": 6000,
+          "estimatedRevenue": 14000
+        },
+        {
+          "id": "o8",
+          "cons": [
+            "سوق أصغر"
+          ],
+          "pros": [
+            "تميز"
+          ],
+          "title": "زيت",
+          "estimatedCost": 4000,
+          "estimatedRevenue": 10000
+        },
+        {
+          "id": "o9",
+          "cons": [
+            "تكلفة عالية",
+            "مخاطرة"
+          ],
+          "pros": [
+            "حضور كامل"
+          ],
+          "title": "الكل معاً",
+          "estimatedCost": 15000,
+          "estimatedRevenue": 36000
+        }
+      ],
+      "deadline": "2026-03-22",
+      "decidedAt": null,
+      "decidedBy": "غازي",
+      "projectId": "p1",
+      "chosenOptionId": null
+    },
+    "updated_at": "2026-04-04T20:35:00.167253+00:00"
+  },
+  {
+    "id": "x17750779979083j5h2",
+    "type": "decision",
+    "reason": "manual",
+    "archived_at": "2026-04-01T21:13:17.908Z",
+    "archived_month": 3,
+    "archived_year": 2026,
+    "data": {
+      "id": "x17750649338395zg68",
+      "notes": "",
+      "title": "موظفات جوزاء — وقف دانيا — وش وقفك؟",
+      "impact": "medium",
+      "status": "pending",
+      "brandId": "b1",
+      "context": "",
+      "options": [
+        {
+          "id": "x1775064933839od0ln",
+          "cons": [],
+          "pros": [],
+          "title": "ميزانية",
+          "estimatedCost": null,
+          "estimatedRevenue": null
+        },
+        {
+          "id": "x17750649338396ey21",
+          "cons": [],
+          "pros": [],
+          "title": "شخص",
+          "estimatedCost": null,
+          "estimatedRevenue": null
+        },
+        {
+          "id": "x17750649338390txnn",
+          "cons": [],
+          "pros": [],
+          "title": "وقت",
+          "estimatedCost": null,
+          "estimatedRevenue": null
+        }
+      ],
+      "deadline": null,
+      "decidedAt": null,
+      "decidedBy": "غازي",
+      "projectId": null,
+      "chosenOptionId": null
+    },
+    "updated_at": "2026-04-04T20:35:00.167253+00:00"
+  }
+]

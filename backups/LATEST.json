@@ -1,6 +1,6 @@
 {
-  "backup_date": "2026-04-17",
-  "backup_time": "2026-04-17T23:09:09.099Z",
+  "backup_date": "2026-04-18",
+  "backup_time": "2026-04-18T22:04:19.236Z",
   "tables_discovered": 13,
   "tables": {
     "tasks": 100,
@@ -13,11 +13,11 @@
     "decisions": 14,
     "events": 7,
     "archive": 26,
-    "weekly_focus": 16,
-    "salla_orders": 57,
+    "weekly_focus": 17,
+    "salla_orders": 62,
     "metrics": 8
   },
-  "total_records": 288,
+  "total_records": 294,
   "status": "success",
-  "backup_folder": "backups/2026-04-17"
+  "backup_folder": "backups/2026-04-18"
 }
