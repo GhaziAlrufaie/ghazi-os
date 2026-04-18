@@ -5,7 +5,7 @@
 import { createServerClient } from '@/lib/supabase';
 import { revalidatePath } from 'next/cache';
 
-export type FocusTargetType = 'brand' | 'personal' | 'custom';
+export type FocusTargetType = 'brand' | 'project' | 'task' | 'personal' | 'finance' | 'recharge' | 'custom';
 
 export interface WeeklyFocusEntry {
   id: string;

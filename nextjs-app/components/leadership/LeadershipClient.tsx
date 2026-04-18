@@ -13,7 +13,7 @@ import {
   type InboxTask,
 } from '@/lib/inbox-actions';
 import {
-  setDayFocus, clearDayFocus,
+  setDayFocus, clearDayFocus, moveFocusToNextDay,
   type WeeklyFocusEntry, type FocusTargetType,
 } from '@/lib/weekly-focus-actions';
 import type { DecisionRow, EmployeeRow } from '@/lib/leadership-types';
@@ -59,11 +59,11 @@ function toISO(d: Date): string { return d.toISOString().split('T')[0]; }
 function todayISO(): string { return toISO(new Date()); }
 function fmt(n: number): string { return n.toLocaleString('ar-SA'); }
 
-function getWeekDates(): Date[] {
+function getWeekDates(offset = 0): Date[] {
   const today = new Date();
   return Array.from({ length: 7 }, (_, i) => {
     const d = new Date(today);
-    d.setDate(today.getDate() + i);
+    d.setDate(today.getDate() + i + offset * 7);
     return d;
   });
 }
@@ -98,45 +98,85 @@ function CollapsibleSection({
 }
 
 // ─── Week Compass ─────────────────────────────────────────────────────────────
+const FOCUS_TYPE_LABELS: Record<FocusTargetType, string> = {
+  brand: '🏷 براند', project: '📁 مشروع', task: '✅ مهمة',
+  personal: '👤 شخصي', finance: '💰 مالي', recharge: '⚡ استراحة', custom: '✏ مخصص',
+};
+const FOCUS_TYPE_COLORS: Record<FocusTargetType, string> = {
+  brand: '#C9A84C', project: '#3498db', task: '#2ecc71',
+  personal: '#8B5CF6', finance: '#e67e22', recharge: '#1abc9c', custom: '#6B7280',
+};
+const PRIORITY_ORDER: Record<string, number> = { critical: 0, high: 1, medium: 2, low: 3 };
+
 function WeekCompass({
-  weeklyFocus, brands, onFocusChange,
+  weeklyFocus, brands, activeTasks, todaySales, onFocusChange,
 }: {
   weeklyFocus: WeeklyFocusEntry[];
   brands: Brand[];
+  activeTasks: ActiveTask[];
+  todaySales: number;
   onFocusChange: (entries: WeeklyFocusEntry[]) => void;
 }) {
   const router = useRouter();
+  const [weekOffset, setWeekOffset] = useState(0);
   const [modalDate, setModalDate] = useState<string | null>(null);
   const [targetType, setTargetType] = useState<FocusTargetType>('brand');
   const [selectedBrandId, setSelectedBrandId] = useState('');
+  const [selectedTaskId, setSelectedTaskId] = useState('');
+  const [taskBrandFilter, setTaskBrandFilter] = useState('');
+  const [taskPriorityFilter, setTaskPriorityFilter] = useState('');
   const [customName, setCustomName] = useState('');
   const [notes, setNotes] = useState('');
   const [isPending, startTransition] = useTransition();
-  const weekDates = getWeekDates();
+
+  const weekDates = getWeekDates(weekOffset);
   const entryMap = new Map(weeklyFocus.map(e => [e.focusDate, e]));
   const today = todayISO();
+
+  const last7BrandIds = new Set(weeklyFocus.filter(e => e.targetType === 'brand').map(e => e.targetId));
+  const neglectedBrands = brands.filter(b => !last7BrandIds.has(b.id));
+
+  const filteredTasks = activeTasks
+    .filter(t => !taskBrandFilter || t.brandId === taskBrandFilter)
+    .filter(t => !taskPriorityFilter || t.priority === taskPriorityFilter)
+    .sort((a, b) => (PRIORITY_ORDER[a.priority] ?? 9) - (PRIORITY_ORDER[b.priority] ?? 9));
+
+  const weekStart = weekDates[0];
+  const isCurrentWeek = weekOffset === 0;
+  const weekLabel = `📅 ${MONTH_NAMES[weekStart.getMonth()]} ${weekStart.getFullYear()}${isCurrentWeek ? ' — الحالي' : ''}`;
 
   function openModal(date: string) {
     const existing = entryMap.get(date);
     setModalDate(date);
     setTargetType(existing?.targetType ?? 'brand');
     setSelectedBrandId(existing?.targetType === 'brand' ? (existing.targetId ?? '') : '');
-    setCustomName(existing?.targetType === 'custom' ? existing.targetName : '');
+    setSelectedTaskId(existing?.targetType === 'task' ? (existing.targetId ?? '') : '');
+    setTaskBrandFilter('');
+    setTaskPriorityFilter('');
+    setCustomName(['project', 'custom'].includes(existing?.targetType ?? '') ? existing!.targetName : '');
     setNotes(existing?.notes ?? '');
   }
 
   function handleSave() {
     if (!modalDate) return;
-    let targetName = '', targetColor = '#C9A84C', targetId: string | null = null;
+    let targetName = '', targetColor = FOCUS_TYPE_COLORS[targetType], targetId: string | null = null;
     if (targetType === 'brand') {
       const brand = brands.find(b => b.id === selectedBrandId);
       if (!brand) return;
       targetName = brand.name; targetColor = brand.color; targetId = brand.id;
+    } else if (targetType === 'task') {
+      const task = activeTasks.find(t => t.id === selectedTaskId);
+      if (!task) return;
+      targetName = task.title; targetColor = PRIORITY_COLORS[task.priority] ?? '#888'; targetId = task.id;
     } else if (targetType === 'personal') {
-      targetName = 'مهام شخصية'; targetColor = '#8B5CF6';
+      targetName = 'مهام شخصية';
+    } else if (targetType === 'finance') {
+      targetName = 'مالي';
+    } else if (targetType === 'recharge') {
+      targetName = 'استراحة';
     } else {
       if (!customName.trim()) return;
-      targetName = customName.trim(); targetColor = '#6B7280';
+      targetName = customName.trim();
     }
     const date = modalDate;
     startTransition(async () => {
@@ -160,20 +200,62 @@ function WeekCompass({
     });
   }
 
+  function handleMoveToNextDay() {
+    if (!modalDate) return;
+    const date = modalDate;
+    setModalDate(null);
+    startTransition(async () => {
+      await moveFocusToNextDay(date);
+      router.refresh();
+    });
+  }
+
+  const isSaveDisabled = isPending
+    || (targetType === 'brand' && !selectedBrandId)
+    || (targetType === 'task' && !selectedTaskId)
+    || (['project', 'custom'].includes(targetType) && !customName.trim());
+
   return (
     <>
+      {/* ── Header ── */}
+      <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 10, direction: 'rtl', flexWrap: 'wrap' }}>
+        <button onClick={() => setWeekOffset(o => o - 1)}
+          style={{ fontSize: 14, padding: '4px 10px', borderRadius: 8, cursor: 'pointer', border: '1px solid rgba(255,255,255,0.1)', background: 'rgba(255,255,255,0.04)', color: 'var(--txt3)', fontFamily: 'inherit' }}>‹</button>
+        <span style={{ fontSize: 11, color: 'var(--txt3)', flex: 1, textAlign: 'center' }}>{weekLabel}</span>
+        <button onClick={() => setWeekOffset(o => o + 1)}
+          style={{ fontSize: 14, padding: '4px 10px', borderRadius: 8, cursor: 'pointer', border: '1px solid rgba(255,255,255,0.1)', background: 'rgba(255,255,255,0.04)', color: 'var(--txt3)', fontFamily: 'inherit' }}>›</button>
+        {neglectedBrands.length > 0 && (
+          <span title={neglectedBrands.map(b => b.name).join('، ')}
+            style={{ fontSize: 10, padding: '3px 8px', borderRadius: 20, background: 'rgba(231,76,60,0.15)', color: '#e74c3c', cursor: 'default', whiteSpace: 'nowrap' }}>
+            🔴 {neglectedBrands.length} براند يشتكي
+          </span>
+        )}
+        <button onClick={() => openModal(today)}
+          style={{ fontSize: 11, padding: '5px 10px', borderRadius: 8, cursor: 'pointer', border: '1px solid rgba(201,150,59,0.3)', background: 'rgba(201,150,59,0.08)', color: 'var(--gold)', fontFamily: 'inherit', whiteSpace: 'nowrap' }}>+ تعيين اليوم</button>
+      </div>
+
+      {/* ── بطاقات الأيام ── */}
       <div style={{ overflowX: 'auto', paddingBottom: 4 }}>
         <div style={{ display: 'flex', gap: 8, minWidth: 'max-content' }}>
           {weekDates.map(d => {
             const iso = toISO(d);
             const entry = entryMap.get(iso);
             const isToday = iso === today;
+            const brand = entry?.targetType === 'brand' ? brands.find(b => b.id === entry.targetId) : null;
+            const taskCount = brand ? activeTasks.filter(t => t.brandId === brand.id).length : 0;
+            const typeIcon = brand?.icon ?? (
+              entry?.targetType === 'personal' ? '👤' :
+              entry?.targetType === 'finance' ? '💰' :
+              entry?.targetType === 'recharge' ? '⚡' :
+              entry?.targetType === 'task' ? '✅' :
+              entry?.targetType === 'project' ? '📁' : '✏'
+            );
             return (
               <button
                 key={iso}
                 onClick={() => openModal(iso)}
                 style={{
-                  width: 100, flexShrink: 0, padding: '10px 8px', borderRadius: 12, cursor: 'pointer', textAlign: 'right', direction: 'rtl',
+                  width: 110, flexShrink: 0, padding: '10px 8px', borderRadius: 12, cursor: 'pointer', textAlign: 'right', direction: 'rtl',
                   background: isToday ? 'rgba(201,150,59,0.08)' : 'rgba(255,255,255,0.02)',
                   border: isToday ? '1.5px solid rgba(201,150,59,0.4)' : '1.5px solid rgba(255,255,255,0.06)',
                   transition: 'all 0.2s',
@@ -185,11 +267,20 @@ function WeekCompass({
                 </div>
                 {entry ? (
                   <div>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: 4, marginBottom: 2 }}>
-                      <span style={{ width: 6, height: 6, borderRadius: '50%', background: entry.targetColor, flexShrink: 0 }} />
-                      <span style={{ fontSize: 10, fontWeight: 600, color: 'var(--txt)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', maxWidth: 72 }}>{entry.targetName}</span>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 4, marginBottom: 3 }}>
+                      <span style={{ fontSize: 13 }}>{typeIcon}</span>
+                      <span style={{ fontSize: 10, fontWeight: 700, color: entry.targetColor, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', maxWidth: 68 }}>{entry.targetName}</span>
                     </div>
-                    {entry.notes && <p style={{ fontSize: 9, color: 'var(--txt3)', margin: 0, overflow: 'hidden', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical' }}>{entry.notes}</p>}
+                    <span style={{ fontSize: 8, padding: '1px 5px', borderRadius: 10, background: `${entry.targetColor}22`, color: entry.targetColor, display: 'inline-block', marginBottom: 3 }}>
+                      {FOCUS_TYPE_LABELS[entry.targetType]?.split(' ')[1] ?? entry.targetType}
+                    </span>
+                    {brand && taskCount > 0 && (
+                      <div style={{ fontSize: 8, color: 'var(--txt3)', marginTop: 2 }}>{taskCount} مهمة</div>
+                    )}
+                    {isToday && entry.targetType === 'brand' && (
+                      <div style={{ fontSize: 8, color: '#2ecc71', marginTop: 1 }}>{fmt(todaySales)} ر.س</div>
+                    )}
+                    {entry.notes && <p style={{ fontSize: 8, color: 'var(--txt3)', margin: '2px 0 0', overflow: 'hidden', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical' }}>{entry.notes}</p>}
                   </div>
                 ) : (
                   <span style={{ fontSize: 9, color: 'var(--txt3)', border: '1px dashed rgba(255,255,255,0.08)', borderRadius: 4, padding: '2px 4px', display: 'inline-block' }}>+ فوكس</span>
@@ -200,47 +291,111 @@ function WeekCompass({
         </div>
       </div>
 
-      {/* Modal */}
+      {/* ── لوحة البراندات المهملة ── */}
+      {neglectedBrands.length > 0 && (
+        <div style={{ marginTop: 10, padding: '8px 12px', borderRadius: 10, background: 'rgba(231,76,60,0.06)', border: '1px solid rgba(231,76,60,0.15)', direction: 'rtl' }}>
+          <p style={{ fontSize: 10, color: '#e74c3c', margin: '0 0 6px', fontWeight: 600 }}>🔴 براندات لم تُعيَّن هذا الأسبوع:</p>
+          <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
+            {neglectedBrands.map(b => (
+              <button key={b.id} onClick={() => openModal(today)}
+                style={{ fontSize: 10, padding: '3px 8px', borderRadius: 20, cursor: 'pointer', border: `1px solid ${b.color}44`, background: `${b.color}11`, color: b.color, fontFamily: 'inherit' }}>
+                {b.icon} {b.name}
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* ── Modal تعيين الفوكس ── */}
       {modalDate && (
-        <div style={{ position: 'fixed', inset: 0, zIndex: 200, background: 'rgba(0,0,0,0.7)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 16 }}
+        <div style={{ position: 'fixed', inset: 0, zIndex: 200, background: 'rgba(0,0,0,0.75)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 16 }}
           onClick={() => setModalDate(null)}>
-          <div style={{ background: '#0c1020', border: '1px solid rgba(201,150,59,0.2)', borderRadius: 16, padding: 20, width: '100%', maxWidth: 400, direction: 'rtl' }}
+          <div style={{ background: '#0c1020', border: '1px solid rgba(201,150,59,0.2)', borderRadius: 16, padding: 20, width: '100%', maxWidth: 440, maxHeight: '90vh', overflowY: 'auto', direction: 'rtl' }}
             onClick={e => e.stopPropagation()}>
             <h3 style={{ fontSize: 15, fontWeight: 600, color: 'var(--txt)', marginBottom: 4 }}>تعيين الفوكس</h3>
-            <p style={{ fontSize: 11, color: 'var(--txt3)', marginBottom: 16 }}>{DAY_NAMES[new Date(modalDate).getDay()]} — {modalDate}</p>
-            <div style={{ display: 'flex', gap: 8, marginBottom: 16 }}>
-              {(['brand', 'personal', 'custom'] as FocusTargetType[]).map(t => (
+            <p style={{ fontSize: 11, color: 'var(--txt3)', marginBottom: 14 }}>{DAY_NAMES[new Date(modalDate + 'T12:00:00').getDay()]} — {modalDate}</p>
+
+            {/* 7 أنواع */}
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4,1fr)', gap: 6, marginBottom: 14 }}>
+              {(Object.keys(FOCUS_TYPE_LABELS) as FocusTargetType[]).map(t => (
                 <button key={t} onClick={() => setTargetType(t)}
-                  style={{ fontSize: 11, padding: '6px 12px', borderRadius: 20, cursor: 'pointer', fontFamily: 'inherit', border: 'none', background: targetType === t ? 'rgba(201,150,59,0.2)' : 'rgba(255,255,255,0.04)', color: targetType === t ? 'var(--gold)' : 'var(--txt3)' }}>
-                  {t === 'brand' ? '🏷 براند' : t === 'personal' ? '👤 شخصي' : '✏ مخصص'}
+                  style={{ fontSize: 10, padding: '7px 4px', borderRadius: 8, cursor: 'pointer', fontFamily: 'inherit', border: targetType === t ? `1px solid ${FOCUS_TYPE_COLORS[t]}` : '1px solid rgba(255,255,255,0.08)', background: targetType === t ? `${FOCUS_TYPE_COLORS[t]}22` : 'rgba(255,255,255,0.03)', color: targetType === t ? FOCUS_TYPE_COLORS[t] : 'var(--txt3)', textAlign: 'center' }}>
+                  {FOCUS_TYPE_LABELS[t]}
                 </button>
               ))}
             </div>
+
+            {/* براند */}
             {targetType === 'brand' && (
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8, marginBottom: 16 }}>
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8, marginBottom: 14 }}>
                 {brands.map(b => (
                   <button key={b.id} onClick={() => setSelectedBrandId(b.id)}
                     style={{ fontSize: 11, padding: '8px 10px', borderRadius: 8, cursor: 'pointer', fontFamily: 'inherit', textAlign: 'right', direction: 'rtl', border: selectedBrandId === b.id ? `1px solid ${b.color}` : '1px solid rgba(255,255,255,0.08)', background: selectedBrandId === b.id ? `${b.color}20` : 'rgba(255,255,255,0.02)', color: selectedBrandId === b.id ? 'var(--txt)' : 'var(--txt3)' }}>
                     <span style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-                      <span style={{ width: 6, height: 6, borderRadius: '50%', background: b.color, flexShrink: 0 }} />
-                      {b.name}
+                      <span style={{ fontSize: 14 }}>{b.icon}</span>
+                      <span style={{ color: selectedBrandId === b.id ? b.color : undefined }}>{b.name}</span>
                     </span>
                   </button>
                 ))}
               </div>
             )}
-            {targetType === 'custom' && (
-              <input value={customName} onChange={e => setCustomName(e.target.value)} placeholder="اسم الفوكس المخصص" className="input" style={{ marginBottom: 16 }} />
+
+            {/* مهمة: فلترة بالبراند أولاً ثم الأولوية */}
+            {targetType === 'task' && (
+              <div style={{ marginBottom: 14 }}>
+                <div style={{ display: 'flex', gap: 6, marginBottom: 8, flexWrap: 'wrap' }}>
+                  <select value={taskBrandFilter} onChange={e => setTaskBrandFilter(e.target.value)}
+                    style={{ fontSize: 10, padding: '5px 8px', borderRadius: 8, border: '1px solid rgba(255,255,255,0.1)', background: '#0c1020', color: 'var(--txt)', fontFamily: 'inherit', flex: 1 }}>
+                    <option value=''>كل البراندات</option>
+                    {brands.map(b => <option key={b.id} value={b.id}>{b.icon} {b.name}</option>)}
+                  </select>
+                  <select value={taskPriorityFilter} onChange={e => setTaskPriorityFilter(e.target.value)}
+                    style={{ fontSize: 10, padding: '5px 8px', borderRadius: 8, border: '1px solid rgba(255,255,255,0.1)', background: '#0c1020', color: 'var(--txt)', fontFamily: 'inherit', flex: 1 }}>
+                    <option value=''>كل الأولويات</option>
+                    <option value='critical'>🔴 حرج</option>
+                    <option value='high'>🟠 عالي</option>
+                    <option value='medium'>🔵 متوسط</option>
+                    <option value='low'>🟢 منخفض</option>
+                  </select>
+                </div>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 6, maxHeight: 200, overflowY: 'auto' }}>
+                  {filteredTasks.length === 0 && <p style={{ fontSize: 11, color: 'var(--txt3)', textAlign: 'center', padding: 8 }}>لا توجد مهام</p>}
+                  {filteredTasks.map(t => (
+                    <button key={t.id} onClick={() => setSelectedTaskId(t.id)}
+                      style={{ fontSize: 11, padding: '8px 10px', borderRadius: 8, cursor: 'pointer', fontFamily: 'inherit', textAlign: 'right', direction: 'rtl', border: selectedTaskId === t.id ? `1px solid ${PRIORITY_COLORS[t.priority]}` : '1px solid rgba(255,255,255,0.08)', background: selectedTaskId === t.id ? `${PRIORITY_COLORS[t.priority]}18` : 'rgba(255,255,255,0.02)', color: 'var(--txt)' }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                        <span style={{ width: 6, height: 6, borderRadius: '50%', background: PRIORITY_COLORS[t.priority] ?? '#888', flexShrink: 0 }} />
+                        <span style={{ flex: 1, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{t.title}</span>
+                        {t.brandName && <span style={{ fontSize: 9, color: t.brandColor ?? 'var(--txt3)', flexShrink: 0 }}>{t.brandName}</span>}
+                      </div>
+                    </button>
+                  ))}
+                </div>
+              </div>
             )}
-            <textarea value={notes} onChange={e => setNotes(e.target.value)} placeholder="ملاحظات (اختياري)" className="input" style={{ height: 60, resize: 'none', marginBottom: 16 }} />
-            <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+
+            {/* مشروع أو مخصص */}
+            {(targetType === 'project' || targetType === 'custom') && (
+              <input value={customName} onChange={e => setCustomName(e.target.value)}
+                placeholder={targetType === 'project' ? 'اسم المشروع' : 'اسم الفوكس المخصص'}
+                className='input' style={{ marginBottom: 14 }} />
+            )}
+
+            {/* ملاحظات */}
+            <textarea value={notes} onChange={e => setNotes(e.target.value)} placeholder='ملاحظات (اختياري)' className='input' style={{ height: 56, resize: 'none', marginBottom: 14 }} />
+
+            {/* أزرار */}
+            <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', alignItems: 'center' }}>
               {entryMap.has(modalDate) && (
-                <button onClick={handleClear} style={{ fontSize: 11, padding: '7px 14px', borderRadius: 8, cursor: 'pointer', fontFamily: 'inherit', border: '1px solid rgba(231,76,60,0.3)', background: 'transparent', color: '#e74c3c' }}>مسح</button>
+                <>
+                  <button onClick={handleClear} style={{ fontSize: 11, padding: '7px 12px', borderRadius: 8, cursor: 'pointer', fontFamily: 'inherit', border: '1px solid rgba(231,76,60,0.3)', background: 'transparent', color: '#e74c3c' }}>مسح</button>
+                  <button onClick={handleMoveToNextDay} style={{ fontSize: 11, padding: '7px 12px', borderRadius: 8, cursor: 'pointer', fontFamily: 'inherit', border: '1px solid rgba(52,152,219,0.3)', background: 'transparent', color: '#3498db' }}>ترحيل للغد ➡️</button>
+                </>
               )}
               <div style={{ flex: 1 }} />
               <button onClick={() => setModalDate(null)} style={{ fontSize: 12, padding: '7px 14px', borderRadius: 8, cursor: 'pointer', fontFamily: 'inherit', border: 'none', background: 'transparent', color: 'var(--txt3)' }}>إلغاء</button>
-              <button onClick={handleSave} disabled={isPending || (targetType === 'brand' && !selectedBrandId) || (targetType === 'custom' && !customName.trim())}
-                style={{ fontSize: 12, padding: '7px 18px', borderRadius: 8, cursor: 'pointer', fontFamily: 'inherit', border: 'none', background: 'linear-gradient(135deg,var(--gold),#8B6914)', color: '#05070d', fontWeight: 700, opacity: isPending ? 0.6 : 1 }}>
+              <button onClick={handleSave} disabled={isSaveDisabled}
+                style={{ fontSize: 12, padding: '7px 18px', borderRadius: 8, cursor: 'pointer', fontFamily: 'inherit', border: 'none', background: 'linear-gradient(135deg,var(--gold),#8B6914)', color: '#05070d', fontWeight: 700, opacity: isSaveDisabled ? 0.5 : 1 }}>
                 {isPending ? 'جارٍ...' : 'حفظ'}
               </button>
             </div>
@@ -602,7 +757,7 @@ export default function LeadershipClient({
 
         {/* ── 2. بوصلة الأسبوع ── */}
         <CollapsibleSection id="compass" icon="🧭" title="بوصلة الأسبوع" defaultOpen={true}>
-          <WeekCompass weeklyFocus={weeklyFocus} brands={brands} onFocusChange={setWeeklyFocus} />
+          <WeekCompass weeklyFocus={weeklyFocus} brands={brands} activeTasks={activeTasks} todaySales={todaySales} onFocusChange={setWeeklyFocus} />
         </CollapsibleSection>
 
         {/* ── 3. الشيء الواحد الآن ── */}
