@@ -1,5 +1,7 @@
 'use client';
 import nextDynamic from 'next/dynamic';
+import { ToastProvider } from '@/components/Toast';
+import { MonthNavProvider } from '@/components/MonthNav';
 
 const LayoutShell = nextDynamic(() => import('@/components/LayoutShell'), {
   ssr: false,
@@ -7,5 +9,11 @@ const LayoutShell = nextDynamic(() => import('@/components/LayoutShell'), {
 });
 
 export default function LayoutShellWrapper({ children }: { children: React.ReactNode }) {
-  return <LayoutShell>{children}</LayoutShell>;
+  return (
+    <ToastProvider>
+      <MonthNavProvider>
+        <LayoutShell>{children}</LayoutShell>
+      </MonthNavProvider>
+    </ToastProvider>
+  );
 }

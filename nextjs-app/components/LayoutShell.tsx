@@ -1,11 +1,10 @@
 'use client';
 /*
- * Ghazi OS — Legendary Edition
- * LayoutShell: Client Component يتحقق من الجلسة عبر API
+ * Ghazi OS — LayoutShell
+ * يستخدم CSS classes من globals.css: .side, .main
  */
 import { useEffect, useState } from 'react';
 import Sidebar from '@/components/Sidebar';
-import CursorGlow from '@/components/CursorGlow';
 
 export default function LayoutShell({ children }: { children: React.ReactNode }) {
   const [isLoggedIn, setIsLoggedIn] = useState<boolean | null>(null);
@@ -17,21 +16,23 @@ export default function LayoutShell({ children }: { children: React.ReactNode })
       .catch(() => setIsLoggedIn(false));
   }, []);
 
-  // حالة التحميل: نعرض الـ children مباشرة (صفحة login ستظهر)
   if (isLoggedIn === null) {
     return <>{children}</>;
   }
 
   return (
     <>
-      <CursorGlow />
+      {/* Orbs */}
+      <div className="orb o1" />
+      <div className="orb o2" />
+
       {isLoggedIn ? (
-        <div className="app-layout">
+        <>
           <Sidebar />
-          <main className="main-content">
+          <div className="main">
             {children}
-          </main>
-        </div>
+          </div>
+        </>
       ) : (
         <>{children}</>
       )}

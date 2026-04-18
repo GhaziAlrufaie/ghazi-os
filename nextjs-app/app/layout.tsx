@@ -14,13 +14,11 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html lang="ar" dir="rtl">
       <head>
         <link
-          href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@200;300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap"
+          href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@300;400;500;600;700&display=swap"
           rel="stylesheet"
         />
       </head>
       <body>
-        <div className="aurora-layer" aria-hidden="true" />
-        <div className="noise-layer" aria-hidden="true" />
         <LayoutShellWrapper>{children}</LayoutShellWrapper>
       </body>
     </html>
