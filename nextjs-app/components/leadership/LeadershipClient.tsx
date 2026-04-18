@@ -30,6 +30,8 @@ interface UpcomingEvent {
   brandId: string | null; brandName: string | null; brandColor: string | null;
 }
 interface Brand { id: string; name: string; icon: string; color: string; }
+interface Project { id: string; brandId: string | null; title: string; status: string; }
+interface PersonalTask { id: string; title: string; priority: string; status: string; }
 interface Props {
   decisions: DecisionRow[];
   employees: EmployeeRow[];
@@ -40,6 +42,8 @@ interface Props {
   upcomingEvents: UpcomingEvent[];
   activeTasks: ActiveTask[];
   dailyTasks: string[];
+  projects: Project[];
+  personalTasks: PersonalTask[];
 }
 
 // ─── Constants ────────────────────────────────────────────────────────────────
@@ -109,13 +113,15 @@ const FOCUS_TYPE_COLORS: Record<FocusTargetType, string> = {
 const PRIORITY_ORDER: Record<string, number> = { critical: 0, high: 1, medium: 2, low: 3 };
 
 function WeekCompass({
-  weeklyFocus, brands, activeTasks, todaySales, onFocusChange,
+  weeklyFocus, brands, activeTasks, todaySales, onFocusChange, projects, personalTasks,
 }: {
   weeklyFocus: WeeklyFocusEntry[];
   brands: Brand[];
   activeTasks: ActiveTask[];
   todaySales: number;
   onFocusChange: (entries: WeeklyFocusEntry[]) => void;
+  projects: Project[];
+  personalTasks: PersonalTask[];
 }) {
   const router = useRouter();
   const [weekOffset, setWeekOffset] = useState(0);
@@ -127,6 +133,10 @@ function WeekCompass({
   const [taskPriorityFilter, setTaskPriorityFilter] = useState('');
   const [customName, setCustomName] = useState('');
   const [notes, setNotes] = useState('');
+  const [selectedProjectId, setSelectedProjectId] = useState('');
+  const [projectBrandFilter, setProjectBrandFilter] = useState('');
+  const [selectedPersonalTaskId, setSelectedPersonalTaskId] = useState('');
+  const [personalPriorityFilter, setPersonalPriorityFilter] = useState('');
   const [isPending, startTransition] = useTransition();
 
   const weekDates = getWeekDates(weekOffset);
@@ -151,9 +161,13 @@ function WeekCompass({
     setTargetType(existing?.targetType ?? 'brand');
     setSelectedBrandId(existing?.targetType === 'brand' ? (existing.targetId ?? '') : '');
     setSelectedTaskId(existing?.targetType === 'task' ? (existing.targetId ?? '') : '');
+    setSelectedProjectId(existing?.targetType === 'project' ? (existing.targetId ?? '') : '');
+    setSelectedPersonalTaskId(existing?.targetType === 'personal' ? (existing.targetId ?? '') : '');
     setTaskBrandFilter('');
     setTaskPriorityFilter('');
-    setCustomName(['project', 'custom'].includes(existing?.targetType ?? '') ? existing!.targetName : '');
+    setProjectBrandFilter('');
+    setPersonalPriorityFilter('');
+    setCustomName(existing?.targetType === 'custom' ? existing.targetName : '');
     setNotes(existing?.notes ?? '');
   }
 
@@ -168,12 +182,17 @@ function WeekCompass({
       const task = activeTasks.find(t => t.id === selectedTaskId);
       if (!task) return;
       targetName = task.title; targetColor = PRIORITY_COLORS[task.priority] ?? '#888'; targetId = task.id;
+    } else if (targetType === 'project') {
+      const project = projects.find(p => p.id === selectedProjectId);
+      if (!project) return;
+      targetName = project.title; targetId = project.id;
     } else if (targetType === 'personal') {
-      targetName = 'مهام شخصية';
+      const pt = personalTasks.find(p => p.id === selectedPersonalTaskId);
+      if (pt) { targetName = pt.title; targetId = pt.id; } else { targetName = 'مهام شخصية'; }
     } else if (targetType === 'finance') {
-      targetName = 'مالي';
+      targetName = 'يوم مالي'; targetColor = '#e67e22';
     } else if (targetType === 'recharge') {
-      targetName = 'استراحة';
+      targetName = 'استراحة'; targetColor = '#1abc9c';
     } else {
       if (!customName.trim()) return;
       targetName = customName.trim();
@@ -213,7 +232,8 @@ function WeekCompass({
   const isSaveDisabled = isPending
     || (targetType === 'brand' && !selectedBrandId)
     || (targetType === 'task' && !selectedTaskId)
-    || (['project', 'custom'].includes(targetType) && !customName.trim());
+    || (targetType === 'project' && !selectedProjectId)
+    || (targetType === 'custom' && !customName.trim());
 
   return (
     <>
@@ -274,11 +294,32 @@ function WeekCompass({
                     <span style={{ fontSize: 8, padding: '1px 5px', borderRadius: 10, background: `${entry.targetColor}22`, color: entry.targetColor, display: 'inline-block', marginBottom: 3 }}>
                       {FOCUS_TYPE_LABELS[entry.targetType]?.split(' ')[1] ?? entry.targetType}
                     </span>
-                    {brand && taskCount > 0 && (
+                    {/* براند: عدد المهام + مبيعات اليوم */}
+                    {entry.targetType === 'brand' && brand && taskCount > 0 && (
                       <div style={{ fontSize: 8, color: 'var(--txt3)', marginTop: 2 }}>{taskCount} مهمة</div>
                     )}
                     {isToday && entry.targetType === 'brand' && (
                       <div style={{ fontSize: 8, color: '#2ecc71', marginTop: 1 }}>{fmt(todaySales)} ر.س</div>
+                    )}
+                    {/* مشروع: أيقونة مشروع */}
+                    {entry.targetType === 'project' && (
+                      <div style={{ fontSize: 8, color: '#3498db', marginTop: 2 }}>📁 مشروع</div>
+                    )}
+                    {/* مهمة: نقطة ملونة بالأولوية */}
+                    {entry.targetType === 'task' && (
+                      <div style={{ fontSize: 8, color: entry.targetColor, marginTop: 2 }}>✅ مهمة</div>
+                    )}
+                    {/* شخصي */}
+                    {entry.targetType === 'personal' && (
+                      <div style={{ fontSize: 8, color: '#8B5CF6', marginTop: 2 }}>👤 شخصي</div>
+                    )}
+                    {/* مالي */}
+                    {entry.targetType === 'finance' && (
+                      <div style={{ fontSize: 8, color: '#e67e22', marginTop: 2 }}>💰 يوم مالي</div>
+                    )}
+                    {/* استراحة */}
+                    {entry.targetType === 'recharge' && (
+                      <div style={{ fontSize: 8, color: '#1abc9c', marginTop: 2 }}>🌿 استراحة</div>
                     )}
                     {entry.notes && <p style={{ fontSize: 8, color: 'var(--txt3)', margin: '2px 0 0', overflow: 'hidden', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical' }}>{entry.notes}</p>}
                   </div>
@@ -374,10 +415,108 @@ function WeekCompass({
               </div>
             )}
 
-            {/* مشروع أو مخصص */}
-            {(targetType === 'project' || targetType === 'custom') && (
+            {/* مشروع: فلترة بالبراند ثم قائمة مشاريعه */}
+            {targetType === 'project' && (
+              <div style={{ marginBottom: 14 }}>
+                <select value={projectBrandFilter} onChange={e => { setProjectBrandFilter(e.target.value); setSelectedProjectId(''); }}
+                  style={{ fontSize: 10, padding: '5px 8px', borderRadius: 8, border: '1px solid rgba(255,255,255,0.1)', background: '#0c1020', color: 'var(--txt)', fontFamily: 'inherit', width: '100%', marginBottom: 8 }}>
+                  <option value=''>كل البراندات</option>
+                  {brands.map(b => <option key={b.id} value={b.id}>{b.icon} {b.name}</option>)}
+                </select>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 6, maxHeight: 200, overflowY: 'auto' }}>
+                  {projects.filter(p => !projectBrandFilter || p.brandId === projectBrandFilter).length === 0 && (
+                    <p style={{ fontSize: 11, color: 'var(--txt3)', textAlign: 'center', padding: 8 }}>لا توجد مشاريع نشطة</p>
+                  )}
+                  {projects.filter(p => !projectBrandFilter || p.brandId === projectBrandFilter).map(p => {
+                    const pBrand = brands.find(b => b.id === p.brandId);
+                    return (
+                      <button key={p.id} onClick={() => setSelectedProjectId(p.id)}
+                        style={{ fontSize: 11, padding: '8px 10px', borderRadius: 8, cursor: 'pointer', fontFamily: 'inherit', textAlign: 'right', direction: 'rtl', border: selectedProjectId === p.id ? '1px solid #3498db' : '1px solid rgba(255,255,255,0.08)', background: selectedProjectId === p.id ? 'rgba(52,152,219,0.12)' : 'rgba(255,255,255,0.02)', color: 'var(--txt)' }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                          <span style={{ fontSize: 13 }}>📁</span>
+                          <span style={{ flex: 1, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{p.title}</span>
+                          {pBrand && <span style={{ fontSize: 9, color: pBrand.color, flexShrink: 0 }}>{pBrand.icon} {pBrand.name}</span>}
+                        </div>
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
+
+            {/* شخصي: قائمة personal_tasks مع فلترة بالأولوية */}
+            {targetType === 'personal' && (
+              <div style={{ marginBottom: 14 }}>
+                <select value={personalPriorityFilter} onChange={e => setPersonalPriorityFilter(e.target.value)}
+                  style={{ fontSize: 10, padding: '5px 8px', borderRadius: 8, border: '1px solid rgba(255,255,255,0.1)', background: '#0c1020', color: 'var(--txt)', fontFamily: 'inherit', width: '100%', marginBottom: 8 }}>
+                  <option value=''>كل الأولويات</option>
+                  <option value='critical'>🔴 حرج</option>
+                  <option value='high'>🟠 عالي</option>
+                  <option value='medium'>🔵 متوسط</option>
+                  <option value='low'>🟢 منخفض</option>
+                </select>
+                {personalTasks.length === 0 ? (
+                  <p style={{ fontSize: 11, color: 'var(--txt3)', textAlign: 'center', padding: 8 }}>لا توجد مهام شخصية نشطة</p>
+                ) : (
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: 6, maxHeight: 200, overflowY: 'auto' }}>
+                    {personalTasks
+                      .filter(p => !personalPriorityFilter || p.priority === personalPriorityFilter)
+                      .sort((a, b) => (PRIORITY_ORDER[a.priority] ?? 9) - (PRIORITY_ORDER[b.priority] ?? 9))
+                      .map(p => (
+                        <button key={p.id} onClick={() => setSelectedPersonalTaskId(p.id)}
+                          style={{ fontSize: 11, padding: '8px 10px', borderRadius: 8, cursor: 'pointer', fontFamily: 'inherit', textAlign: 'right', direction: 'rtl', border: selectedPersonalTaskId === p.id ? `1px solid ${PRIORITY_COLORS[p.priority] ?? '#8B5CF6'}` : '1px solid rgba(255,255,255,0.08)', background: selectedPersonalTaskId === p.id ? `${PRIORITY_COLORS[p.priority] ?? '#8B5CF6'}18` : 'rgba(255,255,255,0.02)', color: 'var(--txt)' }}>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                            <span style={{ width: 6, height: 6, borderRadius: '50%', background: PRIORITY_COLORS[p.priority] ?? '#8B5CF6', flexShrink: 0 }} />
+                            <span style={{ flex: 1, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{p.title}</span>
+                            <span style={{ fontSize: 9, color: PRIORITY_COLORS[p.priority] ?? '#8B5CF6', flexShrink: 0 }}>{PRIORITY_LABELS[p.priority]}</span>
+                          </div>
+                        </button>
+                      ))}
+                  </div>
+                )}
+              </div>
+            )}
+
+            {/* مالي: نص توضيحي + ملاحظات */}
+            {targetType === 'finance' && (
+              <div style={{ marginBottom: 14, padding: '12px 14px', borderRadius: 10, background: 'rgba(230,126,34,0.06)', border: '1px solid rgba(230,126,34,0.2)' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 8 }}>
+                  <span style={{ fontSize: 20 }}>💰</span>
+                  <div>
+                    <div style={{ fontSize: 12, fontWeight: 700, color: '#e67e22' }}>يوم مالي</div>
+                    <div style={{ fontSize: 10, color: 'var(--txt3)' }}>مراجعات، حسابات، دفعات، تقارير مالية</div>
+                  </div>
+                </div>
+                <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
+                  {['مراجعة الحسابات', 'دفع الرواتب', 'تقرير المبيعات', 'تسوية الفواتير'].map(tag => (
+                    <span key={tag} style={{ fontSize: 9, padding: '2px 8px', borderRadius: 20, background: 'rgba(230,126,34,0.1)', color: '#e67e22', border: '1px solid rgba(230,126,34,0.2)' }}>{tag}</span>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* استراحة: نص توضيحي + ملاحظات */}
+            {targetType === 'recharge' && (
+              <div style={{ marginBottom: 14, padding: '12px 14px', borderRadius: 10, background: 'rgba(26,188,156,0.06)', border: '1px solid rgba(26,188,156,0.2)' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 8 }}>
+                  <span style={{ fontSize: 20 }}>🌿</span>
+                  <div>
+                    <div style={{ fontSize: 12, fontWeight: 700, color: '#1abc9c' }}>يوم استراحة وتجديد طاقة</div>
+                    <div style={{ fontSize: 10, color: 'var(--txt3)' }}>لا عمل اليوم — فقط راحة واستعادة الطاقة</div>
+                  </div>
+                </div>
+                <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
+                  {['نوم كافٍ', 'رياضة خفيفة', 'قراءة', 'وقت عائلي', 'تأمل'].map(tag => (
+                    <span key={tag} style={{ fontSize: 9, padding: '2px 8px', borderRadius: 20, background: 'rgba(26,188,156,0.1)', color: '#1abc9c', border: '1px solid rgba(26,188,156,0.2)' }}>{tag}</span>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* مخصص */}
+            {targetType === 'custom' && (
               <input value={customName} onChange={e => setCustomName(e.target.value)}
-                placeholder={targetType === 'project' ? 'اسم المشروع' : 'اسم الفوكس المخصص'}
+                placeholder='اسم الفوكس المخصص'
                 className='input' style={{ marginBottom: 14 }} />
             )}
 
@@ -634,6 +773,8 @@ export default function LeadershipClient({
   upcomingEvents,
   activeTasks,
   dailyTasks,
+  projects,
+  personalTasks,
 }: Props) {
   const pathname = usePathname();
   const [decisions, setDecisions] = useState<DecisionRow[]>(initialDecisions);
@@ -757,7 +898,7 @@ export default function LeadershipClient({
 
         {/* ── 2. بوصلة الأسبوع ── */}
         <CollapsibleSection id="compass" icon="🧭" title="بوصلة الأسبوع" defaultOpen={true}>
-          <WeekCompass weeklyFocus={weeklyFocus} brands={brands} activeTasks={activeTasks} todaySales={todaySales} onFocusChange={setWeeklyFocus} />
+          <WeekCompass weeklyFocus={weeklyFocus} brands={brands} activeTasks={activeTasks} todaySales={todaySales} onFocusChange={setWeeklyFocus} projects={projects} personalTasks={personalTasks} />
         </CollapsibleSection>
 
         {/* ── 3. الشيء الواحد الآن ── */}

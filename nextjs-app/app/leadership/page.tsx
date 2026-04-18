@@ -99,6 +99,39 @@ async function fetchActiveTasks() {
   }));
 }
 
+async function fetchProjects() {
+  try {
+    const supabase = createServerClient();
+    const { data } = await supabase
+      .from('projects')
+      .select('id,brand_id,title,status')
+      .in('status', ['active', 'paused'])
+      .order('sort_order', { ascending: true });
+    return (data ?? []).map((p: { id: string; brand_id: string | null; title: string; status: string }) => ({
+      id: p.id,
+      brandId: p.brand_id ?? null,
+      title: p.title,
+      status: p.status,
+    }));
+  } catch { return []; }
+}
+async function fetchPersonalTasks() {
+  try {
+    const supabase = createServerClient();
+    const { data } = await supabase
+      .from('personal_tasks')
+      .select('id,title,priority,status')
+      .in('status', ['todo', 'in_progress'])
+      .order('sort_order', { ascending: true })
+      .limit(20);
+    return (data ?? []).map((t: { id: string; title: string; priority: string; status: string }) => ({
+      id: t.id,
+      title: t.title,
+      priority: t.priority,
+      status: t.status,
+    }));
+  } catch { return []; }
+}
 async function fetchDailyTasks(): Promise<string[]> {
   try {
     const supabase = createServerClient();
@@ -113,7 +146,7 @@ async function fetchDailyTasks(): Promise<string[]> {
 }
 
 export default async function LeadershipPage() {
-  const [decisions, employees, brands, inboxTasks, weeklyFocus, todaySales, upcomingEvents, activeTasks, dailyTasks] = await Promise.all([
+  const [decisions, employees, brands, inboxTasks, weeklyFocus, todaySales, upcomingEvents, activeTasks, dailyTasks, projects, personalTasks] = await Promise.all([
     getDecisions(),
     getEmployees(),
     getBrands(),
@@ -123,6 +156,8 @@ export default async function LeadershipPage() {
     fetchUpcomingEvents(),
     fetchActiveTasks(),
     fetchDailyTasks(),
+    fetchProjects(),
+    fetchPersonalTasks(),
   ]);
 
   const brandsMapped = brands.map(b => ({
@@ -143,6 +178,8 @@ export default async function LeadershipPage() {
       upcomingEvents={upcomingEvents}
       activeTasks={activeTasks}
       dailyTasks={dailyTasks}
+      projects={projects}
+      personalTasks={personalTasks}
     />
   );
 }
