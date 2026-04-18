@@ -1,7 +1,7 @@
 'use client';
 /*
  * Ghazi OS — Legendary Edition
- * Login Page: صفحة تسجيل الدخول
+ * Login Page: صفحة تسجيل الدخول — كلمة مرور فقط
  * خلفية: #05070d + Aurora + Noise
  * البطاقة: glass morphism ذهبي
  */
@@ -10,7 +10,6 @@ import { useRouter } from 'next/navigation';
 
 export default function LoginPage() {
   const router = useRouter();
-  const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
@@ -25,7 +24,7 @@ export default function LoginPage() {
       const res = await fetch('/api/auth/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ username, password }),
+        body: JSON.stringify({ password }),
       });
 
       const data = await res.json();
@@ -119,51 +118,6 @@ export default function LoginPage() {
         </div>
 
         <form onSubmit={handleSubmit}>
-          {/* اسم المستخدم */}
-          <div style={{ marginBottom: 16 }}>
-            <label
-              style={{
-                display: 'block',
-                fontSize: 11,
-                color: 'rgba(255,255,255,0.4)',
-                marginBottom: 6,
-                letterSpacing: '0.08em',
-                textTransform: 'uppercase',
-              }}
-            >
-              اسم المستخدم
-            </label>
-            <input
-              type="text"
-              value={username}
-              onChange={(e) => setUsername(e.target.value)}
-              onKeyDown={(e) => e.key === 'Enter' && document.getElementById('pass-input')?.focus()}
-              autoComplete="username"
-              required
-              style={{
-                width: '100%',
-                background: 'rgba(255,255,255,0.04)',
-                border: '1px solid rgba(255,255,255,0.10)',
-                borderRadius: 10,
-                padding: '11px 14px',
-                color: 'rgba(255,255,255,0.92)',
-                fontSize: 14,
-                fontFamily: 'IBM Plex Sans Arabic, sans-serif',
-                outline: 'none',
-                boxSizing: 'border-box',
-                transition: 'border-color 0.3s, box-shadow 0.3s',
-              }}
-              onFocus={(e) => {
-                e.target.style.borderColor = 'rgba(201,150,59,0.4)';
-                e.target.style.boxShadow = '0 0 0 3px rgba(201,150,59,0.08)';
-              }}
-              onBlur={(e) => {
-                e.target.style.borderColor = 'rgba(255,255,255,0.10)';
-                e.target.style.boxShadow = 'none';
-              }}
-            />
-          </div>
-
           {/* كلمة المرور */}
           <div style={{ marginBottom: 24 }}>
             <label
@@ -184,6 +138,7 @@ export default function LoginPage() {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               autoComplete="current-password"
+              autoFocus
               required
               style={{
                 width: '100%',
