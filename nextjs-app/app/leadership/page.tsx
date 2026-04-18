@@ -80,14 +80,29 @@ async function fetchActiveTasks() {
   const supabase = createServerClient();
   const { data } = await supabase
     .from('tasks')
-    .select('id,title,status,priority,brand_id,due_date')
-    .in('status', ['todo', 'in_progress'])
-    .order('sort_order', { ascending: true })
-    .limit(10);
+    .select('id,title,status,priority,brand_id,due_date,project_id,description')
+    .in('status', ['todo', 'in_progress', 'blocked'])
+    .order('priority', { ascending: true })
+    .order('created_at', { ascending: true })
+    .limit(30);
   const brandsRes = await supabase.from('brands').select('id,name,color');
   const brandsMap: Record<string, { name: string; color: string }> = {};
   (brandsRes.data ?? []).forEach((b: { id: string; name: string; color: string }) => { brandsMap[b.id] = { name: b.name, color: b.color }; });
-  return (data ?? []).map((t: { id: string; title: string; status: string; priority: string; brand_id: string | null; due_date: string | null }) => ({
+  // جلب subtasks لكل مهمة
+  const taskIds = (data ?? []).map((t: { id: string }) => t.id);
+  let subtasksMap: Record<string, { id: string; title: string; completed: boolean }[]> = {};
+  if (taskIds.length > 0) {
+    const { data: subs } = await supabase
+      .from('task_checklist')
+      .select('id,task_id,title,completed')
+      .in('task_id', taskIds)
+      .order('sort_order', { ascending: true });
+    (subs ?? []).forEach((s: { id: string; task_id: string; title: string; completed: boolean }) => {
+      if (!subtasksMap[s.task_id]) subtasksMap[s.task_id] = [];
+      subtasksMap[s.task_id].push({ id: s.id, title: s.title, completed: s.completed });
+    });
+  }
+  return (data ?? []).map((t: { id: string; title: string; status: string; priority: string; brand_id: string | null; due_date: string | null; project_id: string | null; description: string | null }) => ({
     id: t.id,
     title: t.title,
     status: t.status,
@@ -96,6 +111,9 @@ async function fetchActiveTasks() {
     brandName: t.brand_id ? (brandsMap[t.brand_id]?.name ?? null) : null,
     brandColor: t.brand_id ? (brandsMap[t.brand_id]?.color ?? null) : null,
     dueDate: t.due_date ?? null,
+    projectId: t.project_id ?? null,
+    hasDescription: !!(t.description && t.description.trim()),
+    subtasks: subtasksMap[t.id] ?? [],
   }));
 }
 

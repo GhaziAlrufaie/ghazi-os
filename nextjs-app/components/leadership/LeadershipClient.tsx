@@ -20,10 +20,14 @@ import type { DecisionRow, EmployeeRow } from '@/lib/leadership-types';
 import { DECISION_STATUS_LABELS, DECISION_IMPACT_LABELS } from '@/lib/leadership-types';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
+interface Subtask { id: string; title: string; completed: boolean; }
 interface ActiveTask {
   id: string; title: string; status: string; priority: string;
   brandId: string | null; brandName: string | null; brandColor: string | null;
   dueDate: string | null;
+  projectId: string | null;
+  hasDescription: boolean;
+  subtasks: Subtask[];
 }
 interface UpcomingEvent {
   id: string; title: string; day: number; month: number; year: number;
@@ -546,42 +550,278 @@ function WeekCompass({
 }
 
 // ─── Focus Now (الشيء الواحد الآن) ───────────────────────────────────────────
-function FocusNow({ tasks }: { tasks: ActiveTask[] }) {
-  const [checkedIds, setCheckedIds] = useState<Set<string>>(new Set());
-  const toggle = (id: string) => setCheckedIds(prev => {
-    const next = new Set(prev);
-    if (next.has(id)) next.delete(id); else next.add(id);
-    return next;
-  });
-  if (!tasks.length) {
-    return <p style={{ fontSize: 12, color: 'var(--txt3)', textAlign: 'center', padding: '16px 0' }}>🎉 لا توجد مهام نشطة</p>;
+const FOCUS_TIPS = [
+  'ابدأ يومك بالمهم مو بالعاجل',
+  'الإنجاز الحقيقي يبدأ بخطوة واحدة',
+  'لا تطارد الكمال — أنجز ثم حسّن',
+  'ركّز على شيء واحد حتى يكتمل',
+  'المهمة الصعبة أولاً — بعدها كل شيء أسهل',
+  'قيمتك في عمقك لا في كثرة مهامك',
+];
+
+const STATUS_LABELS: Record<string, string> = {
+  todo: 'قيد الانتظار', in_progress: 'جاري', blocked: 'عالق', done: 'مكتمل',
+};
+
+function isOverdue(dueDate: string | null): boolean {
+  if (!dueDate) return false;
+  return new Date(dueDate) < new Date(new Date().toDateString());
+}
+
+
+function FocusNow({
+  tasks, todayFocus, projects, personalTasks,
+}: {
+  tasks: ActiveTask[];
+  todayFocus: WeeklyFocusEntry | null;
+  projects: Project[];
+  personalTasks: PersonalTask[];
+}) {
+  const router = useRouter();
+  const [selectedId, setSelectedId] = useState<string | null>(null);
+  const [localSubtasks, setLocalSubtasks] = useState<Record<string, boolean>>({});
+  const [localStatus, setLocalStatus] = useState<Record<string, string>>({});
+  const [isPending, startTransition] = useTransition();
+  const tip = FOCUS_TIPS[new Date().getDay() % FOCUS_TIPS.length];
+
+  // ── فلترة المهام حسب نوع الفوكس ──
+  const focusType = todayFocus?.targetType ?? null;
+  const focusTargetId = todayFocus?.targetId ?? null;
+
+  const candidateTasks = (() => {
+    if (!focusType || focusType === 'custom') return tasks;
+    if (focusType === 'brand') {
+      return tasks.filter(t => t.brandId === focusTargetId);
+    }
+    if (focusType === 'project') {
+      return tasks.filter(t => t.projectId === focusTargetId);
+    }
+    if (focusType === 'task') {
+      return tasks.filter(t => t.id === focusTargetId);
+    }
+    if (focusType === 'personal') {
+      // مهام شخصية — نعرض personalTasks كـ display فقط
+      return [];
+    }
+    if (focusType === 'finance') {
+      // مهام مالية — بحث في العنوان
+      return tasks.filter(t => /مال|حساب|فاتور|دفع|راتب|ضريب/i.test(t.title));
+    }
+    if (focusType === 'recharge') return [];
+    return tasks;
+  })();
+
+  const sortedTasks = [...candidateTasks].sort((a, b) =>
+    (PRIORITY_ORDER[a.priority] ?? 9) - (PRIORITY_ORDER[b.priority] ?? 9)
+  );
+
+  const selectedTask = sortedTasks.find(t => t.id === selectedId) ?? null;
+
+  // ── حالة استراحة ──
+  if (focusType === 'recharge') {
+    return (
+      <div style={{ paddingTop: 12 }}>
+        <div style={{ padding: '20px', borderRadius: 14, background: 'rgba(26,188,156,0.06)', border: '1px solid rgba(26,188,156,0.2)', textAlign: 'center' }}>
+          <div style={{ fontSize: 32, marginBottom: 8 }}>🌿</div>
+          <div style={{ fontSize: 14, fontWeight: 700, color: '#1abc9c', marginBottom: 4 }}>يوم استراحة</div>
+          <div style={{ fontSize: 11, color: 'var(--txt3)' }}>لا عمل اليوم — خذ وقتك لتجديد الطاقة</div>
+        </div>
+      </div>
+    );
   }
-  return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 6, paddingTop: 12 }}>
-      {tasks.map(t => {
-        const done = checkedIds.has(t.id);
-        const pColor = PRIORITY_COLORS[t.priority] || '#888';
-        return (
-          <div key={t.id} onClick={() => toggle(t.id)}
-            style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '8px 10px', borderRadius: 10, cursor: 'pointer', background: done ? 'rgba(46,204,113,0.04)' : 'rgba(255,255,255,0.02)', border: `1px solid ${done ? 'rgba(46,204,113,0.2)' : 'rgba(255,255,255,0.06)'}`, transition: 'all 0.2s' }}>
-            <div style={{ width: 16, height: 16, borderRadius: 4, border: `1.5px solid ${done ? '#2ecc71' : pColor}`, background: done ? '#2ecc71' : 'transparent', flexShrink: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-              {done && <span style={{ fontSize: 10, color: '#05070d', fontWeight: 700 }}>✓</span>}
-            </div>
-            <div style={{ flex: 1, minWidth: 0 }}>
-              <div style={{ fontSize: 12, color: done ? 'var(--txt3)' : 'var(--txt)', textDecoration: done ? 'line-through' : 'none', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{t.title}</div>
-              <div style={{ display: 'flex', gap: 6, marginTop: 2, alignItems: 'center' }}>
-                <span style={{ fontSize: 9, color: pColor, fontWeight: 600 }}>{PRIORITY_LABELS[t.priority]}</span>
-                {t.brandName && <span style={{ fontSize: 9, color: t.brandColor ?? 'var(--txt3)' }}>• {t.brandName}</span>}
-                {t.dueDate && <span style={{ fontSize: 9, color: 'var(--txt3)' }}>• {new Date(t.dueDate).toLocaleDateString('ar-SA', { month: 'short', day: 'numeric' })}</span>}
+
+  // ── حالة شخصي ──
+  if (focusType === 'personal') {
+    const focusedPersonal = personalTasks.find(p => p.id === focusTargetId);
+    const displayPersonal = focusedPersonal ? [focusedPersonal] : personalTasks.slice(0, 5);
+    return (
+      <div style={{ paddingTop: 12 }}>
+        <div style={{ fontSize: 10, color: 'var(--txt3)', marginBottom: 8, padding: '6px 10px', background: 'rgba(139,92,246,0.06)', borderRadius: 8, border: '1px solid rgba(139,92,246,0.15)' }}>
+          💡 {tip}
+        </div>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+          {displayPersonal.map(p => {
+            const pColor = PRIORITY_COLORS[p.priority] ?? '#8B5CF6';
+            return (
+              <div key={p.id} style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '9px 12px', borderRadius: 10, background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(139,92,246,0.15)' }}>
+                <span style={{ width: 8, height: 8, borderRadius: '50%', background: pColor, flexShrink: 0 }} />
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <div style={{ fontSize: 12, color: 'var(--txt)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{p.title}</div>
+                  <div style={{ fontSize: 9, color: pColor, marginTop: 1 }}>{PRIORITY_LABELS[p.priority]}</div>
+                </div>
+                <span style={{ fontSize: 9, padding: '2px 6px', borderRadius: 10, background: 'rgba(139,92,246,0.1)', color: '#8B5CF6' }}>شخصي</span>
               </div>
+            );
+          })}
+        </div>
+      </div>
+    );
+  }
+
+  // ── لا مهام ──
+  if (!sortedTasks.length) {
+    return (
+      <div style={{ paddingTop: 12 }}>
+        <div style={{ fontSize: 10, color: 'var(--txt3)', marginBottom: 10, padding: '6px 10px', background: 'rgba(201,150,59,0.06)', borderRadius: 8, border: '1px solid rgba(201,150,59,0.1)' }}>💡 {tip}</div>
+        <p style={{ fontSize: 12, color: 'var(--txt3)', textAlign: 'center', padding: '16px 0' }}>🎉 لا توجد مهام نشطة{focusType ? ` لـ ${todayFocus?.targetName}` : ''}</p>
+      </div>
+    );
+  }
+
+  return (
+    <div style={{ paddingTop: 12 }}>
+      {/* نصيحة اليوم */}
+      <div style={{ fontSize: 10, color: 'var(--txt3)', marginBottom: 10, padding: '6px 10px', background: 'rgba(201,150,59,0.06)', borderRadius: 8, border: '1px solid rgba(201,150,59,0.1)' }}>💡 {tip}</div>
+
+      {/* قائمة المهام */}
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+        {sortedTasks.map(t => {
+          const isSelected = selectedId === t.id;
+          const pColor = PRIORITY_COLORS[t.priority] ?? '#888';
+          const currentStatus = localStatus[t.id] ?? t.status;
+          const completedSubs = t.subtasks.filter(s => localSubtasks[s.id] !== undefined ? localSubtasks[s.id] : s.completed).length;
+          const totalSubs = t.subtasks.length;
+          const progressPct = totalSubs > 0 ? Math.round((completedSubs / totalSubs) * 100) : (currentStatus === 'done' ? 100 : 0);
+          const barColor = isOverdue(t.dueDate) ? '#e74c3c' : currentStatus === 'in_progress' ? 'var(--gold)' : pColor;
+          const overdue = isOverdue(t.dueDate);
+
+          return (
+            <div key={t.id}
+              style={{ borderRadius: 12, border: isSelected ? `1.5px solid ${pColor}` : '1px solid rgba(255,255,255,0.07)', background: isSelected ? `${pColor}08` : 'rgba(255,255,255,0.02)', transition: 'all 0.2s', overflow: 'hidden' }}
+            >
+              {/* ── صف المهمة ── */}
+              <div
+                onClick={() => setSelectedId(isSelected ? null : t.id)}
+                style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '9px 12px', cursor: 'pointer' }}
+              >
+                {/* نقطة الأولوية */}
+                <span style={{ width: 8, height: 8, borderRadius: '50%', background: pColor, flexShrink: 0 }} />
+
+                {/* المحتوى */}
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <div style={{ fontSize: 12, color: 'var(--txt)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', fontWeight: isSelected ? 600 : 400 }}>{t.title}</div>
+                  <div style={{ display: 'flex', gap: 6, marginTop: 2, alignItems: 'center', flexWrap: 'wrap' }}>
+                    {t.brandName && <span style={{ fontSize: 9, color: t.brandColor ?? 'var(--txt3)' }}>{t.brandName}</span>}
+                    {t.dueDate && (
+                      <span style={{ fontSize: 9, color: overdue ? '#e74c3c' : 'var(--txt3)' }}>
+                        {overdue ? '⚠ ' : ''}{
+                          new Date(t.dueDate).toLocaleDateString('ar-SA', { month: 'short', day: 'numeric' })
+                        }
+                      </span>
+                    )}
+                    <span style={{ fontSize: 9, color: currentStatus === 'blocked' ? '#e74c3c' : currentStatus === 'in_progress' ? 'var(--gold)' : 'var(--txt3)' }}>
+                      {STATUS_LABELS[currentStatus] ?? currentStatus}
+                    </span>
+                    {totalSubs > 0 && <span style={{ fontSize: 9, color: 'var(--txt3)' }}>{completedSubs}/{totalSubs}</span>}
+                  </div>
+                </div>
+
+                {/* شريط التقدم */}
+                <div style={{ width: 44, display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 2, flexShrink: 0 }}>
+                  <span style={{ fontSize: 8, color: 'var(--txt3)' }}>{progressPct}%</span>
+                  <div style={{ width: 44, height: 3, background: 'rgba(255,255,255,0.06)', borderRadius: 3 }}>
+                    <div style={{ width: `${progressPct}%`, height: '100%', background: barColor, borderRadius: 3, transition: 'width 0.3s' }} />
+                  </div>
+                </div>
+              </div>
+
+              {/* ── العرض الموسّع ── */}
+              {isSelected && (
+                <div style={{ padding: '0 12px 12px', borderTop: '1px solid rgba(255,255,255,0.06)' }}>
+                  {/* شارات الرأس */}
+                  <div style={{ display: 'flex', gap: 6, marginBottom: 10, marginTop: 10, flexWrap: 'wrap' }}>
+                    <span style={{ fontSize: 9, padding: '2px 8px', borderRadius: 10, background: `${pColor}20`, color: pColor, border: `1px solid ${pColor}40` }}>
+                      {PRIORITY_LABELS[t.priority]}
+                    </span>
+                    {t.projectId && (
+                      <span style={{ fontSize: 9, padding: '2px 8px', borderRadius: 10, background: 'rgba(52,152,219,0.1)', color: '#3498db', border: '1px solid rgba(52,152,219,0.3)' }}>📁 مشروع</span>
+                    )}
+                    {t.hasDescription && (
+                      <span style={{ fontSize: 9, padding: '2px 8px', borderRadius: 10, background: 'rgba(255,255,255,0.05)', color: 'var(--txt3)', border: '1px solid rgba(255,255,255,0.1)' }}>📝 وصف</span>
+                    )}
+                    {overdue && (
+                      <span style={{ fontSize: 9, padding: '2px 8px', borderRadius: 10, background: 'rgba(231,76,60,0.1)', color: '#e74c3c', border: '1px solid rgba(231,76,60,0.3)' }}>⚠ متأخرة</span>
+                    )}
+                  </div>
+
+                  {/* شريط تقدم موسّع */}
+                  {totalSubs > 0 && (
+                    <div style={{ marginBottom: 10 }}>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 4 }}>
+                        <span style={{ fontSize: 9, color: 'var(--txt3)' }}>الخطوة التالية</span>
+                        <span style={{ fontSize: 9, color: barColor, fontWeight: 600 }}>{progressPct}% — {completedSubs}/{totalSubs}</span>
+                      </div>
+                      <div style={{ height: 4, background: 'rgba(255,255,255,0.06)', borderRadius: 4 }}>
+                        <div style={{ width: `${progressPct}%`, height: '100%', background: barColor, borderRadius: 4, transition: 'width 0.3s' }} />
+                      </div>
+                    </div>
+                  )}
+
+                  {/* المهام الفرعية — أول 4 */}
+                  {t.subtasks.length > 0 && (
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: 4, marginBottom: 10 }}>
+                      {t.subtasks.slice(0, 4).map(s => {
+                        const checked = localSubtasks[s.id] !== undefined ? localSubtasks[s.id] : s.completed;
+                        return (
+                          <div key={s.id}
+                            onClick={e => { e.stopPropagation(); setLocalSubtasks(prev => ({ ...prev, [s.id]: !checked })); }}
+                            style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '5px 8px', borderRadius: 7, cursor: 'pointer', background: checked ? 'rgba(46,204,113,0.04)' : 'rgba(255,255,255,0.02)', border: `1px solid ${checked ? 'rgba(46,204,113,0.15)' : 'rgba(255,255,255,0.06)'}` }}
+                          >
+                            <div style={{ width: 13, height: 13, borderRadius: 3, border: `1.5px solid ${checked ? '#2ecc71' : 'rgba(255,255,255,0.2)'}`, background: checked ? '#2ecc71' : 'transparent', flexShrink: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                              {checked && <span style={{ fontSize: 9, color: '#05070d', fontWeight: 700 }}>✓</span>}
+                            </div>
+                            <span style={{ fontSize: 11, color: checked ? 'var(--txt3)' : 'var(--txt)', textDecoration: checked ? 'line-through' : 'none', flex: 1, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{s.title}</span>
+                            <span style={{ fontSize: 8, color: 'var(--txt3)', flexShrink: 0 }}>قائمة</span>
+                          </div>
+                        );
+                      })}
+                      {t.subtasks.length > 4 && (
+                        <span style={{ fontSize: 10, color: 'var(--txt3)', paddingRight: 8 }}>+ {t.subtasks.length - 4} أخرى...</span>
+                      )}
+                    </div>
+                  )}
+
+                  {/* اختيار الحالة */}
+                  <div style={{ display: 'flex', gap: 6, marginBottom: 10, alignItems: 'center' }}>
+                    <span style={{ fontSize: 10, color: 'var(--txt3)' }}>الحالة:</span>
+                    {(['todo', 'in_progress', 'blocked'] as const).map(s => (
+                      <button key={s} onClick={e => { e.stopPropagation(); setLocalStatus(prev => ({ ...prev, [t.id]: s })); }}
+                        style={{ fontSize: 9, padding: '3px 8px', borderRadius: 6, cursor: 'pointer', fontFamily: 'inherit', border: (localStatus[t.id] ?? t.status) === s ? `1px solid ${s === 'blocked' ? '#e74c3c' : s === 'in_progress' ? 'var(--gold)' : 'rgba(255,255,255,0.3)'}` : '1px solid rgba(255,255,255,0.08)', background: (localStatus[t.id] ?? t.status) === s ? (s === 'blocked' ? 'rgba(231,76,60,0.1)' : s === 'in_progress' ? 'rgba(201,150,59,0.1)' : 'rgba(255,255,255,0.05)') : 'transparent', color: (localStatus[t.id] ?? t.status) === s ? (s === 'blocked' ? '#e74c3c' : s === 'in_progress' ? 'var(--gold)' : 'var(--txt)') : 'var(--txt3)' }}>
+                        {STATUS_LABELS[s]}
+                      </button>
+                    ))}
+                  </div>
+
+                  {/* أزرار الإجراءات السريعة */}
+                  <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
+                    <button
+                      onClick={e => { e.stopPropagation(); setLocalStatus(prev => ({ ...prev, [t.id]: 'done' })); setSelectedId(null); }}
+                      style={{ fontSize: 10, padding: '5px 10px', borderRadius: 8, cursor: 'pointer', fontFamily: 'inherit', border: '1px solid rgba(46,204,113,0.3)', background: 'rgba(46,204,113,0.08)', color: '#2ecc71' }}
+                    >✓ خلصت</button>
+                    <button
+                      onClick={e => { e.stopPropagation(); setLocalStatus(prev => ({ ...prev, [t.id]: 'blocked' })); }}
+                      style={{ fontSize: 10, padding: '5px 10px', borderRadius: 8, cursor: 'pointer', fontFamily: 'inherit', border: '1px solid rgba(231,76,60,0.3)', background: 'rgba(231,76,60,0.08)', color: '#e74c3c' }}
+                    >⚡ عالق</button>
+                    <button
+                      onClick={e => { e.stopPropagation(); setSelectedId(null); }}
+                      style={{ fontSize: 10, padding: '5px 10px', borderRadius: 8, cursor: 'pointer', fontFamily: 'inherit', border: '1px solid rgba(255,255,255,0.1)', background: 'transparent', color: 'var(--txt3)' }}
+                    >⏰ بعدين</button>
+                    <button
+                      onClick={e => { e.stopPropagation(); const others = sortedTasks.filter(x => x.id !== t.id); if (others.length) setSelectedId(others[0].id); }}
+                      style={{ fontSize: 10, padding: '5px 10px', borderRadius: 8, cursor: 'pointer', fontFamily: 'inherit', border: '1px solid rgba(255,255,255,0.1)', background: 'transparent', color: 'var(--txt3)' }}
+                    >🔄 تغيير</button>
+                    <div style={{ flex: 1 }} />
+                    <Link href={`/tasks/${t.id}`}
+                      onClick={e => e.stopPropagation()}
+                      style={{ fontSize: 10, padding: '5px 10px', borderRadius: 8, border: `1px solid ${pColor}40`, background: `${pColor}10`, color: pColor, textDecoration: 'none', display: 'inline-block' }}
+                    >فتح التفاصيل ←</Link>
+                  </div>
+                </div>
+              )}
             </div>
-            {/* Progress bar placeholder */}
-            <div style={{ width: 40, height: 3, background: 'rgba(255,255,255,0.06)', borderRadius: 3, flexShrink: 0 }}>
-              <div style={{ width: done ? '100%' : '0%', height: '100%', background: pColor, borderRadius: 3, transition: 'width 0.3s' }} />
-            </div>
-          </div>
-        );
-      })}
+          );
+        })}
+      </div>
     </div>
   );
 }
@@ -903,7 +1143,7 @@ export default function LeadershipClient({
 
         {/* ── 3. الشيء الواحد الآن ── */}
         <CollapsibleSection id="focus" icon="🎯" title="الشيء الواحد الآن" badge={activeTasks.length} defaultOpen={true}>
-          <FocusNow tasks={activeTasks} />
+          <FocusNow tasks={activeTasks} todayFocus={todayFocus ?? null} projects={projects} personalTasks={personalTasks} />
         </CollapsibleSection>
 
         {/* ── Row: يومي ثابت + قرارات معلقة ── */}
