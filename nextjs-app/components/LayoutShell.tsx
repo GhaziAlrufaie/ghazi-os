@@ -3,8 +3,10 @@
  * Ghazi OS — LayoutShell
  * يستقبل sidebar كـ prop (Server Component) لتجاوز Server/Client boundary
  * يستخدم CSS classes من globals.css: .side, .main, .topbar, .month-bar
+ * 
+ * ملاحظة: لا يحتاج auth check هنا — الـ middleware يتولى الحماية
+ * الـ Sidebar يظهر دائماً عند تحميل الصفحة
  */
-import { useEffect, useState } from 'react';
 import { usePathname } from 'next/navigation';
 import Topbar from '@/components/Topbar';
 import MonthNav from '@/components/MonthNav';
@@ -36,33 +38,6 @@ const PAGE_TITLES: Record<string, string> = {
 export default function LayoutShell({ children, sidebar }: LayoutShellProps) {
   const pathname = usePathname();
 
-  // الحالة الأولية: نفترض أن المستخدم مسجل دخول (optimistic)
-  // إذا لم يكن مسجلاً، سيُعاد توجيهه من الـ middleware/server
-  // هذا يمنع flash بدون Sidebar
-  const [isLoggedIn, setIsLoggedIn] = useState<boolean>(true);
-  const [authChecked, setAuthChecked] = useState(false);
-
-  useEffect(() => {
-    fetch('/api/auth/check')
-      .then(r => r.json())
-      .then(d => {
-        const loggedIn = d.isLoggedIn === true;
-        setIsLoggedIn(loggedIn);
-        setAuthChecked(true);
-        // حفظ الحالة في localStorage كـ cache
-        if (loggedIn) {
-          localStorage.setItem('ghazi_auth', '1');
-        } else {
-          localStorage.removeItem('ghazi_auth');
-        }
-      })
-      .catch(() => {
-        setIsLoggedIn(false);
-        setAuthChecked(true);
-        localStorage.removeItem('ghazi_auth');
-      });
-  }, []);
-
   // تحديد عنوان الصفحة — يبحث عن أقرب مطابقة
   const currentPath = pathname ?? '/';
   const pageTitle = (() => {
@@ -74,30 +49,33 @@ export default function LayoutShell({ children, sidebar }: LayoutShellProps) {
     return 'Ghazi OS';
   })();
 
+  // صفحة تسجيل الدخول — لا تحتاج Sidebar
+  const isLoginPage = currentPath === '/login';
+
+  if (isLoginPage) {
+    return <>{children}</>;
+  }
+
   return (
     <>
       {/* Orbs */}
       <div className="orb o1" />
       <div className="orb o2" />
 
-      {isLoggedIn ? (
-        <>
-          {sidebar}
-          <div className="main">
-            {/* Topbar — ثابت في أعلى كل صفحة */}
-            <Topbar title={pageTitle} />
+      {/* Sidebar */}
+      {sidebar}
 
-            {/* Month Navigation Bar */}
-            <MonthNav />
+      {/* Main Content */}
+      <div className="main">
+        {/* Topbar — ثابت في أعلى كل صفحة */}
+        <Topbar title={pageTitle} />
 
-            {/* محتوى الصفحة */}
-            {children}
-          </div>
-        </>
-      ) : (
-        // إذا تأكد أنه غير مسجل دخول → عرض المحتوى فقط (صفحة login)
-        <>{children}</>
-      )}
+        {/* Month Navigation Bar */}
+        <MonthNav />
+
+        {/* محتوى الصفحة */}
+        {children}
+      </div>
     </>
   );
 }
