@@ -1,12 +1,13 @@
 'use client';
 // Calendar Client — Light Theme — مطابق لـ index.html
-// Design: --bg:#FFFFFF | --txt:#1D1D1F | --gold:#C9A84C | --brd:#E5E5E5
+// Layout: .scr.on wrapper (padding: 20px 24px) — نفس /brands و /tasks
+// Grid: 1fr 320px — تقويم واسع + panel يمين ثابت
 import React, { useState, useCallback } from 'react';
 import type { CalEvent, CalTask, Brand } from '@/app/calendar/page';
 import { addEvent, updateEvent, deleteEvent } from '@/lib/calendar-actions';
 
 // ─── ثوابت ───────────────────────────────────────────────────────────────────
-const MONTHS = [
+const MONTHS_AR = [
   'يناير','فبراير','مارس','أبريل','مايو','يونيو',
   'يوليو','أغسطس','سبتمبر','أكتوبر','نوفمبر','ديسمبر',
 ];
@@ -14,7 +15,7 @@ const DAYS_AR = ['أح','إث','ثل','أر','خم','جم','سب'];
 const OCCASIONS = [
   { name: 'رمضان',        date: new Date(2027, 1, 17), icon: '🌙' },
   { name: 'اليوم الوطني', date: new Date(2026, 8, 23), icon: '🇸🇦' },
-  { name: 'يوم التأسيس', date: new Date(2027, 1, 22), icon: '🏛️' },
+  { name: 'يوم التأسيس',  date: new Date(2027, 1, 22), icon: '🏛️' },
 ];
 const RECURRING = [
   { label: 'يومي',       note: 'واتساب + سلة' },
@@ -87,74 +88,57 @@ function EventFormModal({ brands, editEvent, defaultDate, onClose, onSave }: Eve
   }
 
   return (
-    <div
-      className="fixed inset-0 z-50 flex items-center justify-center p-4"
-      style={{ background: 'rgba(0,0,0,0.4)', backdropFilter: 'blur(4px)' }}
-      onClick={onClose}
-    >
-      <div
-        className="w-full max-w-sm rounded-2xl p-6 relative"
-        style={{ background: '#FFFFFF', border: '1px solid #E5E5E5', boxShadow: '0 8px 32px rgba(0,0,0,0.12)' }}
-        onClick={e => e.stopPropagation()}
-      >
-        <button
-          onClick={onClose}
-          className="absolute top-4 left-4 text-lg"
-          style={{ color: '#AEAEB2', background: 'none', border: 'none', cursor: 'pointer' }}
-        >✕</button>
-        <h2 className="text-base font-bold mb-4" style={{ color: '#1D1D1F' }}>
+    <div className="modal-bg on" onClick={onClose}>
+      <div className="modal-box" style={{ maxWidth: 440 }} onClick={e => e.stopPropagation()}>
+        <button className="modal-close" onClick={onClose}>✕</button>
+        <h2 style={{ fontSize: 16, fontWeight: 800, color: 'var(--txt)', marginBottom: 20 }}>
           {isEdit ? 'تعديل الحدث' : '+ حدث جديد'}
         </h2>
-        <form onSubmit={handleSubmit} className="space-y-3">
+        <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
           <div>
-            <label className="block text-xs font-semibold mb-1" style={{ color: '#6E6E73' }}>العنوان</label>
+            <label style={{ fontSize: 11, color: 'var(--txt3)', display: 'block', marginBottom: 4 }}>العنوان</label>
             <input
               value={title} onChange={e => setTitle(e.target.value)}
               placeholder="اسم الحدث..."
-              className="w-full rounded-lg px-3 py-2 text-sm"
-              style={{ background: '#F5F5F7', border: '1px solid #E5E5E5', color: '#1D1D1F', outline: 'none' }}
+              style={{ width: '100%', padding: '8px 12px', border: '1px solid var(--brd)', borderRadius: 8, fontSize: 13, color: 'var(--txt)', background: 'var(--bg)', outline: 'none' }}
             />
           </div>
           <div>
-            <label className="block text-xs font-semibold mb-1" style={{ color: '#6E6E73' }}>التاريخ</label>
+            <label style={{ fontSize: 11, color: 'var(--txt3)', display: 'block', marginBottom: 4 }}>التاريخ</label>
             <input
               type="date" value={date} onChange={e => setDate(e.target.value)}
-              className="w-full rounded-lg px-3 py-2 text-sm"
-              style={{ background: '#F5F5F7', border: '1px solid #E5E5E5', color: '#1D1D1F', outline: 'none' }}
+              style={{ width: '100%', padding: '8px 12px', border: '1px solid var(--brd)', borderRadius: 8, fontSize: 13, color: 'var(--txt)', background: 'var(--bg)', outline: 'none' }}
             />
           </div>
           <div>
-            <label className="block text-xs font-semibold mb-1" style={{ color: '#6E6E73' }}>النوع</label>
+            <label style={{ fontSize: 11, color: 'var(--txt3)', display: 'block', marginBottom: 4 }}>النوع</label>
             <select
               value={type} onChange={e => setType(e.target.value)}
-              className="w-full rounded-lg px-3 py-2 text-sm"
-              style={{ background: '#F5F5F7', border: '1px solid #E5E5E5', color: '#1D1D1F', outline: 'none' }}
+              style={{ width: '100%', padding: '8px 12px', border: '1px solid var(--brd)', borderRadius: 8, fontSize: 13, color: 'var(--txt)', background: 'var(--bg)', outline: 'none' }}
             >
               {EVENT_TYPES.map(t => <option key={t.value} value={t.value}>{t.label}</option>)}
             </select>
           </div>
           <div>
-            <label className="block text-xs font-semibold mb-1" style={{ color: '#6E6E73' }}>البراند (اختياري)</label>
+            <label style={{ fontSize: 11, color: 'var(--txt3)', display: 'block', marginBottom: 4 }}>البراند (اختياري)</label>
             <select
               value={brand} onChange={e => setBrand(e.target.value)}
-              className="w-full rounded-lg px-3 py-2 text-sm"
-              style={{ background: '#F5F5F7', border: '1px solid #E5E5E5', color: '#1D1D1F', outline: 'none' }}
+              style={{ width: '100%', padding: '8px 12px', border: '1px solid var(--brd)', borderRadius: 8, fontSize: 13, color: 'var(--txt)', background: 'var(--bg)', outline: 'none' }}
             >
               <option value="">— بدون براند —</option>
               {brands.map(b => <option key={b.id} value={b.id}>{b.name}</option>)}
             </select>
           </div>
-          {error && <p className="text-xs" style={{ color: '#FF3B30' }}>{error}</p>}
-          <div className="flex gap-2 pt-2">
+          {error && <p style={{ fontSize: 12, color: 'var(--danger)', margin: 0 }}>{error}</p>}
+          <div style={{ display: 'flex', gap: 8, justifyContent: 'flex-end', marginTop: 4 }}>
             <button
               type="button" onClick={onClose}
-              className="flex-1 py-2 rounded-lg text-sm font-semibold"
-              style={{ background: '#F5F5F7', border: '1px solid #E5E5E5', color: '#6E6E73', cursor: 'pointer' }}
+              style={{ padding: '8px 20px', borderRadius: 8, fontSize: 13, fontWeight: 600, background: 'var(--bg2)', border: '1px solid var(--brd)', color: 'var(--txt3)', cursor: 'pointer' }}
             >إلغاء</button>
             <button
               type="submit" disabled={loading}
-              className="flex-1 py-2 rounded-lg text-sm font-bold"
-              style={{ background: '#C9A84C', color: '#FFFFFF', border: 'none', cursor: 'pointer', opacity: loading ? 0.7 : 1 }}
+              className="btn"
+              style={{ opacity: loading ? 0.7 : 1 }}
             >{loading ? '...' : isEdit ? 'حفظ' : 'إضافة'}</button>
           </div>
         </form>
@@ -184,44 +168,46 @@ function DayPanel({ day, month, year, events, tasks, brands, onClose, onDelete, 
     event: 'حدث', meeting: 'اجتماع', deadline: 'موعد نهائي', reminder: 'تذكير',
   };
   return (
-    <div
-      className="fixed inset-0 z-50 flex items-center justify-center p-4"
-      style={{ background: 'rgba(0,0,0,0.4)', backdropFilter: 'blur(4px)' }}
-      onClick={onClose}
-    >
+    <div className="modal-bg on" onClick={onClose}>
       <div
-        className="w-full max-w-sm rounded-2xl p-6 relative"
-        style={{ background: '#FFFFFF', border: '1px solid #E5E5E5', boxShadow: '0 8px 32px rgba(0,0,0,0.12)', maxHeight: '80vh', overflowY: 'auto' }}
+        className="modal-box"
+        style={{ maxWidth: 440, maxHeight: '80vh', overflowY: 'auto' }}
         onClick={e => e.stopPropagation()}
       >
-        <button
-          onClick={onClose}
-          className="absolute top-4 left-4 text-lg"
-          style={{ color: '#AEAEB2', background: 'none', border: 'none', cursor: 'pointer' }}
-        >✕</button>
-        <h2 className="text-base font-bold mb-4" style={{ color: '#C9A84C' }}>
-          {pad(day)} {MONTHS[month]} {year}
+        <button className="modal-close" onClick={onClose}>✕</button>
+        <h2 style={{ fontSize: 16, fontWeight: 800, color: 'var(--gold)', marginBottom: 16 }}>
+          {pad(day)} {MONTHS_AR[month]} {year}
         </h2>
         {dayEvents.length > 0 && (
-          <div className="mb-4">
-            <div className="text-xs font-bold mb-2" style={{ color: '#C9A84C' }}>📌 الأحداث</div>
+          <div style={{ marginBottom: 16 }}>
+            <div style={{ fontSize: 11, fontWeight: 700, color: 'var(--gold)', marginBottom: 8 }}>📌 الأحداث</div>
             {dayEvents.map(e => {
               const b = e.brandId ? brandsMap[e.brandId] : null;
               return (
-                <div key={e.id} className="py-2" style={{ borderBottom: '1px solid #F0F0F0' }}>
-                  <div className="flex items-start justify-between gap-2">
-                    <div className="flex-1 min-w-0">
-                      <div className="text-sm font-medium" style={{ color: '#1D1D1F' }}>{e.title}</div>
-                      <div className="flex items-center gap-2 mt-1 flex-wrap">
-                        <span className="text-xs px-2 py-0.5 rounded-full" style={{ background: 'rgba(201,168,76,0.1)', color: '#C9A84C' }}>
+                <div key={e.id} style={{ padding: '10px 0', borderBottom: '1px solid var(--brd)' }}>
+                  <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 8 }}>
+                    <div style={{ flex: 1, minWidth: 0 }}>
+                      <div style={{ fontSize: 13, fontWeight: 600, color: 'var(--txt)' }}>{e.title}</div>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginTop: 4, flexWrap: 'wrap' }}>
+                        <span style={{ fontSize: 10, padding: '2px 8px', borderRadius: 10, background: 'var(--gold-dim)', color: 'var(--gold)', fontWeight: 700 }}>
                           {typeLabel[e.type] ?? e.type}
                         </span>
-                        {b && <span className="text-xs px-2 py-0.5 rounded-full" style={{ background: `${b.color}22`, color: b.color }}>{b.name}</span>}
+                        {b && (
+                          <span style={{ fontSize: 10, padding: '2px 8px', borderRadius: 10, background: `${b.color}22`, color: b.color, fontWeight: 700 }}>
+                            {b.name}
+                          </span>
+                        )}
                       </div>
                     </div>
-                    <div className="flex gap-2 flex-shrink-0">
-                      <button onClick={() => { onEdit(e); onClose(); }} className="text-xs" style={{ color: '#007AFF', background: 'none', border: 'none', cursor: 'pointer' }}>تعديل</button>
-                      <button onClick={() => onDelete(e.id)} className="text-xs" style={{ color: '#FF3B30', background: 'none', border: 'none', cursor: 'pointer' }}>حذف</button>
+                    <div style={{ display: 'flex', gap: 8, flexShrink: 0 }}>
+                      <button
+                        onClick={() => { onEdit(e); onClose(); }}
+                        style={{ fontSize: 12, color: '#007AFF', background: 'none', border: 'none', cursor: 'pointer', padding: 0 }}
+                      >تعديل</button>
+                      <button
+                        onClick={() => onDelete(e.id)}
+                        style={{ fontSize: 12, color: 'var(--danger)', background: 'none', border: 'none', cursor: 'pointer', padding: 0 }}
+                      >حذف</button>
                     </div>
                   </div>
                 </div>
@@ -231,22 +217,22 @@ function DayPanel({ day, month, year, events, tasks, brands, onClose, onDelete, 
         )}
         {dayTasks.length > 0 && (
           <div>
-            <div className="text-xs font-bold mb-2" style={{ color: '#C9A84C' }}>✅ المهام</div>
+            <div style={{ fontSize: 11, fontWeight: 700, color: 'var(--gold)', marginBottom: 8 }}>✅ المهام</div>
             {dayTasks.map(t => (
-              <div key={t.id} className="flex items-center gap-2 py-2" style={{ borderBottom: '1px solid #F0F0F0' }}>
+              <div key={t.id} style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '8px 0', borderBottom: '1px solid var(--brd)' }}>
                 <div
-                  className="w-4 h-4 rounded flex items-center justify-center text-xs flex-shrink-0"
                   style={{
-                    border: t.status === 'done' ? '1.5px solid #34C759' : '1.5px solid #AEAEB2',
+                    width: 16, height: 16, borderRadius: 4, flexShrink: 0,
+                    border: t.status === 'done' ? '1.5px solid var(--success)' : '1.5px solid var(--txt3)',
                     background: t.status === 'done' ? 'rgba(52,199,89,0.1)' : 'transparent',
+                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    fontSize: 10, color: 'var(--success)',
                   }}
-                >
-                  {t.status === 'done' && <span style={{ color: '#34C759' }}>✓</span>}
-                </div>
-                <div className="flex-1">
-                  <div className="text-sm" style={{ color: t.status === 'done' ? '#AEAEB2' : '#1D1D1F', textDecoration: t.status === 'done' ? 'line-through' : 'none' }}>{t.title}</div>
+                >{t.status === 'done' ? '✓' : ''}</div>
+                <div style={{ flex: 1 }}>
+                  <div style={{ fontSize: 13, color: 'var(--txt)', textDecoration: t.status === 'done' ? 'line-through' : 'none', opacity: t.status === 'done' ? 0.5 : 1 }}>{t.title}</div>
                   {t.brandName && (
-                    <span className="text-xs px-2 py-0.5 rounded-full mt-1 inline-block" style={{ background: `${t.brandColor ?? '#C9A84C'}22`, color: t.brandColor ?? '#C9A84C' }}>
+                    <span style={{ fontSize: 10, padding: '1px 6px', borderRadius: 8, background: `${t.brandColor ?? 'var(--gold)'}22`, color: t.brandColor ?? 'var(--gold)', fontWeight: 700, marginTop: 2, display: 'inline-block' }}>
                       {t.brandName}
                     </span>
                   )}
@@ -256,7 +242,9 @@ function DayPanel({ day, month, year, events, tasks, brands, onClose, onDelete, 
           </div>
         )}
         {dayEvents.length === 0 && dayTasks.length === 0 && (
-          <p className="text-center text-sm py-6" style={{ color: '#AEAEB2' }}>لا توجد أحداث أو مهام في هذا اليوم</p>
+          <p style={{ textAlign: 'center', fontSize: 13, color: 'var(--txt3)', padding: '24px 0' }}>
+            لا توجد أحداث أو مهام في هذا اليوم
+          </p>
         )}
       </div>
     </div>
@@ -314,16 +302,18 @@ export default function CalendarClient({ initialEvents, initialTasks, brands }: 
     const today          = isCurrentMonth ? now.getDate() : -1;
     const cells: React.ReactElement[] = [];
 
+    // Empty cells before first day
     for (let i = 0; i < firstDay; i++) {
-      cells.push(<td key={`e${i}`} style={{ padding: '8px 4px' }} />);
+      cells.push(<td key={`e${i}`} style={{ padding: '12px 8px', minHeight: 80 }} />);
     }
+
     for (let d = 1; d <= daysInMonth; d++) {
-      const dayEvents = events.filter(e => e.day === d && e.month === curMonth && e.year === curYear);
-      const dayTasks  = initialTasks.filter(t => {
+      const dayEvts  = events.filter(e => e.day === d && e.month === curMonth && e.year === curYear);
+      const dayTasks = initialTasks.filter(t => {
         const dt = new Date(t.dueDate);
         return dt.getDate() === d && dt.getMonth() === curMonth && dt.getFullYear() === curYear;
       });
-      const hasItems = dayEvents.length > 0 || dayTasks.length > 0;
+      const hasItems = dayEvts.length > 0 || dayTasks.length > 0;
       const isToday  = d === today;
       cells.push(
         <td
@@ -331,38 +321,47 @@ export default function CalendarClient({ initialEvents, initialTasks, brands }: 
           onClick={() => setDayPanel({ day: d, month: curMonth, year: curYear })}
           onDoubleClick={() => openAddForDay(d, curMonth, curYear)}
           style={{
-            padding: '8px 4px',
-            fontSize: '12px',
-            borderRadius: '8px',
+            padding: '12px 8px',
+            minHeight: 80,
+            fontSize: 13,
+            borderRadius: 8,
             textAlign: 'center',
             cursor: 'pointer',
-            position: 'relative',
-            background: isToday ? '#C9A84C' : 'transparent',
-            color: isToday ? '#FFFFFF' : hasItems ? '#C9A84C' : '#1D1D1F',
+            verticalAlign: 'top',
+            background: isToday ? 'var(--gold)' : 'transparent',
+            color: isToday ? '#fff' : hasItems ? 'var(--gold)' : 'var(--txt)',
             fontWeight: isToday || hasItems ? 700 : 400,
             transition: 'background 0.15s',
           }}
-          title={[...dayEvents.map(e => e.title), ...dayTasks.map(t => t.title)].join(', ') || 'انقر مرتين لإضافة حدث'}
+          title={[...dayEvts.map(e => e.title), ...dayTasks.map(t => t.title)].join(', ') || 'انقر مرتين لإضافة حدث'}
         >
-          {pad(d)}
+          <div>{pad(d)}</div>
           {hasItems && !isToday && (
-            <div style={{ width: 4, height: 4, borderRadius: '50%', background: '#C9A84C', margin: '2px auto 0' }} />
+            <div style={{ display: 'flex', justifyContent: 'center', gap: 2, marginTop: 4 }}>
+              {dayEvts.slice(0, 3).map((_, i) => (
+                <div key={i} style={{ width: 4, height: 4, borderRadius: '50%', background: 'var(--gold)' }} />
+              ))}
+            </div>
           )}
         </td>
       );
     }
+
+    // Trailing empty cells
     const remaining = 7 - ((firstDay + daysInMonth) % 7);
     if (remaining < 7) {
-      for (let j = 0; j < remaining; j++) cells.push(<td key={`r${j}`} style={{ padding: '8px 4px' }} />);
+      for (let j = 0; j < remaining; j++) cells.push(<td key={`r${j}`} style={{ padding: '12px 8px', minHeight: 80 }} />);
     }
+
     const rows: React.ReactElement[][] = [];
     for (let i = 0; i < cells.length; i += 7) rows.push(cells.slice(i, i + 7));
+
     return (
       <table style={{ width: '100%', borderCollapse: 'separate', borderSpacing: '2px', direction: 'ltr' }}>
         <thead>
           <tr>
             {DAYS_AR.map(d => (
-              <th key={d} style={{ fontSize: '11px', color: '#AEAEB2', padding: '4px 2px', fontWeight: 600, textAlign: 'center' }}>{d}</th>
+              <th key={d} style={{ fontSize: 11, color: 'var(--txt3)', padding: '8px 4px', fontWeight: 600, textAlign: 'center' }}>{d}</th>
             ))}
           </tr>
         </thead>
@@ -384,153 +383,146 @@ export default function CalendarClient({ initialEvents, initialTasks, brands }: 
     .sort((a, b) => a.day - b.day);
 
   return (
-    <div className="scr on" style={{ direction: 'rtl' }}>
+    <div className="scr on">
 
-      {/* Page Header */}
-      <div
-        className="flex items-center justify-between"
-        style={{ borderBottom: '1px solid #E5E5E5', paddingBottom: 16, marginBottom: 20 }}
-      >
+      {/* ── Page Header ── */}
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 20 }}>
         <div>
-          <h1 className="text-xl font-bold" style={{ color: '#1D1D1F' }}>التقويم</h1>
-          <p className="text-xs mt-0.5" style={{ color: '#AEAEB2' }}>
-            {monthEvents.length} حدث — {MONTHS[curMonth]} {curYear}
+          <h1 style={{ fontSize: 20, fontWeight: 800, color: 'var(--txt)', marginBottom: 4 }}>التقويم</h1>
+          <p style={{ fontSize: 12, color: 'var(--txt3)' }}>
+            {monthEvents.length} حدث — {MONTHS_AR[curMonth]} {curYear}
           </p>
         </div>
         <button
+          className="btn"
           onClick={() => { setEditTarget(null); setFormDefault(undefined); setShowForm(true); }}
-          className="flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-semibold"
-          style={{ background: '#C9A84C', color: '#FFFFFF', border: 'none', cursor: 'pointer' }}
         >
-          + حدث
+          + حدث جديد
         </button>
       </div>
 
-      {/* Main Content */}
-      <div>
-        <div
-          className="grid gap-6"
-          style={{ gridTemplateColumns: 'minmax(0, 2fr) minmax(0, 1fr)', maxWidth: 1000 }}
-        >
+      {/* ── Main Grid: Calendar (1fr) + Sidebar (320px) ── */}
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 320px', gap: 20, alignItems: 'start' }}>
 
-          {/* ── Left: Calendar Grid + Countdowns ── */}
-          <div className="space-y-5">
+        {/* ── Left: Calendar Card + Countdowns ── */}
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
 
-            {/* Calendar Card */}
-            <div
-              className="rounded-2xl p-5"
-              style={{ background: '#FFFFFF', border: '1px solid #E5E5E5', boxShadow: '0 1px 6px rgba(0,0,0,0.04)' }}
-            >
-              {/* Month Nav */}
-              <div className="flex items-center justify-between mb-5">
-                <button
-                  onClick={nextMonth}
-                  className="w-8 h-8 rounded-lg flex items-center justify-center text-sm"
-                  style={{ background: '#F5F5F7', border: '1px solid #E5E5E5', color: '#C9A84C', cursor: 'pointer' }}
-                >◄</button>
-                <h3 className="font-bold text-base" style={{ color: '#1D1D1F' }}>
-                  {MONTHS[curMonth]} {curYear}
-                </h3>
-                <button
-                  onClick={prevMonth}
-                  className="w-8 h-8 rounded-lg flex items-center justify-center text-sm"
-                  style={{ background: '#F5F5F7', border: '1px solid #E5E5E5', color: '#C9A84C', cursor: 'pointer' }}
-                >►</button>
-              </div>
-              {buildGrid()}
-              <p className="text-center text-xs mt-3" style={{ color: '#AEAEB2' }}>
-                انقر مرة للتفاصيل · انقر مرتين لإضافة حدث
-              </p>
+          {/* Calendar Card */}
+          <div style={{ background: 'var(--bg)', border: '1px solid var(--brd)', borderRadius: 16, padding: '20px 24px', boxShadow: '0 1px 6px rgba(0,0,0,0.04)' }}>
+            {/* Month Navigation */}
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 20 }}>
+              <button
+                onClick={nextMonth}
+                style={{ width: 32, height: 32, borderRadius: 8, border: '1px solid var(--brd)', background: 'var(--bg2)', color: 'var(--gold)', cursor: 'pointer', fontSize: 13, display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+              >◄</button>
+              <h3 style={{ fontSize: 16, fontWeight: 800, color: 'var(--txt)', margin: 0 }}>
+                {MONTHS_AR[curMonth]} {curYear}
+              </h3>
+              <button
+                onClick={prevMonth}
+                style={{ width: 32, height: 32, borderRadius: 8, border: '1px solid var(--brd)', background: 'var(--bg2)', color: 'var(--gold)', cursor: 'pointer', fontSize: 13, display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+              >►</button>
             </div>
 
-            {/* Countdowns */}
-            {countdowns.length > 0 && (
-              <div>
-                <h3 className="text-xs font-bold mb-3" style={{ color: '#6E6E73' }}>العد التنازلي</h3>
-                <div className="grid grid-cols-3 gap-3">
-                  {countdowns.map(o => (
-                    <div
-                      key={o.name}
-                      className="rounded-xl px-4 py-3"
-                      style={{ background: 'rgba(201,168,76,0.06)', border: '1px solid rgba(201,168,76,0.2)' }}
-                    >
-                      <div className="text-sm font-semibold mb-1" style={{ color: '#1D1D1F' }}>{o.icon} {o.name}</div>
-                      <div className="text-2xl font-black" style={{ color: '#C9A84C' }}>{o.days}</div>
-                      <div className="text-xs" style={{ color: '#AEAEB2' }}>يوم متبقي</div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
+            {/* Grid */}
+            {buildGrid()}
+
+            <p style={{ textAlign: 'center', fontSize: 11, color: 'var(--txt3)', marginTop: 12 }}>
+              انقر مرة للتفاصيل · انقر مرتين لإضافة حدث
+            </p>
           </div>
 
-          {/* ── Right: Events Panel ── */}
-          <div className="space-y-4">
-
-            {/* Month Events */}
-            <div
-              className="rounded-2xl p-4"
-              style={{ background: '#FFFFFF', border: '1px solid #E5E5E5', boxShadow: '0 1px 6px rgba(0,0,0,0.04)' }}
-            >
-              <div className="flex items-center justify-between mb-3">
-                <h3 className="font-bold text-sm" style={{ color: '#1D1D1F' }}>📌 أحداث الشهر</h3>
-                <span
-                  className="text-xs px-2 py-0.5 rounded-full font-bold"
-                  style={{ background: 'rgba(201,168,76,0.1)', color: '#C9A84C' }}
-                >{monthEvents.length}</span>
+          {/* Countdowns */}
+          {countdowns.length > 0 && (
+            <div>
+              <div style={{ fontSize: 11, fontWeight: 700, color: 'var(--txt3)', marginBottom: 10, textTransform: 'uppercase', letterSpacing: 1 }}>
+                العد التنازلي
               </div>
-              {monthEvents.length === 0 ? (
-                <p className="text-center text-sm py-4" style={{ color: '#AEAEB2' }}>لا توجد أحداث هذا الشهر</p>
-              ) : (
-                <div>
-                  {monthEvents.map(e => {
-                    const b = e.brandId ? brandsMap[e.brandId] : null;
-                    return (
-                      <div key={e.id} className="flex items-start gap-3 py-2" style={{ borderBottom: '1px solid #F5F5F7' }}>
-                        <span className="text-xs font-bold mt-0.5 w-6 flex-shrink-0 text-center" style={{ color: '#C9A84C' }}>{pad(e.day)}</span>
-                        <div className="flex-1 min-w-0">
-                          <div className="text-sm font-medium truncate" style={{ color: '#1D1D1F' }}>{e.title}</div>
-                          {b && (
-                            <span className="text-xs px-2 py-0.5 rounded-full mt-0.5 inline-block" style={{ background: `${b.color}22`, color: b.color }}>{b.name}</span>
-                          )}
-                        </div>
-                        <button
-                          onClick={() => openEdit(e)}
-                          className="text-xs flex-shrink-0"
-                          style={{ color: '#AEAEB2', background: 'none', border: 'none', cursor: 'pointer' }}
-                        >✏</button>
-                      </div>
-                    );
-                  })}
-                </div>
-              )}
-            </div>
-
-            {/* Recurring */}
-            <div
-              className="rounded-2xl p-4"
-              style={{ background: '#FFFFFF', border: '1px solid #E5E5E5', boxShadow: '0 1px 6px rgba(0,0,0,0.04)' }}
-            >
-              <h3 className="font-bold text-sm mb-3" style={{ color: '#1D1D1F' }}>🔁 متكرر</h3>
-              <div>
-                {RECURRING.map((r, i) => (
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 12 }}>
+                {countdowns.map(o => (
                   <div
-                    key={i}
-                    className="flex items-center justify-between py-2"
-                    style={{ borderBottom: i < RECURRING.length - 1 ? '1px solid #F5F5F7' : 'none' }}
+                    key={o.name}
+                    style={{ background: 'var(--gold-dim)', border: '1px solid var(--gold-b)', borderRadius: 12, padding: '16px 20px' }}
                   >
-                    <span className="text-xs font-semibold" style={{ color: '#1D1D1F' }}>{r.label}</span>
-                    <span className="text-xs" style={{ color: '#AEAEB2' }}>{r.note}</span>
+                    <div style={{ fontSize: 13, fontWeight: 600, color: 'var(--txt)', marginBottom: 6 }}>{o.icon} {o.name}</div>
+                    <div style={{ fontSize: 28, fontWeight: 900, color: 'var(--gold)', lineHeight: 1 }}>{o.days}</div>
+                    <div style={{ fontSize: 11, color: 'var(--txt3)', marginTop: 4 }}>يوم متبقي</div>
                   </div>
                 ))}
               </div>
             </div>
+          )}
+        </div>
 
+        {/* ── Right Sidebar: أحداث الشهر + متكرر ── */}
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+
+          {/* أحداث الشهر */}
+          <div style={{ background: 'var(--bg)', border: '1px solid var(--brd)', borderRadius: 16, padding: 20, boxShadow: '0 1px 6px rgba(0,0,0,0.04)' }}>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 14 }}>
+              <h3 style={{ fontSize: 14, fontWeight: 800, color: 'var(--txt)', margin: 0 }}>📌 أحداث الشهر</h3>
+              <span style={{ fontSize: 11, padding: '2px 8px', borderRadius: 10, background: 'var(--gold-dim)', color: 'var(--gold)', fontWeight: 700 }}>
+                {monthEvents.length}
+              </span>
+            </div>
+            {monthEvents.length === 0 ? (
+              <p style={{ textAlign: 'center', fontSize: 13, color: 'var(--txt3)', padding: '16px 0' }}>
+                لا توجد أحداث هذا الشهر
+              </p>
+            ) : (
+              <div>
+                {monthEvents.map(e => {
+                  const b = e.brandId ? brandsMap[e.brandId] : null;
+                  return (
+                    <div key={e.id} style={{ display: 'flex', alignItems: 'flex-start', gap: 10, padding: '10px 0', borderBottom: '1px solid var(--brd)' }}>
+                      <span style={{ fontSize: 12, fontWeight: 800, color: 'var(--gold)', flexShrink: 0, minWidth: 24, textAlign: 'center', marginTop: 1 }}>
+                        {pad(e.day)}
+                      </span>
+                      <div style={{ flex: 1, minWidth: 0 }}>
+                        <div style={{ fontSize: 13, fontWeight: 500, color: 'var(--txt)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                          {e.title}
+                        </div>
+                        {b && (
+                          <span style={{ fontSize: 10, padding: '1px 6px', borderRadius: 8, background: `${b.color}22`, color: b.color, fontWeight: 700, marginTop: 2, display: 'inline-block' }}>
+                            {b.name}
+                          </span>
+                        )}
+                      </div>
+                      <button
+                        onClick={() => openEdit(e)}
+                        style={{ fontSize: 12, color: 'var(--txt3)', background: 'none', border: 'none', cursor: 'pointer', padding: 0, flexShrink: 0 }}
+                      >✏</button>
+                    </div>
+                  );
+                })}
+              </div>
+            )}
           </div>
+
+          {/* متكرر */}
+          <div style={{ background: 'var(--bg)', border: '1px solid var(--brd)', borderRadius: 16, padding: 20, boxShadow: '0 1px 6px rgba(0,0,0,0.04)' }}>
+            <h3 style={{ fontSize: 14, fontWeight: 800, color: 'var(--txt)', marginBottom: 14 }}>🔁 متكرر</h3>
+            <div>
+              {RECURRING.map((r, i) => (
+                <div
+                  key={i}
+                  style={{
+                    display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+                    padding: '10px 0',
+                    borderBottom: i < RECURRING.length - 1 ? '1px solid var(--brd)' : 'none',
+                  }}
+                >
+                  <span style={{ fontSize: 13, fontWeight: 600, color: 'var(--txt)' }}>{r.label}</span>
+                  <span style={{ fontSize: 12, color: 'var(--txt3)' }}>{r.note}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+
         </div>
       </div>
 
-      {/* Day Panel Modal */}
+      {/* ── Day Panel Modal ── */}
       {dayPanel && (
         <DayPanel
           day={dayPanel.day} month={dayPanel.month} year={dayPanel.year}
@@ -542,7 +534,7 @@ export default function CalendarClient({ initialEvents, initialTasks, brands }: 
         />
       )}
 
-      {/* Add / Edit Event Modal */}
+      {/* ── Add / Edit Event Modal ── */}
       {showForm && (
         <EventFormModal
           brands={brands}
