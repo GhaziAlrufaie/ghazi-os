@@ -4,7 +4,7 @@
 import { createServerClient } from '@/lib/supabase';
 import { revalidatePath } from 'next/cache';
 
-export type TaskStatus = 'todo' | 'in_progress' | 'on_hold' | 'done';
+export type TaskStatus = 'todo' | 'in_progress' | 'on_hold' | 'done' | 'ideas';
 export type TaskPriority = 'critical' | 'high' | 'medium' | 'low';
 
 export interface Task {
@@ -25,6 +25,7 @@ interface AddTaskInput {
   status: TaskStatus;
   priority: TaskPriority;
   brandId?: string | null;
+  projectId?: string | null;
 }
 
 interface UpdateTaskInput {
@@ -56,6 +57,7 @@ export async function addTask(
       status: input.status,
       priority: input.priority,
       brand_id: input.brandId ?? null,
+      project_id: input.projectId ?? null,
       sort_order: 0,
     })
     .select('id,title,description,status,priority,due_date,brand_id,project_id,sort_order')

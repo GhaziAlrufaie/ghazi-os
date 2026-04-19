@@ -823,3 +823,59 @@ textarea { resize: vertical; min-height: 80px; }
   .w2-tab-label { display: none; }
   .w2-tab { padding: 8px 12px; }
 }
+
+/* ══════════════════════════════════════════
+   BRAND STATS COLUMN — bsc-* classes
+══════════════════════════════════════════ */
+.brand-stats-col .bsc-header { display: flex; align-items: center; gap: 8px; margin-bottom: 20px; }
+.brand-stats-col .bsc-icon { font-size: 24px; }
+.brand-stats-col .bsc-name { font-size: 13px; font-weight: 800; line-height: 1.2; }
+.brand-stats-col .bsc-desc { font-size: 10px; color: var(--txt3); margin-top: 2px; }
+.bsc-stat { padding: 10px 0; border-bottom: 1px solid var(--brd); display: flex; flex-direction: column; gap: 2px; }
+.bsc-stat:last-child { border-bottom: none; }
+.bsc-stat .bsc-val { font-size: 22px; font-weight: 800; line-height: 1; }
+.bsc-stat .bsc-lbl { font-size: 10px; color: var(--txt3); margin-top: 2px; }
+.bsc-alerts { margin-top: 12px; display: flex; flex-direction: column; gap: 6px; }
+.bsc-alert-item { font-size: 10px; color: var(--danger); padding: 4px 6px; background: rgba(255,59,48,.08); border-radius: 4px; border-right: 2px solid var(--danger); cursor: pointer; }
+.bsc-alert-item:hover { background: rgba(255,59,48,.15); }
+
+/* ══════════════════════════════════════════
+   BRAND TASK CARD — extra classes
+══════════════════════════════════════════ */
+.brand-task-card .btc-icons { display: flex; align-items: center; gap: 5px; margin-top: 5px; flex-wrap: wrap; }
+.brand-task-card .btc-icon { font-size: 10px; color: var(--txt3); display: inline-flex; align-items: center; gap: 2px; background: var(--bg2); border-radius: 4px; padding: 1px 5px; line-height: 1.4; }
+.brand-task-card .btc-proj { font-size: 10px; color: var(--txt3); background: var(--bg2); border-radius: 4px; padding: 1px 5px; }
+.brand-task-card .btc-checklist { font-size: 10px; color: var(--txt3); }
+.brand-task-card.drag-above { border-top: 2px solid var(--gold) !important; }
+.brand-task-card.drag-below { border-bottom: 2px solid var(--gold) !important; }
+
+/* ══════════════════════════════════════════
+   PROJECT OPTIONS MENU
+══════════════════════════════════════════ */
+.proj-opts-item { padding: 8px 14px; font-size: 12px; cursor: pointer; color: var(--txt); transition: background .12s; }
+.proj-opts-item:hover { background: var(--bg2); }
+.proj-opts-item.danger { color: var(--danger); }
+.proj-opts-item.danger:hover { background: rgba(255,59,48,.08); }
+
+/* ══════════════════════════════════════════
+   PRIORITY PICKER POPUP
+══════════════════════════════════════════ */
+.pri-picker { position: absolute; bottom: 100%; right: 0; background: var(--card); border: 1px solid var(--brd); border-radius: 8px; box-shadow: 0 8px 24px rgba(0,0,0,0.15); z-index: 9999; padding: 6px; display: flex; flex-direction: column; gap: 3px; min-width: 120px; }
+.pri-picker-item { display: flex; align-items: center; gap: 6px; padding: 5px 8px; border-radius: 5px; cursor: pointer; font-size: 11px; font-weight: 600; transition: background .12s; }
+.pri-picker-item:hover { background: var(--bg2); }
+
+/* ══════════════════════════════════════════
+   DHIKRNI MISSION CONTROL
+══════════════════════════════════════════ */
+.dmc-wrap { display: flex; flex-direction: column; gap: 16px; padding: 16px; height: calc(100vh - 120px); overflow-y: auto; }
+.dmc-header { display: flex; align-items: center; gap: 12px; padding: 16px; background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%); border-radius: 12px; color: #fff; }
+.dmc-logo { font-size: 32px; }
+.dmc-title { font-size: 18px; font-weight: 800; }
+.dmc-subtitle { font-size: 11px; color: rgba(255,255,255,0.6); margin-top: 2px; }
+.dmc-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 12px; }
+.dmc-card { background: var(--card); border: 1px solid var(--brd); border-radius: 10px; padding: 14px; }
+.dmc-card-title { font-size: 12px; font-weight: 700; color: var(--txt2); margin-bottom: 10px; text-transform: uppercase; letter-spacing: 0.5px; }
+.dmc-stat-row { display: flex; align-items: center; justify-content: space-between; padding: 6px 0; border-bottom: 1px solid var(--brd); }
+.dmc-stat-row:last-child { border-bottom: none; }
+.dmc-stat-label { font-size: 11px; color: var(--txt2); }
+.dmc-stat-value { font-size: 14px; font-weight: 800; }
