@@ -4,7 +4,7 @@
 import { createServerClient } from '@/lib/supabase';
 import { revalidatePath } from 'next/cache';
 
-export type TaskStatus = 'todo' | 'in_progress' | 'on_hold' | 'done' | 'ideas';
+export type TaskStatus = 'todo' | 'in_progress' | 'on_hold' | 'waiting' | 'done' | 'ideas';
 export type TaskPriority = 'critical' | 'high' | 'medium' | 'low';
 
 export interface Task {
@@ -36,6 +36,26 @@ interface UpdateTaskInput {
   priority?: TaskPriority;
   dueDate?: string | null;
   sortOrder?: number;
+}
+
+export async function getTasks(): Promise<Task[]> {
+  const supabase = createServerClient();
+  const { data } = await supabase
+    .from('tasks')
+    .select('id,title,description,status,priority,due_date,brand_id,project_id,sort_order')
+    .order('sort_order');
+  return (data ?? []).map(r => ({
+    id: r.id as string,
+    title: r.title as string,
+    description: (r.description as string) ?? '',
+    status: r.status as TaskStatus,
+    priority: r.priority as TaskPriority,
+    dueDate: (r.due_date as string | null) ?? null,
+    brandId: (r.brand_id as string | null) ?? null,
+    projectId: (r.project_id as string | null) ?? null,
+    sortOrder: (r.sort_order as number) ?? 0,
+    hasDescription: !!((r.description as string)?.trim()),
+  }));
 }
 
 function genId(): string {

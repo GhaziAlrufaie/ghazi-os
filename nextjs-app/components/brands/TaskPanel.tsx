@@ -43,6 +43,7 @@ const STATUS_CHIP_CLASS: Record<TaskStatus, string> = {
   todo:        'status-todo',
   in_progress: 'status-in_progress',
   on_hold:     'status-on_hold',
+  waiting:     'status-on_hold',
   done:        'status-done',
   ideas:       'status-ideas',
 };
