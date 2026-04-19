@@ -393,18 +393,20 @@ export default function BrandDetailClient({ brand: initialBrand, initialTasks, i
     setTasks((prev) => prev.filter((t) => t.id !== id));
     await archiveTask(task);
   }
-  async function handleDelete(id: string) {
+  function handleDelete(id: string) {
     const task = tasks.find((t) => t.id === id);
     if (!task) return;
     setTasks((prev) => prev.filter((t) => t.id !== id));
-    await deleteTask(id);
+    // push undo BEFORE the async delete so the closure captures the right task
     pushUndo({
       label: `حذف "${task.title}"`,
       undo: async () => {
-        await restoreTask(task);
-        setTasks((prev) => [...prev, task]);
+        const res = await restoreTask(task);
+        if (!res?.error) setTasks((prev) => [...prev, task]);
       },
     });
+    // fire-and-forget delete
+    deleteTask(id).catch(() => {});
   }
   function handleAdd(task: Task) { setTasks((prev) => [...prev, task]); }
   function handleUpdate(patch: Partial<Task>) {
@@ -487,7 +489,7 @@ export default function BrandDetailClient({ brand: initialBrand, initialTasks, i
         task={panelTask}
         onClose={() => setPanelTask(null)}
         onUpdate={handleUpdate}
-        onDelete={(id) => { setTasks((prev) => prev.filter((t) => t.id !== id)); setPanelTask(null); }}
+        onDelete={(id) => { handleDelete(id); setPanelTask(null); }}
         onArchive={(task) => { setTasks((prev) => prev.filter((t) => t.id !== task.id)); setPanelTask(null); }}
       />
 
