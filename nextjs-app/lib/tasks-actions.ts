@@ -149,6 +149,66 @@ export async function deleteTask(id: string): Promise<{ error?: string }> {
   return {};
 }
 
+// ── Finance Tasks (category = 'financial') ──────────────────────────────────
+export async function getFinanceTasks(): Promise<Task[]> {
+  const supabase = createServerClient();
+  const { data } = await supabase
+    .from('tasks')
+    .select('id,title,description,status,priority,due_date,brand_id,project_id,sort_order,category')
+    .eq('category', 'financial')
+    .order('sort_order');
+  return (data ?? []).map(r => ({
+    id: r.id as string,
+    title: r.title as string,
+    description: (r.description as string) ?? '',
+    status: r.status as TaskStatus,
+    priority: r.priority as TaskPriority,
+    dueDate: (r.due_date as string | null) ?? null,
+    brandId: (r.brand_id as string | null) ?? null,
+    projectId: (r.project_id as string | null) ?? null,
+    sortOrder: (r.sort_order as number) ?? 0,
+    hasDescription: !!((r.description as string)?.trim()),
+  }));
+}
+
+export async function addFinanceTask(
+  input: AddTaskInput
+): Promise<{ task?: Task; error?: string }> {
+  const supabase = createServerClient();
+  const id = genId();
+  const { data, error } = await supabase
+    .from('tasks')
+    .insert({
+      id,
+      title: input.title,
+      description: '',
+      status: input.status,
+      priority: input.priority,
+      brand_id: null,
+      project_id: null,
+      sort_order: 0,
+      category: 'financial',
+    })
+    .select('id,title,description,status,priority,due_date,brand_id,project_id,sort_order')
+    .single();
+  if (error) return { error: error.message };
+  revalidatePath('/finance');
+  return {
+    task: {
+      id: data.id,
+      title: data.title,
+      description: data.description ?? '',
+      status: data.status as TaskStatus,
+      priority: data.priority as TaskPriority,
+      dueDate: data.due_date ?? null,
+      brandId: data.brand_id ?? null,
+      projectId: data.project_id ?? null,
+      sortOrder: data.sort_order ?? 0,
+      hasDescription: !!(data.description?.trim()),
+    },
+  };
+}
+
 export async function archiveTask(
   task: Task
 ): Promise<{ error?: string }> {
