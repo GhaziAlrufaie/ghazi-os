@@ -7,8 +7,10 @@ import type { ProjectRow } from '@/lib/projects-types';
 import type { BrandRow } from '@/lib/brands-types';
 
 interface AddTaskModalProps {
-  brand: BrandRow;
-  projects: ProjectRow[];
+  brand?: BrandRow;
+  brands?: BrandRow[];
+  defaultBrandId?: string | null;
+  projects?: ProjectRow[];
   defaultStatus?: TaskStatus;
   defaultProjectId?: string | null;
   onClose: () => void;
@@ -17,20 +19,24 @@ interface AddTaskModalProps {
 
 export default function AddTaskModal({
   brand,
-  projects,
+  brands,
+  defaultBrandId = null,
+  projects = [],
   defaultStatus = 'todo',
   defaultProjectId = null,
   onClose,
   onAdd,
 }: AddTaskModalProps) {
-  const [title, setTitle]       = useState('');
-  const [desc, setDesc]         = useState('');
-  const [status, setStatus]     = useState<TaskStatus>(defaultStatus);
-  const [priority, setPriority] = useState<TaskPriority>('medium');
+  const allBrands: BrandRow[] = brands ?? (brand ? [brand] : []);
+  const [title, setTitle]         = useState('');
+  const [desc, setDesc]           = useState('');
+  const [status, setStatus]       = useState<TaskStatus>(defaultStatus);
+  const [priority, setPriority]   = useState<TaskPriority>('medium');
   const [projectId, setProjectId] = useState<string>(defaultProjectId ?? '');
-  const [dueDate, setDueDate]   = useState('');
-  const [loading, setLoading]   = useState(false);
-  const [error, setError]       = useState('');
+  const [brandId, setBrandId]     = useState<string>(defaultBrandId ?? brand?.id ?? '');
+  const [dueDate, setDueDate]     = useState('');
+  const [loading, setLoading]     = useState(false);
+  const [error, setError]         = useState('');
   const titleRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
@@ -42,24 +48,24 @@ export default function AddTaskModal({
     return () => document.removeEventListener('keydown', handler);
   }, [onClose]);
 
+  const activeBrand = allBrands.find((b) => b.id === brandId);
+
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     if (!title.trim()) { setError('أدخل عنوان المهمة'); return; }
+    if (!brandId) { setError('اختر البراند'); return; }
     setLoading(true);
     setError('');
     const res = await addTask({
       title: title.trim(),
       status,
       priority,
-      brandId: brand.id,
+      brandId,
       projectId: projectId || null,
     });
     setLoading(false);
     if (res.error) { setError(res.error); return; }
-    if (res.task) {
-      // Attach description if provided (separate update)
-      onAdd(res.task);
-    }
+    if (res.task) onAdd(res.task);
     onClose();
   }
 
@@ -146,17 +152,29 @@ export default function AddTaskModal({
             </div>
           </div>
 
-          {/* Brand (read-only) */}
+          {/* Brand */}
           <div className="atm-field">
-            <label className="atm-label">البراند</label>
-            <div style={{
-              padding: '9px 12px', background: 'var(--bg2)', border: '1px solid var(--brd)',
-              borderRadius: 8, fontSize: 13, color: 'var(--txt2)',
-              display: 'flex', alignItems: 'center', gap: 8,
-            }}>
-              <span>{brand.icon}</span>
-              <span>{brand.name}</span>
-            </div>
+            <label className="atm-label">البراند *</label>
+            {allBrands.length === 1 ? (
+              <div style={{
+                padding: '9px 12px', background: 'var(--bg2)', border: '1px solid var(--brd)',
+                borderRadius: 8, fontSize: 13, color: 'var(--txt2)',
+                display: 'flex', alignItems: 'center', gap: 8,
+              }}>
+                <span>{activeBrand?.icon}</span>
+                <span>{activeBrand?.name}</span>
+              </div>
+            ) : (
+              <select
+                className="atm-select"
+                value={brandId}
+                onChange={(e) => setBrandId(e.target.value)}>
+                <option value="">— اختر البراند —</option>
+                {allBrands.map((b) => (
+                  <option key={b.id} value={b.id}>{b.icon} {b.name}</option>
+                ))}
+              </select>
+            )}
           </div>
 
           {error && (

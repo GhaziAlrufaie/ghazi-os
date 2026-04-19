@@ -943,3 +943,49 @@ textarea { resize: vertical; min-height: 80px; }
 .atm-textarea { width: 100%; background: var(--bg2); border: 1px solid var(--brd); border-radius: 8px; padding: 9px 12px; font-size: 13px; color: var(--txt); font-family: inherit; outline: none; resize: none; min-height: 80px; transition: border-color .15s; }
 .atm-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
 .atm-footer { display: flex; justify-content: flex-start; gap: 8px; margin-top: 20px; }
+
+/* ─── Project Card ─────────────────────────────────────────────────────────── */
+.proj-card {
+  background: rgba(255,255,255,0.02);
+  border: 1px solid rgba(255,255,255,0.07);
+  border-radius: 10px;
+  padding: 12px 14px;
+  margin-bottom: 8px;
+  position: relative;
+  transition: background 0.15s;
+}
+.proj-card:hover { background: rgba(255,255,255,0.04); }
+.proj-card-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+.proj-card-title {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--txt1);
+  line-height: 1.4;
+  flex: 1;
+}
+.proj-card-actions {
+  display: flex;
+  gap: 4px;
+  opacity: 0;
+  transition: opacity 0.15s;
+}
+.proj-card:hover .proj-card-actions { opacity: 1; }
+
+/* ─── Progress Bar ─────────────────────────────────────────────────────────── */
+.progress-bar {
+  height: 4px;
+  background: rgba(255,255,255,0.08);
+  border-radius: 2px;
+  overflow: hidden;
+}
+.progress-fill {
+  height: 100%;
+  border-radius: 2px;
+  transition: width 0.3s ease;
+}

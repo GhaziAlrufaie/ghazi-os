@@ -6,6 +6,8 @@ import type { Task, TaskStatus, TaskPriority } from '@/lib/tasks-actions';
 import { updateTask, deleteTask, archiveTask } from '@/lib/tasks-actions';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
+interface BrandRow { id: string; name: string; color: string; }
+
 interface SubtaskItem {
   id: string;
   title: string;
@@ -18,6 +20,8 @@ interface ActivityItem {
   ts: string;
   type: 'action' | 'comment';
 }
+
+interface LinkItem { id: string; url: string; label: string; }
 
 // ─── Constants ────────────────────────────────────────────────────────────────
 const STATUS_CHIPS: { v: TaskStatus; lbl: string; color: string }[] = [
@@ -53,10 +57,11 @@ const PRI_CHIP_CLASS: Record<TaskPriority, string> = {
 // ─── Props ────────────────────────────────────────────────────────────────────
 interface TaskPanelProps {
   task: Task | null;
+  brands?: BrandRow[];
   onClose: () => void;
-  onUpdate: (updated: Task) => void;
+  onUpdate: (patch: Partial<Task>) => void;
   onDelete: (id: string) => void;
-  onArchive: (id: string) => void;
+  onArchive: (task: Task) => void;
 }
 
 // ─── Dropdown Component ───────────────────────────────────────────────────────
@@ -116,7 +121,11 @@ export default function TaskPanel({ task, onClose, onUpdate, onDelete, onArchive
   const [newSt, setNewSt]       = useState('');
   const [activity, setActivity] = useState<ActivityItem[]>([]);
   const [comment, setComment]   = useState('');
-  const [saving, setSaving]     = useState(false);
+  const [tags, setTags]         = useState<string[]>([]);
+  const [newTag, setNewTag]     = useState('');
+  const [links, setLinks]       = useState<LinkItem[]>([]);
+  const [newLink, setNewLink]   = useState({ url: '', label: '' });
+  const [showLinkForm, setShowLinkForm] = useState(false);
 
   // Sync state when task changes
   useEffect(() => {
@@ -129,6 +138,11 @@ export default function TaskPanel({ task, onClose, onUpdate, onDelete, onArchive
     setSubtasks([]);
     setActivity([]);
     setComment('');
+    setTags([]);
+    setLinks([]);
+    setNewTag('');
+    setNewLink({ url: '', label: '' });
+    setShowLinkForm(false);
   }, [task?.id]);
 
   // Escape key
@@ -145,33 +159,51 @@ export default function TaskPanel({ task, onClose, onUpdate, onDelete, onArchive
   // ── Auto-save helpers ──
   async function saveTitle(val: string) {
     if (val === task!.title) return;
-    const res = await updateTask({ id: task!.id, title: val });
-    if (res.task) onUpdate(res.task);
+    await updateTask({ id: task!.id, title: val });
+    onUpdate({ title: val });
   }
 
   async function saveDesc(val: string) {
-    if (val === task!.description) return;
-    const res = await updateTask({ id: task!.id, description: val });
-    if (res.task) onUpdate(res.task);
+    if (val === (task!.description ?? '')) return;
+    await updateTask({ id: task!.id, description: val });
+    onUpdate({ description: val });
   }
 
   async function changeStatus(v: TaskStatus) {
     setStatus(v);
-    const res = await updateTask({ id: task!.id, status: v });
-    if (res.task) onUpdate(res.task);
+    await updateTask({ id: task!.id, status: v });
+    onUpdate({ status: v });
   }
 
   async function changePriority(v: TaskPriority) {
     setPriority(v);
-    const res = await updateTask({ id: task!.id, priority: v });
-    if (res.task) onUpdate(res.task);
+    await updateTask({ id: task!.id, priority: v });
+    onUpdate({ priority: v });
   }
 
   async function changeDueDate(val: string) {
     setDueDate(val);
-    const res = await updateTask({ id: task!.id, dueDate: val || null });
-    if (res.task) onUpdate(res.task);
+    await updateTask({ id: task!.id, dueDate: val || null });
+    onUpdate({ dueDate: val || null });
   }
+
+  // ── Tags ──
+  function addTag() {
+    const t = newTag.trim().replace(/^#/, '');
+    if (!t || tags.includes(t)) return;
+    setTags((prev) => [...prev, t]);
+    setNewTag('');
+  }
+  function removeTag(tag: string) { setTags((prev) => prev.filter((t) => t !== tag)); }
+
+  // ── Links ──
+  function addLink() {
+    if (!newLink.url.trim()) return;
+    setLinks((prev) => [...prev, { id: `lnk_${Date.now()}`, url: newLink.url.trim(), label: newLink.label.trim() || newLink.url.trim() }]);
+    setNewLink({ url: '', label: '' });
+    setShowLinkForm(false);
+  }
+  function removeLink(id: string) { setLinks((prev) => prev.filter((l) => l.id !== id)); }
 
   // ── Subtasks ──
   function addSubtask() {
@@ -207,20 +239,13 @@ export default function TaskPanel({ task, onClose, onUpdate, onDelete, onArchive
   }
 
   // ── Delete / Archive ──
-  async function handleDelete() {
-    if (!confirm('هل تريد حذف هذه المهمة؟')) return;
-    setSaving(true);
-    await deleteTask(task!.id);
-    setSaving(false);
+  function handleDelete() {
     onDelete(task!.id);
     onClose();
   }
 
-  async function handleArchive() {
-    setSaving(true);
-    await archiveTask(task!);
-    setSaving(false);
-    onArchive(task!.id);
+  function handleArchive() {
+    onArchive(task!);
     onClose();
   }
 
@@ -282,8 +307,45 @@ export default function TaskPanel({ task, onClose, onUpdate, onDelete, onArchive
               rows={4}
             />
 
+            {/* Tags */}
+            <div className="tp-section-label" style={{ marginTop: 16 }}>🏷️ التصنيفات</div>
+            <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6, marginBottom: 8 }}>
+              {tags.map((tag) => (
+                <span key={tag} style={{ display: 'inline-flex', alignItems: 'center', gap: 4, padding: '2px 8px', borderRadius: 12, fontSize: 11, background: 'rgba(201,168,76,0.15)', color: 'var(--gold)', border: '1px solid rgba(201,168,76,0.25)' }}>
+                  #{tag}
+                  <button onClick={() => removeTag(tag)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--txt3)', padding: 0, fontSize: 10 }}>✕</button>
+                </span>
+              ))}
+            </div>
+            <div style={{ display: 'flex', gap: 6 }}>
+              <input value={newTag} onChange={(e) => setNewTag(e.target.value)} onKeyDown={(e) => { if (e.key === 'Enter') addTag(); }} placeholder="+ أضف تصنيف..." style={{ flex: 1, background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)', borderRadius: 6, padding: '5px 10px', fontSize: 11, color: 'var(--txt1)', outline: 'none' }} />
+              <button className="btn btn-sm" onClick={addTag}>+</button>
+            </div>
+
+            {/* Links */}
+            <div className="tp-section-label" style={{ marginTop: 16 }}>🔗 الروابط</div>
+            {links.map((lnk) => (
+              <div key={lnk.id} style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 6, padding: '5px 8px', borderRadius: 6, background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.06)' }}>
+                <span style={{ fontSize: 12 }}>🔗</span>
+                <a href={lnk.url} target="_blank" rel="noreferrer" style={{ flex: 1, fontSize: 11, color: 'var(--accent)', textDecoration: 'none', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{lnk.label}</a>
+                <button onClick={() => removeLink(lnk.id)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--txt3)', fontSize: 10 }}>✕</button>
+              </div>
+            ))}
+            {showLinkForm ? (
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+                <input value={newLink.url} onChange={(e) => setNewLink((p) => ({ ...p, url: e.target.value }))} placeholder="https://..." style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)', borderRadius: 6, padding: '5px 10px', fontSize: 11, color: 'var(--txt1)', outline: 'none' }} />
+                <input value={newLink.label} onChange={(e) => setNewLink((p) => ({ ...p, label: e.target.value }))} placeholder="التسمية (اختياري)" style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)', borderRadius: 6, padding: '5px 10px', fontSize: 11, color: 'var(--txt1)', outline: 'none' }} />
+                <div style={{ display: 'flex', gap: 6 }}>
+                  <button className="btn btn-sm" onClick={addLink}>إضافة</button>
+                  <button className="btn btn-sm btn-plain" onClick={() => setShowLinkForm(false)}>إلغاء</button>
+                </div>
+              </div>
+            ) : (
+              <button className="btn btn-sm btn-plain" onClick={() => setShowLinkForm(true)}>+ رابط جديد</button>
+            )}
+
             {/* Subtasks */}
-            <div className="tp-section-label">✅ الخطوات</div>
+            <div className="tp-section-label" style={{ marginTop: 16 }}>✅ الخطوات</div>
             {subtasks.length > 0 && (
               <>
                 <div className="tp-st-progress">
@@ -381,15 +443,13 @@ export default function TaskPanel({ task, onClose, onUpdate, onDelete, onArchive
               <button
                 className="btn btn-sm"
                 style={{ width: '100%' }}
-                onClick={handleArchive}
-                disabled={saving}>
+                onClick={handleArchive}>
                 🗄️ أرشفة
               </button>
               <button
                 className="btn btn-sm btn-plain"
                 style={{ width: '100%', color: 'var(--danger)' }}
-                onClick={handleDelete}
-                disabled={saving}>
+                onClick={handleDelete}>
                 🗑 حذف
               </button>
             </div>

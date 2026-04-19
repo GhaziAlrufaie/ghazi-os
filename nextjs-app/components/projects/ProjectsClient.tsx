@@ -1,242 +1,231 @@
 'use client';
-// Client Component — Projects (قسم المشاريع)
-// عرض المشاريع مجمّعة حسب الحالة + CRUD كامل
-import React, { useState } from 'react';
+// ProjectsClient — صفحة المشاريع
+// Kanban 4 أعمدة: تخطيط / نشط / موقوف / مكتمل + List View
+// Color stripe يمين بلون البراند + Progress bar + Days remaining
+import React, { useState, useTransition } from 'react';
+import { useRouter } from 'next/navigation';
 import type { ProjectRow } from '@/lib/projects-types';
-import { STATUS_LABELS, PRIORITY_LABELS } from '@/lib/projects-types';
 import { addProject, updateProject, deleteProject } from '@/lib/projects-actions';
-import type { BrandRow } from '@/lib/brands-types';
 
-// ─── Priority colors ──────────────────────────────────────────────────────────
-const PRIORITY_COLORS: Record<string, string> = {
-  low: '#6B7280',
-  medium: '#3B82F6',
-  high: '#F59E0B',
-  critical: '#EF4444',
+// ─── Types ────────────────────────────────────────────────────────────────────
+interface BrandRow { id: string; name: string; color: string; icon?: string; }
+
+// ─── Constants ────────────────────────────────────────────────────────────────
+const KANBAN_COLS: { id: ProjectRow['status']; label: string; color: string }[] = [
+  { id: 'planning',  label: 'تخطيط',   color: '#2196f3' },
+  { id: 'active',    label: 'نشط',      color: '#4caf50' },
+  { id: 'paused',    label: 'موقوف',    color: '#ff9800' },
+  { id: 'done',      label: 'مكتمل',    color: '#9e9e9e' },
+];
+
+const STATUS_LABELS: Record<string, string> = {
+  planning: 'تخطيط', active: 'نشط', paused: 'موقوف',
+  done: 'مكتمل', archived: 'مؤرشف',
 };
 
-const STATUS_COLORS: Record<string, string> = {
-  planning: '#8B5CF6',
-  active: '#10B981',
-  paused: '#F59E0B',
-  done: '#6B7280',
-  archived: '#374151',
+const PRI_LABELS: Record<string, string> = {
+  critical: 'حرج', high: 'عالي', medium: 'متوسط', low: 'منخفض',
 };
 
-// ─── ProjectForm Modal ────────────────────────────────────────────────────────
-interface FormProps {
-  edit?: ProjectRow | null;
-  brands: BrandRow[];
-  onClose: () => void;
-  onSave: (p: ProjectRow, isEdit: boolean) => void;
+// ─── Helpers ──────────────────────────────────────────────────────────────────
+function daysLeft(dateStr: string | null): number | null {
+  if (!dateStr) return null;
+  const diff = new Date(dateStr).getTime() - Date.now();
+  return Math.ceil(diff / 86400000);
 }
-function ProjectForm({ edit, brands, onClose, onSave }: FormProps) {
-  const isEdit = !!edit;
-  const [title,      setTitle]      = useState(edit?.title ?? '');
-  const [desc,       setDesc]       = useState(edit?.description ?? '');
-  const [brandId,    setBrandId]    = useState(edit?.brandId ?? '');
-  const [status,     setStatus]     = useState(edit?.status ?? 'planning');
-  const [priority,   setPriority]   = useState(edit?.priority ?? 'medium');
-  const [startDate,  setStartDate]  = useState(edit?.startDate ?? '');
-  const [targetDate, setTargetDate] = useState(edit?.targetDate ?? '');
-  const [tagsInput,  setTagsInput]  = useState((edit?.tags ?? []).join(', '));
-  const [progress,   setProgress]   = useState(edit?.progress ?? 0);
-  const [loading,    setLoading]    = useState(false);
-  const [error,      setError]      = useState('');
 
-  async function handleSubmit(ev: React.FormEvent) {
-    ev.preventDefault();
-    if (!title.trim()) { setError('أدخل عنوان المشروع'); return; }
-    setLoading(true); setError('');
-    const tags = tagsInput.split(',').map(t => t.trim()).filter(Boolean);
-    const payload = {
-      brandId: brandId || null,
-      title: title.trim(),
-      description: desc,
-      status,
-      priority,
-      startDate: startDate || null,
-      targetDate: targetDate || null,
-      tags,
-    };
-    if (isEdit && edit) {
-      const res = await updateProject({ id: edit.id, ...payload, progress });
-      setLoading(false);
-      if (res.error) { setError(res.error); return; }
-      if (res.project) onSave(res.project, true);
-    } else {
-      const res = await addProject(payload);
-      setLoading(false);
-      if (res.error) { setError(res.error); return; }
-      if (res.project) onSave(res.project, false);
-    }
-    onClose();
+function daysLeftLabel(dateStr: string | null): string {
+  const d = daysLeft(dateStr);
+  if (d === null) return '';
+  if (d < 0) return `متأخر ${Math.abs(d)} يوم`;
+  if (d === 0) return 'اليوم';
+  if (d === 1) return 'غداً';
+  return `${d} يوم متبقي`;
+}
+
+// ─── ProjectCard ──────────────────────────────────────────────────────────────
+function ProjectCard({
+  project, brand, taskCount, doneCount, onEdit, onDelete, onNavigate,
+}: {
+  project: ProjectRow;
+  brand?: BrandRow;
+  taskCount: number;
+  doneCount: number;
+  onEdit: (p: ProjectRow) => void;
+  onDelete: (id: string) => void;
+  onNavigate: (id: string) => void;
+}) {
+  const [deleting, setDeleting] = useState(false);
+  const prog = taskCount > 0 ? Math.round((doneCount / taskCount) * 100) : (project.progress ?? 0);
+  const days = daysLeft(project.targetDate);
+  const isOverdue = days !== null && days < 0;
+  const brandColor = brand?.color ?? '#C9A84C';
+
+  async function handleDelete(e: React.MouseEvent) {
+    e.stopPropagation();
+    if (!confirm('حذف هذا المشروع؟')) return;
+    setDeleting(true);
+    await onDelete(project.id);
+    setDeleting(false);
   }
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4" style={{ background: 'rgba(0,0,0,0.85)' }}>
-      <div className="rounded-xl p-6 w-full max-w-lg relative overflow-y-auto max-h-[90vh]" style={{ background: '#0d1117', border: '1px solid rgba(201,150,59,0.25)' }}>
-        <button onClick={onClose} className="absolute top-4 left-4 text-gray-400 hover:text-white">✕</button>
-        <h2 className="text-lg font-bold mb-5" style={{ color: '#C9963B' }}>
-          {isEdit ? '✏ تعديل المشروع' : '+ مشروع جديد'}
-        </h2>
-        <form onSubmit={handleSubmit} className="space-y-4">
-          {/* Title */}
-          <div>
-            <label className="block text-xs text-gray-400 mb-1">عنوان المشروع *</label>
-            <input value={title} onChange={e => setTitle(e.target.value)} placeholder="اسم المشروع"
-              className="w-full rounded-lg px-3 py-2 text-sm text-white outline-none"
-              style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(201,150,59,0.15)' }} />
-          </div>
-          {/* Brand */}
-          <div>
-            <label className="block text-xs text-gray-400 mb-1">البراند (اختياري)</label>
-            <select value={brandId} onChange={e => setBrandId(e.target.value)}
-              className="w-full rounded-lg px-3 py-2 text-sm text-white outline-none"
-              style={{ background: '#0d1117', border: '1px solid rgba(201,150,59,0.15)' }}>
-              <option value="">— بدون براند —</option>
-              {brands.map(b => <option key={b.id} value={b.id}>{b.icon} {b.name}</option>)}
-            </select>
-          </div>
-          {/* Status + Priority */}
-          <div className="grid grid-cols-2 gap-3">
-            <div>
-              <label className="block text-xs text-gray-400 mb-1">الحالة</label>
-              <select value={status} onChange={e => setStatus(e.target.value as 'planning' | 'active' | 'paused' | 'done' | 'archived')}
-                className="w-full rounded-lg px-3 py-2 text-sm text-white outline-none"
-                style={{ background: '#0d1117', border: '1px solid rgba(201,150,59,0.15)' }}>
-                <option value="planning">تخطيط</option>
-                <option value="active">نشط</option>
-                <option value="paused">متوقف</option>
-                <option value="done">مكتمل</option>
-                <option value="archived">مؤرشف</option>
-              </select>
-            </div>
-            <div>
-              <label className="block text-xs text-gray-400 mb-1">الأولوية</label>
-              <select value={priority} onChange={e => setPriority(e.target.value as 'low' | 'medium' | 'high' | 'critical')}
-                className="w-full rounded-lg px-3 py-2 text-sm text-white outline-none"
-                style={{ background: '#0d1117', border: '1px solid rgba(201,150,59,0.15)' }}>
-                <option value="low">منخفض</option>
-                <option value="medium">متوسط</option>
-                <option value="high">مرتفع</option>
-                <option value="critical">حرج</option>
-              </select>
-            </div>
-          </div>
-          {/* Dates */}
-          <div className="grid grid-cols-2 gap-3">
-            <div>
-              <label className="block text-xs text-gray-400 mb-1">تاريخ البدء</label>
-              <input type="date" value={startDate} onChange={e => setStartDate(e.target.value)}
-                className="w-full rounded-lg px-3 py-2 text-sm text-white outline-none"
-                style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(201,150,59,0.15)', colorScheme: 'dark' }} />
-            </div>
-            <div>
-              <label className="block text-xs text-gray-400 mb-1">تاريخ الهدف</label>
-              <input type="date" value={targetDate} onChange={e => setTargetDate(e.target.value)}
-                className="w-full rounded-lg px-3 py-2 text-sm text-white outline-none"
-                style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(201,150,59,0.15)', colorScheme: 'dark' }} />
-            </div>
-          </div>
-          {/* Progress (edit only) */}
-          {isEdit && (
-            <div>
-              <label className="block text-xs text-gray-400 mb-1">التقدم: {progress}%</label>
-              <input type="range" min={0} max={100} value={progress} onChange={e => setProgress(Number(e.target.value))}
-                className="w-full" style={{ accentColor: '#C9963B' }} />
-            </div>
-          )}
-          {/* Tags */}
-          <div>
-            <label className="block text-xs text-gray-400 mb-1">الوسوم (مفصولة بفاصلة)</label>
-            <input value={tagsInput} onChange={e => setTagsInput(e.target.value)} placeholder="تسويق, منتج, عاجل"
-              className="w-full rounded-lg px-3 py-2 text-sm text-white outline-none"
-              style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(201,150,59,0.15)' }} />
-          </div>
-          {/* Description */}
-          <div>
-            <label className="block text-xs text-gray-400 mb-1">وصف (اختياري)</label>
-            <textarea value={desc} onChange={e => setDesc(e.target.value)} rows={2} placeholder="تفاصيل المشروع..."
-              className="w-full rounded-lg px-3 py-2 text-sm text-white outline-none resize-none"
-              style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(201,150,59,0.15)' }} />
-          </div>
-          {error && <p className="text-red-400 text-xs">{error}</p>}
-          <div className="flex gap-3 pt-2">
-            <button type="button" onClick={onClose} className="flex-1 py-2 rounded-lg text-sm text-gray-400 border" style={{ borderColor: 'rgba(255,255,255,0.1)' }}>إلغاء</button>
-            <button type="submit" disabled={loading} className="flex-1 py-2 rounded-lg text-sm font-semibold" style={{ background: '#C9963B', color: '#05070d', opacity: loading ? 0.6 : 1 }}>
-              {loading ? '...' : isEdit ? 'حفظ' : '+ أضف'}
-            </button>
-          </div>
-        </form>
+    <div
+      className="proj-card"
+      onClick={() => onNavigate(project.id)}
+      style={{ borderRight: `3px solid ${brandColor}`, cursor: 'pointer' }}
+    >
+      {/* Header */}
+      <div className="proj-card-header">
+        <div className="proj-card-title">{project.title}</div>
+        <div className="proj-card-actions" onClick={(e) => e.stopPropagation()}>
+          <button className="ptc-btn" onClick={() => onEdit(project)} title="تعديل">✏</button>
+          <button className="ptc-btn del" onClick={handleDelete} disabled={deleting} title="حذف">
+            {deleting ? '...' : '🗑'}
+          </button>
+        </div>
+      </div>
+
+      {/* Brand */}
+      {brand && (
+        <div style={{ display: 'flex', alignItems: 'center', gap: 5, marginBottom: 8 }}>
+          <span className="brand-dot" style={{ background: brandColor }} />
+          <span style={{ fontSize: 11, color: 'var(--txt2)' }}>{brand.name}</span>
+        </div>
+      )}
+
+      {/* Description */}
+      {project.description && (
+        <div style={{ fontSize: 11, color: 'var(--txt2)', marginBottom: 8, lineHeight: 1.5 }}>
+          {project.description.slice(0, 80)}{project.description.length > 80 ? '...' : ''}
+        </div>
+      )}
+
+      {/* Progress */}
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', fontSize: 10, color: 'var(--txt2)', marginBottom: 4 }}>
+        <span>{doneCount}/{taskCount} مهمة</span>
+        <span>{prog}%</span>
+      </div>
+      <div className="progress-bar" style={{ marginBottom: 8 }}>
+        <div className="progress-fill" style={{ width: `${prog}%`, background: brandColor }} />
+      </div>
+
+      {/* Days remaining */}
+      {project.targetDate && (
+        <div style={{ fontSize: 9, color: isOverdue ? 'var(--danger)' : 'var(--txt3)', marginBottom: 4 }}>
+          {daysLeftLabel(project.targetDate)}
+        </div>
+      )}
+
+      {/* Status badge */}
+      <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginTop: 6 }}>
+        <span className={`badge ${project.status === 'active' ? 'badge-success' : project.status === 'planning' ? 'badge-accent' : project.status === 'paused' ? 'badge-warning' : 'badge-muted'}`}>
+          {STATUS_LABELS[project.status] ?? project.status}
+        </span>
+        <span className={`badge ${project.priority === 'critical' ? 'badge-danger' : project.priority === 'high' ? 'badge-warning' : 'badge-muted'}`}>
+          {PRI_LABELS[project.priority] ?? project.priority}
+        </span>
       </div>
     </div>
   );
 }
 
-// ─── Project Card ─────────────────────────────────────────────────────────────
-interface CardProps {
-  project: ProjectRow;
-  brand?: BrandRow;
-  onEdit: (p: ProjectRow) => void;
-  onDelete: (id: string) => void;
-  deleting: boolean;
-}
-function ProjectCard({ project: p, brand, onEdit, onDelete, deleting }: CardProps) {
-  const brandColor = brand?.color ?? '#C9963B';
+// ─── AddProjectModal ──────────────────────────────────────────────────────────
+function AddProjectModal({
+  brands, edit, onClose, onSave,
+}: {
+  brands: BrandRow[];
+  edit: ProjectRow | null;
+  onClose: () => void;
+  onSave: (p: ProjectRow, isEdit: boolean) => void;
+}) {
+  const [title, setTitle]       = useState(edit?.title ?? '');
+  const [desc, setDesc]         = useState(edit?.description ?? '');
+  const [brandId, setBrandId]   = useState(edit?.brandId ?? '');
+  const [status, setStatus]     = useState<string>(edit?.status ?? 'planning');
+  const [priority, setPriority] = useState<string>(edit?.priority ?? 'medium');
+  const [startDate, setStartDate] = useState(edit?.startDate ?? '');
+  const [targetDate, setTargetDate] = useState(edit?.targetDate ?? '');
+  const [saving, setSaving]     = useState(false);
+  const [error, setError]       = useState('');
+
+  async function handleSave() {
+    if (!title.trim()) { setError('أدخل اسم المشروع'); return; }
+    setSaving(true);
+    if (edit) {
+      const res = await updateProject({
+        id: edit.id, brandId: brandId || null, title, description: desc,
+        status: status as ProjectRow['status'], priority: priority as ProjectRow['priority'],
+        startDate: startDate || null, targetDate: targetDate || null,
+        tags: edit.tags, progress: edit.progress,
+      });
+      if (res.project) { onSave(res.project, true); onClose(); }
+      else setError(res.error ?? 'خطأ في الحفظ');
+    } else {
+      const res = await addProject({
+        brandId: brandId || null, title, description: desc,
+        status, priority, startDate: startDate || null,
+        targetDate: targetDate || null, tags: [],
+      });
+      if (res.project) { onSave(res.project, false); onClose(); }
+      else setError(res.error ?? 'خطأ في الإضافة');
+    }
+    setSaving(false);
+  }
+
   return (
-    <div className="rounded-xl p-4 relative" style={{ background: 'rgba(255,255,255,0.03)', border: `1px solid ${brandColor}22` }}>
-      <div className="absolute top-0 left-0 right-0 h-0.5 rounded-t-xl" style={{ background: brandColor }} />
-      {/* Header */}
-      <div className="flex items-start justify-between gap-2 mt-1">
-        <div className="flex-1 min-w-0">
-          <h3 className="font-semibold text-white text-sm leading-snug">{p.title}</h3>
-          {brand && (
-            <div className="flex items-center gap-1 mt-1">
-              <span className="text-xs">{brand.icon}</span>
-              <span className="text-xs" style={{ color: brandColor }}>{brand.name}</span>
-            </div>
-          )}
+    <div className="modal-overlay" onClick={onClose}>
+      <div className="modal-box" onClick={(e) => e.stopPropagation()}>
+        <div className="modal-header">
+          <h2 className="modal-title">{edit ? 'تعديل المشروع' : '+ مشروع جديد'}</h2>
+          <button className="modal-close" onClick={onClose}>✕</button>
         </div>
-        <span className="text-xs px-2 py-0.5 rounded-full flex-shrink-0 font-medium"
-          style={{ background: `${PRIORITY_COLORS[p.priority]}22`, color: PRIORITY_COLORS[p.priority] }}>
-          {PRIORITY_LABELS[p.priority]}
-        </span>
-      </div>
-      {/* Progress bar */}
-      {p.progress > 0 && (
-        <div className="mt-3">
-          <div className="flex justify-between text-xs text-gray-500 mb-1">
-            <span>التقدم</span><span>{p.progress}%</span>
+        {error && <div style={{ color: 'var(--danger)', fontSize: 12, marginBottom: 8 }}>{error}</div>}
+        <label className="field-label">اسم المشروع *</label>
+        <input className="field-input" value={title} onChange={(e) => setTitle(e.target.value)} placeholder="اسم المشروع..." />
+        <label className="field-label">الوصف</label>
+        <textarea className="field-input" value={desc} onChange={(e) => setDesc(e.target.value)} placeholder="وصف المشروع..." rows={3} style={{ resize: 'vertical' }} />
+        <label className="field-label">البراند</label>
+        <select className="field-input" value={brandId} onChange={(e) => setBrandId(e.target.value)}>
+          <option value="">— بدون براند</option>
+          {brands.map((b) => <option key={b.id} value={b.id}>{b.name}</option>)}
+        </select>
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
+          <div>
+            <label className="field-label">الحالة</label>
+            <select className="field-input" value={status} onChange={(e) => setStatus(e.target.value)}>
+              <option value="planning">تخطيط</option>
+              <option value="active">نشط</option>
+              <option value="paused">موقوف</option>
+              <option value="done">مكتمل</option>
+            </select>
           </div>
-          <div className="h-1.5 rounded-full" style={{ background: 'rgba(255,255,255,0.1)' }}>
-            <div className="h-full rounded-full transition-all" style={{ width: `${p.progress}%`, background: brandColor }} />
+          <div>
+            <label className="field-label">الأولوية</label>
+            <select className="field-input" value={priority} onChange={(e) => setPriority(e.target.value)}>
+              <option value="critical">حرج</option>
+              <option value="high">عالي</option>
+              <option value="medium">متوسط</option>
+              <option value="low">منخفض</option>
+            </select>
           </div>
         </div>
-      )}
-      {/* Tags */}
-      {p.tags.length > 0 && (
-        <div className="flex flex-wrap gap-1 mt-2">
-          {p.tags.map(t => (
-            <span key={t} className="text-xs px-1.5 py-0.5 rounded" style={{ background: 'rgba(255,255,255,0.06)', color: '#9ca3af' }}>
-              {t}
-            </span>
-          ))}
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
+          <div>
+            <label className="field-label">تاريخ البداية</label>
+            <input type="date" className="field-input" value={startDate} onChange={(e) => setStartDate(e.target.value)} />
+          </div>
+          <div>
+            <label className="field-label">تاريخ الهدف</label>
+            <input type="date" className="field-input" value={targetDate} onChange={(e) => setTargetDate(e.target.value)} />
+          </div>
         </div>
-      )}
-      {/* Dates */}
-      {(p.startDate || p.targetDate) && (
-        <div className="flex gap-3 mt-2 text-xs text-gray-500">
-          {p.startDate && <span>📅 {p.startDate}</span>}
-          {p.targetDate && <span>🎯 {p.targetDate}</span>}
+        <div className="modal-actions">
+          <button className="btn-cancel" onClick={onClose}>إلغاء</button>
+          <button className="btn-save" onClick={handleSave} disabled={saving}>
+            {saving ? 'جارٍ الحفظ...' : (edit ? 'حفظ التعديلات' : '+ أضف المشروع')}
+          </button>
         </div>
-      )}
-      {/* Actions */}
-      <div className="flex gap-2 mt-3 pt-3 border-t" style={{ borderColor: 'rgba(255,255,255,0.06)' }}>
-        <button onClick={() => onEdit(p)} className="flex-1 py-1.5 rounded-lg text-xs text-blue-400 hover:text-blue-300" style={{ background: 'rgba(59,130,246,0.1)' }}>✏ تعديل</button>
-        <button onClick={() => onDelete(p.id)} disabled={deleting} className="flex-1 py-1.5 rounded-lg text-xs text-red-400 hover:text-red-300" style={{ background: 'rgba(239,68,68,0.1)' }}>
-          {deleting ? '...' : '🗑 حذف'}
-        </button>
       </div>
     </div>
   );
@@ -246,101 +235,209 @@ function ProjectCard({ project: p, brand, onEdit, onDelete, deleting }: CardProp
 interface Props {
   initialProjects: ProjectRow[];
   brands: BrandRow[];
+  taskStats?: Record<string, { total: number; done: number }>;
 }
 
-export default function ProjectsClient({ initialProjects, brands }: Props) {
-  const [projects,  setProjects]  = useState<ProjectRow[]>(initialProjects);
-  const [showForm,  setShowForm]  = useState(false);
-  const [editProj,  setEditProj]  = useState<ProjectRow | null>(null);
-  const [filter,    setFilter]    = useState<string>('all');
-  const [deleting,  setDeleting]  = useState<string | null>(null);
+export default function ProjectsClient({ initialProjects, brands, taskStats = {} }: Props) {
+  const router = useRouter();
+  const [projects, setProjects]   = useState<ProjectRow[]>(initialProjects);
+  const [view, setView]           = useState<'kanban' | 'list'>('kanban');
+  const [filterBrand, setFilterBrand] = useState<string>('all');
+  const [showForm, setShowForm]   = useState(false);
+  const [editProj, setEditProj]   = useState<ProjectRow | null>(null);
+  const [, startTransition]       = useTransition();
 
-  const brandMap = Object.fromEntries(brands.map(b => [b.id, b]));
+  const brandMap = Object.fromEntries(brands.map((b) => [b.id, b]));
+
+  const filtered = filterBrand === 'all'
+    ? projects
+    : projects.filter((p) => p.brandId === filterBrand);
 
   function handleSave(p: ProjectRow, isEdit: boolean) {
-    setProjects(prev => isEdit ? prev.map(x => x.id === p.id ? p : x) : [...prev, p]);
+    setProjects((prev) => isEdit ? prev.map((x) => x.id === p.id ? p : x) : [...prev, p]);
   }
 
-  async function handleDelete(id: string) {
-    if (!confirm('حذف هذا المشروع؟')) return;
-    setDeleting(id);
-    await deleteProject(id);
-    setProjects(prev => prev.filter(x => x.id !== id));
-    setDeleting(null);
+  function handleDelete(id: string) {
+    setProjects((prev) => prev.filter((x) => x.id !== id));
+    startTransition(async () => { await deleteProject(id); });
   }
 
-  const filtered = filter === 'all' ? projects : projects.filter(p => p.status === filter);
-
-  // Group by status for kanban-like view
-  const statuses: Array<ProjectRow['status']> = ['active', 'planning', 'paused', 'done', 'archived'];
-
-  const counts = Object.fromEntries(statuses.map(s => [s, projects.filter(p => p.status === s).length]));
+  function handleNavigate(id: string) {
+    router.push(`/project-detail/${id}`);
+  }
 
   return (
-    <div className="min-h-screen p-6" style={{ background: '#05070d', color: '#e2e8f0' }}>
-      {/* Header */}
-      <div className="flex items-center justify-between mb-6">
-        <div>
-          <h1 className="text-2xl font-bold" style={{ color: '#C9963B' }}>المشاريع</h1>
-          <p className="text-sm text-gray-400 mt-1">{projects.length} مشروع مسجّل</p>
+    <div className="scr on" style={{ padding: '20px 24px' }}>
+      {/* Topbar */}
+      <div style={{ marginBottom: 16 }}>
+        <div className="filters">
+          <select
+            className="filter-select"
+            value={filterBrand}
+            onChange={(e) => setFilterBrand(e.target.value)}
+          >
+            <option value="all">كل البراندات</option>
+            {brands.map((b) => (
+              <option key={b.id} value={b.id}>{b.name}</option>
+            ))}
+          </select>
+          <div style={{ marginRight: 'auto', display: 'flex', gap: 6 }}>
+            <button
+              className={`btn btn-sm${view === 'kanban' ? '' : ' btn-plain'}`}
+              onClick={() => setView('kanban')}
+            >كانبان</button>
+            <button
+              className={`btn btn-sm${view === 'list' ? '' : ' btn-plain'}`}
+              onClick={() => setView('list')}
+            >قائمة</button>
+            <button
+              className="btn btn-sm"
+              onClick={() => { setEditProj(null); setShowForm(true); }}
+              style={{ marginRight: 8 }}
+            >+ مشروع جديد</button>
+          </div>
         </div>
-        <button
-          onClick={() => { setEditProj(null); setShowForm(true); }}
-          className="px-4 py-2 rounded-lg text-sm font-semibold"
-          style={{ background: '#C9963B', color: '#05070d' }}
-        >
-          + مشروع جديد
-        </button>
       </div>
 
-      {/* Filter tabs */}
-      <div className="flex gap-2 mb-6 flex-wrap">
-        {[
-          { value: 'all',      label: `الكل (${projects.length})` },
-          { value: 'active',   label: `نشط (${counts.active ?? 0})` },
-          { value: 'planning', label: `تخطيط (${counts.planning ?? 0})` },
-          { value: 'paused',   label: `متوقف (${counts.paused ?? 0})` },
-          { value: 'done',     label: `مكتمل (${counts.done ?? 0})` },
-          { value: 'archived', label: `مؤرشف (${counts.archived ?? 0})` },
-        ].map(f => (
-          <button key={f.value} onClick={() => setFilter(f.value)}
-            className="px-3 py-1.5 rounded-full text-xs font-medium transition-all"
-            style={{
-              background: filter === f.value ? '#C9963B' : 'rgba(255,255,255,0.05)',
-              color: filter === f.value ? '#05070d' : '#9ca3af',
-              border: `1px solid ${filter === f.value ? '#C9963B' : 'rgba(255,255,255,0.1)'}`,
-            }}>
-            {f.label}
-          </button>
-        ))}
-      </div>
-
-      {/* Projects Grid */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-        {filtered.map(p => (
-          <ProjectCard
-            key={p.id}
-            project={p}
-            brand={p.brandId ? brandMap[p.brandId] : undefined}
-            onEdit={proj => { setEditProj(proj); setShowForm(true); }}
-            onDelete={handleDelete}
-            deleting={deleting === p.id}
-          />
-        ))}
-      </div>
-
-      {filtered.length === 0 && (
-        <div className="text-center py-16 text-gray-500">
-          <div className="text-4xl mb-3">📋</div>
-          <p>لا توجد مشاريع</p>
+      {/* Kanban View */}
+      {view === 'kanban' && (
+        <div className="kanban">
+          {KANBAN_COLS.map((col) => {
+            const colProjs = filtered.filter((p) => p.status === col.id);
+            return (
+              <div key={col.id} className="kanban-col">
+                <div className="kanban-col-header">
+                  <h3 style={{ color: col.color }}>{col.label}</h3>
+                  <span className="badge badge-muted">{colProjs.length}</span>
+                </div>
+                {colProjs.length === 0 && (
+                  <div style={{ textAlign: 'center', padding: '20px', color: 'var(--txt3)', fontSize: 11 }}>
+                    لا توجد مشاريع
+                  </div>
+                )}
+                {colProjs.map((p) => {
+                  const stats = taskStats[p.id] ?? { total: 0, done: 0 };
+                  return (
+                    <ProjectCard
+                      key={p.id}
+                      project={p}
+                      brand={p.brandId ? brandMap[p.brandId] : undefined}
+                      taskCount={stats.total}
+                      doneCount={stats.done}
+                      onEdit={(proj) => { setEditProj(proj); setShowForm(true); }}
+                      onDelete={handleDelete}
+                      onNavigate={handleNavigate}
+                    />
+                  );
+                })}
+              </div>
+            );
+          })}
         </div>
       )}
 
-      {/* Form Modal */}
+      {/* List View */}
+      {view === 'list' && (
+        <table className="tasks-table" style={{ width: '100%' }}>
+          <thead>
+            <tr>
+              <th>المشروع</th>
+              <th>البراند</th>
+              <th>الحالة</th>
+              <th>الأولوية</th>
+              <th>التقدم</th>
+              <th>الموعد</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody>
+            {filtered.length === 0 && (
+              <tr>
+                <td colSpan={7} style={{ textAlign: 'center', padding: 30, color: 'var(--txt3)' }}>
+                  لا توجد مشاريع
+                </td>
+              </tr>
+            )}
+            {filtered.map((p) => {
+              const brand = p.brandId ? brandMap[p.brandId] : undefined;
+              const stats = taskStats[p.id] ?? { total: 0, done: 0 };
+              const prog = stats.total > 0
+                ? Math.round((stats.done / stats.total) * 100)
+                : (p.progress ?? 0);
+              const days = daysLeft(p.targetDate);
+              const isOverdue = days !== null && days < 0;
+              return (
+                <tr
+                  key={p.id}
+                  style={{ cursor: 'pointer' }}
+                  onClick={() => handleNavigate(p.id)}
+                >
+                  <td>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                      {brand && (
+                        <div style={{ width: 3, height: 20, background: brand.color, borderRadius: 2, flexShrink: 0 }} />
+                      )}
+                      <span style={{ fontSize: 12, fontWeight: 600 }}>{p.title}</span>
+                    </div>
+                  </td>
+                  <td>
+                    {brand ? (
+                      <span className="brand-tag" style={{ background: `${brand.color}22`, color: brand.color }}>
+                        {brand.name}
+                      </span>
+                    ) : '—'}
+                  </td>
+                  <td>
+                    <span className={`badge ${p.status === 'active' ? 'badge-success' : p.status === 'planning' ? 'badge-accent' : p.status === 'paused' ? 'badge-warning' : 'badge-muted'}`}>
+                      {STATUS_LABELS[p.status] ?? p.status}
+                    </span>
+                  </td>
+                  <td>
+                    <span className={`badge ${p.priority === 'critical' ? 'badge-danger' : p.priority === 'high' ? 'badge-warning' : 'badge-muted'}`}>
+                      {PRI_LABELS[p.priority] ?? p.priority}
+                    </span>
+                  </td>
+                  <td style={{ minWidth: 100 }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                      <div className="progress-bar" style={{ flex: 1 }}>
+                        <div className="progress-fill" style={{ width: `${prog}%`, background: brand?.color ?? 'var(--accent)' }} />
+                      </div>
+                      <span style={{ fontSize: 10, color: 'var(--txt2)' }}>{prog}%</span>
+                    </div>
+                  </td>
+                  <td style={{ fontSize: 10, color: isOverdue ? 'var(--danger)' : 'var(--txt2)' }}>
+                    {daysLeftLabel(p.targetDate)}
+                  </td>
+                  <td onClick={(e) => e.stopPropagation()}>
+                    <button
+                      className="btn btn-sm btn-plain"
+                      style={{ fontSize: 10 }}
+                      onClick={() => { setEditProj(p); setShowForm(true); }}
+                    >✏</button>
+                  </td>
+                </tr>
+              );
+            })}
+          </tbody>
+        </table>
+      )}
+
+      {filtered.length === 0 && view === 'kanban' && (
+        <div className="empty-state" style={{ marginTop: 40 }}>
+          <div className="icon">📋</div>
+          <h3>لا توجد مشاريع</h3>
+          <p>ابدأ بإنشاء مشروعك الأول</p>
+          <button className="btn" onClick={() => { setEditProj(null); setShowForm(true); }}>
+            + مشروع جديد
+          </button>
+        </div>
+      )}
+
+      {/* Modal */}
       {showForm && (
-        <ProjectForm
-          edit={editProj}
+        <AddProjectModal
           brands={brands}
+          edit={editProj}
           onClose={() => { setShowForm(false); setEditProj(null); }}
           onSave={handleSave}
         />

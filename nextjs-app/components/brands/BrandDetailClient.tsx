@@ -397,9 +397,11 @@ export default function BrandDetailClient({ brand: initialBrand, initialTasks, i
     await deleteTask(id);
   }
   function handleAdd(task: Task) { setTasks((prev) => [...prev, task]); }
-  function handleUpdate(updated: Task) {
+  function handleUpdate(patch: Partial<Task>) {
+    if (!panelTask) return;
+    const updated = { ...panelTask, ...patch };
     setTasks((prev) => prev.map((t) => t.id === updated.id ? updated : t));
-    if (panelTask?.id === updated.id) setPanelTask(updated);
+    setPanelTask(updated);
   }
 
   // ── Brand actions ──
@@ -476,7 +478,7 @@ export default function BrandDetailClient({ brand: initialBrand, initialTasks, i
         onClose={() => setPanelTask(null)}
         onUpdate={handleUpdate}
         onDelete={(id) => { setTasks((prev) => prev.filter((t) => t.id !== id)); setPanelTask(null); }}
-        onArchive={(id) => { setTasks((prev) => prev.filter((t) => t.id !== id)); setPanelTask(null); }}
+        onArchive={(task) => { setTasks((prev) => prev.filter((t) => t.id !== task.id)); setPanelTask(null); }}
       />
 
       {/* Add Task Modal */}

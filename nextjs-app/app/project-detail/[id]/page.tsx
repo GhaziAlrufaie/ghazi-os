@@ -1,21 +1,44 @@
-// Server Component — Tasks page
 export const dynamic = 'force-dynamic';
+// Server Component — Project Detail Page
+// يعرض تفاصيل مشروع واحد + Kanban مهامه
 import { createServerClient } from '@/lib/supabase';
-import TasksClient from '@/components/tasks/TasksClient';
+import { notFound } from 'next/navigation';
+import ProjectDetailClient from '@/components/project-detail/ProjectDetailClient';
 import type { Task, TaskStatus, TaskPriority } from '@/lib/tasks-actions';
 import type { BrandRow } from '@/lib/brands-types';
+import type { ProjectRow } from '@/lib/projects-types';
 
-async function fetchData() {
+
+
+async function getData(id: string) {
   const supabase = createServerClient();
-  const [tasksRes, brandsRes, projectsRes] = await Promise.all([
+  const [projRes, tasksRes, brandsRes] = await Promise.all([
+    supabase.from('projects').select('*').eq('id', id).single(),
     supabase
       .from('tasks')
       .select('id,title,description,status,priority,due_date,brand_id,project_id,sort_order')
-      .order('sort_order', { ascending: true })
-      .order('updated_at', { ascending: false }),
+      .eq('project_id', id)
+      .order('sort_order'),
     supabase.from('brands').select('id,name,name_en,color,icon,status,health_score,description,production_days,nav_order,main_tab_label').order('nav_order'),
-    supabase.from('projects').select('id,title,brand_id').order('title'),
   ]);
+
+  if (projRes.error || !projRes.data) return null;
+
+  const r = projRes.data;
+  const project: ProjectRow = {
+    id: r.id,
+    brandId: r.brand_id ?? null,
+    title: r.title,
+    description: r.description ?? '',
+    status: r.status,
+    priority: r.priority,
+    startDate: r.start_date ?? null,
+    targetDate: r.target_date ?? null,
+    progress: r.progress ?? 0,
+    tags: r.tags ?? [],
+    sortOrder: r.sort_order ?? 0,
+    updatedAt: r.updated_at ?? null,
+  };
 
   const tasks: Task[] = (tasksRes.data ?? []).map((row) => ({
     id: row.id,
@@ -43,16 +66,18 @@ async function fetchData() {
     navOrder: b.nav_order ?? 0,
     mainTabLabel: b.main_tab_label ?? null,
   }));
-  return {
-    tasks,
-    brands,
-    projects: projectsRes.data ?? [],
-  };
+
+  return { project, tasks, brands };
 }
 
-export default async function TasksPage() {
-  const { tasks, brands, projects } = await fetchData();
+export default async function ProjectDetailPage({ params }: { params: { id: string } }) {
+  const data = await getData(params.id);
+  if (!data) notFound();
   return (
-    <TasksClient initialTasks={tasks} brands={brands} projects={projects} />
+    <ProjectDetailClient
+      project={data.project}
+      initialTasks={data.tasks}
+      brands={data.brands}
+    />
   );
 }
