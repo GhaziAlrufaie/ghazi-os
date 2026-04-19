@@ -1,5 +1,6 @@
 'use client';
-// Design: Reminders page — simple list with inline edit + add + delete
+// RemindersClient — صفحة التذكيرات
+// Layout: .scr.on wrapper — نفس /brands و /calendar
 import { useState, useTransition, useRef } from 'react';
 import {
   addReminder,
@@ -12,9 +13,9 @@ interface Props { initialReminders: Reminder[] }
 
 export default function RemindersClient({ initialReminders }: Props) {
   const [reminders, setReminders] = useState<Reminder[]>(initialReminders);
-  const [newText, setNewText] = useState('');
+  const [newText, setNewText]     = useState('');
   const [editingId, setEditingId] = useState<string | null>(null);
-  const [editText, setEditText] = useState('');
+  const [editText, setEditText]   = useState('');
   const [, startTransition] = useTransition();
   const inputRef = useRef<HTMLInputElement>(null);
 
@@ -53,68 +54,146 @@ export default function RemindersClient({ initialReminders }: Props) {
     startTransition(async () => { await updateReminder(id, text); });
   }
 
+  const inputStyle: React.CSSProperties = {
+    flex: 1,
+    padding: '9px 14px',
+    border: '1px solid var(--brd)',
+    borderRadius: 8,
+    fontSize: 13,
+    color: 'var(--txt)',
+    background: 'var(--bg)',
+    outline: 'none',
+    fontFamily: 'inherit',
+  };
+
   return (
-    <div className="max-w-2xl mx-auto py-8 px-4">
-      <div className="flex items-center gap-3 mb-8">
-        <span className="text-2xl">💡</span>
-        <h1 className="text-xl font-bold text-white">تذكيراتي</h1>
-        <span className="text-xs text-gray-500 bg-white/5 px-2 py-0.5 rounded-full">{reminders.length}</span>
+    <div className="scr on">
+
+      {/* ── Page Header ── */}
+      <div style={{ marginBottom: 24 }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 4 }}>
+          <span style={{ fontSize: 20 }}>💡</span>
+          <h1 style={{ fontSize: 20, fontWeight: 800, color: 'var(--txt)', margin: 0 }}>تذكيراتي</h1>
+          <span style={{
+            fontSize: 11, padding: '2px 10px', borderRadius: 20,
+            background: 'var(--gold-dim)', color: 'var(--gold)', fontWeight: 700, border: '1px solid var(--gold-b)',
+          }}>
+            {reminders.length}
+          </span>
+        </div>
+        <p style={{ fontSize: 12, color: 'var(--txt3)', margin: 0 }}>ملاحظات وتذكيرات سريعة</p>
       </div>
 
-      {/* Add Row */}
-      <div className="flex gap-2 mb-6">
+      {/* ── Add Row ── */}
+      <div style={{
+        display: 'flex', gap: 8, marginBottom: 24,
+        background: 'var(--bg)', border: '1px solid var(--brd)',
+        borderRadius: 12, padding: '12px 16px',
+        boxShadow: '0 1px 4px rgba(0,0,0,0.04)',
+      }}>
         <input
           ref={inputRef}
           value={newText}
           onChange={(e) => setNewText(e.target.value)}
           onKeyDown={(e) => e.key === 'Enter' && handleAdd()}
-          placeholder="أضف تذكيراً جديداً..."
-          className="flex-1 bg-white/5 border border-white/10 rounded-lg px-4 py-2.5 text-sm text-white placeholder-gray-600 outline-none focus:border-purple-500/50 transition-colors"
+          placeholder="أضف تذكيراً جديداً... (Enter للإضافة)"
+          style={inputStyle}
         />
         <button
           onClick={handleAdd}
           disabled={!newText.trim()}
-          className="px-4 py-2.5 bg-purple-600 hover:bg-purple-500 disabled:opacity-40 text-white text-sm rounded-lg transition-colors font-medium"
+          className="btn"
+          style={{ opacity: !newText.trim() ? 0.5 : 1, flexShrink: 0 }}
         >
-          إضافة
+          + إضافة
         </button>
       </div>
 
-      {/* List */}
+      {/* ── List ── */}
       {reminders.length === 0 ? (
-        <div className="text-center py-16 text-gray-600">
-          <div className="text-4xl mb-3">💡</div>
-          <p className="text-sm">لا توجد تذكيرات حتى الآن</p>
+        <div style={{ textAlign: 'center', padding: '60px 0', color: 'var(--txt3)' }}>
+          <div style={{ fontSize: 40, marginBottom: 12 }}>💡</div>
+          <p style={{ fontSize: 13 }}>لا توجد تذكيرات حتى الآن</p>
+          <p style={{ fontSize: 11, marginTop: 4 }}>اكتب تذكيراً واضغط Enter</p>
         </div>
       ) : (
-        <div className="flex flex-col gap-2">
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 8, maxWidth: 720 }}>
           {reminders.map((r) => (
-            <div key={r.id}
-              className="flex items-center gap-3 bg-[#1a1a2e] border border-white/8 rounded-lg px-4 py-3 group hover:border-white/20 transition-all">
-              <span className="text-yellow-500 text-sm flex-shrink-0">💡</span>
+            <div
+              key={r.id}
+              style={{
+                display: 'flex', alignItems: 'center', gap: 12,
+                background: 'var(--bg)', border: '1px solid var(--brd)',
+                borderRadius: 10, padding: '12px 16px',
+                boxShadow: '0 1px 3px rgba(0,0,0,0.04)',
+                transition: 'border-color .15s',
+              }}
+              onMouseEnter={e => (e.currentTarget.style.borderColor = 'var(--gold-b)')}
+              onMouseLeave={e => (e.currentTarget.style.borderColor = 'var(--brd)')}
+            >
+              {/* Icon */}
+              <span style={{ fontSize: 16, flexShrink: 0, color: 'var(--gold)' }}>💡</span>
+
+              {/* Text / Edit */}
               {editingId === r.id ? (
                 <input
                   value={editText}
                   onChange={(e) => setEditText(e.target.value)}
                   onKeyDown={(e) => {
-                    if (e.key === 'Enter') handleSaveEdit(r.id);
+                    if (e.key === 'Enter')  handleSaveEdit(r.id);
                     if (e.key === 'Escape') setEditingId(null);
                   }}
                   onBlur={() => handleSaveEdit(r.id)}
                   autoFocus
-                  className="flex-1 bg-transparent text-sm text-white outline-none border-b border-purple-500/50"
+                  style={{
+                    flex: 1, background: 'transparent', border: 'none',
+                    borderBottom: '1px solid var(--gold)', fontSize: 13,
+                    color: 'var(--txt)', outline: 'none', fontFamily: 'inherit', padding: '2px 0',
+                  }}
                 />
               ) : (
                 <span
                   onClick={() => startEdit(r)}
-                  className="flex-1 text-sm text-gray-200 cursor-text hover:text-white transition-colors"
+                  style={{
+                    flex: 1, fontSize: 13, color: 'var(--txt)',
+                    cursor: 'text', lineHeight: 1.5,
+                  }}
                 >
                   {r.text}
                 </span>
               )}
-              <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                <button onClick={() => startEdit(r)} className="text-gray-500 hover:text-blue-400 text-xs px-1.5 py-1">✏</button>
-                <button onClick={() => handleDelete(r.id)} className="text-gray-500 hover:text-red-400 text-xs px-1.5 py-1">✕</button>
+
+              {/* Date */}
+              <span style={{ fontSize: 10, color: 'var(--txt3)', flexShrink: 0, whiteSpace: 'nowrap' }}>
+                {new Date(r.created_at).toLocaleDateString('ar-SA', { month: 'short', day: 'numeric' })}
+              </span>
+
+              {/* Actions */}
+              <div style={{ display: 'flex', gap: 4, flexShrink: 0 }}>
+                <button
+                  onClick={() => startEdit(r)}
+                  style={{
+                    background: 'none', border: '1px solid var(--brd)', borderRadius: 6,
+                    color: 'var(--txt3)', cursor: 'pointer', fontSize: 12,
+                    padding: '3px 8px', transition: 'all .15s', fontFamily: 'inherit',
+                  }}
+                  onMouseEnter={e => { (e.currentTarget as HTMLButtonElement).style.borderColor = 'var(--accent)'; (e.currentTarget as HTMLButtonElement).style.color = 'var(--accent)'; }}
+                  onMouseLeave={e => { (e.currentTarget as HTMLButtonElement).style.borderColor = 'var(--brd)'; (e.currentTarget as HTMLButtonElement).style.color = 'var(--txt3)'; }}
+                >
+                  ✏
+                </button>
+                <button
+                  onClick={() => handleDelete(r.id)}
+                  style={{
+                    background: 'none', border: '1px solid var(--brd)', borderRadius: 6,
+                    color: 'var(--txt3)', cursor: 'pointer', fontSize: 12,
+                    padding: '3px 8px', transition: 'all .15s', fontFamily: 'inherit',
+                  }}
+                  onMouseEnter={e => { (e.currentTarget as HTMLButtonElement).style.borderColor = 'var(--danger)'; (e.currentTarget as HTMLButtonElement).style.color = 'var(--danger)'; }}
+                  onMouseLeave={e => { (e.currentTarget as HTMLButtonElement).style.borderColor = 'var(--brd)'; (e.currentTarget as HTMLButtonElement).style.color = 'var(--txt3)'; }}
+                >
+                  ✕
+                </button>
               </div>
             </div>
           ))}
