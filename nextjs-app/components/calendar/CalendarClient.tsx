@@ -384,12 +384,12 @@ export default function CalendarClient({ initialEvents, initialTasks, brands }: 
     .sort((a, b) => a.day - b.day);
 
   return (
-    <div style={{ background: '#FFFFFF', minHeight: '100vh', direction: 'rtl' }}>
+    <div className="scr on" style={{ direction: 'rtl' }}>
 
       {/* Page Header */}
       <div
-        className="flex items-center justify-between px-6 py-4"
-        style={{ borderBottom: '1px solid #E5E5E5', background: '#FFFFFF', position: 'sticky', top: 0, zIndex: 30 }}
+        className="flex items-center justify-between"
+        style={{ borderBottom: '1px solid #E5E5E5', paddingBottom: 16, marginBottom: 20 }}
       >
         <div>
           <h1 className="text-xl font-bold" style={{ color: '#1D1D1F' }}>التقويم</h1>
@@ -407,7 +407,7 @@ export default function CalendarClient({ initialEvents, initialTasks, brands }: 
       </div>
 
       {/* Main Content */}
-      <div className="p-6">
+      <div>
         <div
           className="grid gap-6"
           style={{ gridTemplateColumns: 'minmax(0, 2fr) minmax(0, 1fr)', maxWidth: 1000 }}
