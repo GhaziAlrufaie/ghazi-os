@@ -1090,7 +1090,7 @@ export default function LeadershipClient({
   const dateLabel = `${DAY_NAMES[d.getDay()]} ${d.getDate()} ${MONTH_NAMES[d.getMonth()]} ${d.getFullYear()}`;
 
   return (
-    <div style={{ padding: '0 0 40px', direction: 'rtl' }}>
+    <div className="scr on" style={{ direction: 'rtl' }}>
       {/* Sticky Banner */}
       <StickyBanner todayFocus={todayFocus} todaySales={todaySales} onEdit={() => setEditorDate(todayISO())} />
 

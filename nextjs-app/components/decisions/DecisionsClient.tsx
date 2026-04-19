@@ -194,7 +194,7 @@ export default function DecisionsClient({ initialPending, initialDecided, brands
   }
 
   return (
-    <div className="page-container" dir="rtl">
+    <div className="scr on" dir="rtl">
       {/* رأس الصفحة */}
       <div className="page-header">
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>

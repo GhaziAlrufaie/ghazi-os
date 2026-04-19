@@ -112,7 +112,7 @@ export default function ArchiveClient({ initialArchive, archivedBrands, activeBr
   }
 
   return (
-    <div className="page-container" dir="rtl">
+    <div className="scr on" dir="rtl">
       {/* رأس الصفحة */}
       <div className="page-header">
         <h1 className="page-title">الأرشيف</h1>

@@ -64,7 +64,7 @@ export default function SalesClient({ orders }: Props) {
   };
 
   return (
-    <div style={{ padding: '20px', maxWidth: '900px', margin: '0 auto' }}>
+    <div className="scr on">
       {/* Header */}
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '20px' }}>
         <h2 style={{ fontSize: '20px', fontWeight: 800, margin: 0 }}>🛍️ المبيعات — سلة</h2>
