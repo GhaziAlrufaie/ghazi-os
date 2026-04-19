@@ -1,13 +1,8 @@
 'use client';
-import nextDynamic from 'next/dynamic';
 import { ToastProvider } from '@/components/Toast';
 import { MonthNavProvider } from '@/components/MonthNav';
 import { GlobalProviders } from '@/components/GlobalProviders';
-
-const LayoutShell = nextDynamic(() => import('@/components/LayoutShell'), {
-  ssr: false,
-  loading: () => <></>,
-});
+import LayoutShell from '@/components/LayoutShell';
 
 interface LayoutShellWrapperProps {
   children: React.ReactNode;
