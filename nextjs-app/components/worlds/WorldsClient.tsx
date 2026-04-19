@@ -352,21 +352,26 @@ function WealthTab() {
 export default function WorldsClient() {
   const [activeTab, setActiveTab] = useState<Tab>('zen');
   return (
-    <div className="h-full flex flex-col">
+    <div className="scr on">
       {/* Tabs */}
-      <div className="flex gap-1 mb-6 bg-white/3 rounded-xl p-1 w-fit">
+      <div style={{ display: 'flex', gap: 4, marginBottom: 24, background: 'var(--bg2)', borderRadius: 12, padding: 4, width: 'fit-content', border: '1px solid var(--brd)' }}>
         {TABS.map((t) => (
           <button key={t.id} onClick={() => setActiveTab(t.id)}
-            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm transition-all ${
-              activeTab === t.id ? 'bg-white/10 text-white font-medium' : 'text-gray-500 hover:text-gray-300'
-            }`}>
+            style={{
+              display: 'flex', alignItems: 'center', gap: 6, padding: '6px 14px',
+              borderRadius: 8, fontSize: 13, fontFamily: 'inherit', cursor: 'pointer',
+              border: 'none', transition: 'all .15s',
+              background: activeTab === t.id ? 'var(--gold-dim)' : 'transparent',
+              color: activeTab === t.id ? 'var(--gold)' : 'var(--txt3)',
+              fontWeight: activeTab === t.id ? 700 : 400,
+            }}>
             <span>{t.emoji}</span>
             <span>{t.label}</span>
           </button>
         ))}
       </div>
       {/* Content */}
-      <div className="flex-1 overflow-y-auto">
+      <div>
         {activeTab === 'zen'    && <ZenTab />}
         {activeTab === 'health' && <HealthTab />}
         {activeTab === 'family' && <FamilyTab />}
