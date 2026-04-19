@@ -36,14 +36,10 @@ const PAGE_TITLES: Record<string, string> = {
 export default function LayoutShell({ children, sidebar }: LayoutShellProps) {
   const pathname = usePathname();
 
-  // تحقق سريع من الـ cookie لتجنب flash بدون Sidebar
-  // iron-session يضع الـ cookie بـ httpOnly=true لذا لا يمكن قراءتها من JS
-  // نستخدم localStorage كـ cache للحالة
-  const [isLoggedIn, setIsLoggedIn] = useState<boolean>(() => {
-    if (typeof window === 'undefined') return false;
-    // تحقق من localStorage cache أولاً لتجنب flash
-    return localStorage.getItem('ghazi_auth') === '1';
-  });
+  // الحالة الأولية: نفترض أن المستخدم مسجل دخول (optimistic)
+  // إذا لم يكن مسجلاً، سيُعاد توجيهه من الـ middleware/server
+  // هذا يمنع flash بدون Sidebar
+  const [isLoggedIn, setIsLoggedIn] = useState<boolean>(true);
   const [authChecked, setAuthChecked] = useState(false);
 
   useEffect(() => {
@@ -78,15 +74,6 @@ export default function LayoutShell({ children, sidebar }: LayoutShellProps) {
     return 'Ghazi OS';
   })();
 
-  // إذا لم يتم التحقق بعد ولا يوجد cache → loading skeleton
-  if (!isLoggedIn && !authChecked) {
-    return (
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100vh', background: 'var(--bg)' }}>
-        <div style={{ width: 32, height: 32, border: '3px solid var(--brd)', borderTopColor: 'var(--gold)', borderRadius: '50%', animation: 'spin 0.8s linear infinite' }} />
-      </div>
-    );
-  }
-
   return (
     <>
       {/* Orbs */}
@@ -108,6 +95,7 @@ export default function LayoutShell({ children, sidebar }: LayoutShellProps) {
           </div>
         </>
       ) : (
+        // إذا تأكد أنه غير مسجل دخول → عرض المحتوى فقط (صفحة login)
         <>{children}</>
       )}
     </>
