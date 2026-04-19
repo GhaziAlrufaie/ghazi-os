@@ -27,27 +27,45 @@ const PAGE_TITLES: Record<string, string> = {
   '/worlds': 'عوالمي',
   '/reminders': 'التذكيرات',
   '/decisions': 'القرارات',
-  '/employees': 'الفريق',
-  '/inbox': 'صندوق الوارد',
-  '/events': 'الفعاليات',
-  '/reports': 'التقارير',
+  '/calendar': 'التقويم',
+  '/performance': 'الأداء',
+  '/archive': 'الأرشيف',
   '/settings': 'الإعدادات',
 };
 
 export default function LayoutShell({ children, sidebar }: LayoutShellProps) {
-  const [isLoggedIn, setIsLoggedIn] = useState<boolean | null>(null);
   const pathname = usePathname();
+
+  // تحقق سريع من الـ cookie لتجنب flash بدون Sidebar
+  // iron-session يضع الـ cookie بـ httpOnly=true لذا لا يمكن قراءتها من JS
+  // نستخدم localStorage كـ cache للحالة
+  const [isLoggedIn, setIsLoggedIn] = useState<boolean>(() => {
+    if (typeof window === 'undefined') return false;
+    // تحقق من localStorage cache أولاً لتجنب flash
+    return localStorage.getItem('ghazi_auth') === '1';
+  });
+  const [authChecked, setAuthChecked] = useState(false);
 
   useEffect(() => {
     fetch('/api/auth/check')
       .then(r => r.json())
-      .then(d => setIsLoggedIn(d.isLoggedIn === true))
-      .catch(() => setIsLoggedIn(false));
+      .then(d => {
+        const loggedIn = d.isLoggedIn === true;
+        setIsLoggedIn(loggedIn);
+        setAuthChecked(true);
+        // حفظ الحالة في localStorage كـ cache
+        if (loggedIn) {
+          localStorage.setItem('ghazi_auth', '1');
+        } else {
+          localStorage.removeItem('ghazi_auth');
+        }
+      })
+      .catch(() => {
+        setIsLoggedIn(false);
+        setAuthChecked(true);
+        localStorage.removeItem('ghazi_auth');
+      });
   }, []);
-
-  if (isLoggedIn === null) {
-    return <>{children}</>;
-  }
 
   // تحديد عنوان الصفحة — يبحث عن أقرب مطابقة
   const currentPath = pathname ?? '/';
@@ -59,6 +77,15 @@ export default function LayoutShell({ children, sidebar }: LayoutShellProps) {
     }
     return 'Ghazi OS';
   })();
+
+  // إذا لم يتم التحقق بعد ولا يوجد cache → loading skeleton
+  if (!isLoggedIn && !authChecked) {
+    return (
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100vh', background: 'var(--bg)' }}>
+        <div style={{ width: 32, height: 32, border: '3px solid var(--brd)', borderTopColor: 'var(--gold)', borderRadius: '50%', animation: 'spin 0.8s linear infinite' }} />
+      </div>
+    );
+  }
 
   return (
     <>
