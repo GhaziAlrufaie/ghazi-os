@@ -2,10 +2,11 @@
 /*
  * Ghazi OS — Topbar
  * مطابق للأصل: .topbar, .search-wrap, .search-input, .search-dropdown
- * يحتوي: عنوان الصفحة + Global Search + أزرار إجراءات
+ * يحتوي: عنوان الصفحة + Global Search (Ctrl+K) + Quick Add (Ctrl+N) + أزرار إجراءات
  */
 import { useState, useRef, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
+import { useGlobal } from '@/components/GlobalProviders';
 
 interface TopbarProps {
   title: string;
@@ -23,9 +24,12 @@ interface SearchResult {
 
 export default function Topbar({ title, actions }: TopbarProps) {
   const router = useRouter();
+  const { openQuickAdd } = useGlobal();
   const [query, setQuery] = useState('');
   const [results, setResults] = useState<SearchResult[]>([]);
   const [showDropdown, setShowDropdown] = useState(false);
+  const [isSearching, setIsSearching] = useState(false);
+  const [noResults, setNoResults] = useState(false);
   const searchRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
@@ -40,28 +44,33 @@ export default function Topbar({ title, actions }: TopbarProps) {
     return () => document.removeEventListener('mousedown', handleClick);
   }, []);
 
-  // البحث
+  // البحث مع debounce 300ms
   useEffect(() => {
     if (!query.trim()) {
       setResults([]);
       setShowDropdown(false);
+      setNoResults(false);
+      setIsSearching(false);
       return;
     }
-
-    // بحث في Supabase (مؤقتاً نعرض نتائج فارغة)
+    setIsSearching(true);
     const timer = setTimeout(async () => {
       try {
         const res = await fetch(`/api/search?q=${encodeURIComponent(query)}`);
         if (res.ok) {
           const data = await res.json();
-          setResults(data.results || []);
+          const r = data.results || [];
+          setResults(r);
+          setNoResults(r.length === 0);
           setShowDropdown(true);
         }
       } catch {
         setResults([]);
+        setNoResults(true);
+      } finally {
+        setIsSearching(false);
       }
     }, 300);
-
     return () => clearTimeout(timer);
   }, [query]);
 
@@ -85,27 +94,32 @@ export default function Topbar({ title, actions }: TopbarProps) {
     decision: 'القرارات',
   };
 
+  const escapeRegex = (s: string) => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+
   return (
     <div className="topbar">
       <h2>{title}</h2>
 
       <div className="topbar-actions">
         {/* Global Search */}
-        <div className="search-wrap" ref={searchRef}>
-          <span className="search-icon">🔍</span>
+        <div className="search-wrap" ref={searchRef} style={{ position: 'relative' }}>
+          <span className="search-icon">{isSearching ? '⏳' : '🔍'}</span>
           <input
             ref={inputRef}
             type="text"
             className="search-input"
-            placeholder="بحث سريع..."
+            placeholder="بحث سريع... (Ctrl+K)"
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             onFocus={() => { if (results.length > 0) setShowDropdown(true); }}
+            onKeyDown={(e) => { if (e.key === 'Escape') { setQuery(''); setShowDropdown(false); } }}
           />
 
           {/* Dropdown */}
-          <div className={`search-dropdown${showDropdown && results.length > 0 ? ' on' : ''}`}>
-            {Object.keys(grouped).length === 0 && query.trim() ? (
+          <div className={`search-dropdown${showDropdown ? ' on' : ''}`}>
+            {isSearching ? (
+              <div className="search-empty">جاري البحث...</div>
+            ) : noResults ? (
               <div className="search-empty">لا توجد نتائج لـ &quot;{query}&quot;</div>
             ) : (
               Object.entries(grouped).map(([type, items]) => (
@@ -123,7 +137,7 @@ export default function Topbar({ title, actions }: TopbarProps) {
                           className="search-item-title"
                           dangerouslySetInnerHTML={{
                             __html: item.title.replace(
-                              new RegExp(query, 'gi'),
+                              new RegExp(escapeRegex(query), 'gi'),
                               (m) => `<mark class="search-highlight">${m}</mark>`
                             ),
                           }}
@@ -140,6 +154,28 @@ export default function Topbar({ title, actions }: TopbarProps) {
             )}
           </div>
         </div>
+
+        {/* Quick Add Button */}
+        <button
+          onClick={openQuickAdd}
+          title="إضافة سريعة (Ctrl+N)"
+          style={{
+            width: 32, height: 32, borderRadius: '50%', border: '1px solid var(--brd)',
+            background: 'var(--bg2)', color: 'var(--txt2)', fontSize: 18, cursor: 'pointer',
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            transition: 'border-color .15s, color .15s', flexShrink: 0,
+          }}
+          onMouseEnter={(e) => {
+            (e.currentTarget as HTMLElement).style.borderColor = 'var(--gold-b)';
+            (e.currentTarget as HTMLElement).style.color = 'var(--gold)';
+          }}
+          onMouseLeave={(e) => {
+            (e.currentTarget as HTMLElement).style.borderColor = 'var(--brd)';
+            (e.currentTarget as HTMLElement).style.color = 'var(--txt2)';
+          }}
+        >
+          +
+        </button>
 
         {/* Custom Actions */}
         {actions}

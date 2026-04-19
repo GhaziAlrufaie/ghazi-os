@@ -2,6 +2,7 @@
 import nextDynamic from 'next/dynamic';
 import { ToastProvider } from '@/components/Toast';
 import { MonthNavProvider } from '@/components/MonthNav';
+import { GlobalProviders } from '@/components/GlobalProviders';
 
 const LayoutShell = nextDynamic(() => import('@/components/LayoutShell'), {
   ssr: false,
@@ -17,7 +18,9 @@ export default function LayoutShellWrapper({ children, sidebar }: LayoutShellWra
   return (
     <ToastProvider>
       <MonthNavProvider>
-        <LayoutShell sidebar={sidebar}>{children}</LayoutShell>
+        <GlobalProviders>
+          <LayoutShell sidebar={sidebar}>{children}</LayoutShell>
+        </GlobalProviders>
       </MonthNavProvider>
     </ToastProvider>
   );
