@@ -4,11 +4,12 @@
 // Color stripe يمين بلون البراند + Progress bar + Days remaining
 import React, { useState, useTransition } from 'react';
 import { useRouter } from 'next/navigation';
+import type { BrandRow } from '@/lib/brands-types';
 import type { ProjectRow } from '@/lib/projects-types';
 import { addProject, updateProject, deleteProject } from '@/lib/projects-actions';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
-interface BrandRow { id: string; name: string; color: string; icon?: string; }
+
 
 // ─── Constants ────────────────────────────────────────────────────────────────
 const KANBAN_COLS: { id: ProjectRow['status']; label: string; color: string }[] = [

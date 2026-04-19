@@ -503,18 +503,18 @@ export default function DecisionsClient({ initialPending, initialDecided, brands
         .empty-sub { font-size: 12px; color: var(--txt3); }
         /* Modal */
         .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.7); display: flex; align-items: center; justify-content: center; z-index: 100; }
-        .modal-box { background: #0d1117; border: 1px solid rgba(201,150,59,0.2); border-radius: 14px; padding: 24px; width: 100%; max-width: 440px; max-height: 90vh; overflow-y: auto; }
+        .modal-box { background: #FFFFFF; border: 1px solid #E5E5E5; border-radius: 14px; padding: 24px; width: 100%; max-width: 440px; max-height: 90vh; overflow-y: auto; box-shadow: 0 8px 32px rgba(0,0,0,0.12); }
         .modal-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; }
-        .modal-title { font-size: 16px; font-weight: 800; color: var(--gold); margin: 0; }
-        .modal-close { background: transparent; border: none; color: var(--txt3); font-size: 16px; cursor: pointer; padding: 4px; }
-        .field-label { display: block; font-size: 11px; color: var(--txt3); margin-bottom: 5px; margin-top: 12px; font-weight: 600; }
-        .field-input { width: 100%; background: rgba(255,255,255,0.04); border: 1px solid rgba(201,150,59,0.15); color: var(--txt1); padding: 8px 10px; border-radius: 7px; font-size: 13px; font-family: inherit; box-sizing: border-box; }
+        .modal-title { font-size: 16px; font-weight: 800; color: #1D1D1F; margin: 0; }
+        .modal-close { background: transparent; border: none; color: #6B7280; font-size: 16px; cursor: pointer; padding: 4px; }
+        .field-label { display: block; font-size: 11px; color: #6B7280; margin-bottom: 5px; margin-top: 12px; font-weight: 600; }
+        .field-input { width: 100%; background: #F9F9F9; border: 1px solid #E5E5E5; color: #1D1D1F; padding: 8px 10px; border-radius: 7px; font-size: 13px; font-family: inherit; box-sizing: border-box; }
         .field-input:focus { outline: none; border-color: var(--gold); }
         .modal-actions { display: flex; gap: 8px; justify-content: flex-end; margin-top: 20px; }
         .btn-save { background: rgba(201,150,59,0.2); border: 1px solid var(--gold); color: var(--gold); padding: 8px 18px; border-radius: 7px; font-size: 12px; font-weight: 700; cursor: pointer; font-family: inherit; transition: all 0.2s; }
         .btn-save:hover { background: rgba(201,150,59,0.35); }
         .btn-save:disabled { opacity: 0.5; cursor: not-allowed; }
-        .btn-cancel { background: transparent; border: 1px solid rgba(255,255,255,0.1); color: var(--txt2); padding: 8px 14px; border-radius: 7px; font-size: 12px; cursor: pointer; font-family: inherit; }
+        .btn-cancel { background: transparent; border: 1px solid #E5E5E5; color: #6B7280; padding: 8px 14px; border-radius: 7px; font-size: 12px; cursor: pointer; font-family: inherit; }
         .btn-danger-sm { background: rgba(239,68,68,0.1); border: 1px solid rgba(239,68,68,0.3); color: #ef4444; padding: 8px 12px; border-radius: 7px; font-size: 12px; cursor: pointer; font-family: inherit; margin-left: auto; }
       `}</style>
     </div>

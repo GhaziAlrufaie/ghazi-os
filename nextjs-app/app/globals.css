@@ -989,3 +989,31 @@ textarea { resize: vertical; min-height: 80px; }
   border-radius: 2px;
   transition: width 0.3s ease;
 }
+
+/* ── SHARED MODAL CLASSES ─────────────────────────────────────────────────── */
+.modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.55); display: flex; align-items: center; justify-content: center; z-index: 300; backdrop-filter: blur(2px); }
+.modal-box { background: #FFFFFF; border: 1px solid #E5E5E5; border-radius: 14px; padding: 24px; width: 100%; max-width: 480px; max-height: 90vh; overflow-y: auto; box-shadow: 0 8px 32px rgba(0,0,0,0.12); }
+.modal-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; }
+.modal-title { font-size: 16px; font-weight: 800; color: #1D1D1F; margin: 0; }
+.modal-close { background: transparent; border: none; color: #6B7280; font-size: 18px; cursor: pointer; padding: 4px; line-height: 1; }
+.modal-close:hover { color: #1D1D1F; }
+.modal-actions { display: flex; gap: 8px; justify-content: flex-end; margin-top: 20px; }
+.modal-field-label { display: block; font-size: 11px; color: #6B7280; margin-bottom: 5px; margin-top: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.04em; }
+.modal-field-input { width: 100%; background: #F9F9F9; border: 1px solid #E5E5E5; color: #1D1D1F; padding: 8px 10px; border-radius: 7px; font-size: 13px; font-family: inherit; box-sizing: border-box; outline: none; transition: border-color .15s; }
+.modal-field-input:focus { border-color: #C9963B; }
+.modal-field-select { width: 100%; background: #F9F9F9; border: 1px solid #E5E5E5; color: #1D1D1F; padding: 8px 10px; border-radius: 7px; font-size: 13px; font-family: inherit; box-sizing: border-box; outline: none; cursor: pointer; }
+.modal-btn-save { background: rgba(201,150,59,0.15); border: 1px solid #C9963B; color: #C9963B; padding: 8px 18px; border-radius: 7px; font-size: 12px; font-weight: 700; cursor: pointer; font-family: inherit; transition: all .2s; }
+.modal-btn-save:hover { background: rgba(201,150,59,0.3); }
+.modal-btn-save:disabled { opacity: 0.5; cursor: not-allowed; }
+.modal-btn-cancel { background: transparent; border: 1px solid #E5E5E5; color: #6B7280; padding: 8px 14px; border-radius: 7px; font-size: 12px; cursor: pointer; font-family: inherit; transition: all .15s; }
+.modal-btn-cancel:hover { border-color: #9CA3AF; color: #374151; }
+/* field-label / field-input aliases used in DecisionsClient */
+.field-label { display: block; font-size: 11px; color: #6B7280; margin-bottom: 5px; margin-top: 12px; font-weight: 600; }
+.field-input { width: 100%; background: #F9F9F9; border: 1px solid #E5E5E5; color: #1D1D1F; padding: 8px 10px; border-radius: 7px; font-size: 13px; font-family: inherit; box-sizing: border-box; outline: none; }
+.field-input:focus { border-color: #C9963B; }
+/* btn-save / btn-cancel aliases used in ProjectsClient & DecisionsClient */
+.btn-save { background: rgba(201,150,59,0.15); border: 1px solid #C9963B; color: #C9963B; padding: 8px 18px; border-radius: 7px; font-size: 12px; font-weight: 700; cursor: pointer; font-family: inherit; transition: all .2s; }
+.btn-save:hover { background: rgba(201,150,59,0.3); }
+.btn-save:disabled { opacity: 0.5; cursor: not-allowed; }
+.btn-cancel { background: transparent; border: 1px solid #E5E5E5; color: #6B7280; padding: 8px 14px; border-radius: 7px; font-size: 12px; cursor: pointer; font-family: inherit; transition: all .15s; }
+.btn-cancel:hover { border-color: #9CA3AF; color: #374151; }

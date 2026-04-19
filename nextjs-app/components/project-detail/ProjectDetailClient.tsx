@@ -21,7 +21,6 @@ const COLUMNS: { id: TaskStatus; label: string; color: string }[] = [
   { id: 'in_progress', label: 'جاري التنفيذ',  color: '#3b82f6' },
   { id: 'on_hold',     label: 'معلق',           color: '#f59e0b' },
   { id: 'done',        label: 'تم',             color: '#22c55e' },
-  { id: 'ideas',       label: '💡 أفكار',       color: '#a78bfa' },
 ];
 
 const PRI_COLORS: Record<string, string> = {
