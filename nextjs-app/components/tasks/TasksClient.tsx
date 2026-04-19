@@ -7,9 +7,10 @@ import React, { useState, useTransition, useRef, useCallback } from 'react';
 import { DragDropContext, Droppable, Draggable, DropResult } from '@hello-pangea/dnd';
 import type { BrandRow } from '@/lib/brands-types';
 import type { Task, TaskStatus, TaskPriority } from '@/lib/tasks-actions';
-import { addTask, updateTask, deleteTask, archiveTask } from '@/lib/tasks-actions';
+import { addTask, updateTask, deleteTask, archiveTask, restoreTask } from '@/lib/tasks-actions';
 import TaskPanel from '@/components/brands/TaskPanel';
 import AddTaskModal from '@/components/brands/AddTaskModal';
+import { useGlobal } from '@/components/GlobalProviders';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -139,6 +140,7 @@ interface Props {
 }
 
 export default function TasksClient({ initialTasks, brands, projects }: Props) {
+  const { pushUndo } = useGlobal();
   const [tasks, setTasks]               = useState<Task[]>(initialTasks);
   const [view, setView]                 = useState<'list' | 'kanban' | 'calendar'>('kanban');
   const [filterBrand, setFilterBrand]   = useState<string>('all');
@@ -208,9 +210,18 @@ export default function TasksClient({ initialTasks, brands, projects }: Props) {
 
   // ── Task actions ─────────────────────────────────────────────────────────────
   function handleDelete(id: string) {
+    const task = tasks.find((t) => t.id === id);
+    if (!task) return;
     setTasks((prev) => prev.filter((t) => t.id !== id));
     if (selectedTask?.id === id) setSelectedTask(null);
     startTransition(async () => { await deleteTask(id); });
+    pushUndo({
+      label: `حذف "${task.title}"`,
+      undo: async () => {
+        await restoreTask(task);
+        setTasks((prev) => [...prev, task]);
+      },
+    });
   }
 
   function handleArchive(task: Task) {

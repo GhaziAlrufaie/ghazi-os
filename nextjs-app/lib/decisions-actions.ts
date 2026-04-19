@@ -105,6 +105,28 @@ export async function deleteDecision(decId: string): Promise<{ ok: boolean; erro
   return { ok: true };
 }
 
+export async function restoreDecision(dec: import('@/app/decisions/page').Decision): Promise<{ ok: boolean; error?: string }> {
+  const supabase = getSupabase();
+  const { error } = await supabase.from('decisions').insert({
+    id: dec.id,
+    brand_id: dec.brand_id,
+    project_id: dec.project_id,
+    title: dec.title,
+    context: dec.context,
+    options: dec.options,
+    chosen_option_id: dec.chosen_option_id,
+    status: dec.status,
+    impact: dec.impact,
+    deadline: dec.deadline,
+    decided_at: dec.decided_at,
+    decided_by: dec.decided_by,
+    notes: dec.notes,
+  });
+  if (error) return { ok: false, error: error.message };
+  revalidatePath('/decisions');
+  return { ok: true };
+}
+
 export async function archiveDecision(decId: string): Promise<{ ok: boolean; error?: string }> {
   const supabase = getSupabase();
   // جلب القرار أولاً

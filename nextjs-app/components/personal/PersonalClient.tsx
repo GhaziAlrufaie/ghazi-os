@@ -8,11 +8,13 @@ import {
   updatePersonalTask,
   deletePersonalTask,
   archivePersonalTask,
+  restorePersonalTask,
   type PersonalTask,
   type TaskStatus,
   type TaskPriority,
   type TaskCategory,
 } from '@/lib/personal-actions';
+import { useGlobal } from '@/components/GlobalProviders';
 
 // ─── Constants ────────────────────────────────────────────────────────────────
 const COLUMNS: { id: TaskStatus; label: string; color: string }[] = [
@@ -429,6 +431,7 @@ function EditModal({ task, categories, onSave, onClose }: {
 
 // ─── Main Component ───────────────────────────────────────────────────────────
 export default function PersonalClient({ initialTasks }: Props) {
+  const { pushUndo } = useGlobal();
   const [tasks, setTasks] = useState<PersonalTask[]>(initialTasks);
   const [categories, setCategories] = useState(DEFAULT_CATEGORIES);
   const [activeCategory, setActiveCategory] = useState<TaskCategory | 'all'>('all');
@@ -468,8 +471,17 @@ export default function PersonalClient({ initialTasks }: Props) {
   }
 
   function handleDelete(id: string) {
+    const task = tasks.find((t) => t.id === id);
+    if (!task) return;
     setTasks((prev) => prev.filter((t) => t.id !== id));
     startTransition(async () => { await deletePersonalTask(id); });
+    pushUndo({
+      label: `حذف "${task.title}"`,
+      undo: async () => {
+        await restorePersonalTask(task);
+        setTasks((prev) => [...prev, task]);
+      },
+    });
   }
 
   function handleArchive(task: PersonalTask) {

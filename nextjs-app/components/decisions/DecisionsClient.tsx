@@ -11,7 +11,9 @@ import {
   saveDecision,
   deleteDecision,
   archiveDecision,
+  restoreDecision,
 } from '@/lib/decisions-actions';
+import { useGlobal } from '@/components/GlobalProviders';
 
 interface Props {
   initialPending: Decision[];
@@ -44,6 +46,7 @@ function genId(): string {
 }
 
 export default function DecisionsClient({ initialPending, initialDecided, brands }: Props) {
+  const { pushUndo } = useGlobal();
   const [pending, setPending] = useState<Decision[]>(initialPending);
   const [decided, setDecided] = useState<Decision[]>(initialDecided);
   const [selectedOpts, setSelectedOpts] = useState<Record<string, string>>({});
@@ -107,13 +110,22 @@ export default function DecisionsClient({ initialPending, initialDecided, brands
   }
 
   function handleDelete(decId: string) {
-    if (!confirm('حذف القرار نهائياً؟')) return;
+    const dec = [...pending, ...decided].find((d) => d.id === decId);
+    if (!dec) return;
     startTransition(async () => {
       const res = await deleteDecision(decId);
       if (res.ok) {
         setPending((prev) => prev.filter((d) => d.id !== decId));
         setDecided((prev) => prev.filter((d) => d.id !== decId));
         setEditingDecision(null);
+        pushUndo({
+          label: `حذف "قرار: ${dec.title}"`,
+          undo: async () => {
+            await restoreDecision(dec);
+            if (dec.status === 'pending') setPending((prev) => [...prev, dec]);
+            else setDecided((prev) => [...prev, dec]);
+          },
+        });
       }
     });
   }

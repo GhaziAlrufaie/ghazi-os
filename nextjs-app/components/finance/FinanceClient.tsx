@@ -6,11 +6,12 @@
 // Tabs: كل المهام المالية | 💰 المصاريف
 import { useState, useTransition } from 'react';
 import { DragDropContext, Droppable, Draggable, type DropResult } from '@hello-pangea/dnd';
-import { addFinanceTask, updateTask, archiveTask, deleteTask } from '@/lib/tasks-actions';
+import { addFinanceTask, updateTask, archiveTask, deleteTask, restoreTask } from '@/lib/tasks-actions';
 import type { Task, TaskStatus, TaskPriority } from '@/lib/tasks-actions';
 import type { ExpenseSection } from '@/lib/expenses-types';
 import { EXPENSE_TYPE_LABELS } from '@/lib/expenses-types';
 import TaskPanel from '@/components/brands/TaskPanel';
+import { useGlobal } from '@/components/GlobalProviders';
 
 // ─── ثوابت ───────────────────────────────────────────────────────────────────
 const COLUMNS: { id: TaskStatus; label: string; color: string }[] = [
@@ -141,6 +142,7 @@ function AddFinanceTaskModal({ defaultStatus, onClose, onAdd }: AddModalProps) {
 
 // ─── Main Component ───────────────────────────────────────────────────────────
 export default function FinanceClient({ initialTasks, expenses }: Props) {
+  const { pushUndo } = useGlobal();
   const [tasks,          setTasks]          = useState<Task[]>(initialTasks);
   const [tab,            setTab]            = useState<TabType>('kanban');
   const [selectedTask,   setSelectedTask]   = useState<Task | null>(null);
@@ -192,9 +194,18 @@ export default function FinanceClient({ initialTasks, expenses }: Props) {
   };
 
   const handleDelete = (taskId: string) => {
+    const task = tasks.find(t => t.id === taskId);
+    if (!task) return;
     setTasks(prev => prev.filter(t => t.id !== taskId));
     if (selectedTask?.id === taskId) setSelectedTask(null);
     startTransition(async () => { await deleteTask(taskId); });
+    pushUndo({
+      label: `حذف "${task.title}"`,
+      undo: async () => {
+        await restoreTask(task);
+        setTasks(prev => [...prev, task]);
+      },
+    });
   };
 
   // ── Update ────────────────────────────────────────────────────────────────

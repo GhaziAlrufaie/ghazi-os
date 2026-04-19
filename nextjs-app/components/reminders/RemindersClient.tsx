@@ -6,12 +6,15 @@ import {
   addReminder,
   updateReminder,
   deleteReminder,
+  restoreReminder,
   type Reminder,
 } from '@/lib/reminders-actions';
+import { useGlobal } from '@/components/GlobalProviders';
 
 interface Props { initialReminders: Reminder[] }
 
 export default function RemindersClient({ initialReminders }: Props) {
+  const { pushUndo } = useGlobal();
   const [reminders, setReminders] = useState<Reminder[]>(initialReminders);
   const [newText, setNewText]     = useState('');
   const [editingId, setEditingId] = useState<string | null>(null);
@@ -37,8 +40,17 @@ export default function RemindersClient({ initialReminders }: Props) {
   }
 
   function handleDelete(id: string) {
+    const reminder = reminders.find((r) => r.id === id);
+    if (!reminder) return;
     setReminders((prev) => prev.filter((r) => r.id !== id));
     startTransition(async () => { await deleteReminder(id); });
+    pushUndo({
+      label: `حذف "تذكير: ${reminder.text.slice(0, 30)}"`,
+      undo: async () => {
+        await restoreReminder(reminder);
+        setReminders((prev) => [reminder, ...prev]);
+      },
+    });
   }
 
   function startEdit(r: Reminder) {

@@ -109,6 +109,23 @@ export async function deletePersonalTask(id: string): Promise<{ error?: string }
   return {};
 }
 
+export async function restorePersonalTask(task: PersonalTask): Promise<{ error?: string }> {
+  const supabase = createServerClient();
+  const { error } = await supabase.from('personal_tasks').insert({
+    id: task.id,
+    title: task.title,
+    description: task.description,
+    status: task.status,
+    priority: task.priority,
+    category: task.category,
+    due_date: task.dueDate,
+    sort_order: task.sortOrder,
+  });
+  if (error) return { error: error.message };
+  revalidatePath('/personal');
+  return {};
+}
+
 export async function archivePersonalTask(
   task: PersonalTask
 ): Promise<{ error?: string }> {

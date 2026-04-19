@@ -149,6 +149,25 @@ export async function deleteTask(id: string): Promise<{ error?: string }> {
   return {};
 }
 
+export async function restoreTask(task: Task): Promise<{ error?: string }> {
+  const supabase = createServerClient();
+  const { error } = await supabase.from('tasks').insert({
+    id: task.id,
+    title: task.title,
+    description: task.description,
+    status: task.status,
+    priority: task.priority,
+    due_date: task.dueDate,
+    brand_id: task.brandId,
+    project_id: task.projectId,
+    sort_order: task.sortOrder,
+  });
+  if (error) return { error: error.message };
+  revalidatePath('/tasks');
+  revalidatePath('/brands');
+  return {};
+}
+
 // ── Finance Tasks (category = 'financial') ──────────────────────────────────
 export async function getFinanceTasks(): Promise<Task[]> {
   const supabase = createServerClient();

@@ -11,11 +11,12 @@ import {
 } from '@hello-pangea/dnd';
 import type { BrandRow } from '@/lib/brands-types';
 import type { Task, TaskStatus, TaskPriority } from '@/lib/tasks-actions';
-import { addTask, updateTask, deleteTask, archiveTask } from '@/lib/tasks-actions';
+import { addTask, updateTask, deleteTask, archiveTask, restoreTask } from '@/lib/tasks-actions';
 import type { ProjectRow } from '@/lib/projects-types';
 import { updateBrand, deleteBrand } from '@/lib/brands-actions';
 import TaskPanel from './TaskPanel';
 import AddTaskModal from './AddTaskModal';
+import { useGlobal } from '@/components/GlobalProviders';
 
 // ─── Constants ────────────────────────────────────────────────────────────────
 const KANBAN_COLS: { id: TaskStatus; name: string; color: string }[] = [
@@ -364,6 +365,7 @@ interface Props { brand: BrandRow; initialTasks: Task[]; initialProjects: Projec
 
 export default function BrandDetailClient({ brand: initialBrand, initialTasks, initialProjects }: Props) {
   const router = useRouter();
+  const { pushUndo } = useGlobal();
   const [brand, setBrand]     = useState<BrandRow>(initialBrand);
   const [tasks, setTasks]     = useState<Task[]>(initialTasks);
   const [projects]            = useState<ProjectRow[]>(initialProjects);
@@ -392,9 +394,17 @@ export default function BrandDetailClient({ brand: initialBrand, initialTasks, i
     await archiveTask(task);
   }
   async function handleDelete(id: string) {
-    if (!confirm('هل تريد حذف هذه المهمة؟')) return;
+    const task = tasks.find((t) => t.id === id);
+    if (!task) return;
     setTasks((prev) => prev.filter((t) => t.id !== id));
     await deleteTask(id);
+    pushUndo({
+      label: `حذف "${task.title}"`,
+      undo: async () => {
+        await restoreTask(task);
+        setTasks((prev) => [...prev, task]);
+      },
+    });
   }
   function handleAdd(task: Task) { setTasks((prev) => [...prev, task]); }
   function handleUpdate(patch: Partial<Task>) {

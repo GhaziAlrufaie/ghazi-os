@@ -47,3 +47,15 @@ export async function deleteReminder(id: string): Promise<{ error?: string }> {
   revalidatePath('/reminders');
   return {};
 }
+
+export async function restoreReminder(reminder: Reminder): Promise<{ error?: string }> {
+  const supabase = createServerClient();
+  const { error } = await supabase.from('reminders').insert({
+    id: reminder.id,
+    text: reminder.text,
+    created_at: reminder.created_at,
+  });
+  if (error) return { error: error.message };
+  revalidatePath('/reminders');
+  return {};
+}
