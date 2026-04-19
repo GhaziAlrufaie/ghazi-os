@@ -109,22 +109,7 @@ const NAV_ITEMS = [
       <svg viewBox="0 0 24 24"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
     ),
   },
-  {
-    id: 'inbox',
-    label: 'الوارد',
-    href: '/inbox',
-    icon: (
-      <svg viewBox="0 0 24 24"><polyline points="22 12 16 12 14 15 10 15 8 12 2 12"/><path d="M5.45 5.11L2 12v6a2 2 0 002 2h16a2 2 0 002-2v-6l-3.45-6.89A2 2 0 0016.76 4H7.24a2 2 0 00-1.79 1.11z"/></svg>
-    ),
-  },
-  {
-    id: 'team',
-    label: 'الفريق',
-    href: '/team',
-    icon: (
-      <svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg>
-    ),
-  },
+
   {
     id: 'reminders',
     label: 'التذكيرات',
