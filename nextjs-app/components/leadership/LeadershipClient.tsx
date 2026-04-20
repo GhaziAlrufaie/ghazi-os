@@ -996,14 +996,10 @@ export default function LeadershipClient({
           </div>
 
           {/* ثلاثة أعمدة متساوية: القرارات + التقويم + الوارد */}
-          <div style={{
+          <div className="triple-panel" style={{
             display: 'grid',
             gridTemplateColumns: '1fr 1fr 1fr',
-            gap: 20,
-            marginLeft: -24,
-            marginRight: 'calc(-24px - 220px)',
-            width: 'calc(100% + 24px + 220px + 24px)',
-            padding: '0 24px'
+            gap: 20
           }}>
 
             {/* القرارات */}

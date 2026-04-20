@@ -335,6 +335,15 @@ body::before {
    FOCUS HERO — The big one
    ═══════════════════════════════════════════════════════════════════════════ */
 
+.focus-hero,
+.weekly-compass-section,
+.daily-tasks-section,
+.triple-panel {
+  margin-left: -24px;
+  margin-right: calc(-24px - 220px);
+  width: calc(100% + 24px + 220px + 24px);
+}
+
 .focus-hero {
   position: relative;
   padding: 28px 36px;
@@ -345,9 +354,6 @@ body::before {
   overflow: hidden;
   box-shadow: 0 8px 32px rgba(255, 107, 107, 0.2);
   color: white;
-  margin-left: -24px;
-  margin-right: calc(-24px - 220px);
-  width: calc(100% + 24px + 220px + 24px);
 }
 
 /* Decorative elements */
@@ -512,9 +518,6 @@ body::before {
 .section.daily-tasks-section {
   border-radius: 20px;
   overflow: hidden;
-  margin-left: -24px;
-  margin-right: calc(-24px - 220px);
-  width: calc(100% + 24px + 220px + 24px);
   border-left: none;
   border-right: none;
 }
@@ -930,15 +933,7 @@ body::before {
 
 /* ═══════════════════════════════════════════════════════════════════════════
    TRIPLE PANEL — Decisions + Calendar + Inbox
-   ═══════════════════════════════════════════════════════════════════════════ */
-
-.triple {
-  display: grid;
-  grid-template-columns: 1fr 1fr 1fr;
-  gap: 16px;
-}
-
-/* Decisions */
+   ═══════════════════════════════════════════════════════════════════════════ ** Decisions */
 .decision-item {
   padding: 12px 14px;
   background: var(--bg-soft);
@@ -1658,9 +1653,6 @@ body::before {
 
 .focus-hero {
   border-radius: 20px;
-  margin-left: -24px;
-  margin-right: calc(-24px - 220px);
-  width: calc(100% + 24px + 220px + 24px);
 }
 
 .week-grid .day-card {
