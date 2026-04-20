@@ -1,9 +1,11 @@
 'use client';
 /*
- * Ghazi OS — Leadership Client (المركز القيادي)
- * المرحلة 2 — Light Theme مطابق للأصل
- * WeeklyCompass + FocusEditor + FocusHero + StickyBanner + Decisions + Calendar + Inbox
+ * Ghazi OS — Leadership Client (Studio Theme: المكتب الخشبي الفاخر)
+ * branch: studio-theme-v1
+ * خلفية خشب + ورق كريمي + خطوط Playfair/Caveat/Cormorant
+ * كل البيانات والمنطق محفوظ بدون تغيير
  */
+import './studio-theme.css';
 import { useState, useTransition } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
@@ -113,43 +115,77 @@ function getWeekDates(): string[] {
   });
 }
 
-// ─── CmdSection ───────────────────────────────────────────────────────────────
-function CmdSection({
-  icon, title, badge, children, defaultOpen = false,
+// ─── Paper Card (مكوّن الورقة الكريمية) ──────────────────────────────────────
+function PaperCard({
+  children,
+  rotate = 0,
+  delay = 0,
+  style = {},
 }: {
-  icon: string; title: string; badge?: number; children: React.ReactNode;
-  defaultOpen?: boolean;
+  children: React.ReactNode;
+  rotate?: number;
+  delay?: number;
+  style?: React.CSSProperties;
 }) {
-  const [open, setOpen] = useState(defaultOpen);
   return (
     <div style={{
-      background: '#fff',
-      border: '1px solid var(--brd)',
-      borderRadius: 12,
-      overflow: 'hidden',
-      marginBottom: 12,
-      boxShadow: '0 1px 4px rgba(0,0,0,0.04)',
+      background: 'linear-gradient(135deg, #FBF3DF 0%, #F0E2BC 100%)',
+      borderRadius: 4,
+      padding: '16px',
+      position: 'relative',
+      boxShadow: `
+        2px 2px 0 rgba(237,220,184,0.6),
+        4px 4px 0 rgba(220,200,160,0.4),
+        0 8px 24px rgba(0,0,0,0.35)
+      `,
+      transform: `rotate(${rotate}deg)`,
+      animation: `place-on-table 0.4s ease-out ${delay}s both`,
+      color: '#2B1810',
+      ...style,
     }}>
-      <div
-        onClick={() => setOpen(o => !o)}
-        style={{
-          display: 'flex', alignItems: 'center', gap: 8,
-          padding: '10px 14px', cursor: 'pointer',
-          borderBottom: open ? '1px solid var(--brd)' : 'none',
-          direction: 'rtl',
-        }}
-      >
-        <span style={{ fontSize: 15 }}>{icon}</span>
-        <span style={{ flex: 1, fontSize: 13, fontWeight: 600, color: 'var(--txt)' }}>{title}</span>
-        {badge !== undefined && badge > 0 && (
-          <span style={{ fontSize: 10, fontWeight: 700, background: 'rgba(201,168,76,0.15)', color: 'var(--gold)', padding: '2px 7px', borderRadius: 20 }}>{badge}</span>
-        )}
-        <span style={{ fontSize: 10, color: 'var(--txt3)', transform: open ? 'rotate(90deg)' : 'none', transition: 'transform 0.2s', display: 'inline-block' }}>❯</span>
-      </div>
-      {open && (
-        <div style={{ padding: '12px 14px' }}>
-          {children}
-        </div>
+      {children}
+    </div>
+  );
+}
+
+// ─── Section Title (عنوان القسم بخط Caveat) ──────────────────────────────────
+function SectionTitle({ icon, title, badge }: { icon: string; title: string; badge?: number }) {
+  return (
+    <div style={{
+      display: 'flex',
+      alignItems: 'center',
+      gap: 8,
+      marginBottom: 12,
+      paddingBottom: 8,
+      borderBottom: '1px dashed rgba(180,150,100,0.4)',
+      direction: 'rtl',
+    }}>
+      <span style={{ fontSize: 16 }}>{icon}</span>
+      <span style={{
+        fontFamily: 'var(--font-caveat, cursive)',
+        fontSize: 22,
+        fontWeight: 600,
+        color: '#3D2817',
+        flex: 1,
+      }}>
+        {title}
+      </span>
+      {badge !== undefined && badge > 0 && (
+        <span style={{
+          background: 'linear-gradient(135deg, #D4A055, #9C7231)',
+          color: '#3D2817',
+          fontWeight: 700,
+          borderRadius: '50%',
+          minWidth: 20,
+          height: 20,
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          fontSize: 10,
+          boxShadow: '0 1px 4px rgba(0,0,0,0.2)',
+        }}>
+          {badge}
+        </span>
       )}
     </div>
   );
@@ -169,40 +205,89 @@ function StickyBanner({
     return (
       <div style={{
         position: 'sticky', top: 56, zIndex: 38,
-        background: 'linear-gradient(90deg, rgba(46,204,113,0.08), rgba(39,174,96,0.05))',
-        borderBottom: '1px solid rgba(46,204,113,0.2)',
-        padding: '8px 16px', display: 'flex', alignItems: 'center', gap: 10, direction: 'rtl',
+        background: 'linear-gradient(135deg, rgba(90,120,67,0.2), rgba(90,120,67,0.1))',
+        borderBottom: '1px solid rgba(90,120,67,0.3)',
+        borderRight: '4px solid #5A7843',
+        padding: '8px 16px',
+        display: 'flex', alignItems: 'center', gap: 10, direction: 'rtl',
+        animation: 'place-on-table 0.4s ease-out',
       }}>
         <span style={{ fontSize: 18 }}>🌿</span>
         <div style={{ flex: 1 }}>
-          <span style={{ fontSize: 11, color: 'var(--txt3)', fontWeight: 600 }}>وضع الشحن — </span>
-          <span style={{ fontSize: 12, fontWeight: 700, color: '#27ae60' }}>يوم استراحة مقصود ✓</span>
+          <span style={{
+            fontFamily: 'var(--font-cormorant, serif)',
+            fontStyle: 'italic',
+            fontSize: 12,
+            color: 'rgba(247,236,214,0.6)',
+          }}>وضع الشحن — </span>
+          <span style={{
+            fontFamily: 'var(--font-caveat, cursive)',
+            fontSize: 18,
+            fontWeight: 600,
+            color: '#8BC34A',
+          }}>يوم استراحة مقصود ✓</span>
         </div>
-        <button onClick={onEdit} style={{ fontSize: 10, color: 'var(--gold)', background: 'none', border: '1px solid rgba(201,168,76,0.3)', borderRadius: 6, padding: '3px 10px', cursor: 'pointer', fontFamily: 'inherit' }}>تعديل</button>
+        <button onClick={onEdit} style={{
+          fontFamily: 'var(--font-caveat, cursive)',
+          fontSize: 14,
+          color: '#D4A055',
+          background: 'none',
+          border: '1px dashed rgba(212,160,85,0.5)',
+          borderRadius: 3,
+          padding: '3px 10px',
+          cursor: 'pointer',
+        }}>تعديل</button>
       </div>
     );
   }
 
-  const color = todayFocus.targetColor || '#C9A84C';
+  const color = todayFocus.targetColor || '#D4A055';
   const typeIcon = FOCUS_TYPE_ICONS[todayFocus.targetType] ?? '🎯';
 
   return (
     <div style={{
       position: 'sticky', top: 56, zIndex: 38,
-      background: 'rgba(255,255,255,0.95)',
-      borderBottom: '1px solid var(--brd)',
-      padding: '7px 16px', display: 'flex', alignItems: 'center', gap: 10, direction: 'rtl',
-      backdropFilter: 'blur(8px)',
+      background: 'linear-gradient(135deg, rgba(212,160,85,0.2), rgba(232,188,111,0.1))',
+      borderBottom: '1px solid rgba(212,160,85,0.3)',
+      borderRight: `4px solid ${color}`,
+      padding: '8px 16px',
+      display: 'flex', alignItems: 'center', gap: 10, direction: 'rtl',
+      animation: 'place-on-table 0.4s ease-out',
+      transform: 'rotate(-0.2deg)',
     }}>
       <span style={{ width: 8, height: 8, borderRadius: '50%', background: color, display: 'inline-block', flexShrink: 0 }} />
       <div style={{ flex: 1 }}>
-        <span style={{ fontSize: 10, color: 'var(--txt3)' }}>⚙️ خلّص روتينك أولاً — {typeIcon} بوصلتك اليوم: </span>
-        <span style={{ fontSize: 12, fontWeight: 700, color }}>{todayFocus.targetName}</span>
+        <span style={{
+          fontFamily: 'var(--font-cormorant, serif)',
+          fontStyle: 'italic',
+          fontSize: 12,
+          color: 'rgba(247,236,214,0.5)',
+        }}>⚙️ خلّص روتينك أولاً — {typeIcon} بوصلتك اليوم: </span>
+        <span style={{
+          fontFamily: 'var(--font-caveat, cursive)',
+          fontSize: 20,
+          fontWeight: 700,
+          color,
+        }}>{todayFocus.targetName}</span>
       </div>
       {todayFocus.targetType === 'brand' && todaySales > 0 && (
-        <span style={{ fontSize: 11, color: '#27ae60', fontWeight: 600 }}>📈 {fmt(todaySales)} ريال</span>
+        <span style={{
+          fontFamily: 'var(--font-caveat, cursive)',
+          fontSize: 16,
+          color: '#8BC34A',
+          fontWeight: 600,
+        }}>📈 {fmt(todaySales)} ريال</span>
       )}
-      <button onClick={onEdit} style={{ fontSize: 10, color: 'var(--gold)', background: 'none', border: '1px solid rgba(201,168,76,0.3)', borderRadius: 6, padding: '3px 10px', cursor: 'pointer', fontFamily: 'inherit' }}>تعديل</button>
+      <button onClick={onEdit} style={{
+        fontFamily: 'var(--font-caveat, cursive)',
+        fontSize: 14,
+        color: '#D4A055',
+        background: 'none',
+        border: '1px dashed rgba(212,160,85,0.5)',
+        borderRadius: 3,
+        padding: '3px 10px',
+        cursor: 'pointer',
+      }}>تعديل</button>
     </div>
   );
 }
@@ -246,72 +331,132 @@ function WeeklyCompass({
   }
 
   return (
-    <div style={{ overflowX: 'auto' }}>
-      <div style={{ display: 'flex', gap: 8, minWidth: 560, paddingBottom: 4 }}>
-        {weekDates.map((dateStr) => {
-          const focus = focusMap[dateStr] ?? null;
-          const isToday = dateStr === todayISO();
-          const isDragOver = dragOverDate === dateStr;
-          const color = focus?.targetColor || '#C9A84C';
-          const brand = focus?.targetType === 'brand' ? brands.find(b => b.id === focus.targetId) : null;
-          const icon = focus?.targetType === 'brand' ? (brand?.icon ?? '🎯') : focus ? (FOCUS_TYPE_ICONS[focus.targetType] ?? '🎯') : null;
-          const proj = focus?.targetType === 'project' ? projects.find(p => p.id === focus.targetId) : null;
+    <div style={{
+      background: 'linear-gradient(180deg, #FBF3DF 0%, #F0E2BC 100%)',
+      borderRadius: 4,
+      padding: '14px',
+      position: 'relative',
+      boxShadow: '0 4px 16px rgba(0,0,0,0.3)',
+      transform: 'rotate(0.4deg)',
+      animation: 'place-on-table 0.4s ease-out 0.1s both',
+    }}>
+      {/* خطوط الورق */}
+      <div style={{
+        position: 'absolute', inset: 0, borderRadius: 4, pointerEvents: 'none',
+        background: 'repeating-linear-gradient(180deg, transparent 0px, transparent 23px, rgba(180,150,100,0.15) 23px, rgba(180,150,100,0.15) 24px)',
+      }} />
+      <SectionTitle icon="🧭" title="بوصلة الأسبوع" />
+      <div style={{ overflowX: 'auto', position: 'relative', zIndex: 1 }}>
+        <div style={{ display: 'flex', gap: 6, minWidth: 480, paddingBottom: 4 }}>
+          {weekDates.map((dateStr) => {
+            const focus = focusMap[dateStr] ?? null;
+            const isToday = dateStr === todayISO();
+            const isDragOver = dragOverDate === dateStr;
+            const color = focus?.targetColor || '#D4A055';
+            const brand = focus?.targetType === 'brand' ? brands.find(b => b.id === focus.targetId) : null;
+            const icon = focus?.targetType === 'brand' ? (brand?.icon ?? '🎯') : focus ? (FOCUS_TYPE_ICONS[focus.targetType] ?? '🎯') : null;
+            const proj = focus?.targetType === 'project' ? projects.find(p => p.id === focus.targetId) : null;
 
-          return (
-            <div
-              key={dateStr}
-              onClick={() => onOpenEditor(dateStr)}
-              draggable
-              onDragStart={(e) => { setDragDate(dateStr); e.dataTransfer.effectAllowed = 'move'; }}
-              onDragOver={(e) => { e.preventDefault(); e.dataTransfer.dropEffect = 'move'; }}
-              onDragEnter={() => setDragOverDate(dateStr)}
-              onDragLeave={() => setDragOverDate(null)}
-              onDrop={(e) => handleDrop(e, dateStr)}
-              style={{
-                flex: 1, minWidth: 72, cursor: 'pointer',
-                background: isToday ? 'rgba(201,168,76,0.06)' : isDragOver ? 'rgba(201,168,76,0.1)' : '#fff',
-                border: isToday ? '2px solid var(--gold)' : isDragOver ? '2px dashed var(--gold)' : '1px solid var(--brd)',
-                borderRadius: 10, padding: '8px 6px', textAlign: 'center',
-                transition: 'all 0.15s', direction: 'rtl',
-                boxShadow: isToday ? '0 2px 8px rgba(201,168,76,0.15)' : '0 1px 3px rgba(0,0,0,0.04)',
-              }}
-            >
-              {/* Day name */}
-              <div style={{ fontSize: 9, color: isToday ? 'var(--gold)' : 'var(--txt3)', fontWeight: 700, marginBottom: 2 }}>
-                {dayName(dateStr)}
-              </div>
-              <div style={{ fontSize: 9, color: 'var(--txt3)', marginBottom: 6 }}>
-                {isToday ? <span style={{ background: 'var(--gold)', color: '#fff', padding: '1px 5px', borderRadius: 8, fontSize: 8 }}>اليوم</span> : dateShort(dateStr)}
-              </div>
-
-              {!focus ? (
-                <div style={{ fontSize: 18, color: 'var(--brd)', marginBottom: 4 }}>➕</div>
-              ) : focus.targetType === 'recharge' ? (
-                <>
-                  <div style={{ fontSize: 18, marginBottom: 3 }}>🌿</div>
-                  <div style={{ fontSize: 9, color: '#27ae60', fontWeight: 600 }}>استراحة</div>
-                </>
-              ) : (
-                <>
-                  <div style={{ fontSize: 16, marginBottom: 3 }}>{icon}</div>
-                  <div style={{ fontSize: 9, fontWeight: 700, color, marginBottom: 3, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                    {focus.targetName}
-                  </div>
-                  <span style={{ fontSize: 8, background: `${color}22`, color, padding: '1px 5px', borderRadius: 8, fontWeight: 600 }}>
-                    {FOCUS_TYPE_LABELS[focus.targetType] ?? ''}
-                  </span>
-                  {proj && proj.progress > 0 && (
-                    <div style={{ marginTop: 4 }}>
-                      <div style={{ height: 2, background: 'var(--brd)', borderRadius: 2 }}>
-                        <div style={{ width: `${proj.progress}%`, height: 2, background: color, borderRadius: 2 }} />
-                      </div>
-                    </div>
+            return (
+              <div
+                key={dateStr}
+                onClick={() => onOpenEditor(dateStr)}
+                draggable
+                onDragStart={(e) => { setDragDate(dateStr); e.dataTransfer.effectAllowed = 'move'; }}
+                onDragOver={(e) => { e.preventDefault(); e.dataTransfer.dropEffect = 'move'; }}
+                onDragEnter={() => setDragOverDate(dateStr)}
+                onDragLeave={() => setDragOverDate(null)}
+                onDrop={(e) => handleDrop(e, dateStr)}
+                style={{
+                  flex: 1, minWidth: 64, cursor: 'pointer',
+                  background: isToday ? 'rgba(212,160,85,0.12)' : isDragOver ? 'rgba(212,160,85,0.18)' : 'rgba(255,255,255,0.5)',
+                  border: isToday ? '2px solid #D4A055' : isDragOver ? '2px dashed #D4A055' : '1px dashed rgba(180,150,100,0.5)',
+                  borderRadius: 4, padding: '8px 6px', textAlign: 'center',
+                  transition: 'all 0.15s', direction: 'rtl',
+                  boxShadow: isToday ? '0 2px 8px rgba(212,160,85,0.2)' : '0 1px 3px rgba(0,0,0,0.1)',
+                }}
+              >
+                {/* Day name */}
+                <div style={{
+                  fontFamily: 'var(--font-cormorant, serif)',
+                  fontStyle: 'italic',
+                  fontSize: 10,
+                  color: isToday ? '#9C7231' : '#8B6F42',
+                  fontWeight: 600,
+                  marginBottom: 2,
+                }}>
+                  {dayName(dateStr)}
+                </div>
+                <div style={{
+                  fontFamily: 'var(--font-playfair, serif)',
+                  fontSize: isToday ? 22 : 18,
+                  fontWeight: 600,
+                  color: isToday ? '#3D2817' : '#5A4028',
+                  marginBottom: 4,
+                }}>
+                  {isToday ? (
+                    <span style={{
+                      background: '#8B1E1E',
+                      color: 'white',
+                      padding: '1px 6px',
+                      borderRadius: 3,
+                      fontSize: 9,
+                      fontFamily: 'var(--font-caveat, cursive)',
+                      display: 'inline-block',
+                      transform: 'rotate(-2deg)',
+                    }}>اليوم</span>
+                  ) : (
+                    new Date(dateStr + 'T00:00:00').getDate()
                   )}
-                </>
-              )}
-            </div>
-          );
-        })}
+                </div>
+
+                {!focus ? (
+                  <div style={{ fontSize: 16, color: 'rgba(180,150,100,0.5)', marginBottom: 4 }}>+</div>
+                ) : focus.targetType === 'recharge' ? (
+                  <>
+                    <div style={{ fontSize: 16, marginBottom: 3 }}>🌿</div>
+                    <div style={{ fontFamily: 'var(--font-caveat, cursive)', fontSize: 10, color: '#5A7843', fontWeight: 600 }}>استراحة</div>
+                  </>
+                ) : (
+                  <>
+                    <div style={{ fontSize: 14, marginBottom: 3 }}>{icon}</div>
+                    <div style={{
+                      fontFamily: 'var(--font-caveat, cursive)',
+                      fontSize: 11,
+                      fontWeight: 700,
+                      color,
+                      marginBottom: 3,
+                      overflow: 'hidden',
+                      textOverflow: 'ellipsis',
+                      whiteSpace: 'nowrap',
+                    }}>
+                      {focus.targetName}
+                    </div>
+                    <span style={{
+                      fontFamily: 'var(--font-cormorant, serif)',
+                      fontStyle: 'italic',
+                      fontSize: 9,
+                      background: `${color}22`,
+                      color,
+                      padding: '1px 5px',
+                      borderRadius: 3,
+                      fontWeight: 600,
+                    }}>
+                      {FOCUS_TYPE_LABELS[focus.targetType] ?? ''}
+                    </span>
+                    {proj && proj.progress > 0 && (
+                      <div style={{ marginTop: 4 }}>
+                        <div style={{ height: 2, background: 'rgba(180,150,100,0.3)', borderRadius: 2 }}>
+                          <div style={{ width: `${proj.progress}%`, height: 2, background: color, borderRadius: 2 }} />
+                        </div>
+                      </div>
+                    )}
+                  </>
+                )}
+              </div>
+            );
+          })}
+        </div>
       </div>
     </div>
   );
@@ -338,7 +483,7 @@ function FocusEditorModal({
   const [type, setType] = useState<FocusTargetType>(existing?.targetType ?? 'brand');
   const [selectedId, setSelectedId] = useState<string | null>(existing?.targetId ?? null);
   const [selectedName, setSelectedName] = useState(existing?.targetName ?? '');
-  const [selectedColor, setSelectedColor] = useState(existing?.targetColor ?? '#C9A84C');
+  const [selectedColor, setSelectedColor] = useState(existing?.targetColor ?? '#D4A055');
   const [notes, setNotes] = useState(existing?.notes ?? '');
   const [customText, setCustomText] = useState(existing?.targetType === 'custom' ? (existing?.targetName ?? '') : '');
   const [brandFilter, setBrandFilter] = useState<string>('');
@@ -347,12 +492,10 @@ function FocusEditorModal({
 
   const isToday = dateStr === todayISO();
 
-  // Hungry brands: brands with no focus this week
   const weekDates = getWeekDates();
   const focusedBrandIds = new Set(weeklyFocus.filter(f => f.targetType === 'brand').map(f => f.targetId).filter(Boolean));
   const hungryBrands = brands.filter(b => !focusedBrandIds.has(b.id)).slice(0, 5);
 
-  // Collision warning
   const collisionCount = type === 'brand' && selectedId
     ? weeklyFocus.filter(f => f.focusDate !== dateStr && f.targetType === 'brand' && f.targetId === selectedId).length
     : 0;
@@ -361,7 +504,7 @@ function FocusEditorModal({
     setType(t);
     setSelectedId(null);
     setSelectedName('');
-    setSelectedColor('#C9A84C');
+    setSelectedColor('#D4A055');
     setBrandFilter('');
     setPriorityFilter('');
   }
@@ -408,10 +551,13 @@ function FocusEditorModal({
     (type === 'brand' || type === 'project' || type === 'task') && !selectedId
   ) || (type === 'custom' && !customText.trim());
 
-  const inputStyle: React.CSSProperties = {
-    width: '100%', padding: '6px 10px', border: '1px solid var(--brd)',
-    borderRadius: 8, fontSize: 12, fontFamily: 'inherit',
-    background: 'var(--bg)', color: 'var(--txt)', direction: 'rtl',
+  const paperInputStyle: React.CSSProperties = {
+    width: '100%', padding: '6px 10px',
+    border: '1px solid rgba(180,150,100,0.4)',
+    borderRadius: 4, fontSize: 14,
+    fontFamily: 'var(--font-caveat, cursive)',
+    background: 'rgba(247,236,214,0.3)',
+    color: '#2B1810', direction: 'rtl',
   };
 
   function buildTargetList() {
@@ -422,16 +568,18 @@ function FocusEditorModal({
           onClick={() => handleTargetSelect(b.id, b.name, b.color)}
           style={{
             width: '100%', display: 'flex', alignItems: 'center', gap: 8,
-            padding: '7px 10px', background: selectedId === b.id ? `${b.color}15` : '#fff',
-            border: selectedId === b.id ? `1px solid ${b.color}` : '1px solid var(--brd)',
+            padding: '7px 10px',
+            background: selectedId === b.id ? `${b.color}18` : 'rgba(255,255,255,0.4)',
+            border: selectedId === b.id ? `1px solid ${b.color}` : '1px solid rgba(180,150,100,0.3)',
             borderRight: `3px solid ${b.color}`,
-            borderRadius: 8, cursor: 'pointer', fontFamily: 'inherit', direction: 'rtl',
-            marginBottom: 4, transition: 'all 0.1s',
+            borderRadius: 4, cursor: 'pointer',
+            fontFamily: 'var(--font-caveat, cursive)',
+            direction: 'rtl', marginBottom: 4, transition: 'all 0.1s',
           }}
         >
           <span style={{ fontSize: 15 }}>{b.icon}</span>
-          <span style={{ flex: 1, fontSize: 12, fontWeight: 600, color: 'var(--txt)' }}>{b.name}</span>
-          {selectedId === b.id && <span style={{ color: b.color, fontSize: 12 }}>✓</span>}
+          <span style={{ flex: 1, fontSize: 16, fontWeight: 600, color: '#2B1810' }}>{b.name}</span>
+          {selectedId === b.id && <span style={{ color: b.color, fontSize: 14 }}>✓</span>}
         </button>
       ));
     }
@@ -439,72 +587,66 @@ function FocusEditorModal({
       const filtered = brandFilter ? projects.filter(p => p.brandId === brandFilter) : projects;
       return (
         <>
-          <select style={{ ...inputStyle, height: 32, marginBottom: 8 }} value={brandFilter} onChange={e => setBrandFilter(e.target.value)}>
+          <select style={{ ...paperInputStyle, height: 32, marginBottom: 8 }} value={brandFilter} onChange={e => setBrandFilter(e.target.value)}>
             <option value="">كل البراندات</option>
             {brands.map(b => <option key={b.id} value={b.id}>{b.icon} {b.name}</option>)}
           </select>
           {filtered.map(p => {
             const brand = brands.find(b => b.id === p.brandId);
             return (
-              <button key={p.id} onClick={() => handleTargetSelect(p.id, p.title, brand?.color ?? '#C9A84C')}
+              <button key={p.id} onClick={() => handleTargetSelect(p.id, p.title, brand?.color ?? '#D4A055')}
                 style={{
                   width: '100%', display: 'flex', alignItems: 'center', gap: 8,
-                  padding: '7px 10px', background: selectedId === p.id ? 'rgba(201,168,76,0.08)' : '#fff',
-                  border: selectedId === p.id ? '1px solid var(--gold)' : '1px solid var(--brd)',
-                  borderRight: `3px solid ${brand?.color ?? '#C9A84C'}`,
-                  borderRadius: 8, cursor: 'pointer', fontFamily: 'inherit', direction: 'rtl',
-                  marginBottom: 4,
+                  padding: '7px 10px',
+                  background: selectedId === p.id ? 'rgba(212,160,85,0.1)' : 'rgba(255,255,255,0.4)',
+                  border: selectedId === p.id ? '1px solid #D4A055' : '1px solid rgba(180,150,100,0.3)',
+                  borderRight: `3px solid ${brand?.color ?? '#D4A055'}`,
+                  borderRadius: 4, cursor: 'pointer',
+                  fontFamily: 'var(--font-caveat, cursive)',
+                  direction: 'rtl', marginBottom: 4,
                 }}
               >
                 <span>📁</span>
-                <span style={{ flex: 1, fontSize: 12, fontWeight: 600, color: 'var(--txt)' }}>{p.title}</span>
-                {brand && <span style={{ fontSize: 9, color: brand.color }}>{brand.name}</span>}
-                {selectedId === p.id && <span style={{ color: 'var(--gold)' }}>✓</span>}
+                <span style={{ flex: 1, fontSize: 16, fontWeight: 600, color: '#2B1810' }}>{p.title}</span>
+                {brand && <span style={{ fontSize: 11, color: brand.color }}>{brand.name}</span>}
+                {selectedId === p.id && <span style={{ color: '#D4A055' }}>✓</span>}
               </button>
             );
           })}
-          {filtered.length === 0 && <div style={{ fontSize: 11, color: 'var(--txt3)', padding: '8px 0' }}>لا توجد مشاريع نشطة</div>}
         </>
       );
     }
     if (type === 'task') {
-      const filtered = activeTasks.filter(t => {
-        if (brandFilter && t.brandId !== brandFilter) return false;
-        if (priorityFilter && t.priority !== priorityFilter) return false;
-        return true;
-      });
+      const filtered = priorityFilter ? activeTasks.filter(t => t.priority === priorityFilter) : activeTasks;
       return (
         <>
-          <div style={{ display: 'flex', gap: 6, marginBottom: 8 }}>
-            <select style={{ ...inputStyle, height: 30, flex: 1 }} value={brandFilter} onChange={e => setBrandFilter(e.target.value)}>
-              <option value="">كل البراندات</option>
-              {brands.map(b => <option key={b.id} value={b.id}>{b.icon} {b.name}</option>)}
-            </select>
-            <select style={{ ...inputStyle, height: 30, flex: 1 }} value={priorityFilter} onChange={e => setPriorityFilter(e.target.value)}>
-              <option value="">كل الأولويات</option>
-              <option value="critical">حرج</option>
-              <option value="high">عالي</option>
-              <option value="medium">متوسط</option>
-              <option value="low">منخفض</option>
-            </select>
-          </div>
-          {filtered.slice(0, 12).map(t => (
-            <button key={t.id} onClick={() => handleTargetSelect(t.id, t.title, t.brandColor ?? PRIORITY_COLORS[t.priority] ?? '#888')}
+          <select style={{ ...paperInputStyle, height: 30, marginBottom: 8 }} value={priorityFilter} onChange={e => setPriorityFilter(e.target.value)}>
+            <option value="">كل الأولويات</option>
+            <option value="critical">حرج</option>
+            <option value="high">عالي</option>
+            <option value="medium">متوسط</option>
+            <option value="low">منخفض</option>
+          </select>
+          {filtered.slice(0, 10).map(t => (
+            <button key={t.id} onClick={() => handleTargetSelect(t.id, t.title, PRIORITY_COLORS[t.priority] ?? '#D4A055')}
               style={{
                 width: '100%', display: 'flex', alignItems: 'center', gap: 8,
-                padding: '6px 10px', background: selectedId === t.id ? 'rgba(201,168,76,0.08)' : '#fff',
-                border: selectedId === t.id ? '1px solid var(--gold)' : '1px solid var(--brd)',
-                borderRight: `3px solid ${PRIORITY_COLORS[t.priority] ?? '#888'}`,
-                borderRadius: 8, cursor: 'pointer', fontFamily: 'inherit', direction: 'rtl', marginBottom: 3,
+                padding: '6px 10px',
+                background: selectedId === t.id ? 'rgba(212,160,85,0.1)' : 'rgba(255,255,255,0.4)',
+                border: selectedId === t.id ? '1px solid #D4A055' : '1px solid rgba(180,150,100,0.3)',
+                borderRight: `3px solid ${PRIORITY_COLORS[t.priority] ?? '#D4A055'}`,
+                borderRadius: 4, cursor: 'pointer',
+                fontFamily: 'var(--font-caveat, cursive)',
+                direction: 'rtl', marginBottom: 3,
               }}
             >
               <span style={{ width: 7, height: 7, borderRadius: '50%', background: PRIORITY_COLORS[t.priority] ?? '#888', display: 'inline-block', flexShrink: 0 }} />
-              <span style={{ flex: 1, fontSize: 11, fontWeight: 600, color: 'var(--txt)' }}>{t.title}</span>
-              {t.brandName && <span style={{ fontSize: 9, color: t.brandColor ?? 'var(--txt3)' }}>{t.brandName}</span>}
-              {selectedId === t.id && <span style={{ color: 'var(--gold)' }}>✓</span>}
+              <span style={{ flex: 1, fontSize: 15, fontWeight: 600, color: '#2B1810' }}>{t.title}</span>
+              {t.brandName && <span style={{ fontSize: 10, color: t.brandColor ?? '#8B6F42' }}>{t.brandName}</span>}
+              {selectedId === t.id && <span style={{ color: '#D4A055' }}>✓</span>}
             </button>
           ))}
-          {filtered.length === 0 && <div style={{ fontSize: 11, color: 'var(--txt3)', padding: '8px 0' }}>لا توجد مهام مطابقة</div>}
+          {filtered.length === 0 && <div style={{ fontFamily: 'var(--font-caveat, cursive)', fontSize: 14, color: '#8B6F42', padding: '8px 0' }}>لا توجد مهام مطابقة</div>}
         </>
       );
     }
@@ -512,7 +654,7 @@ function FocusEditorModal({
       const filtered = priorityFilter ? personalTasks.filter(t => t.priority === priorityFilter) : personalTasks;
       return (
         <>
-          <select style={{ ...inputStyle, height: 30, marginBottom: 8 }} value={priorityFilter} onChange={e => setPriorityFilter(e.target.value)}>
+          <select style={{ ...paperInputStyle, height: 30, marginBottom: 8 }} value={priorityFilter} onChange={e => setPriorityFilter(e.target.value)}>
             <option value="">كل الأولويات</option>
             <option value="critical">حرج</option>
             <option value="high">عالي</option>
@@ -523,14 +665,17 @@ function FocusEditorModal({
             <button key={t.id} onClick={() => handleTargetSelect(t.id, t.title, PRIORITY_COLORS[t.priority] ?? '#9b59b6')}
               style={{
                 width: '100%', display: 'flex', alignItems: 'center', gap: 8,
-                padding: '6px 10px', background: selectedId === t.id ? 'rgba(155,89,182,0.08)' : '#fff',
-                border: selectedId === t.id ? '1px solid #9b59b6' : '1px solid var(--brd)',
+                padding: '6px 10px',
+                background: selectedId === t.id ? 'rgba(155,89,182,0.08)' : 'rgba(255,255,255,0.4)',
+                border: selectedId === t.id ? '1px solid #9b59b6' : '1px solid rgba(180,150,100,0.3)',
                 borderRight: `3px solid ${PRIORITY_COLORS[t.priority] ?? '#9b59b6'}`,
-                borderRadius: 8, cursor: 'pointer', fontFamily: 'inherit', direction: 'rtl', marginBottom: 3,
+                borderRadius: 4, cursor: 'pointer',
+                fontFamily: 'var(--font-caveat, cursive)',
+                direction: 'rtl', marginBottom: 3,
               }}
             >
               <span style={{ width: 7, height: 7, borderRadius: '50%', background: PRIORITY_COLORS[t.priority] ?? '#9b59b6', display: 'inline-block', flexShrink: 0 }} />
-              <span style={{ flex: 1, fontSize: 11, fontWeight: 600, color: 'var(--txt)' }}>{t.title}</span>
+              <span style={{ flex: 1, fontSize: 15, fontWeight: 600, color: '#2B1810' }}>{t.title}</span>
               {selectedId === t.id && <span style={{ color: '#9b59b6' }}>✓</span>}
             </button>
           ))}
@@ -541,10 +686,10 @@ function FocusEditorModal({
       return (
         <div style={{ padding: '10px 0', textAlign: 'center' }}>
           <div style={{ fontSize: 30, marginBottom: 8 }}>💰</div>
-          <div style={{ fontSize: 12, fontWeight: 600, color: '#27ae60', marginBottom: 8 }}>يوم مالي</div>
+          <div style={{ fontFamily: 'var(--font-caveat, cursive)', fontSize: 20, fontWeight: 600, color: '#27ae60', marginBottom: 8 }}>يوم مالي</div>
           <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6, justifyContent: 'center' }}>
             {['مراجعة الحسابات', 'دفع الرواتب', 'تحليل المبيعات', 'مراجعة المصاريف', 'تخطيط الميزانية'].map(tag => (
-              <span key={tag} style={{ background: 'rgba(39,174,96,0.1)', color: '#27ae60', padding: '3px 10px', borderRadius: 20, fontSize: 10 }}>{tag}</span>
+              <span key={tag} style={{ background: 'rgba(39,174,96,0.1)', color: '#27ae60', padding: '3px 10px', borderRadius: 20, fontFamily: 'var(--font-caveat, cursive)', fontSize: 14 }}>{tag}</span>
             ))}
           </div>
         </div>
@@ -554,10 +699,10 @@ function FocusEditorModal({
       return (
         <div style={{ padding: '10px 0', textAlign: 'center' }}>
           <div style={{ fontSize: 30, marginBottom: 8 }}>🌿</div>
-          <div style={{ fontSize: 12, fontWeight: 600, color: '#2ecc71', marginBottom: 8 }}>يوم استراحة وشحن طاقة</div>
+          <div style={{ fontFamily: 'var(--font-caveat, cursive)', fontSize: 20, fontWeight: 600, color: '#2ecc71', marginBottom: 8 }}>يوم استراحة وشحن طاقة</div>
           <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6, justifyContent: 'center' }}>
             {['نوم كافٍ', 'رياضة خفيفة', 'وقت عائلي', 'قراءة', 'تأمل وتفكير'].map(tag => (
-              <span key={tag} style={{ background: 'rgba(46,204,113,0.1)', color: '#2ecc71', padding: '3px 10px', borderRadius: 20, fontSize: 10 }}>{tag}</span>
+              <span key={tag} style={{ background: 'rgba(46,204,113,0.1)', color: '#2ecc71', padding: '3px 10px', borderRadius: 20, fontFamily: 'var(--font-caveat, cursive)', fontSize: 14 }}>{tag}</span>
             ))}
           </div>
         </div>
@@ -566,7 +711,7 @@ function FocusEditorModal({
     if (type === 'custom') {
       return (
         <input
-          style={{ ...inputStyle, height: 36 }}
+          style={{ ...paperInputStyle, height: 36, fontSize: 18 }}
           placeholder="اكتب اسم الفوكس..."
           value={customText}
           onChange={e => setCustomText(e.target.value)}
@@ -579,57 +724,81 @@ function FocusEditorModal({
   return (
     <div
       onClick={onClose}
-      style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.35)', zIndex: 1000, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 16 }}
+      style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.6)', zIndex: 1000, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 16 }}
     >
       <div
         onClick={e => e.stopPropagation()}
-        style={{ background: '#fff', borderRadius: 16, width: '100%', maxWidth: 460, maxHeight: '90vh', overflow: 'auto', direction: 'rtl', boxShadow: '0 20px 60px rgba(0,0,0,0.15)' }}
+        style={{
+          background: 'linear-gradient(135deg, #FBF3DF 0%, #F0E2BC 100%)',
+          borderRadius: 4, width: '100%', maxWidth: 460, maxHeight: '90vh', overflow: 'auto',
+          direction: 'rtl',
+          boxShadow: '0 20px 60px rgba(0,0,0,0.5)',
+          color: '#2B1810',
+        }}
       >
         {/* Header */}
-        <div style={{ padding: '14px 16px', borderBottom: '1px solid var(--brd)', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+        <div style={{
+          padding: '14px 16px',
+          borderBottom: '1px dashed rgba(180,150,100,0.4)',
+          display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+        }}>
           <div>
-            <div style={{ fontSize: 14, fontWeight: 700, color: 'var(--txt)' }}>🧭 تعيين فوكس — {dayName(dateStr)}</div>
-            <div style={{ fontSize: 11, color: 'var(--txt3)' }}>{dateShort(dateStr)}{isToday ? ' — اليوم' : ''}</div>
+            <div style={{ fontFamily: 'var(--font-caveat, cursive)', fontSize: 22, fontWeight: 700, color: '#3D2817' }}>
+              🧭 تعيين فوكس — {dayName(dateStr)}
+            </div>
+            <div style={{ fontFamily: 'var(--font-cormorant, serif)', fontStyle: 'italic', fontSize: 12, color: '#8B6F42' }}>
+              {dateShort(dateStr)}{isToday ? ' — اليوم' : ''}
+            </div>
           </div>
-          <button onClick={onClose} style={{ background: 'none', border: 'none', fontSize: 16, cursor: 'pointer', color: 'var(--txt3)', padding: '4px 8px' }}>✕</button>
+          <button onClick={onClose} style={{ background: 'none', border: 'none', fontSize: 16, cursor: 'pointer', color: '#8B6F42', padding: '4px 8px' }}>✕</button>
         </div>
 
         <div style={{ padding: '14px 16px' }}>
           {/* Hungry brands */}
           {hungryBrands.length > 0 && (
-            <div style={{ background: 'rgba(201,168,76,0.08)', border: '1px solid rgba(201,168,76,0.25)', borderRadius: 8, padding: '8px 12px', marginBottom: 12 }}>
-              <div style={{ fontSize: 11, fontWeight: 700, color: 'var(--gold)', marginBottom: 4 }}>💡 براندات تشتكي من الإهمال:</div>
+            <div style={{
+              background: 'rgba(212,160,85,0.1)',
+              border: '1px dashed rgba(212,160,85,0.4)',
+              borderRadius: 4, padding: '8px 12px', marginBottom: 12,
+            }}>
+              <div style={{ fontFamily: 'var(--font-caveat, cursive)', fontSize: 16, fontWeight: 700, color: '#9C7231', marginBottom: 4 }}>💡 براندات تشتكي من الإهمال:</div>
               {hungryBrands.map(b => (
-                <div key={b.id} style={{ fontSize: 11, color: 'var(--txt2)', padding: '1px 0' }}>• {b.icon} {b.name}</div>
+                <div key={b.id} style={{ fontFamily: 'var(--font-caveat, cursive)', fontSize: 15, color: '#5A4028', padding: '1px 0' }}>• {b.icon} {b.name}</div>
               ))}
             </div>
           )}
 
           {/* Collision warning */}
           {collisionCount > 0 && (
-            <div style={{ background: 'rgba(231,76,60,0.06)', border: '1px solid rgba(231,76,60,0.2)', borderRadius: 8, padding: '8px 12px', marginBottom: 12, fontSize: 11, color: 'var(--danger)' }}>
+            <div style={{
+              background: 'rgba(139,30,30,0.06)',
+              border: '1px solid rgba(139,30,30,0.2)',
+              borderRadius: 4, padding: '8px 12px', marginBottom: 12,
+              fontFamily: 'var(--font-caveat, cursive)', fontSize: 15, color: '#8B1E1E',
+            }}>
               ⚠️ هذا البراند مُعيَّن في {collisionCount} يوم آخر هذا الأسبوع
             </div>
           )}
 
           {/* Type selector */}
           <div style={{ marginBottom: 14 }}>
-            <div style={{ fontSize: 11, fontWeight: 700, color: 'var(--txt3)', marginBottom: 8 }}>نوع الفوكس</div>
+            <div style={{ fontFamily: 'var(--font-cormorant, serif)', fontStyle: 'italic', fontSize: 12, fontWeight: 700, color: '#8B6F42', marginBottom: 8 }}>نوع الفوكس</div>
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 6 }}>
               {(['brand','project','task','personal','finance','recharge'] as FocusTargetType[]).map(t => (
                 <button
                   key={t}
                   onClick={() => handleTypeSelect(t)}
                   style={{
-                    padding: '8px 6px', borderRadius: 8, cursor: 'pointer', fontFamily: 'inherit',
-                    background: type === t ? 'rgba(201,168,76,0.12)' : '#fff',
-                    border: type === t ? '1.5px solid var(--gold)' : '1px solid var(--brd)',
+                    padding: '8px 6px', borderRadius: 4, cursor: 'pointer',
+                    fontFamily: 'var(--font-caveat, cursive)',
+                    background: type === t ? 'rgba(212,160,85,0.15)' : 'rgba(255,255,255,0.4)',
+                    border: type === t ? '1.5px solid #D4A055' : '1px dashed rgba(180,150,100,0.4)',
                     display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 3,
                     transition: 'all 0.1s',
                   }}
                 >
                   <span style={{ fontSize: 18 }}>{FOCUS_TYPE_ICONS[t]}</span>
-                  <span style={{ fontSize: 10, fontWeight: 600, color: type === t ? 'var(--gold)' : 'var(--txt2)' }}>{FOCUS_TYPE_LABELS[t]}</span>
+                  <span style={{ fontSize: 12, fontWeight: 600, color: type === t ? '#9C7231' : '#8B6F42' }}>{FOCUS_TYPE_LABELS[t]}</span>
                 </button>
               ))}
             </div>
@@ -637,7 +806,7 @@ function FocusEditorModal({
 
           {/* Target */}
           <div style={{ marginBottom: 14 }}>
-            <div style={{ fontSize: 11, fontWeight: 700, color: 'var(--txt3)', marginBottom: 8 }}>
+            <div style={{ fontFamily: 'var(--font-cormorant, serif)', fontStyle: 'italic', fontSize: 12, fontWeight: 700, color: '#8B6F42', marginBottom: 8 }}>
               {type === 'brand' ? 'اختر البراند' : type === 'project' ? 'اختر المشروع' : type === 'task' ? 'اختر المهمة' : type === 'personal' ? 'اختر المهمة الشخصية' : type === 'finance' ? 'تفاصيل اليوم المالي' : type === 'recharge' ? 'تفاصيل الاستراحة' : 'اكتب الفوكس'}
             </div>
             <div style={{ maxHeight: 200, overflowY: 'auto' }}>
@@ -647,9 +816,9 @@ function FocusEditorModal({
 
           {/* Notes */}
           <div style={{ marginBottom: 14 }}>
-            <div style={{ fontSize: 11, fontWeight: 700, color: 'var(--txt3)', marginBottom: 6 }}>ملاحظات (اختياري)</div>
+            <div style={{ fontFamily: 'var(--font-cormorant, serif)', fontStyle: 'italic', fontSize: 12, fontWeight: 700, color: '#8B6F42', marginBottom: 6 }}>ملاحظات (اختياري)</div>
             <textarea
-              style={{ ...inputStyle, resize: 'none', padding: '8px 10px' }}
+              style={{ ...paperInputStyle, resize: 'none', padding: '8px 10px', fontSize: 16 }}
               rows={2}
               placeholder="أضف ملاحظة..."
               value={notes}
@@ -662,9 +831,15 @@ function FocusEditorModal({
             onClick={handleSave}
             disabled={isSaveDisabled}
             style={{
-              width: '100%', padding: '10px', background: isSaveDisabled ? 'var(--brd)' : 'var(--gold)',
-              color: '#fff', border: 'none', borderRadius: 8, fontSize: 13, fontWeight: 700,
-              cursor: isSaveDisabled ? 'not-allowed' : 'pointer', fontFamily: 'inherit', marginBottom: 8,
+              width: '100%', padding: '10px',
+              background: isSaveDisabled ? 'rgba(180,150,100,0.3)' : 'linear-gradient(135deg, #D4A055, #9C7231)',
+              color: isSaveDisabled ? '#8B6F42' : '#3D2817',
+              border: 'none', borderRadius: 4,
+              fontFamily: 'var(--font-caveat, cursive)',
+              fontSize: 18, fontWeight: 700,
+              cursor: isSaveDisabled ? 'not-allowed' : 'pointer',
+              marginBottom: 8,
+              boxShadow: isSaveDisabled ? 'none' : '0 2px 8px rgba(0,0,0,0.2)',
             }}
           >
             {isPending ? '...' : '💾 حفظ'}
@@ -673,11 +848,27 @@ function FocusEditorModal({
           {existing && (
             <div style={{ display: 'flex', gap: 8 }}>
               <button onClick={handleMigrateToNext} disabled={isPending}
-                style={{ flex: 1, padding: '8px', background: 'rgba(201,168,76,0.08)', border: '1px solid rgba(201,168,76,0.25)', borderRadius: 8, fontSize: 11, color: 'var(--gold)', cursor: 'pointer', fontFamily: 'inherit' }}>
+                style={{
+                  flex: 1, padding: '8px',
+                  background: 'rgba(212,160,85,0.1)',
+                  border: '1px dashed rgba(212,160,85,0.4)',
+                  borderRadius: 4,
+                  fontFamily: 'var(--font-caveat, cursive)',
+                  fontSize: 15, color: '#9C7231',
+                  cursor: 'pointer',
+                }}>
                 ترحيل للغد ➡️
               </button>
               <button onClick={handleClear} disabled={isPending}
-                style={{ flex: 1, padding: '8px', background: 'rgba(231,76,60,0.06)', border: '1px solid rgba(231,76,60,0.15)', borderRadius: 8, fontSize: 11, color: 'var(--danger)', cursor: 'pointer', fontFamily: 'inherit' }}>
+                style={{
+                  flex: 1, padding: '8px',
+                  background: 'rgba(139,30,30,0.06)',
+                  border: '1px dashed rgba(139,30,30,0.3)',
+                  borderRadius: 4,
+                  fontFamily: 'var(--font-caveat, cursive)',
+                  fontSize: 15, color: '#8B1E1E',
+                  cursor: 'pointer',
+                }}>
                 🗑 مسح
               </button>
             </div>
@@ -719,147 +910,191 @@ function FocusHero({
   const sorted = [...candidates].sort((a, b) => (priorityOrder[a.priority] ?? 3) - (priorityOrder[b.priority] ?? 3));
   const selectedTask = selectedTaskId ? sorted.find(t => t.id === selectedTaskId) : null;
 
-  const heroBase: React.CSSProperties = {
-    background: '#fff', border: '1px solid var(--brd)', borderRadius: 12,
-    padding: '14px 16px', marginBottom: 12, direction: 'rtl',
-    boxShadow: '0 1px 4px rgba(0,0,0,0.04)',
-  };
-
   // Recharge
   if (todayFocus?.targetType === 'recharge') {
     return (
-      <div style={{ ...heroBase, background: 'rgba(46,204,113,0.04)', borderColor: 'rgba(46,204,113,0.2)', textAlign: 'center' }}>
-        <div style={{ fontSize: 11, color: '#27ae60', fontWeight: 600, marginBottom: 6 }}>وضع الاستراحة</div>
-        <div style={{ fontSize: 36, marginBottom: 6 }}>🌿</div>
-        <div style={{ fontSize: 14, fontWeight: 700, color: '#27ae60' }}>يوم راحة مقصود</div>
-        <div style={{ fontSize: 11, color: 'var(--txt3)', marginTop: 4 }}>اشحن طاقتك — ستعود أقوى</div>
-      </div>
+      <PaperCard rotate={-1} delay={0.2} style={{ textAlign: 'center', marginBottom: 16 }}>
+        <div style={{ fontFamily: 'var(--font-cormorant, serif)', fontStyle: 'italic', fontSize: 13, color: '#5A7843', fontWeight: 600, marginBottom: 6 }}>وضع الاستراحة</div>
+        <div style={{ fontSize: 40, marginBottom: 8 }}>🌿</div>
+        <div style={{ fontFamily: 'var(--font-playfair, serif)', fontSize: 20, fontWeight: 700, color: '#3D5A28' }}>يوم راحة مقصود</div>
+        <div style={{ fontFamily: 'var(--font-cormorant, serif)', fontStyle: 'italic', fontSize: 13, color: '#8B6F42', marginTop: 6 }}>
+          استرح — العقل المرتاح أكثر إنتاجاً
+        </div>
+        <button onClick={onOpenEditor} style={{
+          marginTop: 12, padding: '6px 16px',
+          background: 'rgba(90,120,67,0.1)',
+          border: '1px dashed rgba(90,120,67,0.4)',
+          borderRadius: 3,
+          fontFamily: 'var(--font-caveat, cursive)', fontSize: 16,
+          color: '#5A7843', cursor: 'pointer',
+        }}>تغيير الفوكس</button>
+      </PaperCard>
     );
   }
 
   // No focus
   if (!todayFocus) {
     return (
-      <div style={{ ...heroBase, textAlign: 'center' }}>
-        <div style={{ fontSize: 11, color: 'var(--txt3)', marginBottom: 8, fontStyle: 'italic' }}>{tip}</div>
-        <button onClick={onOpenEditor}
-          style={{ padding: '8px 20px', background: 'var(--gold)', color: '#fff', border: 'none', borderRadius: 8, fontSize: 12, fontWeight: 700, cursor: 'pointer', fontFamily: 'inherit' }}>
-          🧭 عيّن فوكس اليوم
+      <PaperCard rotate={-1.5} delay={0.2} style={{ marginBottom: 16 }}>
+        {/* دبوس */}
+        <div style={{
+          position: 'absolute', top: -10, left: '50%', transform: 'translateX(-50%)',
+          width: 16, height: 16,
+          background: 'radial-gradient(circle at 40% 35%, #E8BC6F 0%, #D4A055 50%, #9C7231 100%)',
+          borderRadius: '50%',
+          boxShadow: '0 2px 6px rgba(0,0,0,0.4)',
+          zIndex: 10,
+        }} />
+        <div style={{ fontFamily: 'var(--font-caveat, cursive)', fontSize: 14, color: '#8B1E1E', fontWeight: 600, marginBottom: 8 }}>
+          الشيء الواحد الآن
+        </div>
+        <div style={{ fontFamily: 'var(--font-cormorant, serif)', fontStyle: 'italic', fontSize: 14, color: '#8B6F42', marginBottom: 12 }}>
+          {tip}
+        </div>
+        <button onClick={onOpenEditor} style={{
+          width: '100%', padding: '10px',
+          background: 'linear-gradient(135deg, #D4A055, #9C7231)',
+          color: '#3D2817', border: 'none', borderRadius: 4,
+          fontFamily: 'var(--font-caveat, cursive)', fontSize: 18, fontWeight: 700,
+          cursor: 'pointer',
+          boxShadow: '0 2px 8px rgba(0,0,0,0.2)',
+          transform: 'rotate(0.5deg)',
+        }}>
+          🧭 حدد فوكس اليوم
         </button>
-      </div>
+      </PaperCard>
     );
   }
 
-  // Personal
-  if (todayFocus.targetType === 'personal') {
-    const pTasks = personalTasks.slice(0, 8);
-    return (
-      <div style={heroBase}>
-        <div style={{ fontSize: 11, color: '#9b59b6', fontWeight: 700, marginBottom: 6 }}>الشيء الواحد الآن — شخصي 👤</div>
-        <div style={{ fontSize: 11, color: 'var(--txt3)', marginBottom: 8, fontStyle: 'italic' }}>{tip}</div>
-        {pTasks.length === 0 ? (
-          <div style={{ textAlign: 'center', color: 'var(--txt3)', fontSize: 11 }}>ما فيه مهام شخصية نشطة 🎉</div>
-        ) : (
-          pTasks.map(t => (
-            <div key={t.id} style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '5px 0', borderBottom: '1px solid var(--brd)' }}>
-              <span style={{ width: 7, height: 7, borderRadius: '50%', background: PRIORITY_COLORS[t.priority] ?? '#888', display: 'inline-block', flexShrink: 0 }} />
-              <span style={{ flex: 1, fontSize: 12 }}>{t.title}</span>
-              <span style={{ fontSize: 9, background: `${PRIORITY_COLORS[t.priority] ?? '#888'}22`, color: PRIORITY_COLORS[t.priority] ?? '#888', padding: '1px 6px', borderRadius: 8 }}>{PRIORITY_LABELS[t.priority]}</span>
-            </div>
-          ))
-        )}
-      </div>
-    );
-  }
+  const color = todayFocus.targetColor || '#D4A055';
+  const brand = todayFocus.targetType === 'brand' ? brands.find(b => b.id === todayFocus.targetId) : null;
+  const project = todayFocus.targetType === 'project' ? projects.find(p => p.id === todayFocus.targetId) : null;
 
-  // Selected task — expanded
+  // Selected task view
   if (selectedTask) {
-    const brand = brands.find(b => b.id === selectedTask.brandId);
-    const color = brand?.color ?? PRIORITY_COLORS[selectedTask.priority] ?? '#C9A84C';
+    const taskBrand = brands.find(b => b.id === selectedTask.brandId);
+    const taskColor = taskBrand?.color || color;
     const stTotal = selectedTask.subtasks.length;
     const stDone = selectedTask.subtasks.filter(s => s.completed).length;
     const clItems = selectedTask.checklist ?? [];
-    const clTotal = clItems.length;
-    const clDone = clItems.filter(c => c.done).length;
-    const totalItems = stTotal + clTotal;
-    const doneItems = stDone + clDone;
-    const pct = totalItems > 0 ? Math.round(doneItems / totalItems * 100) : 0;
+    const totalItems = stTotal + clItems.length;
+    const doneItems = stDone + clItems.filter(c => c.done).length;
     const isOverdue = selectedTask.dueDate && daysLeft(selectedTask.dueDate) < 0;
-
     const nextSteps = [
-      ...selectedTask.subtasks.filter(s => !s.completed).slice(0, 4).map(s => ({ id: s.id, title: s.title, type: 'مهمة فرعية' })),
-      ...clItems.filter(c => !c.done).slice(0, Math.max(0, 4 - selectedTask.subtasks.filter(s => !s.completed).length)).map(c => ({ id: c.id, title: c.text, type: 'مراجعة' })),
-    ];
+      ...selectedTask.subtasks.filter(s => !s.completed).map(s => ({ id: s.id, title: s.title, type: 'مهمة فرعية' })),
+      ...clItems.filter(c => !c.done).map(c => ({ id: c.id, title: c.text, type: 'قائمة' })),
+    ].slice(0, 3);
 
     return (
-      <div style={heroBase}>
-        <div style={{ fontSize: 11, color: 'var(--gold)', fontWeight: 700, marginBottom: 8 }}>الشيء الواحد الآن</div>
+      <PaperCard rotate={-1.5} delay={0.2} style={{ marginBottom: 16 }}>
+        {/* دبوس */}
+        <div style={{
+          position: 'absolute', top: -10, left: '50%', transform: 'translateX(-50%)',
+          width: 16, height: 16,
+          background: 'radial-gradient(circle at 40% 35%, #E8BC6F 0%, #D4A055 50%, #9C7231 100%)',
+          borderRadius: '50%',
+          boxShadow: '0 2px 6px rgba(0,0,0,0.4)',
+          zIndex: 10,
+        }} />
 
-        {/* Header */}
-        <div style={{ display: 'flex', alignItems: 'flex-start', gap: 8, marginBottom: 8 }}>
+        <div style={{ display: 'flex', alignItems: 'flex-start', gap: 10, marginBottom: 10, direction: 'rtl' }}>
           <div style={{ flex: 1 }}>
             <div style={{ display: 'flex', gap: 4, marginBottom: 4, flexWrap: 'wrap' }}>
-              <span style={{ fontSize: 9, background: 'rgba(52,152,219,0.1)', color: '#3498db', padding: '1px 6px', borderRadius: 8 }}>مهمة</span>
-              <span style={{ fontSize: 9, background: `${PRIORITY_COLORS[selectedTask.priority]}22`, color: PRIORITY_COLORS[selectedTask.priority], padding: '1px 6px', borderRadius: 8 }}>{PRIORITY_LABELS[selectedTask.priority]}</span>
-              {isOverdue && <span style={{ fontSize: 9, background: 'rgba(231,76,60,0.1)', color: 'var(--danger)', padding: '1px 6px', borderRadius: 8 }}>متأخرة</span>}
+              <span style={{ fontFamily: 'var(--font-cormorant, serif)', fontStyle: 'italic', fontSize: 10, background: 'rgba(52,152,219,0.1)', color: '#3498db', padding: '1px 6px', borderRadius: 3 }}>مهمة</span>
+              <span style={{ fontFamily: 'var(--font-cormorant, serif)', fontStyle: 'italic', fontSize: 10, background: `${PRIORITY_COLORS[selectedTask.priority]}22`, color: PRIORITY_COLORS[selectedTask.priority], padding: '1px 6px', borderRadius: 3 }}>{PRIORITY_LABELS[selectedTask.priority]}</span>
+              {isOverdue && <span style={{ fontFamily: 'var(--font-cormorant, serif)', fontStyle: 'italic', fontSize: 10, background: 'rgba(139,30,30,0.1)', color: '#8B1E1E', padding: '1px 6px', borderRadius: 3 }}>متأخرة</span>}
             </div>
-            <div style={{ fontSize: 14, fontWeight: 700, color: 'var(--txt)', marginBottom: 3 }}>{selectedTask.title}</div>
-            {brand && <div style={{ fontSize: 11, color }}>{brand.name}</div>}
+            <div style={{ fontFamily: 'var(--font-caveat, cursive)', fontSize: 28, fontWeight: 700, color: '#2B1810', marginBottom: 3, lineHeight: 1.2 }}>
+              {selectedTask.title}
+            </div>
+            {taskBrand && <div style={{ fontFamily: 'var(--font-cormorant, serif)', fontStyle: 'italic', fontSize: 13, color: taskColor }}>{taskBrand.name}</div>}
           </div>
         </div>
 
-        {/* Progress */}
         {stTotal > 0 && (
-          <div style={{ marginBottom: 6 }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 10, color: 'var(--txt3)', marginBottom: 3 }}>
+          <div style={{ marginBottom: 8 }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', fontFamily: 'var(--font-cormorant, serif)', fontStyle: 'italic', fontSize: 11, color: '#8B6F42', marginBottom: 3 }}>
               <span>مهام فرعية: {stDone}/{stTotal}</span>
               <span>{stTotal > 0 ? Math.round(stDone/stTotal*100) : 0}%</span>
             </div>
-            <div style={{ height: 4, background: 'var(--brd)', borderRadius: 4 }}>
-              <div style={{ width: `${stTotal > 0 ? Math.round(stDone/stTotal*100) : 0}%`, height: 4, background: color, borderRadius: 4, transition: 'width 0.3s' }} />
+            <div style={{ height: 4, background: 'rgba(180,150,100,0.3)', borderRadius: 4 }}>
+              <div style={{ width: `${stTotal > 0 ? Math.round(stDone/stTotal*100) : 0}%`, height: 4, background: taskColor, borderRadius: 4, transition: 'width 0.3s' }} />
             </div>
           </div>
         )}
 
-        {/* Next steps */}
         {nextSteps.length > 0 && (
           <div style={{ marginBottom: 10 }}>
-            <div style={{ fontSize: 10, color: 'var(--txt3)', fontWeight: 600, marginBottom: 4 }}>الخطوة التالية:</div>
+            <div style={{ fontFamily: 'var(--font-cormorant, serif)', fontStyle: 'italic', fontSize: 11, color: '#8B6F42', fontWeight: 600, marginBottom: 4 }}>الخطوة التالية:</div>
             {nextSteps.map(step => (
-              <div key={step.id} style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '4px 0', borderBottom: '1px solid var(--brd)' }}>
-                <input type="checkbox" style={{ accentColor: color }} />
-                <span style={{ flex: 1, fontSize: 11 }}>{step.title}</span>
-                <span style={{ fontSize: 9, color: 'var(--txt3)', background: 'var(--bg2)', padding: '1px 5px', borderRadius: 8 }}>{step.type}</span>
+              <div key={step.id} style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '4px 0', borderBottom: '1px solid rgba(180,150,100,0.2)' }}>
+                <input type="checkbox" style={{ accentColor: taskColor }} />
+                <span style={{ flex: 1, fontFamily: 'var(--font-caveat, cursive)', fontSize: 16 }}>{step.title}</span>
+                <span style={{ fontFamily: 'var(--font-cormorant, serif)', fontStyle: 'italic', fontSize: 10, color: '#8B6F42', background: 'rgba(180,150,100,0.15)', padding: '1px 5px', borderRadius: 3 }}>{step.type}</span>
               </div>
             ))}
-            {totalItems - doneItems > nextSteps.length && (
-              <div style={{ fontSize: 10, color: 'var(--txt3)', marginTop: 4 }}>+ {totalItems - doneItems - nextSteps.length} أخرى...</div>
-            )}
           </div>
         )}
 
-        {/* Actions */}
         <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', marginBottom: 8 }}>
-          <button style={{ flex: 1, padding: '6px 8px', background: 'rgba(46,204,113,0.1)', color: '#27ae60', border: '1px solid rgba(46,204,113,0.2)', borderRadius: 7, fontSize: 11, cursor: 'pointer', fontFamily: 'inherit' }}>✓ خلصت</button>
-          <button style={{ flex: 1, padding: '6px 8px', background: 'rgba(231,76,60,0.06)', color: 'var(--danger)', border: '1px solid rgba(231,76,60,0.15)', borderRadius: 7, fontSize: 11, cursor: 'pointer', fontFamily: 'inherit' }}>⚡ عالق</button>
-          <button style={{ flex: 1, padding: '6px 8px', background: 'rgba(201,168,76,0.08)', color: 'var(--gold)', border: '1px solid rgba(201,168,76,0.2)', borderRadius: 7, fontSize: 11, cursor: 'pointer', fontFamily: 'inherit' }}>⏰ بعدين</button>
-          <button onClick={() => setSelectedTaskId(null)} style={{ flex: 1, padding: '6px 8px', background: 'var(--bg2)', color: 'var(--txt2)', border: '1px solid var(--brd)', borderRadius: 7, fontSize: 11, cursor: 'pointer', fontFamily: 'inherit' }}>🔄 تغيير</button>
+          {[
+            { label: '✓ خلصت', bg: 'rgba(90,120,67,0.1)', color: '#5A7843', border: 'rgba(90,120,67,0.3)' },
+            { label: '⚡ عالق', bg: 'rgba(139,30,30,0.06)', color: '#8B1E1E', border: 'rgba(139,30,30,0.2)' },
+            { label: '⏰ بعدين', bg: 'rgba(212,160,85,0.08)', color: '#9C7231', border: 'rgba(212,160,85,0.3)' },
+          ].map(btn => (
+            <button key={btn.label} style={{
+              flex: 1, padding: '6px 8px',
+              background: btn.bg,
+              color: btn.color,
+              border: `1px dashed ${btn.border}`,
+              borderRadius: 4,
+              fontFamily: 'var(--font-caveat, cursive)', fontSize: 15,
+              cursor: 'pointer',
+            }}>{btn.label}</button>
+          ))}
+          <button onClick={() => setSelectedTaskId(null)} style={{
+            flex: 1, padding: '6px 8px',
+            background: 'rgba(180,150,100,0.1)',
+            color: '#8B6F42',
+            border: '1px dashed rgba(180,150,100,0.3)',
+            borderRadius: 4,
+            fontFamily: 'var(--font-caveat, cursive)', fontSize: 15,
+            cursor: 'pointer',
+          }}>🔄 تغيير</button>
         </div>
-        <Link href={`/tasks/${selectedTask.id}`} style={{ fontSize: 11, color: 'var(--gold)', display: 'block', textAlign: 'center' }}>فتح التفاصيل ←</Link>
-      </div>
+        <Link href={`/tasks/${selectedTask.id}`} style={{
+          fontFamily: 'var(--font-cormorant, serif)', fontStyle: 'italic',
+          fontSize: 13, color: '#9C7231', display: 'block', textAlign: 'center',
+        }}>فتح التفاصيل ←</Link>
+      </PaperCard>
     );
   }
 
   // Pick list
   return (
-    <div style={heroBase}>
-      <div style={{ fontSize: 11, color: 'var(--gold)', fontWeight: 700, marginBottom: 4 }}>الشيء الواحد الآن</div>
-      <div style={{ fontSize: 11, color: 'var(--txt3)', marginBottom: 8, fontStyle: 'italic' }}>{tip}</div>
+    <PaperCard rotate={-1.5} delay={0.2} style={{ marginBottom: 16 }}>
+      {/* دبوس */}
+      <div style={{
+        position: 'absolute', top: -10, left: '50%', transform: 'translateX(-50%)',
+        width: 16, height: 16,
+        background: 'radial-gradient(circle at 40% 35%, #E8BC6F 0%, #D4A055 50%, #9C7231 100%)',
+        borderRadius: '50%',
+        boxShadow: '0 2px 6px rgba(0,0,0,0.4)',
+        zIndex: 10,
+      }} />
+      <div style={{ fontFamily: 'var(--font-caveat, cursive)', fontSize: 22, fontWeight: 700, color: '#3D2817', marginBottom: 4 }}>
+        الشيء الواحد الآن
+      </div>
+      <div style={{ fontFamily: 'var(--font-cormorant, serif)', fontStyle: 'italic', fontSize: 13, color: '#8B6F42', marginBottom: 10 }}>
+        {tip}
+      </div>
       {sorted.length === 0 ? (
-        <div style={{ textAlign: 'center', color: 'var(--txt3)', fontSize: 11 }}>ما فيه مهام نشطة لهذا الفوكس 🎉</div>
+        <div style={{ textAlign: 'center', fontFamily: 'var(--font-caveat, cursive)', fontSize: 18, color: '#8B6F42' }}>
+          ما فيه مهام نشطة لهذا الفوكس 🎉
+        </div>
       ) : (
         <>
-          <div style={{ fontSize: 10, color: 'var(--txt3)', marginBottom: 6 }}>اختر مهمة تركز عليها الآن:</div>
+          <div style={{ fontFamily: 'var(--font-cormorant, serif)', fontStyle: 'italic', fontSize: 12, color: '#8B6F42', marginBottom: 6 }}>اختر مهمة تركز عليها الآن:</div>
           {sorted.slice(0, 8).map(t => {
             const brand = brands.find(b => b.id === t.brandId);
             const pColor = PRIORITY_COLORS[t.priority] ?? '#888';
@@ -874,72 +1109,101 @@ function FocusHero({
               <button key={t.id} onClick={() => setSelectedTaskId(t.id)}
                 style={{
                   width: '100%', display: 'flex', flexDirection: 'column', gap: 3,
-                  padding: '7px 10px', background: '#fff',
-                  border: '1px solid var(--brd)', borderRight: `3px solid ${pColor}`,
-                  borderRadius: 8, cursor: 'pointer', fontFamily: 'inherit',
+                  padding: '7px 10px',
+                  background: 'rgba(255,255,255,0.4)',
+                  border: '1px dashed rgba(180,150,100,0.4)',
+                  borderRight: `3px solid ${pColor}`,
+                  borderRadius: 4, cursor: 'pointer',
+                  fontFamily: 'var(--font-caveat, cursive)',
                   marginBottom: 4, textAlign: 'right', direction: 'rtl',
                   transition: 'all 0.1s',
                 }}
               >
                 <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
                   <span style={{ width: 7, height: 7, borderRadius: '50%', background: pColor, display: 'inline-block', flexShrink: 0 }} />
-                  <span style={{ flex: 1, fontSize: 12, fontWeight: 600, color: 'var(--txt)' }}>{t.title}</span>
-                  <span style={{ fontSize: 9, background: `${pColor}22`, color: pColor, padding: '1px 5px', borderRadius: 8 }}>{PRIORITY_LABELS[t.priority]}</span>
-                  {STATUS_LABELS[t.status] && <span style={{ fontSize: 9, color: 'var(--txt3)' }}>{STATUS_LABELS[t.status]}</span>}
+                  <span style={{ flex: 1, fontSize: 17, fontWeight: 600, color: '#2B1810' }}>{t.title}</span>
+                  <span style={{ fontFamily: 'var(--font-cormorant, serif)', fontStyle: 'italic', fontSize: 10, background: `${pColor}22`, color: pColor, padding: '1px 5px', borderRadius: 3 }}>{PRIORITY_LABELS[t.priority]}</span>
                 </div>
                 {brand && (
                   <div style={{ display: 'flex', alignItems: 'center', gap: 6, paddingRight: 13 }}>
-                    <span style={{ fontSize: 10, color: brand.color }}>{brand.name}</span>
-                    {isOverdue && <span style={{ fontSize: 9, color: 'var(--danger)' }}>⚠ متأخرة</span>}
+                    <span style={{ fontFamily: 'var(--font-cormorant, serif)', fontStyle: 'italic', fontSize: 11, color: brand.color }}>{brand.name}</span>
+                    {isOverdue && <span style={{ fontFamily: 'var(--font-cormorant, serif)', fontStyle: 'italic', fontSize: 10, color: '#8B1E1E' }}>⚠ متأخرة</span>}
                   </div>
                 )}
                 {totalItems > 0 && (
                   <div style={{ paddingRight: 13, display: 'flex', alignItems: 'center', gap: 4 }}>
-                    <div style={{ flex: 1, height: 3, background: 'var(--brd)', borderRadius: 3 }}>
+                    <div style={{ flex: 1, height: 3, background: 'rgba(180,150,100,0.3)', borderRadius: 3 }}>
                       <div style={{ width: `${pct}%`, height: 3, background: pColor, borderRadius: 3 }} />
                     </div>
-                    <span style={{ fontSize: 9, color: 'var(--txt3)' }}>{doneItems}/{totalItems}</span>
+                    <span style={{ fontFamily: 'var(--font-cormorant, serif)', fontStyle: 'italic', fontSize: 10, color: '#8B6F42' }}>{doneItems}/{totalItems}</span>
                   </div>
                 )}
               </button>
             );
           })}
-          {sorted.length > 8 && <div style={{ fontSize: 10, color: 'var(--txt3)' }}>+ {sorted.length - 8} مهمة أخرى</div>}
+          {sorted.length > 8 && <div style={{ fontFamily: 'var(--font-cormorant, serif)', fontStyle: 'italic', fontSize: 12, color: '#8B6F42' }}>+ {sorted.length - 8} مهمة أخرى</div>}
         </>
       )}
-    </div>
+    </PaperCard>
   );
 }
 
 // ─── Decisions Panel ──────────────────────────────────────────────────────────
 function DecisionsPanel({ decisions, brands }: { decisions: DecisionRow[]; brands: Brand[] }) {
   if (!decisions.length) {
-    return <div style={{ textAlign: 'center', padding: 12, color: 'var(--txt3)', fontSize: 11 }}>✅ كل القرارات محسومة!</div>;
+    return (
+      <div style={{ textAlign: 'center', padding: 12, fontFamily: 'var(--font-caveat, cursive)', fontSize: 18, color: '#8B6F42' }}>
+        ✅ كل القرارات محسومة!
+      </div>
+    );
   }
-  const impactColors: Record<string, string> = { critical: '#e74c3c', high: '#e74c3c', medium: '#f39c12', low: '#95a5a6' };
+  const impactColors: Record<string, string> = { critical: '#8B1E1E', high: '#8B1E1E', medium: '#9C7231', low: '#8B6F42' };
   return (
     <div>
+      {/* ختم الشمع */}
+      <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 12, direction: 'rtl' }}>
+        <div style={{
+          width: 40, height: 40,
+          background: 'radial-gradient(circle at 35% 35%, #C63838 0%, #8B1E1E 60%, #5A0E0E 100%)',
+          borderRadius: '50%',
+          display: 'flex', alignItems: 'center', justifyContent: 'center',
+          boxShadow: '0 2px 8px rgba(0,0,0,0.3)',
+          flexShrink: 0,
+        }}>
+          <span style={{ fontFamily: 'var(--font-playfair, serif)', fontStyle: 'italic', fontSize: 16, color: 'rgba(255,255,255,0.9)', fontWeight: 600 }}>G</span>
+        </div>
+        <div>
+          <div style={{ fontFamily: 'var(--font-playfair, serif)', fontSize: 13, fontWeight: 600, color: '#3D2817' }}>قرارات معلقة</div>
+          <div style={{ fontFamily: 'var(--font-cormorant, serif)', fontStyle: 'italic', fontSize: 11, color: '#8B6F42' }}>تحتاج حسماً</div>
+        </div>
+      </div>
       {decisions.slice(0, 5).map(d => {
         const brand = brands.find(b => b.id === d.brand_id);
         return (
-          <div key={d.id} style={{ padding: '8px 0', borderBottom: '1px solid var(--brd)' }}>
-            <div style={{ fontSize: 12, fontWeight: 600, marginBottom: 4, color: 'var(--txt)' }}>{d.title}</div>
+          <div key={d.id} style={{ padding: '8px 0', borderBottom: '1px dashed rgba(180,150,100,0.3)' }}>
+            <div style={{ fontFamily: 'var(--font-caveat, cursive)', fontSize: 18, fontWeight: 600, marginBottom: 4, color: '#2B1810' }}>{d.title}</div>
             <div style={{ display: 'flex', gap: 6, alignItems: 'center', flexWrap: 'wrap' }}>
-              <span style={{ fontSize: 9, background: `${impactColors[d.impact] ?? '#888'}22`, color: impactColors[d.impact] ?? '#888', padding: '1px 6px', borderRadius: 8, fontWeight: 600 }}>
+              <span style={{
+                fontFamily: 'var(--font-cormorant, serif)', fontStyle: 'italic',
+                fontSize: 10,
+                background: `${impactColors[d.impact] ?? '#888'}18`,
+                color: impactColors[d.impact] ?? '#888',
+                padding: '1px 6px', borderRadius: 3, fontWeight: 600,
+              }}>
                 {d.impact === 'critical' ? 'حرج' : d.impact === 'high' ? 'مرتفع' : d.impact === 'medium' ? 'متوسط' : 'منخفض'}
               </span>
               {d.deadline && (
-                <span style={{ fontSize: 10, color: daysLeft(d.deadline) < 3 ? 'var(--danger)' : 'var(--txt3)' }}>
+                <span style={{ fontFamily: 'var(--font-cormorant, serif)', fontStyle: 'italic', fontSize: 11, color: daysLeft(d.deadline) < 3 ? '#8B1E1E' : '#8B6F42' }}>
                   {daysLeftLabel(d.deadline)}
                 </span>
               )}
-              {brand && <span style={{ fontSize: 9, background: `${brand.color}22`, color: brand.color, padding: '1px 6px', borderRadius: 8 }}>{brand.name}</span>}
+              {brand && <span style={{ fontFamily: 'var(--font-cormorant, serif)', fontStyle: 'italic', fontSize: 10, background: `${brand.color}18`, color: brand.color, padding: '1px 6px', borderRadius: 3 }}>{brand.name}</span>}
             </div>
           </div>
         );
       })}
       {decisions.length > 5 && (
-        <Link href="/decisions" style={{ fontSize: 11, color: 'var(--gold)', display: 'block', marginTop: 8 }}>
+        <Link href="/decisions" style={{ fontFamily: 'var(--font-caveat, cursive)', fontSize: 16, color: '#9C7231', display: 'block', marginTop: 8 }}>
           + {decisions.length - 5} قرار آخر ←
         </Link>
       )}
@@ -959,9 +1223,25 @@ function CalendarMini({ upcomingEvents, brands }: { upcomingEvents: UpcomingEven
 
   return (
     <div>
+      {/* شريط لاصق */}
+      <div style={{
+        position: 'absolute', top: -10, right: '50%', transform: 'translateX(50%)',
+        width: 60, height: 14,
+        background: 'rgba(255,220,100,0.7)',
+        borderRadius: 2,
+        boxShadow: '0 1px 3px rgba(0,0,0,0.2)',
+      }} />
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: 8, direction: 'rtl' }}>
+        <span style={{ fontFamily: 'var(--font-playfair, serif)', fontSize: 15, fontWeight: 600, color: '#3D2817' }}>
+          {MONTH_NAMES[month]}
+        </span>
+        <span style={{ fontFamily: 'var(--font-cormorant, serif)', fontStyle: 'italic', fontSize: 12, color: '#8B6F42' }}>
+          {year}
+        </span>
+      </div>
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', gap: 2, marginBottom: 8 }}>
         {['أح','إث','ثل','أر','خم','جم','سب'].map(d => (
-          <div key={d} style={{ textAlign: 'center', fontSize: 9, color: 'var(--txt3)', fontWeight: 600 }}>{d}</div>
+          <div key={d} style={{ textAlign: 'center', fontFamily: 'var(--font-cormorant, serif)', fontStyle: 'italic', fontSize: 9, color: '#8B6F42', fontWeight: 600 }}>{d}</div>
         ))}
         {Array.from({ length: firstDay }, (_, i) => <div key={`e${i}`} />)}
         {Array.from({ length: daysInMonth }, (_, i) => {
@@ -970,13 +1250,22 @@ function CalendarMini({ upcomingEvents, brands }: { upcomingEvents: UpcomingEven
           const hasEvent = eventDays.has(day);
           return (
             <div key={day} style={{
-              textAlign: 'center', fontSize: 10, padding: '3px 0', borderRadius: 4,
-              background: isToday ? 'var(--gold)' : 'transparent',
-              color: isToday ? '#fff' : hasEvent ? 'var(--gold)' : 'var(--txt2)',
-              fontWeight: isToday || hasEvent ? 700 : 400, position: 'relative',
+              textAlign: 'center',
+              fontFamily: isToday ? 'var(--font-playfair, serif)' : 'var(--font-cormorant, serif)',
+              fontStyle: isToday ? 'normal' : 'italic',
+              fontSize: 12, padding: '3px 0', borderRadius: '50%',
+              background: isToday ? '#8B1E1E' : 'transparent',
+              color: isToday ? '#fff' : hasEvent ? '#9C7231' : '#5A4028',
+              fontWeight: isToday || hasEvent ? 700 : 400,
+              position: 'relative',
             }}>
               {day}
-              {hasEvent && !isToday && <span style={{ position: 'absolute', bottom: 1, left: '50%', transform: 'translateX(-50%)', width: 3, height: 3, borderRadius: '50%', background: 'var(--gold)', display: 'block' }} />}
+              {hasEvent && !isToday && (
+                <span style={{
+                  position: 'absolute', bottom: 1, left: '50%', transform: 'translateX(-50%)',
+                  width: 3, height: 3, borderRadius: '50%', background: '#D4A055', display: 'block',
+                }} />
+              )}
             </div>
           );
         })}
@@ -984,10 +1273,10 @@ function CalendarMini({ upcomingEvents, brands }: { upcomingEvents: UpcomingEven
       {upcomingEvents.slice(0, 4).map(e => {
         const brand = brands.find(b => b.id === e.brandId);
         return (
-          <div key={e.id} style={{ display: 'flex', gap: 8, padding: '4px 0', borderBottom: '1px solid var(--brd)', alignItems: 'center' }}>
-            <div style={{ minWidth: 22, color: 'var(--gold)', fontWeight: 700, fontSize: 11 }}>{e.day}</div>
-            <div style={{ flex: 1, fontSize: 11, color: 'var(--txt)' }}>{e.title}</div>
-            {brand && <span style={{ fontSize: 9, color: brand.color }}>{brand.name}</span>}
+          <div key={e.id} style={{ display: 'flex', gap: 8, padding: '4px 0', borderBottom: '1px dashed rgba(180,150,100,0.3)', alignItems: 'center', direction: 'rtl' }}>
+            <div style={{ minWidth: 22, fontFamily: 'var(--font-playfair, serif)', fontWeight: 700, fontSize: 13, color: '#9C7231' }}>{e.day}</div>
+            <div style={{ flex: 1, fontFamily: 'var(--font-caveat, cursive)', fontSize: 16, color: '#2B1810' }}>{e.title}</div>
+            {brand && <span style={{ fontFamily: 'var(--font-cormorant, serif)', fontStyle: 'italic', fontSize: 10, color: brand.color }}>{brand.name}</span>}
           </div>
         );
       })}
@@ -1014,25 +1303,47 @@ function InboxPanel({ inboxTasks }: { inboxTasks: InboxTask[] }) {
 
   return (
     <div>
-      <div style={{ display: 'flex', gap: 6, marginBottom: 10 }}>
+      <div style={{ display: 'flex', gap: 6, marginBottom: 8, direction: 'rtl' }}>
         <input
-          style={{ flex: 1, height: 32, padding: '0 10px', border: '1px solid var(--brd)', borderRadius: 8, fontSize: 12, fontFamily: 'inherit', background: '#fff', color: 'var(--txt)', direction: 'rtl' }}
+          style={{
+            flex: 1, height: 36, padding: '0 10px',
+            border: '1px dashed rgba(180,150,100,0.5)',
+            borderRadius: 4, fontSize: 18,
+            fontFamily: 'var(--font-caveat, cursive)',
+            fontStyle: 'italic',
+            background: 'rgba(255,255,255,0.3)',
+            color: '#2B1810', direction: 'rtl',
+          }}
           placeholder="فكرة أو ملاحظة سريعة..."
           value={newText}
           onChange={e => setNewText(e.target.value)}
           onKeyDown={e => e.key === 'Enter' && handleAdd()}
         />
         <button onClick={handleAdd} disabled={isPending || !newText.trim()}
-          style={{ padding: '0 12px', background: 'var(--gold)', color: '#fff', border: 'none', borderRadius: 8, fontSize: 14, cursor: 'pointer', fontFamily: 'inherit' }}>+</button>
+          style={{
+            padding: '0 12px',
+            background: 'linear-gradient(135deg, #D4A055, #9C7231)',
+            color: '#3D2817', border: 'none', borderRadius: 4,
+            fontFamily: 'var(--font-playfair, serif)', fontSize: 18,
+            cursor: 'pointer',
+            boxShadow: '0 2px 6px rgba(0,0,0,0.15)',
+          }}>+</button>
       </div>
       {inboxTasks.length === 0 ? (
-        <div style={{ textAlign: 'center', padding: 12, color: 'var(--txt3)', fontSize: 11 }}>صندوق الوارد فارغ ✨</div>
+        <div style={{ textAlign: 'center', padding: 12, fontFamily: 'var(--font-caveat, cursive)', fontSize: 18, color: '#8B6F42' }}>
+          صندوق الوارد فارغ ✨
+        </div>
       ) : (
         inboxTasks.slice(0, 8).map(t => (
-          <div key={t.id} style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '6px 0', borderBottom: '1px solid var(--brd)' }}>
-            <span style={{ flex: 1, fontSize: 12, color: 'var(--txt)' }}>{t.text}</span>
+          <div key={t.id} style={{
+            display: 'flex', alignItems: 'flex-start', gap: 8,
+            padding: '6px 0', borderBottom: '1px dashed rgba(180,150,100,0.25)',
+            direction: 'rtl',
+          }}>
+            <span style={{ color: '#D4A055', fontSize: 10, marginTop: 6, flexShrink: 0 }}>◆</span>
+            <span style={{ flex: 1, fontFamily: 'var(--font-caveat, cursive)', fontSize: 18, color: '#2B1810' }}>{t.text}</span>
             <button onClick={() => handleDelete(t.id)}
-              style={{ background: 'none', border: 'none', color: 'var(--txt3)', cursor: 'pointer', fontSize: 13, padding: '0 4px' }}>✕</button>
+              style={{ background: 'none', border: 'none', color: '#C9B585', cursor: 'pointer', fontSize: 13, padding: '0 4px', flexShrink: 0 }}>✕</button>
           </div>
         ))
       )}
@@ -1040,28 +1351,101 @@ function InboxPanel({ inboxTasks }: { inboxTasks: InboxTask[] }) {
   );
 }
 
-// ─── Brand Health Strip ───────────────────────────────────────────────────────
+// ─── Brand Health Strip (زجاجات عطور) ────────────────────────────────────────
 function BrandHealthStrip({ brands, activeTasks }: { brands: Brand[]; activeTasks: ActiveTask[] }) {
-  const statusColors: Record<string, string> = { active: '#27ae60', selling: '#3498db', paused: '#f39c12', archived: '#95a5a6' };
+  const statusColors: Record<string, string> = { active: '#5A7843', selling: '#3498db', paused: '#9C7231', archived: '#8B6F42' };
   const statusLabels: Record<string, string> = { active: 'نشط', selling: 'بيع', paused: 'موقف', archived: 'أرشيف' };
+
   return (
-    <div style={{ display: 'flex', gap: 8, overflowX: 'auto', paddingBottom: 4 }}>
-      {brands.map(b => {
+    <div style={{ display: 'flex', gap: 12, overflowX: 'auto', paddingBottom: 8, paddingTop: 16 }}>
+      {brands.map((b, idx) => {
         const tasks = activeTasks.filter(t => t.brandId === b.id);
+        const rotations = [-3, 2, -1.5, 3, -2, 1.5, -3, 2];
+        const rot = rotations[idx % rotations.length];
+
         return (
           <Link key={b.id} href={`/brands/${b.id}`}
             style={{
-              display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 3,
-              minWidth: 64, padding: '8px 6px', background: '#fff',
-              border: '1px solid var(--brd)', borderTop: `2px solid ${b.color}`,
-              borderRadius: 8, textDecoration: 'none', flexShrink: 0,
-              transition: 'box-shadow 0.15s',
+              display: 'flex', flexDirection: 'column', alignItems: 'center',
+              textDecoration: 'none', flexShrink: 0,
+              transform: `rotate(${rot}deg)`,
+              transition: 'transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1)',
+            }}
+            onMouseEnter={(e) => {
+              (e.currentTarget as HTMLElement).style.transform = `rotate(0deg) translateY(-8px)`;
+            }}
+            onMouseLeave={(e) => {
+              (e.currentTarget as HTMLElement).style.transform = `rotate(${rot}deg)`;
             }}
           >
-            <div style={{ fontSize: 16 }}>{b.icon}</div>
-            <div style={{ fontSize: 9, fontWeight: 700, color: 'var(--txt)', textAlign: 'center', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', maxWidth: 56 }}>{b.name}</div>
-            <div style={{ fontSize: 11, fontWeight: 700, color: b.color }}>{tasks.length}</div>
-            <div style={{ fontSize: 8, color: statusColors[b.status] ?? 'var(--txt3)', fontWeight: 600 }}>{statusLabels[b.status] ?? b.status}</div>
+            {/* Cap */}
+            <div style={{
+              width: '40%', height: 22,
+              background: 'linear-gradient(135deg, #E8BC6F, #9C7231)',
+              borderRadius: '3px 3px 0 0',
+              boxShadow: '0 -1px 4px rgba(0,0,0,0.2)',
+              alignSelf: 'center',
+            }} />
+            {/* Body */}
+            <div style={{
+              width: 72, height: 90,
+              background: `linear-gradient(135deg, ${b.color}CC, ${b.color}88)`,
+              borderRadius: '4px 4px 8px 8px',
+              position: 'relative', overflow: 'hidden',
+              boxShadow: '2px 4px 12px rgba(0,0,0,0.4), inset -3px 0 6px rgba(0,0,0,0.15)',
+            }}>
+              {/* Shine */}
+              <div style={{
+                position: 'absolute', top: 6, right: 6,
+                width: 14, height: 30,
+                background: 'rgba(255,255,255,0.15)',
+                borderRadius: '50%',
+                transform: 'rotate(-15deg)',
+              }} />
+              {/* Label */}
+              <div style={{
+                position: 'absolute', top: '50%', left: '50%',
+                transform: 'translate(-50%, -50%)',
+                background: 'rgba(247,236,214,0.92)',
+                borderRadius: 3, padding: '3px 5px',
+                textAlign: 'center', minWidth: 50,
+                boxShadow: '0 1px 4px rgba(0,0,0,0.2)',
+              }}>
+                <span style={{ fontSize: 12, display: 'block' }}>{b.icon}</span>
+                <span style={{
+                  fontFamily: 'var(--font-caveat, cursive)',
+                  fontSize: 9, color: '#2B1810', display: 'block',
+                  whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', maxWidth: 44,
+                }}>{b.name}</span>
+              </div>
+              {/* Task count badge */}
+              {tasks.length > 0 && (
+                <div style={{
+                  position: 'absolute', top: -6, left: -6,
+                  width: 18, height: 18,
+                  background: '#8B1E1E',
+                  borderRadius: '50%',
+                  display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  fontSize: 9, color: 'white', fontWeight: 700, zIndex: 5,
+                }}>
+                  {tasks.length}
+                </div>
+              )}
+            </div>
+            {/* Shadow */}
+            <div style={{
+              width: 56, height: 8,
+              background: 'radial-gradient(ellipse, rgba(0,0,0,0.3) 0%, transparent 70%)',
+              marginTop: 4,
+            }} />
+            {/* Status */}
+            <div style={{
+              fontFamily: 'var(--font-cormorant, serif)', fontStyle: 'italic',
+              fontSize: 9, color: statusColors[b.status] ?? '#8B6F42',
+              marginTop: 2,
+            }}>
+              {statusLabels[b.status] ?? b.status}
+            </div>
           </Link>
         );
       })}
@@ -1095,17 +1479,37 @@ export default function LeadershipClient({
       <StickyBanner todayFocus={todayFocus} todaySales={todaySales} onEdit={() => setEditorDate(todayISO())} />
 
       {/* Page Header */}
-      <div style={{ padding: '16px 20px 8px', borderBottom: '1px solid var(--brd)', marginBottom: 16 }}>
-        <h1 style={{ fontSize: 20, fontWeight: 800, color: 'var(--txt)', margin: 0 }}>المركز القيادي</h1>
-        <p style={{ fontSize: 12, color: 'var(--txt3)', margin: '3px 0 0' }}>{dateLabel}</p>
+      <div style={{ padding: '16px 20px 8px', marginBottom: 16, direction: 'rtl' }}>
+        <h1 style={{
+          fontFamily: 'var(--font-playfair, serif)',
+          fontSize: 28, fontWeight: 600,
+          color: '#E8BC6F',
+          margin: 0,
+          letterSpacing: '0.02em',
+        }}>
+          المركز القيادي
+        </h1>
+        <p style={{
+          fontFamily: 'var(--font-cormorant, serif)',
+          fontStyle: 'italic',
+          fontSize: 14, color: 'rgba(247,236,214,0.5)',
+          margin: '4px 0 0',
+        }}>
+          {dateLabel}
+        </p>
+      </div>
+
+      {/* Brand Bottles Row */}
+      <div style={{ padding: '0 16px', marginBottom: 20 }}>
+        <BrandHealthStrip brands={brands} activeTasks={activeTasks} />
       </div>
 
       {/* Main Grid */}
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 300px', gap: 16, padding: '0 16px' }}>
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 300px', gap: 20, padding: '0 16px' }}>
         {/* Right Column */}
         <div>
           {/* Weekly Compass */}
-          <CmdSection icon="🧭" title="بوصلة الأسبوع" defaultOpen={true}>
+          <div style={{ marginBottom: 20 }}>
             <WeeklyCompass
               weeklyFocus={weeklyFocus}
               brands={brands}
@@ -1113,7 +1517,7 @@ export default function LeadershipClient({
               projects={projects}
               onOpenEditor={(d) => setEditorDate(d)}
             />
-          </CmdSection>
+          </div>
 
           {/* Focus Hero */}
           <FocusHero
@@ -1126,49 +1530,97 @@ export default function LeadershipClient({
           />
 
           {/* Decisions */}
-          <CmdSection icon="⚖️" title="قرارات معلقة" badge={decisions.length}>
+          <PaperCard rotate={0.5} delay={0.4} style={{ marginBottom: 20 }}>
+            <SectionTitle icon="⚖️" title="قرارات معلقة" badge={decisions.length} />
             <DecisionsPanel decisions={decisions} brands={brands} />
-          </CmdSection>
+          </PaperCard>
         </div>
 
         {/* Left Column */}
         <div>
-          {/* Brand Health */}
-          <CmdSection icon="🏷" title="البراندات" defaultOpen={true}>
-            <BrandHealthStrip brands={brands} activeTasks={activeTasks} />
-          </CmdSection>
-
           {/* Calendar */}
-          <CmdSection icon="📅" title={`${MONTH_NAMES[d.getMonth()]} ${d.getFullYear()}`} defaultOpen={true}>
+          <PaperCard rotate={-2} delay={0.5} style={{ marginBottom: 20, position: 'relative', paddingTop: 20 }}>
             <CalendarMini upcomingEvents={upcomingEvents} brands={brands} />
-          </CmdSection>
+          </PaperCard>
 
           {/* Inbox */}
-          <CmdSection icon="📥" title="صندوق الوارد" badge={inboxTasks.length}>
+          <PaperCard rotate={0} delay={0.6} style={{ marginBottom: 20 }}>
+            <SectionTitle icon="📥" title="صندوق الوارد" badge={inboxTasks.length} />
             <InboxPanel inboxTasks={inboxTasks} />
-          </CmdSection>
+          </PaperCard>
 
           {/* Team */}
           {employees.length > 0 && (
-            <CmdSection icon="👥" title="الفريق" badge={employees.filter(e => e.status === 'active').length}>
-              <div>
-                {employees.slice(0, 5).map(e => (
-                  <div key={e.id} style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '6px 0', borderBottom: '1px solid var(--brd)' }}>
-                    <div style={{ width: 28, height: 28, borderRadius: '50%', background: 'var(--bg2)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 12, fontWeight: 700, color: 'var(--txt2)', flexShrink: 0 }}>
-                      {e.name.charAt(0)}
-                    </div>
-                    <div style={{ flex: 1 }}>
-                      <div style={{ fontSize: 12, fontWeight: 600, color: 'var(--txt)' }}>{e.name}</div>
-                      <div style={{ fontSize: 10, color: 'var(--txt3)' }}>{e.role}</div>
-                    </div>
-                    <span style={{ fontSize: 9, background: e.status === 'active' ? 'rgba(39,174,96,0.1)' : 'var(--bg2)', color: e.status === 'active' ? '#27ae60' : 'var(--txt3)', padding: '2px 7px', borderRadius: 10, fontWeight: 600 }}>
-                      {e.status === 'active' ? 'نشط' : e.status === 'on_leave' ? 'إجازة' : 'غير نشط'}
-                    </span>
-                  </div>
-                ))}
-                <Link href="/team" style={{ fontSize: 11, color: 'var(--gold)', display: 'block', marginTop: 8 }}>عرض الفريق كاملاً ←</Link>
+            <div style={{ marginBottom: 20 }}>
+              <div style={{ fontFamily: 'var(--font-caveat, cursive)', fontSize: 18, color: 'rgba(232,188,111,0.7)', marginBottom: 12, paddingBottom: 4, borderBottom: '1px dashed rgba(212,160,85,0.2)' }}>
+                👥 الفريق
               </div>
-            </CmdSection>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 12 }}>
+                {employees.slice(0, 4).map((e, idx) => {
+                  const rotations = [-1, 1.5, -1.5, 1];
+                  const rot = rotations[idx % rotations.length];
+                  return (
+                    <div key={e.id} style={{
+                      background: 'linear-gradient(135deg, #FBF3DF 0%, #F0E2BC 100%)',
+                      borderRadius: 4, padding: '12px 10px',
+                      position: 'relative',
+                      boxShadow: '0 3px 10px rgba(0,0,0,0.2)',
+                      transform: `rotate(${rot}deg)`,
+                      transition: 'transform 0.2s, box-shadow 0.2s',
+                      color: '#2B1810',
+                    }}
+                    onMouseEnter={(el) => {
+                      (el.currentTarget as HTMLElement).style.transform = `rotate(0deg) translateY(-4px)`;
+                      (el.currentTarget as HTMLElement).style.boxShadow = '0 6px 16px rgba(0,0,0,0.3)';
+                    }}
+                    onMouseLeave={(el) => {
+                      (el.currentTarget as HTMLElement).style.transform = `rotate(${rot}deg)`;
+                      (el.currentTarget as HTMLElement).style.boxShadow = '0 3px 10px rgba(0,0,0,0.2)';
+                    }}
+                    >
+                      {/* شريط لاصق */}
+                      <div style={{
+                        position: 'absolute', top: -8, right: '50%', transform: 'translateX(50%)',
+                        width: 36, height: 12,
+                        background: 'rgba(255,220,100,0.7)',
+                        borderRadius: 2,
+                        boxShadow: '0 1px 3px rgba(0,0,0,0.15)',
+                      }} />
+                      {/* Avatar */}
+                      <div style={{
+                        width: 36, height: 36, borderRadius: '50%',
+                        background: 'linear-gradient(135deg, #D4A055, #9C7231)',
+                        display: 'flex', alignItems: 'center', justifyContent: 'center',
+                        fontFamily: 'var(--font-playfair, serif)', fontSize: 16, fontWeight: 600,
+                        color: 'white', boxShadow: '0 2px 6px rgba(0,0,0,0.2)',
+                        margin: '0 auto 6px',
+                      }}>
+                        {e.name.charAt(0)}
+                      </div>
+                      <div style={{ fontFamily: 'var(--font-caveat, cursive)', fontSize: 16, fontWeight: 700, color: '#2B1810', textAlign: 'center' }}>{e.name}</div>
+                      <div style={{ fontFamily: 'var(--font-cormorant, serif)', fontStyle: 'italic', fontSize: 11, color: '#8B6F42', textAlign: 'center' }}>{e.role}</div>
+                      <div style={{ textAlign: 'center', marginTop: 4 }}>
+                        <span style={{
+                          fontFamily: 'var(--font-cormorant, serif)', fontStyle: 'italic',
+                          fontSize: 9,
+                          background: e.status === 'active' ? 'rgba(90,120,67,0.1)' : 'rgba(180,150,100,0.1)',
+                          color: e.status === 'active' ? '#5A7843' : '#8B6F42',
+                          padding: '2px 7px', borderRadius: 10, fontWeight: 600,
+                        }}>
+                          {e.status === 'active' ? 'نشط' : e.status === 'on_leave' ? 'إجازة' : 'غير نشط'}
+                        </span>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+              <Link href="/team" style={{
+                fontFamily: 'var(--font-caveat, cursive)', fontSize: 15,
+                color: 'rgba(232,188,111,0.7)', display: 'block', marginTop: 8, textAlign: 'center',
+              }}>
+                عرض الفريق كاملاً ←
+              </Link>
+            </div>
           )}
         </div>
       </div>

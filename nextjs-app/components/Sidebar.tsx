@@ -1,8 +1,8 @@
 'use client';
 /*
- * Ghazi OS — Sidebar (Client Component)
- * يستقبل brands من SidebarServer (Supabase)
- * يعرض تاريخ اليوم ديناميكياً
+ * Ghazi OS — Sidebar (Studio Theme: رف خشبي فاخر)
+ * branch: studio-theme-v1
+ * خلفية خشب داكن + لوحة ذهبية + nav items بلون الورق الكريمي
  */
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
@@ -19,112 +19,105 @@ interface SidebarProps {
   brands?: Brand[];
 }
 
-const NAV_ITEMS = [
+const NAV_GROUPS = [
   {
-    id: 'cmd',
-    label: 'المركز',
-    href: '/leadership',
-    icon: (
-      <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-    ),
+    label: 'القيادة',
+    items: [
+      {
+        id: 'cmd',
+        label: 'المركز',
+        href: '/leadership',
+        icon: '⌚',
+      },
+      {
+        id: 'decisions',
+        label: 'القرارات',
+        href: '/decisions',
+        icon: '⚖️',
+      },
+    ],
   },
   {
-    id: 'brands',
-    label: 'البراندات',
-    href: '/brands',
-    hasBrands: true,
-    icon: (
-      <svg viewBox="0 0 24 24"><path d="M20.59 13.41l-7.17 7.17a2 2 0 01-2.83 0L2 12V2h10l8.59 8.59a2 2 0 010 2.82z"/><line x1="7" y1="7" x2="7.01" y2="7"/></svg>
-    ),
+    label: 'الأعمال',
+    items: [
+      {
+        id: 'brands',
+        label: 'البراندات',
+        href: '/brands',
+        hasBrands: true,
+        icon: '🏷',
+      },
+      {
+        id: 'tasks',
+        label: 'المهام',
+        href: '/tasks',
+        icon: '✅',
+      },
+      {
+        id: 'projects',
+        label: 'المشاريع',
+        href: '/projects',
+        icon: '📁',
+      },
+      {
+        id: 'sales',
+        label: 'المبيعات',
+        href: '/sales',
+        icon: '📈',
+      },
+      {
+        id: 'finance',
+        label: 'الماليات',
+        href: '/finance',
+        icon: '💰',
+      },
+    ],
   },
   {
-    id: 'tasks',
-    label: 'المهام',
-    href: '/tasks',
-    icon: (
-      <svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
-    ),
+    label: 'الحياة',
+    items: [
+      {
+        id: 'personal',
+        label: 'الشخصي',
+        href: '/personal',
+        icon: '👤',
+      },
+      {
+        id: 'worlds',
+        label: 'عوالمي',
+        href: '/worlds',
+        icon: '🌍',
+      },
+      {
+        id: 'calendar',
+        label: 'التقويم',
+        href: '/calendar',
+        icon: '📅',
+      },
+      {
+        id: 'reminders',
+        label: 'التذكيرات',
+        href: '/reminders',
+        icon: '🔔',
+      },
+    ],
   },
   {
-    id: 'projects',
-    label: 'المشاريع',
-    href: '/projects',
-    icon: (
-      <svg viewBox="0 0 24 24"><path d="M2 3h6a4 4 0 014 4v14a3 3 0 00-3-3H2z"/><path d="M22 3h-6a4 4 0 00-4 4v14a3 3 0 013-3h7z"/></svg>
-    ),
-  },
-  {
-    id: 'decisions',
-    label: 'القرارات',
-    href: '/decisions',
-    icon: (
-      <svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
-    ),
-  },
-  {
-    id: 'sales',
-    label: 'المبيعات',
-    href: '/sales',
-    icon: (
-      <svg viewBox="0 0 24 24"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 01-8 0"/></svg>
-    ),
-  },
-  {
-    id: 'personal',
-    label: 'الشخصي',
-    href: '/personal',
-    icon: (
-      <svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-    ),
-  },
-  {
-    id: 'worlds',
-    label: 'عوالمي',
-    href: '/worlds',
-    icon: (
-      <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M2 12h20"/><path d="M12 2a15.3 15.3 0 014 10 15.3 15.3 0 01-4 10 15.3 15.3 0 01-4-10 15.3 15.3 0 014-10z"/></svg>
-    ),
-  },
-  {
-    id: 'finance',
-    label: 'الماليات',
-    href: '/finance',
-    icon: (
-      <svg viewBox="0 0 24 24"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/></svg>
-    ),
-  },
-  {
-    id: 'calendar',
-    label: 'التقويم',
-    href: '/calendar',
-    icon: (
-      <svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
-    ),
-  },
-  {
-    id: 'performance',
-    label: 'الأداء',
-    href: '/performance',
-    icon: (
-      <svg viewBox="0 0 24 24"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
-    ),
-  },
-
-  {
-    id: 'reminders',
-    label: 'التذكيرات',
-    href: '/reminders',
-    icon: (
-      <svg viewBox="0 0 24 24"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 01-3.46 0"/></svg>
-    ),
-  },
-  {
-    id: 'settings',
-    label: 'الإعدادات',
-    href: '/settings',
-    icon: (
-      <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg>
-    ),
+    label: 'التحليل',
+    items: [
+      {
+        id: 'performance',
+        label: 'الأداء',
+        href: '/performance',
+        icon: '📊',
+      },
+      {
+        id: 'settings',
+        label: 'الإعدادات',
+        href: '/settings',
+        icon: '⚙️',
+      },
+    ],
   },
 ];
 
@@ -144,7 +137,9 @@ export default function Sidebar({ brands = [] }: SidebarProps) {
 
   useEffect(() => {
     setDateStr(getTodayStr());
-  }, []);
+    // فتح البراندات تلقائياً إذا كنا في صفحة براند
+    if ((pathname ?? '').startsWith('/brands')) setBrandsOpen(true);
+  }, [pathname]);
 
   async function handleLogout() {
     await fetch('/api/auth/logout', { method: 'POST' });
@@ -153,117 +148,249 @@ export default function Sidebar({ brands = [] }: SidebarProps) {
   }
 
   return (
-    <aside className="side">
-      {/* Logo */}
-      <div className="side-logo">
-        <div className="logo-box">G</div>
-        <div className="logo-txt">
-          <h1>Ghazi OS</h1>
-          <div className="sub">{dateStr || 'نظام إدارة الأعمال'}</div>
+    <aside className="side" style={{
+      background: `
+        repeating-linear-gradient(
+          92deg,
+          rgba(0,0,0,0.25) 0px, rgba(0,0,0,0.25) 1px,
+          transparent 1px, transparent 4px,
+          rgba(0,0,0,0.1) 4px, rgba(0,0,0,0.1) 5px,
+          transparent 5px, transparent 14px
+        ),
+        repeating-linear-gradient(
+          88deg,
+          rgba(107,74,47,0.08) 0px, rgba(107,74,47,0.08) 2px,
+          transparent 2px, transparent 20px
+        ),
+        linear-gradient(180deg, #3D2817 0%, #4A2F1B 40%, #3D2817 100%)
+      `,
+      boxShadow: 'inset -4px 0 12px rgba(0,0,0,0.4), 4px 0 16px rgba(0,0,0,0.3)',
+      borderLeft: 'none',
+    }}>
+      {/* Logo Plaque */}
+      <div style={{
+        margin: '14px 10px 10px',
+        background: 'linear-gradient(135deg, #D4A055 0%, #9C7231 50%, #D4A055 100%)',
+        borderRadius: 6,
+        padding: '10px 14px',
+        position: 'relative',
+        boxShadow: '0 2px 8px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.2)',
+        direction: 'rtl',
+      }}>
+        {/* مسامير الزوايا */}
+        <span style={{ position: 'absolute', top: 5, right: 5, width: 5, height: 5, borderRadius: '50%', background: 'rgba(255,255,255,0.5)', display: 'block' }} />
+        <span style={{ position: 'absolute', top: 5, left: 5, width: 5, height: 5, borderRadius: '50%', background: 'rgba(255,255,255,0.5)', display: 'block' }} />
+        <span style={{ position: 'absolute', bottom: 5, right: 5, width: 5, height: 5, borderRadius: '50%', background: 'rgba(255,255,255,0.5)', display: 'block' }} />
+        <span style={{ position: 'absolute', bottom: 5, left: 5, width: 5, height: 5, borderRadius: '50%', background: 'rgba(255,255,255,0.5)', display: 'block' }} />
+        <div style={{ fontFamily: 'var(--font-playfair, serif)', fontSize: 18, fontWeight: 600, color: '#3D2817', letterSpacing: '0.05em' }}>
+          Ghazi OS
+        </div>
+        <div style={{ fontFamily: 'var(--font-cormorant, serif)', fontStyle: 'italic', fontSize: 11, color: 'rgba(61,40,23,0.7)', marginTop: 2 }}>
+          {dateStr || 'نظام إدارة الأعمال'}
         </div>
       </div>
 
       {/* Navigation */}
-      <nav className="side-nav">
-        {NAV_ITEMS.map((item) => {
-          const isActive = item.href === '/'
-            ? pathname === '/'
-            : (pathname ?? '').startsWith(item.href);
-
-          if (item.hasBrands) {
-            return (
-              <div key={item.id}>
-                <div
-                  className={`sn-brands-hdr${isActive ? ' on' : ''}`}
-                  onClick={() => setBrandsOpen(!brandsOpen)}
-                >
-                  <span style={{ width: 16, height: 16, flexShrink: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                    {item.icon}
-                  </span>
-                  <span>{item.label}</span>
-                  <span className={`sn-chevron${brandsOpen ? ' open' : ''}`}>▾</span>
-                </div>
-                <div
-                  className="sn-brand-group"
-                  style={{ maxHeight: brandsOpen ? `${brands.length * 36 + 8}px` : '0' }}
-                >
-                  {brands.length === 0 ? (
-                    <div style={{ padding: '6px 28px', fontSize: 11, color: 'var(--txt3)' }}>لا توجد براندات</div>
-                  ) : (
-                    brands.map((brand) => (
-                      <Link
-                        key={brand.id}
-                        href={`/brands/${brand.id}`}
-                        className={`sn-brand${(pathname ?? '').includes(`/brands/${brand.id}`) ? ' on' : ''}`}
-                      >
-                        <span className="dot" style={{ backgroundColor: brand.color }} />
-                        <span>{brand.icon} {brand.name}</span>
-                      </Link>
-                    ))
-                  )}
-                </div>
-              </div>
-            );
-          }
-
-          return (
-            <Link
-              key={item.id}
-              href={item.href}
-              className={`sn${isActive ? ' on' : ''}`}
-            >
-              <span style={{ width: 16, height: 16, flexShrink: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                {item.icon}
+      <nav className="side-nav" style={{ flex: 1, overflowY: 'auto', padding: '4px 0' }}>
+        {NAV_GROUPS.map((group) => (
+          <div key={group.label}>
+            {/* Group Divider */}
+            <div style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: 6,
+              padding: '8px 12px 4px',
+              direction: 'rtl',
+            }}>
+              <div style={{ flex: 1, height: 1, borderTop: '1px dashed rgba(212,160,85,0.3)' }} />
+              <span style={{
+                fontFamily: 'var(--font-caveat, cursive)',
+                fontSize: 11,
+                color: 'rgba(212,160,85,0.7)',
+                whiteSpace: 'nowrap',
+              }}>
+                {group.label}
               </span>
-              <span>{item.label}</span>
-            </Link>
-          );
-        })}
+              <div style={{ flex: 1, height: 1, borderTop: '1px dashed rgba(212,160,85,0.3)' }} />
+            </div>
+
+            {group.items.map((item) => {
+              const isActive = item.href === '/'
+                ? pathname === '/'
+                : (pathname ?? '').startsWith(item.href);
+
+              if (item.hasBrands) {
+                return (
+                  <div key={item.id}>
+                    <div
+                      onClick={() => setBrandsOpen(!brandsOpen)}
+                      style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: 8,
+                        padding: '7px 14px',
+                        cursor: 'pointer',
+                        direction: 'rtl',
+                        background: isActive ? 'rgba(212,160,85,0.18)' : 'transparent',
+                        borderRight: isActive ? '3px solid #D4A055' : '3px solid transparent',
+                        transition: 'all 0.2s',
+                        color: isActive ? '#E8BC6F' : 'rgba(247,236,214,0.85)',
+                        fontFamily: 'var(--font-ibm, sans-serif)',
+                        fontSize: 12,
+                        fontWeight: isActive ? 600 : 400,
+                      }}
+                      onMouseEnter={(e) => {
+                        if (!isActive) {
+                          (e.currentTarget as HTMLElement).style.background = 'rgba(212,160,85,0.1)';
+                          (e.currentTarget as HTMLElement).style.color = '#E8BC6F';
+                        }
+                      }}
+                      onMouseLeave={(e) => {
+                        if (!isActive) {
+                          (e.currentTarget as HTMLElement).style.background = 'transparent';
+                          (e.currentTarget as HTMLElement).style.color = 'rgba(247,236,214,0.85)';
+                        }
+                      }}
+                    >
+                      <span style={{ fontSize: 14, flexShrink: 0 }}>{item.icon}</span>
+                      <span style={{ flex: 1 }}>{item.label}</span>
+                      <span style={{
+                        fontSize: 10,
+                        transform: brandsOpen ? 'rotate(180deg)' : 'none',
+                        transition: 'transform 0.2s',
+                        display: 'inline-block',
+                        color: 'rgba(212,160,85,0.6)',
+                      }}>▾</span>
+                    </div>
+                    <div style={{
+                      maxHeight: brandsOpen ? `${brands.length * 34 + 8}px` : '0',
+                      overflow: 'hidden',
+                      transition: 'max-height 0.3s ease',
+                    }}>
+                      {brands.length === 0 ? (
+                        <div style={{ padding: '6px 28px', fontSize: 11, color: 'rgba(247,236,214,0.4)', fontFamily: 'var(--font-ibm, sans-serif)' }}>لا توجد براندات</div>
+                      ) : (
+                        brands.map((brand) => {
+                          const isBrandActive = (pathname ?? '').includes(`/brands/${brand.id}`);
+                          return (
+                            <Link
+                              key={brand.id}
+                              href={`/brands/${brand.id}`}
+                              style={{
+                                display: 'flex',
+                                alignItems: 'center',
+                                gap: 8,
+                                padding: '6px 14px 6px 14px',
+                                paddingRight: 28,
+                                textDecoration: 'none',
+                                direction: 'rtl',
+                                background: isBrandActive ? 'rgba(212,160,85,0.12)' : 'transparent',
+                                borderRight: `3px solid ${isBrandActive ? brand.color : 'transparent'}`,
+                                transition: 'all 0.15s',
+                                color: isBrandActive ? '#E8BC6F' : 'rgba(247,236,214,0.7)',
+                                fontSize: 11,
+                                fontFamily: 'var(--font-ibm, sans-serif)',
+                              }}
+                            >
+                              <span style={{ width: 6, height: 6, borderRadius: '50%', background: brand.color, flexShrink: 0, display: 'inline-block' }} />
+                              <span>{brand.icon} {brand.name}</span>
+                            </Link>
+                          );
+                        })
+                      )}
+                    </div>
+                  </div>
+                );
+              }
+
+              return (
+                <Link
+                  key={item.id}
+                  href={item.href}
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: 8,
+                    padding: '7px 14px',
+                    textDecoration: 'none',
+                    direction: 'rtl',
+                    background: isActive ? 'rgba(212,160,85,0.18)' : 'transparent',
+                    borderRight: isActive ? '3px solid #D4A055' : '3px solid transparent',
+                    transition: 'all 0.2s',
+                    color: isActive ? '#E8BC6F' : 'rgba(247,236,214,0.85)',
+                    fontFamily: 'var(--font-ibm, sans-serif)',
+                    fontSize: 12,
+                    fontWeight: isActive ? 600 : 400,
+                  }}
+                  onMouseEnter={(e) => {
+                    if (!isActive) {
+                      (e.currentTarget as HTMLElement).style.background = 'rgba(212,160,85,0.1)';
+                      (e.currentTarget as HTMLElement).style.color = '#E8BC6F';
+                    }
+                  }}
+                  onMouseLeave={(e) => {
+                    if (!isActive) {
+                      (e.currentTarget as HTMLElement).style.background = 'transparent';
+                      (e.currentTarget as HTMLElement).style.color = 'rgba(247,236,214,0.85)';
+                    }
+                  }}
+                >
+                  <span style={{ fontSize: 14, flexShrink: 0 }}>{item.icon}</span>
+                  <span>{item.label}</span>
+                </Link>
+              );
+            })}
+          </div>
+        ))}
       </nav>
 
       {/* Footer */}
-      <div className="side-foot">
+      <div style={{
+        padding: '10px 10px 12px',
+        borderTop: '1px solid rgba(212,160,85,0.2)',
+      }}>
         <button
           onClick={handleLogout}
           style={{
             width: '100%',
             display: 'flex',
             alignItems: 'center',
-            gap: '8px',
+            justifyContent: 'center',
+            gap: 6,
             padding: '7px 10px',
-            background: 'none',
-            border: '1px solid var(--brd)',
-            borderRadius: '6px',
-            color: 'var(--txt3)',
-            fontSize: '11px',
-            fontFamily: 'inherit',
+            background: 'rgba(139,30,30,0.15)',
+            border: '1px solid rgba(139,30,30,0.3)',
+            borderRadius: 4,
+            color: 'rgba(247,236,214,0.6)',
+            fontSize: 11,
+            fontFamily: 'var(--font-ibm, sans-serif)',
             cursor: 'pointer',
             transition: 'all 0.15s',
-            textAlign: 'right',
-            marginBottom: '4px',
+            direction: 'rtl',
           }}
           onMouseEnter={(e) => {
             const b = e.currentTarget as HTMLButtonElement;
-            b.style.background = 'rgba(255,59,48,0.06)';
-            b.style.color = 'var(--danger)';
-            b.style.borderColor = 'rgba(255,59,48,0.2)';
+            b.style.background = 'rgba(139,30,30,0.3)';
+            b.style.color = '#F7ECD6';
           }}
           onMouseLeave={(e) => {
             const b = e.currentTarget as HTMLButtonElement;
-            b.style.background = 'none';
-            b.style.color = 'var(--txt3)';
-            b.style.borderColor = 'var(--brd)';
+            b.style.background = 'rgba(139,30,30,0.15)';
+            b.style.color = 'rgba(247,236,214,0.6)';
           }}
         >
-          <svg viewBox="0 0 24 24" style={{ width: 13, height: 13, stroke: 'currentColor', fill: 'none', strokeWidth: 1.5, strokeLinecap: 'round', strokeLinejoin: 'round', flexShrink: 0 }}>
-            <path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/>
-            <polyline points="16 17 21 12 16 7"/>
-            <line x1="21" y1="12" x2="9" y2="12"/>
-          </svg>
-          <span>تسجيل الخروج</span>
+          <span>🚪</span>
+          <span>خروج</span>
         </button>
-        <div style={{ fontSize: 9, color: 'var(--txt3)', textAlign: 'center', marginTop: 4 }}>
-          Ghazi OS v2.0 — 2025
+        <div style={{
+          fontFamily: 'var(--font-cormorant, serif)',
+          fontStyle: 'italic',
+          fontSize: 10,
+          color: 'rgba(212,160,85,0.4)',
+          textAlign: 'center',
+          marginTop: 6,
+        }}>
+          Ghazi OS — Studio
         </div>
       </div>
     </aside>

@@ -1,0 +1,935 @@
+/*
+ * Ghazi OS — Studio Theme (المكتب الخشبي الفاخر)
+ * branch: studio-theme-v1
+ * يُطبَّق على صفحة /leadership فقط
+ */
+
+/* ─── CSS Variables ─────────────────────────────────────────────────────────── */
+:root {
+  /* Wood */
+  --walnut-deep: #3D2817;
+  --walnut: #4A2F1B;
+  --walnut-light: #5C3E28;
+  --walnut-warm: #6B4A2F;
+  --wood-grain: #2A1A0D;
+
+  /* Paper */
+  --paper-cream: #F7ECD6;
+  --paper-aged: #EDDCB8;
+  --paper-shadow: #C9B585;
+  --paper-dark: #8B6F42;
+  --paper-ink: #2B1810;
+  --paper-ink-soft: #5A4028;
+
+  /* Gold */
+  --gold: #D4A055;
+  --gold-bright: #E8BC6F;
+  --gold-deep: #9C7231;
+  --gold-shadow: #5F4418;
+
+  /* Accents */
+  --red-wax: #8B1E1E;
+  --red-wax-light: #B54040;
+  --coffee: #3C2312;
+  --coffee-foam: #E8DCC4;
+  --green-leaf: #5A7843;
+  --candle-flame: #FFB84A;
+}
+
+/* ─── Body: خلفية خشبية ──────────────────────────────────────────────────────── */
+body {
+  background:
+    repeating-linear-gradient(
+      92deg,
+      rgba(42, 26, 13, 0.3) 0px,
+      rgba(42, 26, 13, 0.3) 1px,
+      transparent 1px,
+      transparent 3px,
+      rgba(42, 26, 13, 0.15) 3px,
+      rgba(42, 26, 13, 0.15) 4px,
+      transparent 4px,
+      transparent 12px
+    ),
+    repeating-linear-gradient(
+      88deg,
+      rgba(107, 74, 47, 0.1) 0px,
+      rgba(107, 74, 47, 0.1) 2px,
+      transparent 2px,
+      transparent 18px
+    ),
+    radial-gradient(ellipse at 30% 30%, #5C3E28 0%, #4A2F1B 50%, #3D2817 100%) !important;
+  color: var(--paper-cream);
+}
+
+/* Vignette */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background: radial-gradient(ellipse at center, transparent 20%, rgba(0, 0, 0, 0.6) 100%);
+  pointer-events: none;
+  z-index: 1;
+}
+
+/* Ambient warm light */
+body::after {
+  content: '';
+  position: fixed;
+  top: -100px;
+  left: -100px;
+  width: 600px;
+  height: 600px;
+  background: radial-gradient(circle, rgba(255, 200, 100, 0.15) 0%, transparent 60%);
+  pointer-events: none;
+  z-index: 2;
+}
+
+/* ─── Animations ─────────────────────────────────────────────────────────────── */
+@keyframes place-on-table {
+  from {
+    opacity: 0;
+    transform: var(--initial-transform, translateY(30px)) scale(0.95);
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes steam-rise {
+  0% { transform: translateY(0) scale(1); opacity: 0; }
+  20% { opacity: 0.6; }
+  100% { transform: translateY(-30px) scale(1.5); opacity: 0; }
+}
+
+@keyframes candle-flicker {
+  0%, 100% { transform: scaleY(1) rotate(-1deg); }
+  50% { transform: scaleY(1.1) rotate(1deg); }
+}
+
+@keyframes bottle-hover {
+  0% { transform: var(--bottle-rotate, rotate(-2deg)) translateY(0); }
+  100% { transform: var(--bottle-rotate, rotate(-2deg)) translateY(-8px); }
+}
+
+/* ─── Studio Layout ──────────────────────────────────────────────────────────── */
+
+/* Sidebar — رف خشبي */
+.studio-sidebar {
+  background: linear-gradient(90deg, rgba(42,26,13,0.95), rgba(60,40,22,0.98), rgba(42,26,13,0.95)) !important;
+  box-shadow: inset -4px 0 12px rgba(0,0,0,0.4), 4px 0 16px rgba(0,0,0,0.3) !important;
+  border-left: none !important;
+}
+
+/* Logo Plaque */
+.studio-logo-plaque {
+  background: linear-gradient(135deg, #D4A055 0%, #9C7231 50%, #D4A055 100%);
+  border-radius: 6px;
+  padding: 10px 14px;
+  margin: 12px 10px;
+  position: relative;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.2);
+}
+
+.studio-logo-plaque::before,
+.studio-logo-plaque::after {
+  content: '●';
+  position: absolute;
+  font-size: 5px;
+  color: rgba(255,255,255,0.6);
+}
+
+.studio-logo-plaque::before { top: 4px; right: 4px; }
+.studio-logo-plaque::after { bottom: 4px; left: 4px; }
+
+/* Nav Group Divider */
+.studio-nav-divider {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  font-family: var(--font-caveat), cursive;
+  font-size: 12px;
+  color: var(--gold);
+  opacity: 0.8;
+}
+
+.studio-nav-divider::before,
+.studio-nav-divider::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  border-top: 1px dashed rgba(212,160,85,0.4);
+}
+
+/* Nav Item */
+.studio-nav-item {
+  color: var(--paper-cream) !important;
+  font-family: 'IBM Plex Sans Arabic', sans-serif !important;
+  transition: all 0.2s !important;
+}
+
+.studio-nav-item:hover {
+  background: rgba(212,160,85,0.12) !important;
+  color: var(--gold-bright) !important;
+}
+
+.studio-nav-item.active {
+  background: rgba(212,160,85,0.18) !important;
+  color: var(--gold-bright) !important;
+  border-right: 3px solid var(--gold) !important;
+}
+
+/* Badge */
+.studio-badge {
+  background: linear-gradient(135deg, var(--gold), var(--gold-deep));
+  color: var(--walnut-deep);
+  font-weight: 700;
+  border-radius: 50%;
+  min-width: 18px;
+  height: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 9px;
+}
+
+/* ─── Topbar ─────────────────────────────────────────────────────────────────── */
+.studio-topbar {
+  background: linear-gradient(180deg, rgba(247,236,214,0.08), rgba(247,236,214,0.02)) !important;
+  border-bottom: 1px solid rgba(247,236,214,0.1) !important;
+  border-radius: 4px;
+}
+
+.studio-topbar h2 {
+  font-family: var(--font-playfair), serif !important;
+  color: var(--gold-bright) !important;
+  font-weight: 600 !important;
+}
+
+.studio-search-input {
+  background: rgba(247,236,214,0.06) !important;
+  border: 1px solid rgba(247,236,214,0.15) !important;
+  color: var(--paper-cream) !important;
+  font-family: var(--font-caveat), cursive !important;
+  font-style: italic;
+}
+
+.studio-search-input::placeholder {
+  color: rgba(247,236,214,0.4) !important;
+  font-family: var(--font-caveat), cursive !important;
+  font-style: italic;
+}
+
+/* ─── Sticky Banner ──────────────────────────────────────────────────────────── */
+.studio-sticky-banner {
+  background: linear-gradient(135deg, rgba(212,160,85,0.25), rgba(232,188,111,0.15)) !important;
+  border: 1px solid rgba(212,160,85,0.4) !important;
+  border-right: 4px solid var(--gold-deep) !important;
+  border-radius: 4px;
+  transform: rotate(-0.3deg);
+  box-shadow: 0 4px 16px rgba(212,160,85,0.2);
+  animation: place-on-table 0.4s ease-out;
+}
+
+.studio-sticky-banner .banner-title {
+  font-family: var(--font-caveat), cursive;
+  font-size: 20px;
+  color: var(--paper-cream);
+}
+
+.studio-sticky-banner .banner-brand {
+  color: var(--gold-bright);
+  font-weight: 700;
+}
+
+.studio-sticky-banner .banner-edit-btn {
+  border: 1px dashed var(--gold) !important;
+  color: var(--gold) !important;
+  background: transparent !important;
+  font-family: var(--font-caveat), cursive !important;
+}
+
+/* ─── Focus Hero (ورقة مثبّتة بدبوس) ───────────────────────────────────────── */
+.studio-focus-hero {
+  background: linear-gradient(135deg, #FBF3DF 0%, #F0E2BC 100%) !important;
+  padding: 28px 36px 28px 50px !important;
+  border-radius: 4px !important;
+  transform: rotate(-1.5deg);
+  box-shadow:
+    4px 4px 0 rgba(237,220,184,0.5),
+    6px 6px 0 rgba(220,200,160,0.4),
+    8px 8px 0 rgba(200,180,140,0.3),
+    0 12px 32px rgba(0,0,0,0.5) !important;
+  position: relative;
+  animation: place-on-table 0.5s ease-out;
+  color: var(--paper-ink) !important;
+}
+
+/* دبوس ذهبي */
+.studio-focus-hero::before {
+  content: '';
+  position: absolute;
+  top: -8px;
+  right: 50%;
+  transform: translateX(50%);
+  width: 16px;
+  height: 16px;
+  background: radial-gradient(circle at 40% 35%, #E8BC6F 0%, #D4A055 50%, #9C7231 100%);
+  border-radius: 50%;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.3);
+  z-index: 10;
+}
+
+.studio-focus-hero .hero-label {
+  font-family: var(--font-caveat), cursive;
+  font-size: 14px;
+  color: var(--red-wax);
+  font-weight: 600;
+  margin-bottom: 6px;
+}
+
+.studio-focus-hero .hero-task-title {
+  font-family: var(--font-caveat), cursive !important;
+  font-size: 38px !important;
+  color: var(--paper-ink) !important;
+  line-height: 1.2;
+}
+
+.studio-focus-hero .hero-highlight {
+  background: linear-gradient(180deg, transparent 60%, rgba(255,200,50,0.5) 60%);
+  padding: 0 2px;
+}
+
+.studio-focus-hero .hero-start-btn {
+  background: var(--red-wax) !important;
+  color: white !important;
+  border: none !important;
+  transform: rotate(1deg);
+  font-family: var(--font-caveat), cursive !important;
+  font-size: 16px !important;
+  padding: 8px 20px !important;
+  border-radius: 4px !important;
+  cursor: pointer;
+  box-shadow: 2px 2px 6px rgba(0,0,0,0.3);
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.studio-focus-hero .hero-start-btn:hover {
+  transform: rotate(0deg) translateY(-2px);
+  box-shadow: 3px 4px 10px rgba(0,0,0,0.4);
+}
+
+/* ─── Weekly Compass (ورقة مسطّرة) ──────────────────────────────────────────── */
+.studio-compass-container {
+  background: linear-gradient(
+    180deg,
+    var(--paper-cream) 0%,
+    var(--paper-aged) 100%
+  ) !important;
+  border-radius: 4px;
+  transform: rotate(0.5deg);
+  box-shadow: 0 4px 16px rgba(0,0,0,0.3);
+  padding: 16px !important;
+  position: relative;
+  animation: place-on-table 0.4s ease-out 0.1s both;
+}
+
+.studio-compass-container::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: repeating-linear-gradient(
+    180deg,
+    transparent 0px,
+    transparent 23px,
+    rgba(180,150,100,0.2) 23px,
+    rgba(180,150,100,0.2) 24px
+  );
+  border-radius: 4px;
+  pointer-events: none;
+}
+
+/* Day card */
+.studio-day-card {
+  background: var(--paper-cream) !important;
+  border: 1px dashed rgba(212,160,85,0.5) !important;
+  border-radius: 4px !important;
+  transition: all 0.2s !important;
+  color: var(--paper-ink) !important;
+}
+
+.studio-day-card.today {
+  background: rgba(212,160,85,0.15) !important;
+  border: 2px solid var(--gold) !important;
+}
+
+.studio-day-card .day-name {
+  font-family: var(--font-cormorant), serif;
+  font-style: italic;
+  font-size: 11px;
+  color: var(--paper-ink-soft);
+}
+
+.studio-day-card .day-number {
+  font-family: var(--font-playfair), serif;
+  font-size: 28px;
+  color: var(--paper-ink);
+  font-weight: 600;
+}
+
+.studio-day-card .today-badge {
+  background: var(--red-wax) !important;
+  color: white !important;
+  font-family: var(--font-caveat), cursive !important;
+  font-size: 10px !important;
+  padding: 1px 6px !important;
+  border-radius: 3px !important;
+  transform: rotate(-3deg);
+  display: inline-block;
+}
+
+.studio-day-card .focus-name {
+  font-family: var(--font-caveat), cursive;
+  font-size: 18px;
+  line-height: 1.2;
+}
+
+/* ─── Daily Tasks (دفتر مع دبوس) ────────────────────────────────────────────── */
+.studio-daily-tasks {
+  background: linear-gradient(180deg, #FEFAF0 0%, #F5EDD5 100%) !important;
+  border-radius: 4px;
+  transform: rotate(0.3deg);
+  box-shadow: 0 4px 16px rgba(0,0,0,0.25);
+  padding: 16px !important;
+  position: relative;
+  animation: place-on-table 0.4s ease-out 0.2s both;
+}
+
+.studio-daily-tasks::before {
+  content: '📌';
+  position: absolute;
+  top: -8px;
+  left: 16px;
+  font-size: 20px;
+  transform: rotate(15deg);
+  filter: drop-shadow(1px 2px 3px rgba(0,0,0,0.3));
+}
+
+.studio-daily-tasks::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: repeating-linear-gradient(
+    180deg,
+    transparent 0px,
+    transparent 27px,
+    rgba(180,150,100,0.15) 27px,
+    rgba(180,150,100,0.15) 28px
+  );
+  border-radius: 4px;
+  pointer-events: none;
+}
+
+.studio-daily-tasks .section-title {
+  font-family: var(--font-caveat), cursive;
+  font-size: 26px;
+  color: var(--paper-ink);
+  font-weight: 600;
+}
+
+.studio-task-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 6px 0;
+  border-bottom: 1px solid rgba(180,150,100,0.2);
+  position: relative;
+  z-index: 1;
+}
+
+.studio-task-checkbox {
+  width: 20px;
+  height: 20px;
+  border: 2px solid var(--paper-ink-soft) !important;
+  border-radius: 3px;
+  background: transparent;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  cursor: pointer;
+}
+
+.studio-task-checkbox.checked {
+  background: rgba(90,120,67,0.1);
+}
+
+.studio-task-checkbox.checked::after {
+  content: '✓';
+  font-family: var(--font-caveat), cursive;
+  font-size: 26px;
+  color: var(--green-leaf);
+  line-height: 1;
+}
+
+.studio-task-text {
+  font-family: var(--font-caveat), cursive;
+  font-size: 19px;
+  color: var(--paper-ink);
+}
+
+.studio-task-text.done {
+  text-decoration: line-through;
+  opacity: 0.6;
+}
+
+/* ─── Hungry Brands (ملصق أحمر) ─────────────────────────────────────────────── */
+.studio-hungry-brands {
+  background: linear-gradient(135deg, rgba(139,30,30,0.1), rgba(181,64,64,0.05)) !important;
+  border: 1px dashed #B54040 !important;
+  border-radius: 4px;
+  transform: rotate(-0.5deg);
+  padding: 14px !important;
+  position: relative;
+  animation: place-on-table 0.4s ease-out 0.3s both;
+}
+
+.studio-hungry-brands::before {
+  content: '🍽️';
+  position: absolute;
+  top: -10px;
+  left: 12px;
+  font-size: 20px;
+}
+
+.studio-hungry-brands .section-title {
+  font-family: var(--font-caveat), cursive;
+  font-size: 22px;
+  color: var(--red-wax-light);
+  font-weight: 600;
+}
+
+.studio-brand-chip {
+  border-radius: 20px;
+  padding: 4px 12px;
+  font-family: var(--font-caveat), cursive;
+  font-size: 15px;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  cursor: pointer;
+  transition: transform 0.15s;
+}
+
+.studio-brand-chip:hover {
+  transform: translateY(-2px);
+}
+
+/* ─── Pending Decisions (رسالة مختومة) ──────────────────────────────────────── */
+.studio-decisions {
+  background: linear-gradient(135deg, #FBF3DF 0%, #F0E2BC 100%) !important;
+  border-radius: 4px;
+  padding: 20px 16px 16px !important;
+  position: relative;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.3);
+  animation: place-on-table 0.4s ease-out 0.4s both;
+  color: var(--paper-ink) !important;
+}
+
+/* خطوط الطي */
+.studio-decisions::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 100%;
+  height: 1px;
+  background: linear-gradient(90deg, transparent 20%, rgba(180,150,100,0.3) 50%, transparent 80%);
+}
+
+.studio-decisions::after {
+  content: '';
+  position: absolute;
+  bottom: 30%;
+  right: 0;
+  width: 100%;
+  height: 1px;
+  background: linear-gradient(90deg, transparent 10%, rgba(180,150,100,0.2) 50%, transparent 90%);
+}
+
+/* ختم شمع */
+.studio-wax-seal {
+  width: 44px;
+  height: 44px;
+  background: radial-gradient(circle at 35% 35%, #C63838 0%, #8B1E1E 60%, #5A0E0E 100%);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.15);
+  flex-shrink: 0;
+}
+
+.studio-wax-seal span {
+  font-family: var(--font-playfair), serif;
+  font-style: italic;
+  font-size: 18px;
+  color: rgba(255,255,255,0.9);
+  font-weight: 600;
+}
+
+.studio-decision-item {
+  font-family: var(--font-caveat), cursive;
+  font-size: 16px;
+  color: var(--paper-ink);
+  padding: 6px 0;
+  border-bottom: 1px solid rgba(180,150,100,0.2);
+}
+
+/* ─── Calendar Mini (تقويم جيب) ─────────────────────────────────────────────── */
+.studio-calendar {
+  background: linear-gradient(180deg, #FEFAF0 0%, #F5EDD5 100%) !important;
+  border-radius: 4px;
+  transform: rotate(-2deg);
+  box-shadow: 0 4px 16px rgba(0,0,0,0.3);
+  padding: 14px !important;
+  position: relative;
+  animation: place-on-table 0.4s ease-out 0.5s both;
+  color: var(--paper-ink) !important;
+}
+
+/* شريط لاصق */
+.studio-calendar::before {
+  content: '';
+  position: absolute;
+  top: -8px;
+  right: 50%;
+  transform: translateX(50%);
+  width: 60px;
+  height: 16px;
+  background: rgba(255,220,100,0.6);
+  border-radius: 2px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+}
+
+.studio-calendar .month-name {
+  font-family: var(--font-playfair), serif;
+  font-size: 16px;
+  color: var(--paper-ink);
+  font-weight: 600;
+}
+
+.studio-calendar .month-subtitle {
+  font-family: var(--font-cormorant), serif;
+  font-style: italic;
+  font-size: 13px;
+  color: var(--paper-ink-soft);
+}
+
+.studio-calendar .cal-day {
+  font-family: var(--font-cormorant), serif;
+  font-size: 13px;
+  color: var(--paper-ink);
+  text-align: center;
+  padding: 3px 0;
+  border-radius: 50%;
+  position: relative;
+}
+
+.studio-calendar .cal-day.today {
+  background: var(--red-wax) !important;
+  color: white !important;
+  border-radius: 50%;
+}
+
+.studio-calendar .cal-day.has-event::after {
+  content: '';
+  position: absolute;
+  bottom: 1px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: var(--gold);
+}
+
+/* ─── Inbox (ورقة + قلم) ─────────────────────────────────────────────────────── */
+.studio-inbox {
+  background: linear-gradient(180deg, #FEFAF0 0%, #F5EDD5 100%) !important;
+  border-radius: 4px;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.25);
+  padding: 14px !important;
+  position: relative;
+  animation: place-on-table 0.4s ease-out 0.6s both;
+  color: var(--paper-ink) !important;
+}
+
+/* زاوية مطوية */
+.studio-inbox::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 0;
+  height: 0;
+  border-style: solid;
+  border-width: 0 0 20px 20px;
+  border-color: transparent transparent rgba(180,150,100,0.4) transparent;
+}
+
+.studio-inbox-input {
+  background: rgba(247,236,214,0.3) !important;
+  border: 1px solid rgba(180,150,100,0.4) !important;
+  color: var(--paper-ink) !important;
+  font-family: var(--font-caveat), cursive !important;
+  font-style: italic;
+  font-size: 18px !important;
+}
+
+.studio-inbox-input::placeholder {
+  color: var(--paper-dark) !important;
+  font-family: var(--font-caveat), cursive !important;
+  font-style: italic;
+}
+
+.studio-inbox-note {
+  font-family: var(--font-caveat), cursive;
+  font-size: 20px;
+  color: var(--paper-ink);
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  padding: 5px 0;
+  border-bottom: 1px solid rgba(180,150,100,0.2);
+}
+
+.studio-inbox-note::before {
+  content: '◆';
+  color: var(--gold);
+  font-size: 10px;
+  margin-top: 6px;
+  flex-shrink: 0;
+}
+
+.studio-inbox-note .note-time {
+  font-family: var(--font-cormorant), serif;
+  font-style: italic;
+  font-size: 12px;
+  color: var(--paper-dark);
+}
+
+/* ─── Team (بطاقات موظفين) ───────────────────────────────────────────────────── */
+.studio-team-card {
+  background: linear-gradient(135deg, #FBF3DF 0%, #F0E2BC 100%);
+  border-radius: 4px;
+  padding: 12px 10px;
+  position: relative;
+  box-shadow: 0 3px 10px rgba(0,0,0,0.2);
+  transition: transform 0.2s, box-shadow 0.2s;
+  color: var(--paper-ink) !important;
+}
+
+.studio-team-card:hover {
+  transform: var(--card-rotate, rotate(-1deg)) translateY(-4px);
+  box-shadow: 0 6px 16px rgba(0,0,0,0.3);
+}
+
+/* شريط لاصق */
+.studio-team-card::before {
+  content: '';
+  position: absolute;
+  top: -8px;
+  right: 50%;
+  transform: translateX(50%);
+  width: 40px;
+  height: 12px;
+  background: rgba(255,220,100,0.6);
+  border-radius: 2px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.15);
+}
+
+.studio-team-avatar {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--gold), var(--gold-deep));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-playfair), serif;
+  font-size: 16px;
+  font-weight: 600;
+  color: white;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+  margin: 0 auto 6px;
+}
+
+.studio-team-name {
+  font-family: var(--font-caveat), cursive;
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--paper-ink);
+  text-align: center;
+}
+
+.studio-team-role {
+  font-family: var(--font-cormorant), serif;
+  font-style: italic;
+  font-size: 12px;
+  color: var(--paper-ink-soft);
+  text-align: center;
+}
+
+/* ─── Reminders Strip (شريط شموع) ───────────────────────────────────────────── */
+.studio-reminder-chip {
+  border-right: 3px solid var(--candle-flame) !important;
+  background: rgba(255,184,74,0.08) !important;
+  border-radius: 4px;
+  padding: 6px 10px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.studio-reminder-text {
+  font-family: var(--font-caveat), cursive;
+  font-size: 16px;
+  color: var(--paper-cream);
+}
+
+.studio-reminder-time {
+  font-family: var(--font-cormorant), serif;
+  font-style: italic;
+  font-size: 12px;
+  color: var(--candle-flame);
+}
+
+/* ─── Brand Bottles (زجاجات عطور) ───────────────────────────────────────────── */
+.studio-bottle-wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  cursor: pointer;
+  transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.studio-bottle-wrap:hover {
+  transform: translateY(-8px) rotate(0deg) !important;
+}
+
+.studio-bottle-cap {
+  width: 40%;
+  height: 28px;
+  background: linear-gradient(135deg, var(--gold-bright), var(--gold-deep));
+  border-radius: 3px 3px 0 0;
+  box-shadow: 0 -1px 4px rgba(0,0,0,0.2);
+}
+
+.studio-bottle-body {
+  width: 90px;
+  height: 110px;
+  border-radius: 6px 6px 10px 10px;
+  position: relative;
+  overflow: hidden;
+  box-shadow: 2px 4px 12px rgba(0,0,0,0.4), inset -4px 0 8px rgba(0,0,0,0.15);
+}
+
+.studio-bottle-shine {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  width: 20px;
+  height: 40px;
+  background: rgba(255,255,255,0.15);
+  border-radius: 50%;
+  transform: rotate(-15deg);
+}
+
+.studio-bottle-label {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: var(--paper-cream);
+  border-radius: 3px;
+  padding: 4px 6px;
+  text-align: center;
+  min-width: 60px;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.2);
+}
+
+.studio-bottle-label .brand-emoji {
+  font-size: 14px;
+  display: block;
+}
+
+.studio-bottle-label .brand-name {
+  font-family: var(--font-caveat), cursive;
+  font-size: 10px;
+  color: var(--paper-ink);
+  display: block;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 56px;
+}
+
+.studio-bottle-shadow {
+  width: 70px;
+  height: 10px;
+  background: radial-gradient(ellipse, rgba(0,0,0,0.3) 0%, transparent 70%);
+  margin-top: 4px;
+}
+
+.studio-bottle-count {
+  position: absolute;
+  top: -6px;
+  left: -6px;
+  width: 18px;
+  height: 18px;
+  background: var(--red-wax);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 9px;
+  color: white;
+  font-weight: 700;
+  z-index: 5;
+}
+
+/* ─── Section Wrapper (CmdSection) ──────────────────────────────────────────── */
+.studio-section {
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+  margin-bottom: 20px !important;
+}
+
+.studio-section-header {
+  font-family: var(--font-caveat), cursive;
+  font-size: 20px;
+  color: var(--gold-bright);
+  padding: 8px 0 !important;
+  border-bottom: 1px dashed rgba(212,160,85,0.3) !important;
+  background: transparent !important;
+}
+
+/* ─── Page Header ────────────────────────────────────────────────────────────── */
+.studio-page-header h1 {
+  font-family: var(--font-playfair), serif !important;
+  color: var(--gold-bright) !important;
+  font-weight: 600 !important;
+}
+
+.studio-page-header p {
+  font-family: var(--font-cormorant), serif !important;
+  font-style: italic;
+  color: var(--paper-shadow) !important;
+}
+
+/* ─── Scrollbar ──────────────────────────────────────────────────────────────── */
+.scr::-webkit-scrollbar { width: 6px; }
+.scr::-webkit-scrollbar-track { background: rgba(42,26,13,0.3); }
+.scr::-webkit-scrollbar-thumb { background: var(--gold-deep); border-radius: 3px; }
