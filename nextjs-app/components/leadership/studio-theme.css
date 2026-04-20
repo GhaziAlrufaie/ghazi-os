@@ -346,8 +346,8 @@ body::before {
   box-shadow: 0 8px 32px rgba(255, 107, 107, 0.2);
   color: white;
   margin-left: -24px;
-  margin-right: -24px;
-  width: calc(100% + 48px);
+  margin-right: calc(-24px - 220px);
+  width: calc(100% + 24px + 220px + 24px);
 }
 
 /* Decorative elements */
