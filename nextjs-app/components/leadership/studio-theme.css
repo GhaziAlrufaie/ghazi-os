@@ -422,6 +422,7 @@ body::before {
   line-height: 1.2;
   margin-bottom: 8px;
   letter-spacing: -0.5px;
+  color: white;
 }
 
 .focus-subtitle {
@@ -456,10 +457,11 @@ body::before {
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 36px;
+  font-size: 48px;
   flex-shrink: 0;
   border: 1px solid rgba(255, 255, 255, 0.3);
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+  opacity: 0.9;
 }
 
 .focus-cta {
@@ -469,20 +471,19 @@ body::before {
 }
 
 .focus-btn {
-  padding: 12px 24px;
-  background: white;
-  color: var(--coral-deep);
+  padding: 8px 16px;
+  background: rgba(255, 255, 255, 0.25);
+  color: white;
   font-family: inherit;
   font-size: 14px;
-  font-weight: 700;
-  border: none;
-  border-radius: 14px;
+  font-weight: 600;
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  border-radius: 12px;
   cursor: pointer;
   transition: all 0.2s;
   display: flex;
   align-items: center;
   gap: 8px;
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
 }
 
 .focus-btn:hover {
@@ -491,7 +492,7 @@ body::before {
 }
 
 .focus-btn.ghost {
-  background: rgba(255, 255, 255, 0.2);
+  background: rgba(255, 255, 255, 0.15);
   backdrop-filter: blur(10px);
   color: white;
   border: 1px solid rgba(255, 255, 255, 0.3);
@@ -1563,8 +1564,8 @@ body::before {
 
 .focus-overdue-badge { background: var(--coral-light); color: var(--coral-deep); padding: 2px 8px; border-radius: 20px; font-size: 10px; font-weight: 700; }
 .focus-progress-wrap { display: flex; align-items: center; gap: 8px; margin-bottom: 12px; }
-.focus-progress-bar { flex: 1; height: 6px; background: rgba(255,255,255,0.3); border-radius: 6px; overflow: hidden; }
-.focus-progress-fill { height: 6px; border-radius: 6px; background: white; transition: width 0.3s; }
+.focus-progress-bar { flex: 1; height: 6px; background: rgba(255,255,255,0.3); border-radius: 10px; overflow: hidden; }
+.focus-progress-fill { height: 6px; border-radius: 10px; background: white; transition: width 0.3s; }
 .focus-progress-label { font-size: 11px; opacity: 0.9; white-space: nowrap; }
 .focus-tasks { margin-top: 16px; border-top: 1px solid rgba(255,255,255,0.3); padding-top: 12px; }
 .focus-tasks-label { font-size: 11px; font-weight: 700; opacity: 0.8; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 8px; }
