@@ -70,8 +70,8 @@ export default function LayoutShell({ children, sidebar }: LayoutShellProps) {
         {/* Topbar — ثابت في أعلى كل صفحة */}
         <Topbar title={pageTitle} />
 
-        {/* Month Navigation Bar */}
-        <MonthNav />
+        {/* Month Navigation Bar — مخفي في /leadership */}
+        {currentPath !== '/leadership' && <MonthNav />}
 
         {/* محتوى الصفحة */}
         {children}

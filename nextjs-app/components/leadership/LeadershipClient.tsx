@@ -907,7 +907,7 @@ export default function LeadershipClient({
       <main className="main">
 
         {/* ── Greeting ────────────────────────────────────────────────────── */}
-        <div className="greeting" style={{ padding: '24px 24px 0' }}>
+        <div className="greeting" style={{ padding: '8px 24px 0' }}>
           <div className="greeting-title">
             <span className="greeting-emoji">👋</span>
             <div className="greeting-text">
