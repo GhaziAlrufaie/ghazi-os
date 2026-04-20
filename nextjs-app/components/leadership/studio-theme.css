@@ -1640,3 +1640,21 @@ body::before {
 .hungry-brands-list { display: flex; flex-wrap: wrap; gap: 6px; }
 .hungry-brand-btn { display: flex; align-items: center; gap: 4px; padding: 4px 10px; background: white; border-radius: 20px; font-size: 12px; font-weight: 600; cursor: pointer; transition: all 0.15s; font-family: inherit; border: 1px solid var(--border-soft); }
 .hungry-brand-btn:hover { transform: translateY(-1px); box-shadow: var(--shadow-sm); }
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   BORDER RADIUS — كل الكاردات
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+.section,
+.sun-section,
+.day-card,
+.decision-item,
+.inbox-item,
+.daily-task,
+.upcoming-item {
+  border-radius: 16px;
+}
+
+.focus-hero {
+  border-radius: 0;
+}
