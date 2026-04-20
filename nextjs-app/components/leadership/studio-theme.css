@@ -511,6 +511,7 @@ body::before {
 .section.weekly-compass-section,
 .section.daily-tasks-section {
   border-radius: 20px;
+  overflow: hidden;
   margin-left: -24px;
   margin-right: calc(-24px - 220px);
   width: calc(100% + 24px + 220px + 24px);
