@@ -627,12 +627,18 @@ function FocusHero({
               <span>مهمة الفوكس</span>
               {isOverdue && <span className="focus-overdue-badge">متأخرة</span>}
             </div>
+            {/* badges: نوع + أولوية + متأخرة */}
+            <div style={{ display: 'flex', gap: 4, marginBottom: 6, flexWrap: 'wrap' }}>
+              <span style={{ fontSize: 9, background: 'rgba(255,255,255,0.25)', color: 'white', padding: '1px 8px', borderRadius: 8, border: '1px solid rgba(255,255,255,0.3)' }}>مهمة</span>
+              <span style={{ fontSize: 9, background: `${PRIORITY_COLORS[selectedTask.priority]}44`, color: 'white', padding: '1px 8px', borderRadius: 8, border: '1px solid rgba(255,255,255,0.3)' }}>{PRIORITY_LABELS[selectedTask.priority]}</span>
+              {isOverdue && <span style={{ fontSize: 9, background: 'rgba(231,76,60,0.4)', color: 'white', padding: '1px 8px', borderRadius: 8 }}>متأخرة</span>}
+            </div>
             <h1 className="focus-title">{selectedTask.title}</h1>
-            {taskBrand && <p className="focus-subtitle" style={{ color: taskColor }}>{taskBrand.name}</p>}
+            {taskBrand && <p className="focus-subtitle" style={{ color: 'rgba(255,255,255,0.85)' }}>{taskBrand.name}</p>}
             {totalItems > 0 && (
               <div className="focus-progress-wrap">
                 <div className="focus-progress-bar">
-                  <div className="focus-progress-fill" style={{ width: `${totalItems > 0 ? Math.round(doneItems/totalItems*100) : 0}%`, background: taskColor }} />
+                  <div className="focus-progress-fill" style={{ width: `${totalItems > 0 ? Math.round(doneItems/totalItems*100) : 0}%` }} />
                 </div>
                 <span className="focus-progress-label">{doneItems}/{totalItems}</span>
               </div>
@@ -641,16 +647,24 @@ function FocusHero({
               <div className="focus-next-steps">
                 {nextSteps.map(step => (
                   <div key={step.id} className="focus-step">
-                    <input type="checkbox" style={{ accentColor: taskColor }} />
+                    <input type="checkbox" style={{ accentColor: 'white' }} />
                     <span className="flex-1">{step.title}</span>
                     <span className="focus-step-type">{step.type}</span>
                   </div>
                 ))}
+                {totalItems - doneItems > nextSteps.length && (
+                  <div style={{ fontSize: 10, opacity: 0.75, marginTop: 4 }}>+ {totalItems - doneItems - nextSteps.length} أخرى...</div>
+                )}
               </div>
             )}
-            <div className="focus-cta">
-              <button className="focus-btn ghost" onClick={() => setSelectedTaskId(null)}>↩ رجوع</button>
+            {/* أزرار الأربعة */}
+            <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', marginTop: 10, marginBottom: 8 }}>
+              <button style={{ flex: 1, padding: '6px 8px', background: 'rgba(46,204,113,0.25)', color: 'white', border: '1px solid rgba(46,204,113,0.4)', borderRadius: 7, fontSize: 11, cursor: 'pointer', fontFamily: 'inherit' }}>✓ خلصت</button>
+              <button style={{ flex: 1, padding: '6px 8px', background: 'rgba(231,76,60,0.25)', color: 'white', border: '1px solid rgba(231,76,60,0.4)', borderRadius: 7, fontSize: 11, cursor: 'pointer', fontFamily: 'inherit' }}>⚡ عالق</button>
+              <button style={{ flex: 1, padding: '6px 8px', background: 'rgba(255,217,61,0.25)', color: 'white', border: '1px solid rgba(255,217,61,0.4)', borderRadius: 7, fontSize: 11, cursor: 'pointer', fontFamily: 'inherit' }}>⏰ بعدين</button>
+              <button onClick={() => setSelectedTaskId(null)} style={{ flex: 1, padding: '6px 8px', background: 'rgba(255,255,255,0.2)', color: 'white', border: '1px solid rgba(255,255,255,0.3)', borderRadius: 7, fontSize: 11, cursor: 'pointer', fontFamily: 'inherit' }}>🔄 تغيير</button>
             </div>
+            <Link href={`/tasks/${selectedTask.id}`} style={{ fontSize: 11, color: 'rgba(255,255,255,0.85)', display: 'block', textAlign: 'center' }}>فتح التفاصيل ←</Link>
           </div>
           <div className="focus-icon-big">✅</div>
         </div>
