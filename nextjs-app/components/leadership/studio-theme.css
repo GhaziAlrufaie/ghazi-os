@@ -81,7 +81,7 @@ body::before {
 
 .app {
   display: grid;
-  grid-template-columns: 1fr 280px;
+  grid-template-columns: 1fr;
   gap: 24px;
   padding: 24px;
   min-height: 100vh;
