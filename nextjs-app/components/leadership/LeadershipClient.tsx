@@ -158,7 +158,7 @@ function WeeklyCompass({
   }
 
   return (
-    <section className="section">
+    <section className="section weekly-compass-section">
       <div className="section-head">
         <div className="section-title-wrap">
           <div className="section-icon" style={{ background: 'var(--sky-light)', color: 'var(--sky-deep)' }}>🧭</div>

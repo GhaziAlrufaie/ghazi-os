@@ -507,6 +507,16 @@ body::before {
   box-shadow: var(--shadow-sm);
 }
 
+/* WeeklyCompass — edge-to-edge مثل FocusHero */
+.section.weekly-compass-section {
+  border-radius: 0;
+  margin-left: -24px;
+  margin-right: calc(-24px - 220px);
+  width: calc(100% + 24px + 220px + 24px);
+  border-left: none;
+  border-right: none;
+}
+
 .section-head {
   display: flex;
   align-items: center;
