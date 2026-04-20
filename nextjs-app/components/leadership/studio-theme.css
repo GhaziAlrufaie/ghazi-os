@@ -341,7 +341,7 @@ body::before {
   min-height: 235px;
   max-height: 235px;
   background: var(--sunrise-gradient);
-  border-radius: 0;
+  border-radius: 20px;
   overflow: hidden;
   box-shadow: 0 8px 32px rgba(255, 107, 107, 0.2);
   color: white;
@@ -1656,5 +1656,12 @@ body::before {
 }
 
 .focus-hero {
-  border-radius: 0;
+  border-radius: 20px;
+  margin-left: -24px;
+  margin-right: calc(-24px - 220px);
+  width: calc(100% + 24px + 220px + 24px);
+}
+
+.week-grid .day-card {
+  border-radius: 16px;
 }
