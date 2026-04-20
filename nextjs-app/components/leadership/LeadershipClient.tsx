@@ -969,7 +969,7 @@ export default function LeadershipClient({
             <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
 
               {/* روتينك اليومي */}
-              <div className="section">
+              <div className="section daily-tasks-section">
                 <div className="section-head">
                   <div className="section-title-wrap">
                     <div className="section-icon" style={{ background: 'var(--mint-light)', color: 'var(--mint-deep)' }}>☑️</div>

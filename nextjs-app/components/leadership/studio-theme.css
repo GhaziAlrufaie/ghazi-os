@@ -508,7 +508,8 @@ body::before {
 }
 
 /* WeeklyCompass — edge-to-edge مثل FocusHero */
-.section.weekly-compass-section {
+.section.weekly-compass-section,
+.section.daily-tasks-section {
   border-radius: 0;
   margin-left: -24px;
   margin-right: calc(-24px - 220px);
