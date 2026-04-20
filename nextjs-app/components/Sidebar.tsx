@@ -1,8 +1,8 @@
 'use client';
 /*
- * Ghazi OS — Sidebar (Studio Theme: رف خشبي فاخر)
+ * Ghazi OS — Sidebar (Sunrise Energy Theme)
  * branch: studio-theme-v1
- * خلفية خشب داكن + لوحة ذهبية + nav items بلون الورق الكريمي
+ * خلفية بيضاء كريمية دافئة + تمييز بالكورال + أيقونات ملونة
  */
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
@@ -23,100 +23,34 @@ const NAV_GROUPS = [
   {
     label: 'القيادة',
     items: [
-      {
-        id: 'cmd',
-        label: 'المركز',
-        href: '/leadership',
-        icon: '⌚',
-      },
-      {
-        id: 'decisions',
-        label: 'القرارات',
-        href: '/decisions',
-        icon: '⚖️',
-      },
+      { id: 'cmd', label: 'المركز', href: '/leadership', icon: '🧭' },
+      { id: 'decisions', label: 'القرارات', href: '/decisions', icon: '⚖️' },
     ],
   },
   {
     label: 'الأعمال',
     items: [
-      {
-        id: 'brands',
-        label: 'البراندات',
-        href: '/brands',
-        hasBrands: true,
-        icon: '🏷',
-      },
-      {
-        id: 'tasks',
-        label: 'المهام',
-        href: '/tasks',
-        icon: '✅',
-      },
-      {
-        id: 'projects',
-        label: 'المشاريع',
-        href: '/projects',
-        icon: '📁',
-      },
-      {
-        id: 'sales',
-        label: 'المبيعات',
-        href: '/sales',
-        icon: '📈',
-      },
-      {
-        id: 'finance',
-        label: 'الماليات',
-        href: '/finance',
-        icon: '💰',
-      },
+      { id: 'brands', label: 'البراندات', href: '/brands', hasBrands: true, icon: '🏷' },
+      { id: 'tasks', label: 'المهام', href: '/tasks', icon: '✅' },
+      { id: 'projects', label: 'المشاريع', href: '/projects', icon: '📁' },
+      { id: 'sales', label: 'المبيعات', href: '/sales', icon: '📈' },
+      { id: 'finance', label: 'الماليات', href: '/finance', icon: '💰' },
     ],
   },
   {
     label: 'الحياة',
     items: [
-      {
-        id: 'personal',
-        label: 'الشخصي',
-        href: '/personal',
-        icon: '👤',
-      },
-      {
-        id: 'worlds',
-        label: 'عوالمي',
-        href: '/worlds',
-        icon: '🌍',
-      },
-      {
-        id: 'calendar',
-        label: 'التقويم',
-        href: '/calendar',
-        icon: '📅',
-      },
-      {
-        id: 'reminders',
-        label: 'التذكيرات',
-        href: '/reminders',
-        icon: '🔔',
-      },
+      { id: 'personal', label: 'الشخصي', href: '/personal', icon: '👤' },
+      { id: 'worlds', label: 'عوالمي', href: '/worlds', icon: '🌍' },
+      { id: 'calendar', label: 'التقويم', href: '/calendar', icon: '📅' },
+      { id: 'reminders', label: 'التذكيرات', href: '/reminders', icon: '🔔' },
     ],
   },
   {
     label: 'التحليل',
     items: [
-      {
-        id: 'performance',
-        label: 'الأداء',
-        href: '/performance',
-        icon: '📊',
-      },
-      {
-        id: 'settings',
-        label: 'الإعدادات',
-        href: '/settings',
-        icon: '⚙️',
-      },
+      { id: 'performance', label: 'الأداء', href: '/performance', icon: '📊' },
+      { id: 'settings', label: 'الإعدادات', href: '/settings', icon: '⚙️' },
     ],
   },
 ];
@@ -137,7 +71,6 @@ export default function Sidebar({ brands = [] }: SidebarProps) {
 
   useEffect(() => {
     setDateStr(getTodayStr());
-    // فتح البراندات تلقائياً إذا كنا في صفحة براند
     if ((pathname ?? '').startsWith('/brands')) setBrandsOpen(true);
   }, [pathname]);
 
@@ -149,43 +82,35 @@ export default function Sidebar({ brands = [] }: SidebarProps) {
 
   return (
     <aside className="side" style={{
-      background: `
-        repeating-linear-gradient(
-          92deg,
-          rgba(0,0,0,0.25) 0px, rgba(0,0,0,0.25) 1px,
-          transparent 1px, transparent 4px,
-          rgba(0,0,0,0.1) 4px, rgba(0,0,0,0.1) 5px,
-          transparent 5px, transparent 14px
-        ),
-        repeating-linear-gradient(
-          88deg,
-          rgba(107,74,47,0.08) 0px, rgba(107,74,47,0.08) 2px,
-          transparent 2px, transparent 20px
-        ),
-        linear-gradient(180deg, #3D2817 0%, #4A2F1B 40%, #3D2817 100%)
-      `,
-      boxShadow: 'inset -4px 0 12px rgba(0,0,0,0.4), 4px 0 16px rgba(0,0,0,0.3)',
-      borderLeft: 'none',
+      background: '#FFFBF5',
+      borderLeft: '1px solid #F0E6D6',
+      boxShadow: '2px 0 12px rgba(255,107,107,0.06)',
     }}>
-      {/* Logo Plaque */}
+      {/* Logo */}
       <div style={{
-        margin: '14px 10px 10px',
-        background: 'linear-gradient(135deg, #D4A055 0%, #9C7231 50%, #D4A055 100%)',
-        borderRadius: 6,
-        padding: '10px 14px',
-        position: 'relative',
-        boxShadow: '0 2px 8px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.2)',
+        margin: '16px 12px 12px',
+        padding: '12px 16px',
+        background: 'linear-gradient(135deg, #FF6B6B 0%, #FFB085 50%, #FFD93D 100%)',
+        borderRadius: 16,
         direction: 'rtl',
+        boxShadow: '0 4px 16px rgba(255,107,107,0.25)',
       }}>
-        {/* مسامير الزوايا */}
-        <span style={{ position: 'absolute', top: 5, right: 5, width: 5, height: 5, borderRadius: '50%', background: 'rgba(255,255,255,0.5)', display: 'block' }} />
-        <span style={{ position: 'absolute', top: 5, left: 5, width: 5, height: 5, borderRadius: '50%', background: 'rgba(255,255,255,0.5)', display: 'block' }} />
-        <span style={{ position: 'absolute', bottom: 5, right: 5, width: 5, height: 5, borderRadius: '50%', background: 'rgba(255,255,255,0.5)', display: 'block' }} />
-        <span style={{ position: 'absolute', bottom: 5, left: 5, width: 5, height: 5, borderRadius: '50%', background: 'rgba(255,255,255,0.5)', display: 'block' }} />
-        <div style={{ fontFamily: 'var(--font-playfair, serif)', fontSize: 18, fontWeight: 600, color: '#3D2817', letterSpacing: '0.05em' }}>
+        <div style={{
+          fontFamily: 'var(--font-jakarta, sans-serif)',
+          fontSize: 18,
+          fontWeight: 800,
+          color: 'white',
+          letterSpacing: '-0.5px',
+        }}>
           Ghazi OS
         </div>
-        <div style={{ fontFamily: 'var(--font-cormorant, serif)', fontStyle: 'italic', fontSize: 11, color: 'rgba(61,40,23,0.7)', marginTop: 2 }}>
+        <div style={{
+          fontFamily: 'var(--font-ibm, sans-serif)',
+          fontSize: 11,
+          color: 'rgba(255,255,255,0.85)',
+          marginTop: 2,
+          fontWeight: 500,
+        }}>
           {dateStr || 'نظام إدارة الأعمال'}
         </div>
       </div>
@@ -194,24 +119,18 @@ export default function Sidebar({ brands = [] }: SidebarProps) {
       <nav className="side-nav" style={{ flex: 1, overflowY: 'auto', padding: '4px 0' }}>
         {NAV_GROUPS.map((group) => (
           <div key={group.label}>
-            {/* Group Divider */}
+            {/* Group Label */}
             <div style={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: 6,
-              padding: '8px 12px 4px',
+              padding: '10px 16px 4px',
+              fontSize: 10,
+              fontWeight: 700,
+              color: '#C4C8D4',
+              textTransform: 'uppercase',
+              letterSpacing: '1px',
+              fontFamily: 'var(--font-ibm, sans-serif)',
               direction: 'rtl',
             }}>
-              <div style={{ flex: 1, height: 1, borderTop: '1px dashed rgba(212,160,85,0.3)' }} />
-              <span style={{
-                fontFamily: 'var(--font-caveat, cursive)',
-                fontSize: 11,
-                color: 'rgba(212,160,85,0.7)',
-                whiteSpace: 'nowrap',
-              }}>
-                {group.label}
-              </span>
-              <div style={{ flex: 1, height: 1, borderTop: '1px dashed rgba(212,160,85,0.3)' }} />
+              {group.label}
             </div>
 
             {group.items.map((item) => {
@@ -219,7 +138,7 @@ export default function Sidebar({ brands = [] }: SidebarProps) {
                 ? pathname === '/'
                 : (pathname ?? '').startsWith(item.href);
 
-              if (item.hasBrands) {
+              if ('hasBrands' in item && item.hasBrands) {
                 return (
                   <div key={item.id}>
                     <div
@@ -227,39 +146,40 @@ export default function Sidebar({ brands = [] }: SidebarProps) {
                       style={{
                         display: 'flex',
                         alignItems: 'center',
-                        gap: 8,
-                        padding: '7px 14px',
+                        gap: 10,
+                        padding: '8px 16px',
                         cursor: 'pointer',
                         direction: 'rtl',
-                        background: isActive ? 'rgba(212,160,85,0.18)' : 'transparent',
-                        borderRight: isActive ? '3px solid #D4A055' : '3px solid transparent',
+                        background: isActive ? '#FFE3E3' : 'transparent',
+                        borderRight: isActive ? '3px solid #FF6B6B' : '3px solid transparent',
                         transition: 'all 0.2s',
-                        color: isActive ? '#E8BC6F' : 'rgba(247,236,214,0.85)',
+                        color: isActive ? '#E84545' : '#5A5F73',
                         fontFamily: 'var(--font-ibm, sans-serif)',
-                        fontSize: 12,
-                        fontWeight: isActive ? 600 : 400,
+                        fontSize: 13,
+                        fontWeight: isActive ? 600 : 500,
+                        borderRadius: '0 0 0 0',
                       }}
                       onMouseEnter={(e) => {
                         if (!isActive) {
-                          (e.currentTarget as HTMLElement).style.background = 'rgba(212,160,85,0.1)';
-                          (e.currentTarget as HTMLElement).style.color = '#E8BC6F';
+                          (e.currentTarget as HTMLElement).style.background = '#FFF8F0';
+                          (e.currentTarget as HTMLElement).style.color = '#E84545';
                         }
                       }}
                       onMouseLeave={(e) => {
                         if (!isActive) {
                           (e.currentTarget as HTMLElement).style.background = 'transparent';
-                          (e.currentTarget as HTMLElement).style.color = 'rgba(247,236,214,0.85)';
+                          (e.currentTarget as HTMLElement).style.color = '#5A5F73';
                         }
                       }}
                     >
-                      <span style={{ fontSize: 14, flexShrink: 0 }}>{item.icon}</span>
+                      <span style={{ fontSize: 16, flexShrink: 0 }}>{item.icon}</span>
                       <span style={{ flex: 1 }}>{item.label}</span>
                       <span style={{
                         fontSize: 10,
                         transform: brandsOpen ? 'rotate(180deg)' : 'none',
                         transition: 'transform 0.2s',
                         display: 'inline-block',
-                        color: 'rgba(212,160,85,0.6)',
+                        color: '#C4C8D4',
                       }}>▾</span>
                     </div>
                     <div style={{
@@ -268,7 +188,7 @@ export default function Sidebar({ brands = [] }: SidebarProps) {
                       transition: 'max-height 0.3s ease',
                     }}>
                       {brands.length === 0 ? (
-                        <div style={{ padding: '6px 28px', fontSize: 11, color: 'rgba(247,236,214,0.4)', fontFamily: 'var(--font-ibm, sans-serif)' }}>لا توجد براندات</div>
+                        <div style={{ padding: '6px 32px', fontSize: 11, color: '#C4C8D4', fontFamily: 'var(--font-ibm, sans-serif)' }}>لا توجد براندات</div>
                       ) : (
                         brands.map((brand) => {
                           const isBrandActive = (pathname ?? '').includes(`/brands/${brand.id}`);
@@ -280,16 +200,17 @@ export default function Sidebar({ brands = [] }: SidebarProps) {
                                 display: 'flex',
                                 alignItems: 'center',
                                 gap: 8,
-                                padding: '6px 14px 6px 14px',
-                                paddingRight: 28,
+                                padding: '6px 16px 6px 16px',
+                                paddingRight: 36,
                                 textDecoration: 'none',
                                 direction: 'rtl',
-                                background: isBrandActive ? 'rgba(212,160,85,0.12)' : 'transparent',
+                                background: isBrandActive ? '#FFF8F0' : 'transparent',
                                 borderRight: `3px solid ${isBrandActive ? brand.color : 'transparent'}`,
                                 transition: 'all 0.15s',
-                                color: isBrandActive ? '#E8BC6F' : 'rgba(247,236,214,0.7)',
-                                fontSize: 11,
+                                color: isBrandActive ? '#2D3142' : '#8B8F9F',
+                                fontSize: 12,
                                 fontFamily: 'var(--font-ibm, sans-serif)',
+                                fontWeight: isBrandActive ? 600 : 400,
                               }}
                             >
                               <span style={{ width: 6, height: 6, borderRadius: '50%', background: brand.color, flexShrink: 0, display: 'inline-block' }} />
@@ -310,32 +231,32 @@ export default function Sidebar({ brands = [] }: SidebarProps) {
                   style={{
                     display: 'flex',
                     alignItems: 'center',
-                    gap: 8,
-                    padding: '7px 14px',
+                    gap: 10,
+                    padding: '8px 16px',
                     textDecoration: 'none',
                     direction: 'rtl',
-                    background: isActive ? 'rgba(212,160,85,0.18)' : 'transparent',
-                    borderRight: isActive ? '3px solid #D4A055' : '3px solid transparent',
+                    background: isActive ? '#FFE3E3' : 'transparent',
+                    borderRight: isActive ? '3px solid #FF6B6B' : '3px solid transparent',
                     transition: 'all 0.2s',
-                    color: isActive ? '#E8BC6F' : 'rgba(247,236,214,0.85)',
+                    color: isActive ? '#E84545' : '#5A5F73',
                     fontFamily: 'var(--font-ibm, sans-serif)',
-                    fontSize: 12,
-                    fontWeight: isActive ? 600 : 400,
+                    fontSize: 13,
+                    fontWeight: isActive ? 600 : 500,
                   }}
                   onMouseEnter={(e) => {
                     if (!isActive) {
-                      (e.currentTarget as HTMLElement).style.background = 'rgba(212,160,85,0.1)';
-                      (e.currentTarget as HTMLElement).style.color = '#E8BC6F';
+                      (e.currentTarget as HTMLElement).style.background = '#FFF8F0';
+                      (e.currentTarget as HTMLElement).style.color = '#E84545';
                     }
                   }}
                   onMouseLeave={(e) => {
                     if (!isActive) {
                       (e.currentTarget as HTMLElement).style.background = 'transparent';
-                      (e.currentTarget as HTMLElement).style.color = 'rgba(247,236,214,0.85)';
+                      (e.currentTarget as HTMLElement).style.color = '#5A5F73';
                     }
                   }}
                 >
-                  <span style={{ fontSize: 14, flexShrink: 0 }}>{item.icon}</span>
+                  <span style={{ fontSize: 16, flexShrink: 0 }}>{item.icon}</span>
                   <span>{item.label}</span>
                 </Link>
               );
@@ -346,8 +267,8 @@ export default function Sidebar({ brands = [] }: SidebarProps) {
 
       {/* Footer */}
       <div style={{
-        padding: '10px 10px 12px',
-        borderTop: '1px solid rgba(212,160,85,0.2)',
+        padding: '12px',
+        borderTop: '1px solid #F0E6D6',
       }}>
         <button
           onClick={handleLogout}
@@ -356,42 +277,35 @@ export default function Sidebar({ brands = [] }: SidebarProps) {
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
-            gap: 6,
-            padding: '7px 10px',
-            background: 'rgba(139,30,30,0.15)',
-            border: '1px solid rgba(139,30,30,0.3)',
-            borderRadius: 4,
-            color: 'rgba(247,236,214,0.6)',
-            fontSize: 11,
+            gap: 8,
+            padding: '9px 12px',
+            background: '#FFF8F0',
+            border: '1px solid #F0E6D6',
+            borderRadius: 12,
+            color: '#8B8F9F',
+            fontSize: 12,
             fontFamily: 'var(--font-ibm, sans-serif)',
             cursor: 'pointer',
-            transition: 'all 0.15s',
+            transition: 'all 0.2s',
             direction: 'rtl',
+            fontWeight: 500,
           }}
           onMouseEnter={(e) => {
             const b = e.currentTarget as HTMLButtonElement;
-            b.style.background = 'rgba(139,30,30,0.3)';
-            b.style.color = '#F7ECD6';
+            b.style.background = '#FFE3E3';
+            b.style.color = '#E84545';
+            b.style.borderColor = '#FF6B6B';
           }}
           onMouseLeave={(e) => {
             const b = e.currentTarget as HTMLButtonElement;
-            b.style.background = 'rgba(139,30,30,0.15)';
-            b.style.color = 'rgba(247,236,214,0.6)';
+            b.style.background = '#FFF8F0';
+            b.style.color = '#8B8F9F';
+            b.style.borderColor = '#F0E6D6';
           }}
         >
           <span>🚪</span>
-          <span>خروج</span>
+          <span>تسجيل الخروج</span>
         </button>
-        <div style={{
-          fontFamily: 'var(--font-cormorant, serif)',
-          fontStyle: 'italic',
-          fontSize: 10,
-          color: 'rgba(212,160,85,0.4)',
-          textAlign: 'center',
-          marginTop: 6,
-        }}>
-          Ghazi OS — Studio
-        </div>
       </div>
     </aside>
   );

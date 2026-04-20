@@ -1,8 +1,8 @@
 'use client';
 /*
- * Ghazi OS — Leadership Client (Studio Theme: المكتب الخشبي الفاخر)
+ * Ghazi OS — Leadership Client (Sunrise Energy Theme)
  * branch: studio-theme-v1
- * خلفية خشب + ورق كريمي + خطوط Playfair/Caveat/Cormorant
+ * خلفية كريمية دافئة + كورال + أصفر دافئ + أخضر نعناع
  * كل البيانات والمنطق محفوظ بدون تغيير
  */
 import './studio-theme.css';
@@ -60,7 +60,7 @@ const DAY_NAMES: Record<number, string> = {
 };
 const MONTH_NAMES = ['يناير','فبراير','مارس','أبريل','مايو','يونيو','يوليو','أغسطس','سبتمبر','أكتوبر','نوفمبر','ديسمبر'];
 const PRIORITY_COLORS: Record<string, string> = {
-  critical: '#e74c3c', high: '#f39c12', medium: '#3498db', low: '#2ecc71',
+  critical: '#FF6B6B', high: '#FFB085', medium: '#4ECDC4', low: '#6BCB77',
 };
 const PRIORITY_LABELS: Record<string, string> = {
   critical: 'حرج', high: 'عالي', medium: 'متوسط', low: 'منخفض',
@@ -115,32 +115,25 @@ function getWeekDates(): string[] {
   });
 }
 
-// ─── Paper Card (مكوّن الورقة الكريمية) ──────────────────────────────────────
-function PaperCard({
+// ─── Sunrise Card (بطاقة بيضاء مع ظل دافئ) ──────────────────────────────────
+function SunriseCard({
   children,
-  rotate = 0,
-  delay = 0,
   style = {},
+  accent,
 }: {
   children: React.ReactNode;
-  rotate?: number;
-  delay?: number;
   style?: React.CSSProperties;
+  accent?: string;
 }) {
   return (
     <div style={{
-      background: 'linear-gradient(135deg, #FBF3DF 0%, #F0E2BC 100%)',
-      borderRadius: 4,
-      padding: '16px',
+      background: 'white',
+      borderRadius: 20,
+      padding: '20px',
       position: 'relative',
-      boxShadow: `
-        2px 2px 0 rgba(237,220,184,0.6),
-        4px 4px 0 rgba(220,200,160,0.4),
-        0 8px 24px rgba(0,0,0,0.35)
-      `,
-      transform: `rotate(${rotate}deg)`,
-      animation: `place-on-table 0.4s ease-out ${delay}s both`,
-      color: '#2B1810',
+      boxShadow: '0 4px 24px rgba(255,107,107,0.08), 0 1px 4px rgba(0,0,0,0.04)',
+      border: '1px solid #F5EDE4',
+      borderTop: accent ? `3px solid ${accent}` : '1px solid #F5EDE4',
       ...style,
     }}>
       {children}
@@ -148,41 +141,49 @@ function PaperCard({
   );
 }
 
-// ─── Section Title (عنوان القسم بخط Caveat) ──────────────────────────────────
-function SectionTitle({ icon, title, badge }: { icon: string; title: string; badge?: number }) {
+// ─── Section Title ────────────────────────────────────────────────────────────
+function SectionTitle({ icon, title, badge, color }: { icon: string; title: string; badge?: number; color?: string }) {
   return (
     <div style={{
       display: 'flex',
       alignItems: 'center',
       gap: 8,
-      marginBottom: 12,
-      paddingBottom: 8,
-      borderBottom: '1px dashed rgba(180,150,100,0.4)',
+      marginBottom: 16,
       direction: 'rtl',
     }}>
-      <span style={{ fontSize: 16 }}>{icon}</span>
       <span style={{
-        fontFamily: 'var(--font-caveat, cursive)',
-        fontSize: 22,
-        fontWeight: 600,
-        color: '#3D2817',
+        width: 32,
+        height: 32,
+        borderRadius: 10,
+        background: color ? `${color}18` : '#FFF0F0',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        fontSize: 16,
+        flexShrink: 0,
+      }}>{icon}</span>
+      <span style={{
+        fontFamily: 'var(--font-ibm, sans-serif)',
+        fontSize: 15,
+        fontWeight: 700,
+        color: '#2D3142',
         flex: 1,
       }}>
         {title}
       </span>
       {badge !== undefined && badge > 0 && (
         <span style={{
-          background: 'linear-gradient(135deg, #D4A055, #9C7231)',
-          color: '#3D2817',
+          background: color || '#FF6B6B',
+          color: 'white',
           fontWeight: 700,
-          borderRadius: '50%',
-          minWidth: 20,
-          height: 20,
+          borderRadius: 20,
+          minWidth: 22,
+          height: 22,
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
-          fontSize: 10,
-          boxShadow: '0 1px 4px rgba(0,0,0,0.2)',
+          fontSize: 11,
+          padding: '0 6px',
         }}>
           {badge}
         </span>
@@ -205,88 +206,67 @@ function StickyBanner({
     return (
       <div style={{
         position: 'sticky', top: 56, zIndex: 38,
-        background: 'linear-gradient(135deg, rgba(90,120,67,0.2), rgba(90,120,67,0.1))',
-        borderBottom: '1px solid rgba(90,120,67,0.3)',
-        borderRight: '4px solid #5A7843',
-        padding: '8px 16px',
-        display: 'flex', alignItems: 'center', gap: 10, direction: 'rtl',
-        animation: 'place-on-table 0.4s ease-out',
+        background: 'linear-gradient(135deg, #6BCB77, #4ECDC4)',
+        padding: '10px 20px',
+        display: 'flex', alignItems: 'center', gap: 12, direction: 'rtl',
       }}>
         <span style={{ fontSize: 18 }}>🌿</span>
         <div style={{ flex: 1 }}>
-          <span style={{
-            fontFamily: 'var(--font-cormorant, serif)',
-            fontStyle: 'italic',
-            fontSize: 12,
-            color: 'rgba(247,236,214,0.6)',
-          }}>وضع الشحن — </span>
-          <span style={{
-            fontFamily: 'var(--font-caveat, cursive)',
-            fontSize: 18,
-            fontWeight: 600,
-            color: '#8BC34A',
-          }}>يوم استراحة مقصود ✓</span>
+          <span style={{ fontFamily: 'var(--font-ibm, sans-serif)', fontSize: 13, color: 'white', fontWeight: 600 }}>
+            وضع الشحن — يوم استراحة مقصود ✓
+          </span>
         </div>
         <button onClick={onEdit} style={{
-          fontFamily: 'var(--font-caveat, cursive)',
-          fontSize: 14,
-          color: '#D4A055',
-          background: 'none',
-          border: '1px dashed rgba(212,160,85,0.5)',
-          borderRadius: 3,
-          padding: '3px 10px',
+          fontFamily: 'var(--font-ibm, sans-serif)',
+          fontSize: 12,
+          color: 'white',
+          background: 'rgba(255,255,255,0.2)',
+          border: '1px solid rgba(255,255,255,0.4)',
+          borderRadius: 8,
+          padding: '4px 12px',
           cursor: 'pointer',
+          fontWeight: 600,
         }}>تعديل</button>
       </div>
     );
   }
 
-  const color = todayFocus.targetColor || '#D4A055';
+  const color = todayFocus.targetColor || '#FF6B6B';
   const typeIcon = FOCUS_TYPE_ICONS[todayFocus.targetType] ?? '🎯';
 
   return (
     <div style={{
       position: 'sticky', top: 56, zIndex: 38,
-      background: 'linear-gradient(135deg, rgba(212,160,85,0.2), rgba(232,188,111,0.1))',
-      borderBottom: '1px solid rgba(212,160,85,0.3)',
+      background: `linear-gradient(135deg, ${color}18, ${color}08)`,
+      borderBottom: `2px solid ${color}30`,
       borderRight: `4px solid ${color}`,
-      padding: '8px 16px',
-      display: 'flex', alignItems: 'center', gap: 10, direction: 'rtl',
-      animation: 'place-on-table 0.4s ease-out',
-      transform: 'rotate(-0.2deg)',
+      padding: '10px 20px',
+      display: 'flex', alignItems: 'center', gap: 12, direction: 'rtl',
     }}>
       <span style={{ width: 8, height: 8, borderRadius: '50%', background: color, display: 'inline-block', flexShrink: 0 }} />
       <div style={{ flex: 1 }}>
-        <span style={{
-          fontFamily: 'var(--font-cormorant, serif)',
-          fontStyle: 'italic',
-          fontSize: 12,
-          color: 'rgba(247,236,214,0.5)',
-        }}>⚙️ خلّص روتينك أولاً — {typeIcon} بوصلتك اليوم: </span>
-        <span style={{
-          fontFamily: 'var(--font-caveat, cursive)',
-          fontSize: 20,
-          fontWeight: 700,
-          color,
-        }}>{todayFocus.targetName}</span>
+        <span style={{ fontFamily: 'var(--font-ibm, sans-serif)', fontSize: 12, color: '#8B8F9F' }}>
+          {typeIcon} بوصلتك اليوم:{' '}
+        </span>
+        <span style={{ fontFamily: 'var(--font-ibm, sans-serif)', fontSize: 14, fontWeight: 700, color }}>
+          {todayFocus.targetName}
+        </span>
       </div>
       {todayFocus.targetType === 'brand' && todaySales > 0 && (
-        <span style={{
-          fontFamily: 'var(--font-caveat, cursive)',
-          fontSize: 16,
-          color: '#8BC34A',
-          fontWeight: 600,
-        }}>📈 {fmt(todaySales)} ريال</span>
+        <span style={{ fontFamily: 'var(--font-ibm, sans-serif)', fontSize: 13, color: '#6BCB77', fontWeight: 700 }}>
+          📈 {fmt(todaySales)} ريال
+        </span>
       )}
       <button onClick={onEdit} style={{
-        fontFamily: 'var(--font-caveat, cursive)',
-        fontSize: 14,
-        color: '#D4A055',
-        background: 'none',
-        border: '1px dashed rgba(212,160,85,0.5)',
-        borderRadius: 3,
-        padding: '3px 10px',
+        fontFamily: 'var(--font-ibm, sans-serif)',
+        fontSize: 12,
+        color,
+        background: `${color}12`,
+        border: `1px solid ${color}40`,
+        borderRadius: 8,
+        padding: '4px 12px',
         cursor: 'pointer',
+        fontWeight: 600,
       }}>تعديل</button>
     </div>
   );
@@ -331,28 +311,15 @@ function WeeklyCompass({
   }
 
   return (
-    <div style={{
-      background: 'linear-gradient(180deg, #FBF3DF 0%, #F0E2BC 100%)',
-      borderRadius: 4,
-      padding: '14px',
-      position: 'relative',
-      boxShadow: '0 4px 16px rgba(0,0,0,0.3)',
-      transform: 'rotate(0.4deg)',
-      animation: 'place-on-table 0.4s ease-out 0.1s both',
-    }}>
-      {/* خطوط الورق */}
-      <div style={{
-        position: 'absolute', inset: 0, borderRadius: 4, pointerEvents: 'none',
-        background: 'repeating-linear-gradient(180deg, transparent 0px, transparent 23px, rgba(180,150,100,0.15) 23px, rgba(180,150,100,0.15) 24px)',
-      }} />
-      <SectionTitle icon="🧭" title="بوصلة الأسبوع" />
-      <div style={{ overflowX: 'auto', position: 'relative', zIndex: 1 }}>
-        <div style={{ display: 'flex', gap: 6, minWidth: 480, paddingBottom: 4 }}>
+    <SunriseCard accent="#FF6B6B">
+      <SectionTitle icon="🧭" title="بوصلة الأسبوع" color="#FF6B6B" />
+      <div style={{ overflowX: 'auto' }}>
+        <div style={{ display: 'flex', gap: 8, minWidth: 480, paddingBottom: 4 }}>
           {weekDates.map((dateStr) => {
             const focus = focusMap[dateStr] ?? null;
             const isToday = dateStr === todayISO();
             const isDragOver = dragOverDate === dateStr;
-            const color = focus?.targetColor || '#D4A055';
+            const color = focus?.targetColor || '#FF6B6B';
             const brand = focus?.targetType === 'brand' ? brands.find(b => b.id === focus.targetId) : null;
             const icon = focus?.targetType === 'brand' ? (brand?.icon ?? '🎯') : focus ? (FOCUS_TYPE_ICONS[focus.targetType] ?? '🎯') : null;
             const proj = focus?.targetType === 'project' ? projects.find(p => p.id === focus.targetId) : null;
@@ -369,41 +336,37 @@ function WeeklyCompass({
                 onDrop={(e) => handleDrop(e, dateStr)}
                 style={{
                   flex: 1, minWidth: 64, cursor: 'pointer',
-                  background: isToday ? 'rgba(212,160,85,0.12)' : isDragOver ? 'rgba(212,160,85,0.18)' : 'rgba(255,255,255,0.5)',
-                  border: isToday ? '2px solid #D4A055' : isDragOver ? '2px dashed #D4A055' : '1px dashed rgba(180,150,100,0.5)',
-                  borderRadius: 4, padding: '8px 6px', textAlign: 'center',
+                  background: isToday ? '#FFF0F0' : isDragOver ? '#FFF8F0' : '#FAFAFA',
+                  border: isToday ? `2px solid #FF6B6B` : isDragOver ? '2px dashed #FFB085' : '1px solid #F0E6D6',
+                  borderRadius: 12, padding: '10px 6px', textAlign: 'center',
                   transition: 'all 0.15s', direction: 'rtl',
-                  boxShadow: isToday ? '0 2px 8px rgba(212,160,85,0.2)' : '0 1px 3px rgba(0,0,0,0.1)',
+                  boxShadow: isToday ? '0 4px 12px rgba(255,107,107,0.15)' : 'none',
                 }}
               >
-                {/* Day name */}
                 <div style={{
-                  fontFamily: 'var(--font-cormorant, serif)',
-                  fontStyle: 'italic',
+                  fontFamily: 'var(--font-ibm, sans-serif)',
                   fontSize: 10,
-                  color: isToday ? '#9C7231' : '#8B6F42',
-                  fontWeight: 600,
-                  marginBottom: 2,
+                  color: isToday ? '#FF6B6B' : '#8B8F9F',
+                  fontWeight: isToday ? 700 : 500,
+                  marginBottom: 4,
                 }}>
                   {dayName(dateStr)}
                 </div>
                 <div style={{
-                  fontFamily: 'var(--font-playfair, serif)',
-                  fontSize: isToday ? 22 : 18,
-                  fontWeight: 600,
-                  color: isToday ? '#3D2817' : '#5A4028',
-                  marginBottom: 4,
+                  fontFamily: 'var(--font-ibm, sans-serif)',
+                  fontSize: isToday ? 20 : 16,
+                  fontWeight: 700,
+                  color: isToday ? '#FF6B6B' : '#2D3142',
+                  marginBottom: 6,
                 }}>
                   {isToday ? (
                     <span style={{
-                      background: '#8B1E1E',
+                      background: '#FF6B6B',
                       color: 'white',
-                      padding: '1px 6px',
-                      borderRadius: 3,
-                      fontSize: 9,
-                      fontFamily: 'var(--font-caveat, cursive)',
+                      padding: '2px 8px',
+                      borderRadius: 20,
+                      fontSize: 10,
                       display: 'inline-block',
-                      transform: 'rotate(-2deg)',
                     }}>اليوم</span>
                   ) : (
                     new Date(dateStr + 'T00:00:00').getDate()
@@ -411,18 +374,18 @@ function WeeklyCompass({
                 </div>
 
                 {!focus ? (
-                  <div style={{ fontSize: 16, color: 'rgba(180,150,100,0.5)', marginBottom: 4 }}>+</div>
+                  <div style={{ fontSize: 18, color: '#E0D8D0', marginBottom: 4 }}>+</div>
                 ) : focus.targetType === 'recharge' ? (
                   <>
                     <div style={{ fontSize: 16, marginBottom: 3 }}>🌿</div>
-                    <div style={{ fontFamily: 'var(--font-caveat, cursive)', fontSize: 10, color: '#5A7843', fontWeight: 600 }}>استراحة</div>
+                    <div style={{ fontFamily: 'var(--font-ibm, sans-serif)', fontSize: 10, color: '#6BCB77', fontWeight: 600 }}>استراحة</div>
                   </>
                 ) : (
                   <>
                     <div style={{ fontSize: 14, marginBottom: 3 }}>{icon}</div>
                     <div style={{
-                      fontFamily: 'var(--font-caveat, cursive)',
-                      fontSize: 11,
+                      fontFamily: 'var(--font-ibm, sans-serif)',
+                      fontSize: 10,
                       fontWeight: 700,
                       color,
                       marginBottom: 3,
@@ -433,21 +396,20 @@ function WeeklyCompass({
                       {focus.targetName}
                     </div>
                     <span style={{
-                      fontFamily: 'var(--font-cormorant, serif)',
-                      fontStyle: 'italic',
+                      fontFamily: 'var(--font-ibm, sans-serif)',
                       fontSize: 9,
-                      background: `${color}22`,
+                      background: `${color}18`,
                       color,
-                      padding: '1px 5px',
-                      borderRadius: 3,
+                      padding: '2px 6px',
+                      borderRadius: 10,
                       fontWeight: 600,
                     }}>
                       {FOCUS_TYPE_LABELS[focus.targetType] ?? ''}
                     </span>
                     {proj && proj.progress > 0 && (
                       <div style={{ marginTop: 4 }}>
-                        <div style={{ height: 2, background: 'rgba(180,150,100,0.3)', borderRadius: 2 }}>
-                          <div style={{ width: `${proj.progress}%`, height: 2, background: color, borderRadius: 2 }} />
+                        <div style={{ height: 3, background: '#F0E6D6', borderRadius: 3 }}>
+                          <div style={{ width: `${proj.progress}%`, height: 3, background: color, borderRadius: 3 }} />
                         </div>
                       </div>
                     )}
@@ -458,7 +420,7 @@ function WeeklyCompass({
           })}
         </div>
       </div>
-    </div>
+    </SunriseCard>
   );
 }
 
@@ -483,7 +445,7 @@ function FocusEditorModal({
   const [type, setType] = useState<FocusTargetType>(existing?.targetType ?? 'brand');
   const [selectedId, setSelectedId] = useState<string | null>(existing?.targetId ?? null);
   const [selectedName, setSelectedName] = useState(existing?.targetName ?? '');
-  const [selectedColor, setSelectedColor] = useState(existing?.targetColor ?? '#D4A055');
+  const [selectedColor, setSelectedColor] = useState(existing?.targetColor ?? '#FF6B6B');
   const [notes, setNotes] = useState(existing?.notes ?? '');
   const [customText, setCustomText] = useState(existing?.targetType === 'custom' ? (existing?.targetName ?? '') : '');
   const [brandFilter, setBrandFilter] = useState<string>('');
@@ -492,19 +454,14 @@ function FocusEditorModal({
 
   const isToday = dateStr === todayISO();
 
-  const weekDates = getWeekDates();
   const focusedBrandIds = new Set(weeklyFocus.filter(f => f.targetType === 'brand').map(f => f.targetId).filter(Boolean));
   const hungryBrands = brands.filter(b => !focusedBrandIds.has(b.id)).slice(0, 5);
-
-  const collisionCount = type === 'brand' && selectedId
-    ? weeklyFocus.filter(f => f.focusDate !== dateStr && f.targetType === 'brand' && f.targetId === selectedId).length
-    : 0;
 
   function handleTypeSelect(t: FocusTargetType) {
     setType(t);
     setSelectedId(null);
     setSelectedName('');
-    setSelectedColor('#D4A055');
+    setSelectedColor('#FF6B6B');
     setBrandFilter('');
     setPriorityFilter('');
   }
@@ -521,9 +478,9 @@ function FocusEditorModal({
     let finalColor = selectedColor;
 
     if (type === 'custom') { finalName = customText.trim(); finalId = null; finalColor = '#888'; }
-    if (type === 'finance') { finalName = 'يوم مالي'; finalId = null; finalColor = '#27ae60'; }
-    if (type === 'recharge') { finalName = 'استراحة'; finalId = null; finalColor = '#2ecc71'; }
-    if (type === 'personal' && !finalName) { finalName = 'مهام شخصية'; finalColor = '#9b59b6'; }
+    if (type === 'finance') { finalName = 'يوم مالي'; finalId = null; finalColor = '#6BCB77'; }
+    if (type === 'recharge') { finalName = 'استراحة'; finalId = null; finalColor = '#4ECDC4'; }
+    if (type === 'personal' && !finalName) { finalName = 'مهام شخصية'; finalColor = '#A78BFA'; }
 
     if (!finalName) return;
 
@@ -551,13 +508,14 @@ function FocusEditorModal({
     (type === 'brand' || type === 'project' || type === 'task') && !selectedId
   ) || (type === 'custom' && !customText.trim());
 
-  const paperInputStyle: React.CSSProperties = {
-    width: '100%', padding: '6px 10px',
-    border: '1px solid rgba(180,150,100,0.4)',
-    borderRadius: 4, fontSize: 14,
-    fontFamily: 'var(--font-caveat, cursive)',
-    background: 'rgba(247,236,214,0.3)',
-    color: '#2B1810', direction: 'rtl',
+  const inputStyle: React.CSSProperties = {
+    width: '100%', padding: '8px 12px',
+    border: '1px solid #F0E6D6',
+    borderRadius: 10, fontSize: 14,
+    fontFamily: 'var(--font-ibm, sans-serif)',
+    background: '#FAFAFA',
+    color: '#2D3142', direction: 'rtl',
+    outline: 'none',
   };
 
   function buildTargetList() {
@@ -567,18 +525,17 @@ function FocusEditorModal({
           key={b.id}
           onClick={() => handleTargetSelect(b.id, b.name, b.color)}
           style={{
-            width: '100%', display: 'flex', alignItems: 'center', gap: 8,
-            padding: '7px 10px',
-            background: selectedId === b.id ? `${b.color}18` : 'rgba(255,255,255,0.4)',
-            border: selectedId === b.id ? `1px solid ${b.color}` : '1px solid rgba(180,150,100,0.3)',
-            borderRight: `3px solid ${b.color}`,
-            borderRadius: 4, cursor: 'pointer',
-            fontFamily: 'var(--font-caveat, cursive)',
-            direction: 'rtl', marginBottom: 4, transition: 'all 0.1s',
+            width: '100%', display: 'flex', alignItems: 'center', gap: 10,
+            padding: '9px 12px',
+            background: selectedId === b.id ? `${b.color}12` : 'white',
+            border: selectedId === b.id ? `1.5px solid ${b.color}` : '1px solid #F0E6D6',
+            borderRadius: 12, cursor: 'pointer',
+            fontFamily: 'var(--font-ibm, sans-serif)',
+            direction: 'rtl', marginBottom: 6, transition: 'all 0.1s',
           }}
         >
-          <span style={{ fontSize: 15 }}>{b.icon}</span>
-          <span style={{ flex: 1, fontSize: 16, fontWeight: 600, color: '#2B1810' }}>{b.name}</span>
+          <span style={{ fontSize: 16 }}>{b.icon}</span>
+          <span style={{ flex: 1, fontSize: 14, fontWeight: 600, color: '#2D3142' }}>{b.name}</span>
           {selectedId === b.id && <span style={{ color: b.color, fontSize: 14 }}>✓</span>}
         </button>
       ));
@@ -587,29 +544,28 @@ function FocusEditorModal({
       const filtered = brandFilter ? projects.filter(p => p.brandId === brandFilter) : projects;
       return (
         <>
-          <select style={{ ...paperInputStyle, height: 32, marginBottom: 8 }} value={brandFilter} onChange={e => setBrandFilter(e.target.value)}>
+          <select style={{ ...inputStyle, height: 36, marginBottom: 10 }} value={brandFilter} onChange={e => setBrandFilter(e.target.value)}>
             <option value="">كل البراندات</option>
             {brands.map(b => <option key={b.id} value={b.id}>{b.icon} {b.name}</option>)}
           </select>
           {filtered.map(p => {
             const brand = brands.find(b => b.id === p.brandId);
             return (
-              <button key={p.id} onClick={() => handleTargetSelect(p.id, p.title, brand?.color ?? '#D4A055')}
+              <button key={p.id} onClick={() => handleTargetSelect(p.id, p.title, brand?.color ?? '#FF6B6B')}
                 style={{
-                  width: '100%', display: 'flex', alignItems: 'center', gap: 8,
-                  padding: '7px 10px',
-                  background: selectedId === p.id ? 'rgba(212,160,85,0.1)' : 'rgba(255,255,255,0.4)',
-                  border: selectedId === p.id ? '1px solid #D4A055' : '1px solid rgba(180,150,100,0.3)',
-                  borderRight: `3px solid ${brand?.color ?? '#D4A055'}`,
-                  borderRadius: 4, cursor: 'pointer',
-                  fontFamily: 'var(--font-caveat, cursive)',
-                  direction: 'rtl', marginBottom: 4,
+                  width: '100%', display: 'flex', alignItems: 'center', gap: 10,
+                  padding: '9px 12px',
+                  background: selectedId === p.id ? '#FFF0F0' : 'white',
+                  border: selectedId === p.id ? '1.5px solid #FF6B6B' : '1px solid #F0E6D6',
+                  borderRadius: 12, cursor: 'pointer',
+                  fontFamily: 'var(--font-ibm, sans-serif)',
+                  direction: 'rtl', marginBottom: 6,
                 }}
               >
                 <span>📁</span>
-                <span style={{ flex: 1, fontSize: 16, fontWeight: 600, color: '#2B1810' }}>{p.title}</span>
-                {brand && <span style={{ fontSize: 11, color: brand.color }}>{brand.name}</span>}
-                {selectedId === p.id && <span style={{ color: '#D4A055' }}>✓</span>}
+                <span style={{ flex: 1, fontSize: 14, fontWeight: 600, color: '#2D3142' }}>{p.title}</span>
+                {brand && <span style={{ fontSize: 11, color: brand.color, fontWeight: 600 }}>{brand.name}</span>}
+                {selectedId === p.id && <span style={{ color: '#FF6B6B' }}>✓</span>}
               </button>
             );
           })}
@@ -620,7 +576,7 @@ function FocusEditorModal({
       const filtered = priorityFilter ? activeTasks.filter(t => t.priority === priorityFilter) : activeTasks;
       return (
         <>
-          <select style={{ ...paperInputStyle, height: 30, marginBottom: 8 }} value={priorityFilter} onChange={e => setPriorityFilter(e.target.value)}>
+          <select style={{ ...inputStyle, height: 36, marginBottom: 10 }} value={priorityFilter} onChange={e => setPriorityFilter(e.target.value)}>
             <option value="">كل الأولويات</option>
             <option value="critical">حرج</option>
             <option value="high">عالي</option>
@@ -628,25 +584,25 @@ function FocusEditorModal({
             <option value="low">منخفض</option>
           </select>
           {filtered.slice(0, 10).map(t => (
-            <button key={t.id} onClick={() => handleTargetSelect(t.id, t.title, PRIORITY_COLORS[t.priority] ?? '#D4A055')}
+            <button key={t.id} onClick={() => handleTargetSelect(t.id, t.title, PRIORITY_COLORS[t.priority] ?? '#FF6B6B')}
               style={{
-                width: '100%', display: 'flex', alignItems: 'center', gap: 8,
-                padding: '6px 10px',
-                background: selectedId === t.id ? 'rgba(212,160,85,0.1)' : 'rgba(255,255,255,0.4)',
-                border: selectedId === t.id ? '1px solid #D4A055' : '1px solid rgba(180,150,100,0.3)',
-                borderRight: `3px solid ${PRIORITY_COLORS[t.priority] ?? '#D4A055'}`,
-                borderRadius: 4, cursor: 'pointer',
-                fontFamily: 'var(--font-caveat, cursive)',
-                direction: 'rtl', marginBottom: 3,
+                width: '100%', display: 'flex', alignItems: 'center', gap: 10,
+                padding: '8px 12px',
+                background: selectedId === t.id ? '#FFF0F0' : 'white',
+                border: selectedId === t.id ? '1.5px solid #FF6B6B' : '1px solid #F0E6D6',
+                borderLeft: `3px solid ${PRIORITY_COLORS[t.priority] ?? '#FF6B6B'}`,
+                borderRadius: 12, cursor: 'pointer',
+                fontFamily: 'var(--font-ibm, sans-serif)',
+                direction: 'rtl', marginBottom: 6,
               }}
             >
-              <span style={{ width: 7, height: 7, borderRadius: '50%', background: PRIORITY_COLORS[t.priority] ?? '#888', display: 'inline-block', flexShrink: 0 }} />
-              <span style={{ flex: 1, fontSize: 15, fontWeight: 600, color: '#2B1810' }}>{t.title}</span>
-              {t.brandName && <span style={{ fontSize: 10, color: t.brandColor ?? '#8B6F42' }}>{t.brandName}</span>}
-              {selectedId === t.id && <span style={{ color: '#D4A055' }}>✓</span>}
+              <span style={{ width: 8, height: 8, borderRadius: '50%', background: PRIORITY_COLORS[t.priority] ?? '#888', display: 'inline-block', flexShrink: 0 }} />
+              <span style={{ flex: 1, fontSize: 13, fontWeight: 600, color: '#2D3142' }}>{t.title}</span>
+              {t.brandName && <span style={{ fontSize: 10, color: t.brandColor ?? '#8B8F9F', fontWeight: 600 }}>{t.brandName}</span>}
+              {selectedId === t.id && <span style={{ color: '#FF6B6B' }}>✓</span>}
             </button>
           ))}
-          {filtered.length === 0 && <div style={{ fontFamily: 'var(--font-caveat, cursive)', fontSize: 14, color: '#8B6F42', padding: '8px 0' }}>لا توجد مهام مطابقة</div>}
+          {filtered.length === 0 && <div style={{ fontFamily: 'var(--font-ibm, sans-serif)', fontSize: 13, color: '#8B8F9F', padding: '8px 0' }}>لا توجد مهام مطابقة</div>}
         </>
       );
     }
@@ -654,7 +610,7 @@ function FocusEditorModal({
       const filtered = priorityFilter ? personalTasks.filter(t => t.priority === priorityFilter) : personalTasks;
       return (
         <>
-          <select style={{ ...paperInputStyle, height: 30, marginBottom: 8 }} value={priorityFilter} onChange={e => setPriorityFilter(e.target.value)}>
+          <select style={{ ...inputStyle, height: 36, marginBottom: 10 }} value={priorityFilter} onChange={e => setPriorityFilter(e.target.value)}>
             <option value="">كل الأولويات</option>
             <option value="critical">حرج</option>
             <option value="high">عالي</option>
@@ -662,21 +618,20 @@ function FocusEditorModal({
             <option value="low">منخفض</option>
           </select>
           {filtered.slice(0, 10).map(t => (
-            <button key={t.id} onClick={() => handleTargetSelect(t.id, t.title, PRIORITY_COLORS[t.priority] ?? '#9b59b6')}
+            <button key={t.id} onClick={() => handleTargetSelect(t.id, t.title, PRIORITY_COLORS[t.priority] ?? '#A78BFA')}
               style={{
-                width: '100%', display: 'flex', alignItems: 'center', gap: 8,
-                padding: '6px 10px',
-                background: selectedId === t.id ? 'rgba(155,89,182,0.08)' : 'rgba(255,255,255,0.4)',
-                border: selectedId === t.id ? '1px solid #9b59b6' : '1px solid rgba(180,150,100,0.3)',
-                borderRight: `3px solid ${PRIORITY_COLORS[t.priority] ?? '#9b59b6'}`,
-                borderRadius: 4, cursor: 'pointer',
-                fontFamily: 'var(--font-caveat, cursive)',
-                direction: 'rtl', marginBottom: 3,
+                width: '100%', display: 'flex', alignItems: 'center', gap: 10,
+                padding: '8px 12px',
+                background: selectedId === t.id ? '#F5F0FF' : 'white',
+                border: selectedId === t.id ? '1.5px solid #A78BFA' : '1px solid #F0E6D6',
+                borderRadius: 12, cursor: 'pointer',
+                fontFamily: 'var(--font-ibm, sans-serif)',
+                direction: 'rtl', marginBottom: 6,
               }}
             >
-              <span style={{ width: 7, height: 7, borderRadius: '50%', background: PRIORITY_COLORS[t.priority] ?? '#9b59b6', display: 'inline-block', flexShrink: 0 }} />
-              <span style={{ flex: 1, fontSize: 15, fontWeight: 600, color: '#2B1810' }}>{t.title}</span>
-              {selectedId === t.id && <span style={{ color: '#9b59b6' }}>✓</span>}
+              <span style={{ width: 8, height: 8, borderRadius: '50%', background: PRIORITY_COLORS[t.priority] ?? '#A78BFA', display: 'inline-block', flexShrink: 0 }} />
+              <span style={{ flex: 1, fontSize: 13, fontWeight: 600, color: '#2D3142' }}>{t.title}</span>
+              {selectedId === t.id && <span style={{ color: '#A78BFA' }}>✓</span>}
             </button>
           ))}
         </>
@@ -684,12 +639,12 @@ function FocusEditorModal({
     }
     if (type === 'finance') {
       return (
-        <div style={{ padding: '10px 0', textAlign: 'center' }}>
-          <div style={{ fontSize: 30, marginBottom: 8 }}>💰</div>
-          <div style={{ fontFamily: 'var(--font-caveat, cursive)', fontSize: 20, fontWeight: 600, color: '#27ae60', marginBottom: 8 }}>يوم مالي</div>
-          <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6, justifyContent: 'center' }}>
+        <div style={{ padding: '12px 0', textAlign: 'center' }}>
+          <div style={{ fontSize: 32, marginBottom: 10 }}>💰</div>
+          <div style={{ fontFamily: 'var(--font-ibm, sans-serif)', fontSize: 16, fontWeight: 700, color: '#6BCB77', marginBottom: 10 }}>يوم مالي</div>
+          <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, justifyContent: 'center' }}>
             {['مراجعة الحسابات', 'دفع الرواتب', 'تحليل المبيعات', 'مراجعة المصاريف', 'تخطيط الميزانية'].map(tag => (
-              <span key={tag} style={{ background: 'rgba(39,174,96,0.1)', color: '#27ae60', padding: '3px 10px', borderRadius: 20, fontFamily: 'var(--font-caveat, cursive)', fontSize: 14 }}>{tag}</span>
+              <span key={tag} style={{ background: '#F0FFF4', color: '#6BCB77', padding: '4px 12px', borderRadius: 20, fontFamily: 'var(--font-ibm, sans-serif)', fontSize: 12, fontWeight: 600 }}>{tag}</span>
             ))}
           </div>
         </div>
@@ -697,12 +652,12 @@ function FocusEditorModal({
     }
     if (type === 'recharge') {
       return (
-        <div style={{ padding: '10px 0', textAlign: 'center' }}>
-          <div style={{ fontSize: 30, marginBottom: 8 }}>🌿</div>
-          <div style={{ fontFamily: 'var(--font-caveat, cursive)', fontSize: 20, fontWeight: 600, color: '#2ecc71', marginBottom: 8 }}>يوم استراحة وشحن طاقة</div>
-          <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6, justifyContent: 'center' }}>
+        <div style={{ padding: '12px 0', textAlign: 'center' }}>
+          <div style={{ fontSize: 32, marginBottom: 10 }}>🌿</div>
+          <div style={{ fontFamily: 'var(--font-ibm, sans-serif)', fontSize: 16, fontWeight: 700, color: '#4ECDC4', marginBottom: 10 }}>يوم استراحة وشحن طاقة</div>
+          <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, justifyContent: 'center' }}>
             {['نوم كافٍ', 'رياضة خفيفة', 'وقت عائلي', 'قراءة', 'تأمل وتفكير'].map(tag => (
-              <span key={tag} style={{ background: 'rgba(46,204,113,0.1)', color: '#2ecc71', padding: '3px 10px', borderRadius: 20, fontFamily: 'var(--font-caveat, cursive)', fontSize: 14 }}>{tag}</span>
+              <span key={tag} style={{ background: '#F0FFFE', color: '#4ECDC4', padding: '4px 12px', borderRadius: 20, fontFamily: 'var(--font-ibm, sans-serif)', fontSize: 12, fontWeight: 600 }}>{tag}</span>
             ))}
           </div>
         </div>
@@ -711,7 +666,7 @@ function FocusEditorModal({
     if (type === 'custom') {
       return (
         <input
-          style={{ ...paperInputStyle, height: 36, fontSize: 18 }}
+          style={{ ...inputStyle, height: 42, fontSize: 15 }}
           placeholder="اكتب اسم الفوكس..."
           value={customText}
           onChange={e => setCustomText(e.target.value)}
@@ -724,101 +679,117 @@ function FocusEditorModal({
   return (
     <div
       onClick={onClose}
-      style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.6)', zIndex: 1000, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 16 }}
+      style={{ position: 'fixed', inset: 0, background: 'rgba(45,49,66,0.5)', zIndex: 1000, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 16 }}
     >
       <div
         onClick={e => e.stopPropagation()}
         style={{
-          background: 'linear-gradient(135deg, #FBF3DF 0%, #F0E2BC 100%)',
-          borderRadius: 4, width: '100%', maxWidth: 460, maxHeight: '90vh', overflow: 'auto',
+          background: 'white',
+          borderRadius: 24, width: '100%', maxWidth: 480, maxHeight: '90vh', overflow: 'auto',
           direction: 'rtl',
-          boxShadow: '0 20px 60px rgba(0,0,0,0.5)',
-          color: '#2B1810',
+          boxShadow: '0 20px 60px rgba(255,107,107,0.15)',
+          color: '#2D3142',
         }}
       >
         {/* Header */}
         <div style={{
-          padding: '14px 16px',
-          borderBottom: '1px dashed rgba(180,150,100,0.4)',
+          padding: '20px 20px 16px',
+          borderBottom: '1px solid #F5EDE4',
           display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+          background: 'linear-gradient(135deg, #FFF0F0, #FFF8F0)',
+          borderRadius: '24px 24px 0 0',
         }}>
           <div>
-            <div style={{ fontFamily: 'var(--font-caveat, cursive)', fontSize: 22, fontWeight: 700, color: '#3D2817' }}>
+            <div style={{ fontFamily: 'var(--font-ibm, sans-serif)', fontSize: 18, fontWeight: 800, color: '#2D3142' }}>
               🧭 تعيين فوكس — {dayName(dateStr)}
             </div>
-            <div style={{ fontFamily: 'var(--font-cormorant, serif)', fontStyle: 'italic', fontSize: 12, color: '#8B6F42' }}>
+            <div style={{ fontFamily: 'var(--font-ibm, sans-serif)', fontSize: 12, color: '#8B8F9F', marginTop: 2 }}>
               {dateShort(dateStr)}{isToday ? ' — اليوم' : ''}
             </div>
           </div>
-          <button onClick={onClose} style={{ background: 'none', border: 'none', fontSize: 16, cursor: 'pointer', color: '#8B6F42', padding: '4px 8px' }}>✕</button>
+          <button onClick={onClose} style={{ background: '#F5EDE4', border: 'none', borderRadius: 10, width: 32, height: 32, fontSize: 14, cursor: 'pointer', color: '#8B8F9F', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>✕</button>
         </div>
 
-        <div style={{ padding: '14px 16px' }}>
+        <div style={{ padding: '16px 20px' }}>
           {/* Hungry brands */}
           {hungryBrands.length > 0 && (
             <div style={{
-              background: 'rgba(212,160,85,0.1)',
-              border: '1px dashed rgba(212,160,85,0.4)',
-              borderRadius: 4, padding: '8px 12px', marginBottom: 12,
+              background: '#FFF8F0',
+              border: '1px solid #FFE0C0',
+              borderRadius: 12,
+              padding: '10px 14px',
+              marginBottom: 16,
+              direction: 'rtl',
             }}>
-              <div style={{ fontFamily: 'var(--font-caveat, cursive)', fontSize: 16, fontWeight: 700, color: '#9C7231', marginBottom: 4 }}>💡 براندات تشتكي من الإهمال:</div>
-              {hungryBrands.map(b => (
-                <div key={b.id} style={{ fontFamily: 'var(--font-caveat, cursive)', fontSize: 15, color: '#5A4028', padding: '1px 0' }}>• {b.icon} {b.name}</div>
-              ))}
+              <div style={{ fontFamily: 'var(--font-ibm, sans-serif)', fontSize: 11, fontWeight: 700, color: '#FFB085', marginBottom: 8 }}>
+                ⚡ براندات بدون فوكس هذا الأسبوع:
+              </div>
+              <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
+                {hungryBrands.map(b => (
+                  <button
+                    key={b.id}
+                    onClick={() => { handleTypeSelect('brand'); handleTargetSelect(b.id, b.name, b.color); }}
+                    style={{
+                      display: 'flex', alignItems: 'center', gap: 5,
+                      padding: '4px 10px',
+                      background: 'white',
+                      border: `1.5px solid ${b.color}`,
+                      borderRadius: 20, cursor: 'pointer',
+                      fontFamily: 'var(--font-ibm, sans-serif)', fontSize: 12, fontWeight: 600,
+                      color: b.color,
+                    }}
+                  >
+                    <span>{b.icon}</span>
+                    <span>{b.name}</span>
+                  </button>
+                ))}
+              </div>
             </div>
           )}
 
-          {/* Collision warning */}
-          {collisionCount > 0 && (
-            <div style={{
-              background: 'rgba(139,30,30,0.06)',
-              border: '1px solid rgba(139,30,30,0.2)',
-              borderRadius: 4, padding: '8px 12px', marginBottom: 12,
-              fontFamily: 'var(--font-caveat, cursive)', fontSize: 15, color: '#8B1E1E',
-            }}>
-              ⚠️ هذا البراند مُعيَّن في {collisionCount} يوم آخر هذا الأسبوع
+          {/* Type Selector */}
+          <div style={{ marginBottom: 16 }}>
+            <div style={{ fontFamily: 'var(--font-ibm, sans-serif)', fontSize: 12, fontWeight: 700, color: '#8B8F9F', marginBottom: 10, textTransform: 'uppercase', letterSpacing: '0.5px' }}>
+              نوع الفوكس
             </div>
-          )}
-
-          {/* Type selector */}
-          <div style={{ marginBottom: 14 }}>
-            <div style={{ fontFamily: 'var(--font-cormorant, serif)', fontStyle: 'italic', fontSize: 12, fontWeight: 700, color: '#8B6F42', marginBottom: 8 }}>نوع الفوكس</div>
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 6 }}>
-              {(['brand','project','task','personal','finance','recharge'] as FocusTargetType[]).map(t => (
+            <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
+              {(['brand', 'project', 'task', 'personal', 'finance', 'recharge', 'custom'] as FocusTargetType[]).map(t => (
                 <button
                   key={t}
                   onClick={() => handleTypeSelect(t)}
                   style={{
-                    padding: '8px 6px', borderRadius: 4, cursor: 'pointer',
-                    fontFamily: 'var(--font-caveat, cursive)',
-                    background: type === t ? 'rgba(212,160,85,0.15)' : 'rgba(255,255,255,0.4)',
-                    border: type === t ? '1.5px solid #D4A055' : '1px dashed rgba(180,150,100,0.4)',
-                    display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 3,
-                    transition: 'all 0.1s',
+                    display: 'flex', alignItems: 'center', gap: 5,
+                    padding: '6px 12px',
+                    background: type === t ? '#FF6B6B' : 'white',
+                    border: type === t ? '1.5px solid #FF6B6B' : '1px solid #F0E6D6',
+                    borderRadius: 20, cursor: 'pointer',
+                    fontFamily: 'var(--font-ibm, sans-serif)', fontSize: 12, fontWeight: 600,
+                    color: type === t ? 'white' : '#5A5F73',
+                    transition: 'all 0.15s',
                   }}
                 >
-                  <span style={{ fontSize: 18 }}>{FOCUS_TYPE_ICONS[t]}</span>
-                  <span style={{ fontSize: 12, fontWeight: 600, color: type === t ? '#9C7231' : '#8B6F42' }}>{FOCUS_TYPE_LABELS[t]}</span>
+                  <span>{FOCUS_TYPE_ICONS[t]}</span>
+                  <span>{FOCUS_TYPE_LABELS[t]}</span>
                 </button>
               ))}
             </div>
           </div>
 
           {/* Target */}
-          <div style={{ marginBottom: 14 }}>
-            <div style={{ fontFamily: 'var(--font-cormorant, serif)', fontStyle: 'italic', fontSize: 12, fontWeight: 700, color: '#8B6F42', marginBottom: 8 }}>
+          <div style={{ marginBottom: 16 }}>
+            <div style={{ fontFamily: 'var(--font-ibm, sans-serif)', fontSize: 12, fontWeight: 700, color: '#8B8F9F', marginBottom: 10, textTransform: 'uppercase', letterSpacing: '0.5px' }}>
               {type === 'brand' ? 'اختر البراند' : type === 'project' ? 'اختر المشروع' : type === 'task' ? 'اختر المهمة' : type === 'personal' ? 'اختر المهمة الشخصية' : type === 'finance' ? 'تفاصيل اليوم المالي' : type === 'recharge' ? 'تفاصيل الاستراحة' : 'اكتب الفوكس'}
             </div>
-            <div style={{ maxHeight: 200, overflowY: 'auto' }}>
+            <div style={{ maxHeight: 220, overflowY: 'auto' }}>
               {buildTargetList()}
             </div>
           </div>
 
           {/* Notes */}
-          <div style={{ marginBottom: 14 }}>
-            <div style={{ fontFamily: 'var(--font-cormorant, serif)', fontStyle: 'italic', fontSize: 12, fontWeight: 700, color: '#8B6F42', marginBottom: 6 }}>ملاحظات (اختياري)</div>
+          <div style={{ marginBottom: 16 }}>
+            <div style={{ fontFamily: 'var(--font-ibm, sans-serif)', fontSize: 12, fontWeight: 700, color: '#8B8F9F', marginBottom: 8, textTransform: 'uppercase', letterSpacing: '0.5px' }}>ملاحظات (اختياري)</div>
             <textarea
-              style={{ ...paperInputStyle, resize: 'none', padding: '8px 10px', fontSize: 16 }}
+              style={{ ...inputStyle, resize: 'none', padding: '10px 12px', fontSize: 14 }}
               rows={2}
               placeholder="أضف ملاحظة..."
               value={notes}
@@ -831,15 +802,15 @@ function FocusEditorModal({
             onClick={handleSave}
             disabled={isSaveDisabled}
             style={{
-              width: '100%', padding: '10px',
-              background: isSaveDisabled ? 'rgba(180,150,100,0.3)' : 'linear-gradient(135deg, #D4A055, #9C7231)',
-              color: isSaveDisabled ? '#8B6F42' : '#3D2817',
-              border: 'none', borderRadius: 4,
-              fontFamily: 'var(--font-caveat, cursive)',
-              fontSize: 18, fontWeight: 700,
+              width: '100%', padding: '12px',
+              background: isSaveDisabled ? '#F0E6D6' : 'linear-gradient(135deg, #FF6B6B 0%, #FFB085 100%)',
+              color: isSaveDisabled ? '#C4C8D4' : 'white',
+              border: 'none', borderRadius: 14,
+              fontFamily: 'var(--font-ibm, sans-serif)',
+              fontSize: 15, fontWeight: 700,
               cursor: isSaveDisabled ? 'not-allowed' : 'pointer',
-              marginBottom: 8,
-              boxShadow: isSaveDisabled ? 'none' : '0 2px 8px rgba(0,0,0,0.2)',
+              marginBottom: 10,
+              boxShadow: isSaveDisabled ? 'none' : '0 4px 16px rgba(255,107,107,0.3)',
             }}
           >
             {isPending ? '...' : '💾 حفظ'}
@@ -849,24 +820,24 @@ function FocusEditorModal({
             <div style={{ display: 'flex', gap: 8 }}>
               <button onClick={handleMigrateToNext} disabled={isPending}
                 style={{
-                  flex: 1, padding: '8px',
-                  background: 'rgba(212,160,85,0.1)',
-                  border: '1px dashed rgba(212,160,85,0.4)',
-                  borderRadius: 4,
-                  fontFamily: 'var(--font-caveat, cursive)',
-                  fontSize: 15, color: '#9C7231',
+                  flex: 1, padding: '10px',
+                  background: '#FFF8F0',
+                  border: '1px solid #FFE0C0',
+                  borderRadius: 12,
+                  fontFamily: 'var(--font-ibm, sans-serif)',
+                  fontSize: 13, color: '#FFB085', fontWeight: 600,
                   cursor: 'pointer',
                 }}>
                 ترحيل للغد ➡️
               </button>
               <button onClick={handleClear} disabled={isPending}
                 style={{
-                  flex: 1, padding: '8px',
-                  background: 'rgba(139,30,30,0.06)',
-                  border: '1px dashed rgba(139,30,30,0.3)',
-                  borderRadius: 4,
-                  fontFamily: 'var(--font-caveat, cursive)',
-                  fontSize: 15, color: '#8B1E1E',
+                  flex: 1, padding: '10px',
+                  background: '#FFF0F0',
+                  border: '1px solid #FFD0D0',
+                  borderRadius: 12,
+                  fontFamily: 'var(--font-ibm, sans-serif)',
+                  fontSize: 13, color: '#FF6B6B', fontWeight: 600,
                   cursor: 'pointer',
                 }}>
                 🗑 مسح
@@ -913,60 +884,50 @@ function FocusHero({
   // Recharge
   if (todayFocus?.targetType === 'recharge') {
     return (
-      <PaperCard rotate={-1} delay={0.2} style={{ textAlign: 'center', marginBottom: 16 }}>
-        <div style={{ fontFamily: 'var(--font-cormorant, serif)', fontStyle: 'italic', fontSize: 13, color: '#5A7843', fontWeight: 600, marginBottom: 6 }}>وضع الاستراحة</div>
-        <div style={{ fontSize: 40, marginBottom: 8 }}>🌿</div>
-        <div style={{ fontFamily: 'var(--font-playfair, serif)', fontSize: 20, fontWeight: 700, color: '#3D5A28' }}>يوم راحة مقصود</div>
-        <div style={{ fontFamily: 'var(--font-cormorant, serif)', fontStyle: 'italic', fontSize: 13, color: '#8B6F42', marginTop: 6 }}>
+      <SunriseCard accent="#4ECDC4" style={{ marginBottom: 20, textAlign: 'center' }}>
+        <div style={{ fontFamily: 'var(--font-ibm, sans-serif)', fontSize: 12, color: '#4ECDC4', fontWeight: 700, marginBottom: 8, textTransform: 'uppercase', letterSpacing: '0.5px' }}>وضع الاستراحة</div>
+        <div style={{ fontSize: 40, marginBottom: 10 }}>🌿</div>
+        <div style={{ fontFamily: 'var(--font-ibm, sans-serif)', fontSize: 20, fontWeight: 800, color: '#2D3142' }}>يوم راحة مقصود</div>
+        <div style={{ fontFamily: 'var(--font-ibm, sans-serif)', fontSize: 13, color: '#8B8F9F', marginTop: 6 }}>
           استرح — العقل المرتاح أكثر إنتاجاً
         </div>
         <button onClick={onOpenEditor} style={{
-          marginTop: 12, padding: '6px 16px',
-          background: 'rgba(90,120,67,0.1)',
-          border: '1px dashed rgba(90,120,67,0.4)',
-          borderRadius: 3,
-          fontFamily: 'var(--font-caveat, cursive)', fontSize: 16,
-          color: '#5A7843', cursor: 'pointer',
+          marginTop: 14, padding: '8px 20px',
+          background: '#F0FFFE',
+          border: '1.5px solid #4ECDC4',
+          borderRadius: 12,
+          fontFamily: 'var(--font-ibm, sans-serif)', fontSize: 13, fontWeight: 600,
+          color: '#4ECDC4', cursor: 'pointer',
         }}>تغيير الفوكس</button>
-      </PaperCard>
+      </SunriseCard>
     );
   }
 
   // No focus
   if (!todayFocus) {
     return (
-      <PaperCard rotate={-1.5} delay={0.2} style={{ marginBottom: 16 }}>
-        {/* دبوس */}
-        <div style={{
-          position: 'absolute', top: -10, left: '50%', transform: 'translateX(-50%)',
-          width: 16, height: 16,
-          background: 'radial-gradient(circle at 40% 35%, #E8BC6F 0%, #D4A055 50%, #9C7231 100%)',
-          borderRadius: '50%',
-          boxShadow: '0 2px 6px rgba(0,0,0,0.4)',
-          zIndex: 10,
-        }} />
-        <div style={{ fontFamily: 'var(--font-caveat, cursive)', fontSize: 14, color: '#8B1E1E', fontWeight: 600, marginBottom: 8 }}>
+      <SunriseCard accent="#FFD93D" style={{ marginBottom: 20 }}>
+        <div style={{ fontFamily: 'var(--font-ibm, sans-serif)', fontSize: 12, color: '#FFB085', fontWeight: 700, marginBottom: 8, textTransform: 'uppercase', letterSpacing: '0.5px' }}>
           الشيء الواحد الآن
         </div>
-        <div style={{ fontFamily: 'var(--font-cormorant, serif)', fontStyle: 'italic', fontSize: 14, color: '#8B6F42', marginBottom: 12 }}>
+        <div style={{ fontFamily: 'var(--font-ibm, sans-serif)', fontSize: 14, color: '#8B8F9F', marginBottom: 16, lineHeight: 1.6 }}>
           {tip}
         </div>
         <button onClick={onOpenEditor} style={{
-          width: '100%', padding: '10px',
-          background: 'linear-gradient(135deg, #D4A055, #9C7231)',
-          color: '#3D2817', border: 'none', borderRadius: 4,
-          fontFamily: 'var(--font-caveat, cursive)', fontSize: 18, fontWeight: 700,
+          width: '100%', padding: '12px',
+          background: 'linear-gradient(135deg, #FF6B6B 0%, #FFB085 100%)',
+          color: 'white', border: 'none', borderRadius: 14,
+          fontFamily: 'var(--font-ibm, sans-serif)', fontSize: 15, fontWeight: 700,
           cursor: 'pointer',
-          boxShadow: '0 2px 8px rgba(0,0,0,0.2)',
-          transform: 'rotate(0.5deg)',
+          boxShadow: '0 4px 16px rgba(255,107,107,0.3)',
         }}>
           🧭 حدد فوكس اليوم
         </button>
-      </PaperCard>
+      </SunriseCard>
     );
   }
 
-  const color = todayFocus.targetColor || '#D4A055';
+  const color = todayFocus.targetColor || '#FF6B6B';
   const brand = todayFocus.targetType === 'brand' ? brands.find(b => b.id === todayFocus.targetId) : null;
   const project = todayFocus.targetType === 'project' ? projects.find(p => p.id === todayFocus.targetId) : null;
 
@@ -986,118 +947,114 @@ function FocusHero({
     ].slice(0, 3);
 
     return (
-      <PaperCard rotate={-1.5} delay={0.2} style={{ marginBottom: 16 }}>
-        {/* دبوس */}
-        <div style={{
-          position: 'absolute', top: -10, left: '50%', transform: 'translateX(-50%)',
-          width: 16, height: 16,
-          background: 'radial-gradient(circle at 40% 35%, #E8BC6F 0%, #D4A055 50%, #9C7231 100%)',
-          borderRadius: '50%',
-          boxShadow: '0 2px 6px rgba(0,0,0,0.4)',
-          zIndex: 10,
-        }} />
-
-        <div style={{ display: 'flex', alignItems: 'flex-start', gap: 10, marginBottom: 10, direction: 'rtl' }}>
+      <SunriseCard accent={taskColor} style={{ marginBottom: 20 }}>
+        <div style={{ display: 'flex', alignItems: 'flex-start', gap: 12, marginBottom: 12, direction: 'rtl' }}>
           <div style={{ flex: 1 }}>
-            <div style={{ display: 'flex', gap: 4, marginBottom: 4, flexWrap: 'wrap' }}>
-              <span style={{ fontFamily: 'var(--font-cormorant, serif)', fontStyle: 'italic', fontSize: 10, background: 'rgba(52,152,219,0.1)', color: '#3498db', padding: '1px 6px', borderRadius: 3 }}>مهمة</span>
-              <span style={{ fontFamily: 'var(--font-cormorant, serif)', fontStyle: 'italic', fontSize: 10, background: `${PRIORITY_COLORS[selectedTask.priority]}22`, color: PRIORITY_COLORS[selectedTask.priority], padding: '1px 6px', borderRadius: 3 }}>{PRIORITY_LABELS[selectedTask.priority]}</span>
-              {isOverdue && <span style={{ fontFamily: 'var(--font-cormorant, serif)', fontStyle: 'italic', fontSize: 10, background: 'rgba(139,30,30,0.1)', color: '#8B1E1E', padding: '1px 6px', borderRadius: 3 }}>متأخرة</span>}
+            <div style={{ display: 'flex', gap: 6, marginBottom: 8, flexWrap: 'wrap' }}>
+              <span style={{ fontFamily: 'var(--font-ibm, sans-serif)', fontSize: 10, fontWeight: 700, background: '#EEF2FF', color: '#6366F1', padding: '2px 8px', borderRadius: 20 }}>مهمة</span>
+              <span style={{ fontFamily: 'var(--font-ibm, sans-serif)', fontSize: 10, fontWeight: 700, background: `${PRIORITY_COLORS[selectedTask.priority]}18`, color: PRIORITY_COLORS[selectedTask.priority], padding: '2px 8px', borderRadius: 20 }}>{PRIORITY_LABELS[selectedTask.priority]}</span>
+              {isOverdue && <span style={{ fontFamily: 'var(--font-ibm, sans-serif)', fontSize: 10, fontWeight: 700, background: '#FFE3E3', color: '#FF6B6B', padding: '2px 8px', borderRadius: 20 }}>متأخرة</span>}
             </div>
-            <div style={{ fontFamily: 'var(--font-caveat, cursive)', fontSize: 28, fontWeight: 700, color: '#2B1810', marginBottom: 3, lineHeight: 1.2 }}>
+            <div style={{ fontFamily: 'var(--font-ibm, sans-serif)', fontSize: 22, fontWeight: 800, color: '#2D3142', marginBottom: 4, lineHeight: 1.3 }}>
               {selectedTask.title}
             </div>
-            {taskBrand && <div style={{ fontFamily: 'var(--font-cormorant, serif)', fontStyle: 'italic', fontSize: 13, color: taskColor }}>{taskBrand.name}</div>}
+            {taskBrand && <div style={{ fontFamily: 'var(--font-ibm, sans-serif)', fontSize: 13, color: taskColor, fontWeight: 600 }}>{taskBrand.name}</div>}
           </div>
         </div>
 
         {stTotal > 0 && (
-          <div style={{ marginBottom: 8 }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', fontFamily: 'var(--font-cormorant, serif)', fontStyle: 'italic', fontSize: 11, color: '#8B6F42', marginBottom: 3 }}>
+          <div style={{ marginBottom: 12 }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', fontFamily: 'var(--font-ibm, sans-serif)', fontSize: 11, color: '#8B8F9F', marginBottom: 4 }}>
               <span>مهام فرعية: {stDone}/{stTotal}</span>
               <span>{stTotal > 0 ? Math.round(stDone/stTotal*100) : 0}%</span>
             </div>
-            <div style={{ height: 4, background: 'rgba(180,150,100,0.3)', borderRadius: 4 }}>
-              <div style={{ width: `${stTotal > 0 ? Math.round(stDone/stTotal*100) : 0}%`, height: 4, background: taskColor, borderRadius: 4, transition: 'width 0.3s' }} />
+            <div style={{ height: 6, background: '#F5EDE4', borderRadius: 6 }}>
+              <div style={{ width: `${stTotal > 0 ? Math.round(stDone/stTotal*100) : 0}%`, height: 6, background: taskColor, borderRadius: 6, transition: 'width 0.3s' }} />
             </div>
           </div>
         )}
 
         {nextSteps.length > 0 && (
-          <div style={{ marginBottom: 10 }}>
-            <div style={{ fontFamily: 'var(--font-cormorant, serif)', fontStyle: 'italic', fontSize: 11, color: '#8B6F42', fontWeight: 600, marginBottom: 4 }}>الخطوة التالية:</div>
+          <div style={{ marginBottom: 12 }}>
+            <div style={{ fontFamily: 'var(--font-ibm, sans-serif)', fontSize: 11, fontWeight: 700, color: '#8B8F9F', marginBottom: 8, textTransform: 'uppercase', letterSpacing: '0.5px' }}>الخطوة التالية:</div>
             {nextSteps.map(step => (
-              <div key={step.id} style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '4px 0', borderBottom: '1px solid rgba(180,150,100,0.2)' }}>
+              <div key={step.id} style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '6px 0', borderBottom: '1px solid #F5EDE4' }}>
                 <input type="checkbox" style={{ accentColor: taskColor }} />
-                <span style={{ flex: 1, fontFamily: 'var(--font-caveat, cursive)', fontSize: 16 }}>{step.title}</span>
-                <span style={{ fontFamily: 'var(--font-cormorant, serif)', fontStyle: 'italic', fontSize: 10, color: '#8B6F42', background: 'rgba(180,150,100,0.15)', padding: '1px 5px', borderRadius: 3 }}>{step.type}</span>
+                <span style={{ flex: 1, fontFamily: 'var(--font-ibm, sans-serif)', fontSize: 13, color: '#2D3142' }}>{step.title}</span>
+                <span style={{ fontFamily: 'var(--font-ibm, sans-serif)', fontSize: 10, fontWeight: 600, color: '#8B8F9F', background: '#F5EDE4', padding: '2px 8px', borderRadius: 10 }}>{step.type}</span>
               </div>
             ))}
           </div>
         )}
 
-        <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', marginBottom: 8 }}>
+        <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', marginBottom: 12 }}>
           {[
-            { label: '✓ خلصت', bg: 'rgba(90,120,67,0.1)', color: '#5A7843', border: 'rgba(90,120,67,0.3)' },
-            { label: '⚡ عالق', bg: 'rgba(139,30,30,0.06)', color: '#8B1E1E', border: 'rgba(139,30,30,0.2)' },
-            { label: '⏰ بعدين', bg: 'rgba(212,160,85,0.08)', color: '#9C7231', border: 'rgba(212,160,85,0.3)' },
+            { label: '✓ خلصت', bg: '#F0FFF4', color: '#6BCB77', border: '#C0EDD0' },
+            { label: '⏸ معلق', bg: '#FFF8F0', color: '#FFB085', border: '#FFE0C0' },
+            { label: '↩ رجوع', bg: '#F5EDE4', color: '#8B8F9F', border: '#E0D8D0' },
           ].map(btn => (
-            <button key={btn.label} style={{
-              flex: 1, padding: '6px 8px',
+            <button key={btn.label} onClick={() => setSelectedTaskId(null)} style={{
+              padding: '6px 14px',
               background: btn.bg,
-              color: btn.color,
-              border: `1px dashed ${btn.border}`,
-              borderRadius: 4,
-              fontFamily: 'var(--font-caveat, cursive)', fontSize: 15,
-              cursor: 'pointer',
+              border: `1px solid ${btn.border}`,
+              borderRadius: 10,
+              fontFamily: 'var(--font-ibm, sans-serif)', fontSize: 12, fontWeight: 600,
+              color: btn.color, cursor: 'pointer',
             }}>{btn.label}</button>
           ))}
-          <button onClick={() => setSelectedTaskId(null)} style={{
-            flex: 1, padding: '6px 8px',
-            background: 'rgba(180,150,100,0.1)',
-            color: '#8B6F42',
-            border: '1px dashed rgba(180,150,100,0.3)',
-            borderRadius: 4,
-            fontFamily: 'var(--font-caveat, cursive)', fontSize: 15,
-            cursor: 'pointer',
-          }}>🔄 تغيير</button>
         </div>
-        <Link href={`/tasks/${selectedTask.id}`} style={{
-          fontFamily: 'var(--font-cormorant, serif)', fontStyle: 'italic',
-          fontSize: 13, color: '#9C7231', display: 'block', textAlign: 'center',
-        }}>فتح التفاصيل ←</Link>
-      </PaperCard>
+      </SunriseCard>
     );
   }
 
-  // Pick list
+  // Focus with tasks list
   return (
-    <PaperCard rotate={-1.5} delay={0.2} style={{ marginBottom: 16 }}>
-      {/* دبوس */}
-      <div style={{
-        position: 'absolute', top: -10, left: '50%', transform: 'translateX(-50%)',
-        width: 16, height: 16,
-        background: 'radial-gradient(circle at 40% 35%, #E8BC6F 0%, #D4A055 50%, #9C7231 100%)',
-        borderRadius: '50%',
-        boxShadow: '0 2px 6px rgba(0,0,0,0.4)',
-        zIndex: 10,
-      }} />
-      <div style={{ fontFamily: 'var(--font-caveat, cursive)', fontSize: 22, fontWeight: 700, color: '#3D2817', marginBottom: 4 }}>
-        الشيء الواحد الآن
+    <SunriseCard accent={color} style={{ marginBottom: 20 }}>
+      {/* Focus Header */}
+      <div style={{ display: 'flex', alignItems: 'flex-start', gap: 12, marginBottom: 16, direction: 'rtl' }}>
+        <div style={{ flex: 1 }}>
+          <div style={{ fontFamily: 'var(--font-ibm, sans-serif)', fontSize: 11, fontWeight: 700, color: '#8B8F9F', marginBottom: 6, textTransform: 'uppercase', letterSpacing: '0.5px' }}>
+            {FOCUS_TYPE_ICONS[todayFocus.targetType]} {FOCUS_TYPE_LABELS[todayFocus.targetType]}
+          </div>
+          <div style={{ fontFamily: 'var(--font-ibm, sans-serif)', fontSize: 24, fontWeight: 800, color: '#2D3142', lineHeight: 1.2, marginBottom: 4 }}>
+            {todayFocus.targetName}
+          </div>
+          {brand && <div style={{ fontFamily: 'var(--font-ibm, sans-serif)', fontSize: 12, color: '#8B8F9F' }}>{brand.icon} براند</div>}
+          {project && project.progress > 0 && (
+            <div style={{ marginTop: 8 }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', fontFamily: 'var(--font-ibm, sans-serif)', fontSize: 11, color: '#8B8F9F', marginBottom: 4 }}>
+                <span>تقدم المشروع</span>
+                <span>{project.progress}%</span>
+              </div>
+              <div style={{ height: 6, background: '#F5EDE4', borderRadius: 6 }}>
+                <div style={{ width: `${project.progress}%`, height: 6, background: color, borderRadius: 6 }} />
+              </div>
+            </div>
+          )}
+        </div>
+        <button onClick={onOpenEditor} style={{
+          padding: '6px 14px',
+          background: `${color}12`,
+          border: `1.5px solid ${color}40`,
+          borderRadius: 10,
+          fontFamily: 'var(--font-ibm, sans-serif)', fontSize: 12, fontWeight: 600,
+          color, cursor: 'pointer', flexShrink: 0,
+        }}>تعديل</button>
       </div>
-      <div style={{ fontFamily: 'var(--font-cormorant, serif)', fontStyle: 'italic', fontSize: 13, color: '#8B6F42', marginBottom: 10 }}>
-        {tip}
-      </div>
+
+      {/* Tasks */}
       {sorted.length === 0 ? (
-        <div style={{ textAlign: 'center', fontFamily: 'var(--font-caveat, cursive)', fontSize: 18, color: '#8B6F42' }}>
-          ما فيه مهام نشطة لهذا الفوكس 🎉
+        <div style={{ textAlign: 'center', padding: '16px 0', fontFamily: 'var(--font-ibm, sans-serif)', fontSize: 13, color: '#8B8F9F' }}>
+          ✅ لا توجد مهام مرتبطة
         </div>
       ) : (
         <>
-          <div style={{ fontFamily: 'var(--font-cormorant, serif)', fontStyle: 'italic', fontSize: 12, color: '#8B6F42', marginBottom: 6 }}>اختر مهمة تركز عليها الآن:</div>
+          <div style={{ fontFamily: 'var(--font-ibm, sans-serif)', fontSize: 11, fontWeight: 700, color: '#8B8F9F', marginBottom: 10, textTransform: 'uppercase', letterSpacing: '0.5px' }}>
+            المهام المرتبطة ({sorted.length})
+          </div>
           {sorted.slice(0, 8).map(t => {
+            const pColor = PRIORITY_COLORS[t.priority] ?? '#8B8F9F';
             const brand = brands.find(b => b.id === t.brandId);
-            const pColor = PRIORITY_COLORS[t.priority] ?? '#888';
             const stTotal = t.subtasks.length;
             const stDone = t.subtasks.filter(s => s.completed).length;
             const clItems = t.checklist ?? [];
@@ -1108,43 +1065,43 @@ function FocusHero({
             return (
               <button key={t.id} onClick={() => setSelectedTaskId(t.id)}
                 style={{
-                  width: '100%', display: 'flex', flexDirection: 'column', gap: 3,
-                  padding: '7px 10px',
-                  background: 'rgba(255,255,255,0.4)',
-                  border: '1px dashed rgba(180,150,100,0.4)',
+                  width: '100%', display: 'flex', flexDirection: 'column', gap: 4,
+                  padding: '10px 12px',
+                  background: '#FAFAFA',
+                  border: '1px solid #F0E6D6',
                   borderRight: `3px solid ${pColor}`,
-                  borderRadius: 4, cursor: 'pointer',
-                  fontFamily: 'var(--font-caveat, cursive)',
-                  marginBottom: 4, textAlign: 'right', direction: 'rtl',
+                  borderRadius: 12, cursor: 'pointer',
+                  fontFamily: 'var(--font-ibm, sans-serif)',
+                  marginBottom: 6, textAlign: 'right', direction: 'rtl',
                   transition: 'all 0.1s',
                 }}
               >
-                <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-                  <span style={{ width: 7, height: 7, borderRadius: '50%', background: pColor, display: 'inline-block', flexShrink: 0 }} />
-                  <span style={{ flex: 1, fontSize: 17, fontWeight: 600, color: '#2B1810' }}>{t.title}</span>
-                  <span style={{ fontFamily: 'var(--font-cormorant, serif)', fontStyle: 'italic', fontSize: 10, background: `${pColor}22`, color: pColor, padding: '1px 5px', borderRadius: 3 }}>{PRIORITY_LABELS[t.priority]}</span>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                  <span style={{ width: 8, height: 8, borderRadius: '50%', background: pColor, display: 'inline-block', flexShrink: 0 }} />
+                  <span style={{ flex: 1, fontSize: 13, fontWeight: 600, color: '#2D3142' }}>{t.title}</span>
+                  <span style={{ fontFamily: 'var(--font-ibm, sans-serif)', fontSize: 10, fontWeight: 700, background: `${pColor}18`, color: pColor, padding: '2px 8px', borderRadius: 10 }}>{PRIORITY_LABELS[t.priority]}</span>
                 </div>
                 {brand && (
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 6, paddingRight: 13 }}>
-                    <span style={{ fontFamily: 'var(--font-cormorant, serif)', fontStyle: 'italic', fontSize: 11, color: brand.color }}>{brand.name}</span>
-                    {isOverdue && <span style={{ fontFamily: 'var(--font-cormorant, serif)', fontStyle: 'italic', fontSize: 10, color: '#8B1E1E' }}>⚠ متأخرة</span>}
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 6, paddingRight: 16 }}>
+                    <span style={{ fontFamily: 'var(--font-ibm, sans-serif)', fontSize: 11, color: brand.color, fontWeight: 600 }}>{brand.name}</span>
+                    {isOverdue && <span style={{ fontFamily: 'var(--font-ibm, sans-serif)', fontSize: 10, color: '#FF6B6B', fontWeight: 700 }}>⚠ متأخرة</span>}
                   </div>
                 )}
                 {totalItems > 0 && (
-                  <div style={{ paddingRight: 13, display: 'flex', alignItems: 'center', gap: 4 }}>
-                    <div style={{ flex: 1, height: 3, background: 'rgba(180,150,100,0.3)', borderRadius: 3 }}>
-                      <div style={{ width: `${pct}%`, height: 3, background: pColor, borderRadius: 3 }} />
+                  <div style={{ paddingRight: 16, display: 'flex', alignItems: 'center', gap: 6 }}>
+                    <div style={{ flex: 1, height: 4, background: '#F0E6D6', borderRadius: 4 }}>
+                      <div style={{ width: `${pct}%`, height: 4, background: pColor, borderRadius: 4 }} />
                     </div>
-                    <span style={{ fontFamily: 'var(--font-cormorant, serif)', fontStyle: 'italic', fontSize: 10, color: '#8B6F42' }}>{doneItems}/{totalItems}</span>
+                    <span style={{ fontFamily: 'var(--font-ibm, sans-serif)', fontSize: 10, color: '#8B8F9F' }}>{doneItems}/{totalItems}</span>
                   </div>
                 )}
               </button>
             );
           })}
-          {sorted.length > 8 && <div style={{ fontFamily: 'var(--font-cormorant, serif)', fontStyle: 'italic', fontSize: 12, color: '#8B6F42' }}>+ {sorted.length - 8} مهمة أخرى</div>}
+          {sorted.length > 8 && <div style={{ fontFamily: 'var(--font-ibm, sans-serif)', fontSize: 12, color: '#8B8F9F', textAlign: 'center', marginTop: 4 }}>+ {sorted.length - 8} مهمة أخرى</div>}
         </>
       )}
-    </PaperCard>
+    </SunriseCard>
   );
 }
 
@@ -1152,58 +1109,41 @@ function FocusHero({
 function DecisionsPanel({ decisions, brands }: { decisions: DecisionRow[]; brands: Brand[] }) {
   if (!decisions.length) {
     return (
-      <div style={{ textAlign: 'center', padding: 12, fontFamily: 'var(--font-caveat, cursive)', fontSize: 18, color: '#8B6F42' }}>
+      <div style={{ textAlign: 'center', padding: 16, fontFamily: 'var(--font-ibm, sans-serif)', fontSize: 14, color: '#6BCB77', fontWeight: 600 }}>
         ✅ كل القرارات محسومة!
       </div>
     );
   }
-  const impactColors: Record<string, string> = { critical: '#8B1E1E', high: '#8B1E1E', medium: '#9C7231', low: '#8B6F42' };
+  const impactColors: Record<string, string> = { critical: '#FF6B6B', high: '#FF6B6B', medium: '#FFB085', low: '#8B8F9F' };
   return (
     <div>
-      {/* ختم الشمع */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 12, direction: 'rtl' }}>
-        <div style={{
-          width: 40, height: 40,
-          background: 'radial-gradient(circle at 35% 35%, #C63838 0%, #8B1E1E 60%, #5A0E0E 100%)',
-          borderRadius: '50%',
-          display: 'flex', alignItems: 'center', justifyContent: 'center',
-          boxShadow: '0 2px 8px rgba(0,0,0,0.3)',
-          flexShrink: 0,
-        }}>
-          <span style={{ fontFamily: 'var(--font-playfair, serif)', fontStyle: 'italic', fontSize: 16, color: 'rgba(255,255,255,0.9)', fontWeight: 600 }}>G</span>
-        </div>
-        <div>
-          <div style={{ fontFamily: 'var(--font-playfair, serif)', fontSize: 13, fontWeight: 600, color: '#3D2817' }}>قرارات معلقة</div>
-          <div style={{ fontFamily: 'var(--font-cormorant, serif)', fontStyle: 'italic', fontSize: 11, color: '#8B6F42' }}>تحتاج حسماً</div>
-        </div>
-      </div>
       {decisions.slice(0, 5).map(d => {
         const brand = brands.find(b => b.id === d.brand_id);
         return (
-          <div key={d.id} style={{ padding: '8px 0', borderBottom: '1px dashed rgba(180,150,100,0.3)' }}>
-            <div style={{ fontFamily: 'var(--font-caveat, cursive)', fontSize: 18, fontWeight: 600, marginBottom: 4, color: '#2B1810' }}>{d.title}</div>
+          <div key={d.id} style={{ padding: '10px 0', borderBottom: '1px solid #F5EDE4' }}>
+            <div style={{ fontFamily: 'var(--font-ibm, sans-serif)', fontSize: 14, fontWeight: 700, marginBottom: 6, color: '#2D3142' }}>{d.title}</div>
             <div style={{ display: 'flex', gap: 6, alignItems: 'center', flexWrap: 'wrap' }}>
               <span style={{
-                fontFamily: 'var(--font-cormorant, serif)', fontStyle: 'italic',
-                fontSize: 10,
+                fontFamily: 'var(--font-ibm, sans-serif)',
+                fontSize: 10, fontWeight: 700,
                 background: `${impactColors[d.impact] ?? '#888'}18`,
                 color: impactColors[d.impact] ?? '#888',
-                padding: '1px 6px', borderRadius: 3, fontWeight: 600,
+                padding: '2px 8px', borderRadius: 20,
               }}>
                 {d.impact === 'critical' ? 'حرج' : d.impact === 'high' ? 'مرتفع' : d.impact === 'medium' ? 'متوسط' : 'منخفض'}
               </span>
               {d.deadline && (
-                <span style={{ fontFamily: 'var(--font-cormorant, serif)', fontStyle: 'italic', fontSize: 11, color: daysLeft(d.deadline) < 3 ? '#8B1E1E' : '#8B6F42' }}>
+                <span style={{ fontFamily: 'var(--font-ibm, sans-serif)', fontSize: 11, color: daysLeft(d.deadline) < 3 ? '#FF6B6B' : '#8B8F9F', fontWeight: 600 }}>
                   {daysLeftLabel(d.deadline)}
                 </span>
               )}
-              {brand && <span style={{ fontFamily: 'var(--font-cormorant, serif)', fontStyle: 'italic', fontSize: 10, background: `${brand.color}18`, color: brand.color, padding: '1px 6px', borderRadius: 3 }}>{brand.name}</span>}
+              {brand && <span style={{ fontFamily: 'var(--font-ibm, sans-serif)', fontSize: 10, fontWeight: 700, background: `${brand.color}18`, color: brand.color, padding: '2px 8px', borderRadius: 20 }}>{brand.name}</span>}
             </div>
           </div>
         );
       })}
       {decisions.length > 5 && (
-        <Link href="/decisions" style={{ fontFamily: 'var(--font-caveat, cursive)', fontSize: 16, color: '#9C7231', display: 'block', marginTop: 8 }}>
+        <Link href="/decisions" style={{ fontFamily: 'var(--font-ibm, sans-serif)', fontSize: 13, fontWeight: 700, color: '#FF6B6B', display: 'block', marginTop: 10 }}>
           + {decisions.length - 5} قرار آخر ←
         </Link>
       )}
@@ -1223,25 +1163,17 @@ function CalendarMini({ upcomingEvents, brands }: { upcomingEvents: UpcomingEven
 
   return (
     <div>
-      {/* شريط لاصق */}
-      <div style={{
-        position: 'absolute', top: -10, right: '50%', transform: 'translateX(50%)',
-        width: 60, height: 14,
-        background: 'rgba(255,220,100,0.7)',
-        borderRadius: 2,
-        boxShadow: '0 1px 3px rgba(0,0,0,0.2)',
-      }} />
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: 8, direction: 'rtl' }}>
-        <span style={{ fontFamily: 'var(--font-playfair, serif)', fontSize: 15, fontWeight: 600, color: '#3D2817' }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: 12, direction: 'rtl' }}>
+        <span style={{ fontFamily: 'var(--font-ibm, sans-serif)', fontSize: 16, fontWeight: 800, color: '#2D3142' }}>
           {MONTH_NAMES[month]}
         </span>
-        <span style={{ fontFamily: 'var(--font-cormorant, serif)', fontStyle: 'italic', fontSize: 12, color: '#8B6F42' }}>
+        <span style={{ fontFamily: 'var(--font-ibm, sans-serif)', fontSize: 12, color: '#8B8F9F', fontWeight: 600 }}>
           {year}
         </span>
       </div>
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', gap: 2, marginBottom: 8 }}>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', gap: 2, marginBottom: 12 }}>
         {['أح','إث','ثل','أر','خم','جم','سب'].map(d => (
-          <div key={d} style={{ textAlign: 'center', fontFamily: 'var(--font-cormorant, serif)', fontStyle: 'italic', fontSize: 9, color: '#8B6F42', fontWeight: 600 }}>{d}</div>
+          <div key={d} style={{ textAlign: 'center', fontFamily: 'var(--font-ibm, sans-serif)', fontSize: 9, fontWeight: 700, color: '#C4C8D4', textTransform: 'uppercase' }}>{d}</div>
         ))}
         {Array.from({ length: firstDay }, (_, i) => <div key={`e${i}`} />)}
         {Array.from({ length: daysInMonth }, (_, i) => {
@@ -1251,11 +1183,10 @@ function CalendarMini({ upcomingEvents, brands }: { upcomingEvents: UpcomingEven
           return (
             <div key={day} style={{
               textAlign: 'center',
-              fontFamily: isToday ? 'var(--font-playfair, serif)' : 'var(--font-cormorant, serif)',
-              fontStyle: isToday ? 'normal' : 'italic',
-              fontSize: 12, padding: '3px 0', borderRadius: '50%',
-              background: isToday ? '#8B1E1E' : 'transparent',
-              color: isToday ? '#fff' : hasEvent ? '#9C7231' : '#5A4028',
+              fontFamily: 'var(--font-ibm, sans-serif)',
+              fontSize: 11, padding: '4px 0', borderRadius: '50%',
+              background: isToday ? '#FF6B6B' : 'transparent',
+              color: isToday ? '#fff' : hasEvent ? '#FF6B6B' : '#5A5F73',
               fontWeight: isToday || hasEvent ? 700 : 400,
               position: 'relative',
             }}>
@@ -1263,7 +1194,7 @@ function CalendarMini({ upcomingEvents, brands }: { upcomingEvents: UpcomingEven
               {hasEvent && !isToday && (
                 <span style={{
                   position: 'absolute', bottom: 1, left: '50%', transform: 'translateX(-50%)',
-                  width: 3, height: 3, borderRadius: '50%', background: '#D4A055', display: 'block',
+                  width: 3, height: 3, borderRadius: '50%', background: '#FFB085', display: 'block',
                 }} />
               )}
             </div>
@@ -1273,10 +1204,15 @@ function CalendarMini({ upcomingEvents, brands }: { upcomingEvents: UpcomingEven
       {upcomingEvents.slice(0, 4).map(e => {
         const brand = brands.find(b => b.id === e.brandId);
         return (
-          <div key={e.id} style={{ display: 'flex', gap: 8, padding: '4px 0', borderBottom: '1px dashed rgba(180,150,100,0.3)', alignItems: 'center', direction: 'rtl' }}>
-            <div style={{ minWidth: 22, fontFamily: 'var(--font-playfair, serif)', fontWeight: 700, fontSize: 13, color: '#9C7231' }}>{e.day}</div>
-            <div style={{ flex: 1, fontFamily: 'var(--font-caveat, cursive)', fontSize: 16, color: '#2B1810' }}>{e.title}</div>
-            {brand && <span style={{ fontFamily: 'var(--font-cormorant, serif)', fontStyle: 'italic', fontSize: 10, color: brand.color }}>{brand.name}</span>}
+          <div key={e.id} style={{ display: 'flex', gap: 10, padding: '6px 0', borderBottom: '1px solid #F5EDE4', alignItems: 'center', direction: 'rtl' }}>
+            <div style={{
+              minWidth: 28, height: 28, borderRadius: 8,
+              background: '#FFF0F0',
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              fontFamily: 'var(--font-ibm, sans-serif)', fontWeight: 800, fontSize: 12, color: '#FF6B6B',
+            }}>{e.day}</div>
+            <div style={{ flex: 1, fontFamily: 'var(--font-ibm, sans-serif)', fontSize: 13, color: '#2D3142', fontWeight: 500 }}>{e.title}</div>
+            {brand && <span style={{ fontFamily: 'var(--font-ibm, sans-serif)', fontSize: 10, fontWeight: 700, color: brand.color }}>{brand.name}</span>}
           </div>
         );
       })}
@@ -1303,16 +1239,16 @@ function InboxPanel({ inboxTasks }: { inboxTasks: InboxTask[] }) {
 
   return (
     <div>
-      <div style={{ display: 'flex', gap: 6, marginBottom: 8, direction: 'rtl' }}>
+      <div style={{ display: 'flex', gap: 8, marginBottom: 12, direction: 'rtl' }}>
         <input
           style={{
-            flex: 1, height: 36, padding: '0 10px',
-            border: '1px dashed rgba(180,150,100,0.5)',
-            borderRadius: 4, fontSize: 18,
-            fontFamily: 'var(--font-caveat, cursive)',
-            fontStyle: 'italic',
-            background: 'rgba(255,255,255,0.3)',
-            color: '#2B1810', direction: 'rtl',
+            flex: 1, height: 38, padding: '0 12px',
+            border: '1px solid #F0E6D6',
+            borderRadius: 12, fontSize: 13,
+            fontFamily: 'var(--font-ibm, sans-serif)',
+            background: '#FAFAFA',
+            color: '#2D3142', direction: 'rtl',
+            outline: 'none',
           }}
           placeholder="فكرة أو ملاحظة سريعة..."
           value={newText}
@@ -1321,29 +1257,32 @@ function InboxPanel({ inboxTasks }: { inboxTasks: InboxTask[] }) {
         />
         <button onClick={handleAdd} disabled={isPending || !newText.trim()}
           style={{
-            padding: '0 12px',
-            background: 'linear-gradient(135deg, #D4A055, #9C7231)',
-            color: '#3D2817', border: 'none', borderRadius: 4,
-            fontFamily: 'var(--font-playfair, serif)', fontSize: 18,
+            padding: '0 16px',
+            background: 'linear-gradient(135deg, #FF6B6B, #FFB085)',
+            color: 'white', border: 'none', borderRadius: 12,
+            fontFamily: 'var(--font-ibm, sans-serif)', fontSize: 18, fontWeight: 700,
             cursor: 'pointer',
-            boxShadow: '0 2px 6px rgba(0,0,0,0.15)',
+            boxShadow: '0 4px 12px rgba(255,107,107,0.25)',
           }}>+</button>
       </div>
       {inboxTasks.length === 0 ? (
-        <div style={{ textAlign: 'center', padding: 12, fontFamily: 'var(--font-caveat, cursive)', fontSize: 18, color: '#8B6F42' }}>
+        <div style={{ textAlign: 'center', padding: 16, fontFamily: 'var(--font-ibm, sans-serif)', fontSize: 13, color: '#C4C8D4' }}>
           صندوق الوارد فارغ ✨
         </div>
       ) : (
         inboxTasks.slice(0, 8).map(t => (
           <div key={t.id} style={{
-            display: 'flex', alignItems: 'flex-start', gap: 8,
-            padding: '6px 0', borderBottom: '1px dashed rgba(180,150,100,0.25)',
+            display: 'flex', alignItems: 'flex-start', gap: 10,
+            padding: '8px 0', borderBottom: '1px solid #F5EDE4',
             direction: 'rtl',
           }}>
-            <span style={{ color: '#D4A055', fontSize: 10, marginTop: 6, flexShrink: 0 }}>◆</span>
-            <span style={{ flex: 1, fontFamily: 'var(--font-caveat, cursive)', fontSize: 18, color: '#2B1810' }}>{t.text}</span>
+            <span style={{ color: '#FFB085', fontSize: 12, marginTop: 4, flexShrink: 0 }}>◆</span>
+            <span style={{ flex: 1, fontFamily: 'var(--font-ibm, sans-serif)', fontSize: 13, color: '#2D3142', lineHeight: 1.5 }}>{t.text}</span>
             <button onClick={() => handleDelete(t.id)}
-              style={{ background: 'none', border: 'none', color: '#C9B585', cursor: 'pointer', fontSize: 13, padding: '0 4px', flexShrink: 0 }}>✕</button>
+              style={{ background: 'none', border: 'none', color: '#C4C8D4', cursor: 'pointer', fontSize: 13, padding: '0 4px', flexShrink: 0, transition: 'color 0.15s' }}
+              onMouseEnter={(e) => { (e.currentTarget as HTMLElement).style.color = '#FF6B6B'; }}
+              onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.color = '#C4C8D4'; }}
+            >✕</button>
           </div>
         ))
       )}
@@ -1351,98 +1290,65 @@ function InboxPanel({ inboxTasks }: { inboxTasks: InboxTask[] }) {
   );
 }
 
-// ─── Brand Health Strip (زجاجات عطور) ────────────────────────────────────────
+// ─── Brand Health Strip (بطاقات براندات) ─────────────────────────────────────
 function BrandHealthStrip({ brands, activeTasks }: { brands: Brand[]; activeTasks: ActiveTask[] }) {
-  const statusColors: Record<string, string> = { active: '#5A7843', selling: '#3498db', paused: '#9C7231', archived: '#8B6F42' };
+  const statusColors: Record<string, string> = { active: '#6BCB77', selling: '#4ECDC4', paused: '#FFB085', archived: '#C4C8D4' };
   const statusLabels: Record<string, string> = { active: 'نشط', selling: 'بيع', paused: 'موقف', archived: 'أرشيف' };
 
   return (
-    <div style={{ display: 'flex', gap: 12, overflowX: 'auto', paddingBottom: 8, paddingTop: 16 }}>
-      {brands.map((b, idx) => {
+    <div style={{ display: 'flex', gap: 10, overflowX: 'auto', paddingBottom: 8 }}>
+      {brands.map((b) => {
         const tasks = activeTasks.filter(t => t.brandId === b.id);
-        const rotations = [-3, 2, -1.5, 3, -2, 1.5, -3, 2];
-        const rot = rotations[idx % rotations.length];
 
         return (
           <Link key={b.id} href={`/brands/${b.id}`}
             style={{
               display: 'flex', flexDirection: 'column', alignItems: 'center',
               textDecoration: 'none', flexShrink: 0,
-              transform: `rotate(${rot}deg)`,
-              transition: 'transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1)',
+              padding: '12px 14px',
+              background: 'white',
+              border: '1px solid #F0E6D6',
+              borderTop: `3px solid ${b.color}`,
+              borderRadius: 16,
+              minWidth: 90,
+              transition: 'all 0.2s',
+              boxShadow: '0 2px 8px rgba(0,0,0,0.04)',
             }}
             onMouseEnter={(e) => {
-              (e.currentTarget as HTMLElement).style.transform = `rotate(0deg) translateY(-8px)`;
+              (e.currentTarget as HTMLElement).style.transform = 'translateY(-4px)';
+              (e.currentTarget as HTMLElement).style.boxShadow = `0 8px 24px ${b.color}25`;
             }}
             onMouseLeave={(e) => {
-              (e.currentTarget as HTMLElement).style.transform = `rotate(${rot}deg)`;
+              (e.currentTarget as HTMLElement).style.transform = 'translateY(0)';
+              (e.currentTarget as HTMLElement).style.boxShadow = '0 2px 8px rgba(0,0,0,0.04)';
             }}
           >
-            {/* Cap */}
+            <div style={{ fontSize: 24, marginBottom: 6 }}>{b.icon}</div>
             <div style={{
-              width: '40%', height: 22,
-              background: 'linear-gradient(135deg, #E8BC6F, #9C7231)',
-              borderRadius: '3px 3px 0 0',
-              boxShadow: '0 -1px 4px rgba(0,0,0,0.2)',
-              alignSelf: 'center',
-            }} />
-            {/* Body */}
-            <div style={{
-              width: 72, height: 90,
-              background: `linear-gradient(135deg, ${b.color}CC, ${b.color}88)`,
-              borderRadius: '4px 4px 8px 8px',
-              position: 'relative', overflow: 'hidden',
-              boxShadow: '2px 4px 12px rgba(0,0,0,0.4), inset -3px 0 6px rgba(0,0,0,0.15)',
-            }}>
-              {/* Shine */}
+              fontFamily: 'var(--font-ibm, sans-serif)',
+              fontSize: 11, fontWeight: 700, color: '#2D3142',
+              textAlign: 'center', marginBottom: 4,
+              maxWidth: 70, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
+            }}>{b.name}</div>
+            {tasks.length > 0 && (
               <div style={{
-                position: 'absolute', top: 6, right: 6,
-                width: 14, height: 30,
-                background: 'rgba(255,255,255,0.15)',
-                borderRadius: '50%',
-                transform: 'rotate(-15deg)',
-              }} />
-              {/* Label */}
-              <div style={{
-                position: 'absolute', top: '50%', left: '50%',
-                transform: 'translate(-50%, -50%)',
-                background: 'rgba(247,236,214,0.92)',
-                borderRadius: 3, padding: '3px 5px',
-                textAlign: 'center', minWidth: 50,
-                boxShadow: '0 1px 4px rgba(0,0,0,0.2)',
+                background: '#FF6B6B',
+                color: 'white',
+                borderRadius: 20,
+                padding: '1px 8px',
+                fontSize: 10, fontWeight: 700,
+                fontFamily: 'var(--font-ibm, sans-serif)',
+                marginBottom: 4,
               }}>
-                <span style={{ fontSize: 12, display: 'block' }}>{b.icon}</span>
-                <span style={{
-                  fontFamily: 'var(--font-caveat, cursive)',
-                  fontSize: 9, color: '#2B1810', display: 'block',
-                  whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', maxWidth: 44,
-                }}>{b.name}</span>
+                {tasks.length} مهمة
               </div>
-              {/* Task count badge */}
-              {tasks.length > 0 && (
-                <div style={{
-                  position: 'absolute', top: -6, left: -6,
-                  width: 18, height: 18,
-                  background: '#8B1E1E',
-                  borderRadius: '50%',
-                  display: 'flex', alignItems: 'center', justifyContent: 'center',
-                  fontSize: 9, color: 'white', fontWeight: 700, zIndex: 5,
-                }}>
-                  {tasks.length}
-                </div>
-              )}
-            </div>
-            {/* Shadow */}
+            )}
             <div style={{
-              width: 56, height: 8,
-              background: 'radial-gradient(ellipse, rgba(0,0,0,0.3) 0%, transparent 70%)',
-              marginTop: 4,
-            }} />
-            {/* Status */}
-            <div style={{
-              fontFamily: 'var(--font-cormorant, serif)', fontStyle: 'italic',
-              fontSize: 9, color: statusColors[b.status] ?? '#8B6F42',
-              marginTop: 2,
+              fontFamily: 'var(--font-ibm, sans-serif)',
+              fontSize: 9, fontWeight: 700,
+              color: statusColors[b.status] ?? '#C4C8D4',
+              textTransform: 'uppercase',
+              letterSpacing: '0.3px',
             }}>
               {statusLabels[b.status] ?? b.status}
             </div>
@@ -1473,39 +1379,50 @@ export default function LeadershipClient({
   const d = new Date();
   const dateLabel = `${DAY_NAMES[d.getDay()]} ${d.getDate()} ${MONTH_NAMES[d.getMonth()]} ${d.getFullYear()}`;
 
+  // Greeting based on time
+  const hour = d.getHours();
+  const greeting = hour < 12 ? 'صباح الخير' : hour < 17 ? 'مساء الخير' : 'مساء النور';
+
   return (
-    <div className="scr on" style={{ direction: 'rtl' }}>
+    <div className="scr on" style={{ direction: 'rtl', background: '#FFFBF5', minHeight: '100vh' }}>
       {/* Sticky Banner */}
       <StickyBanner todayFocus={todayFocus} todaySales={todaySales} onEdit={() => setEditorDate(todayISO())} />
 
       {/* Page Header */}
-      <div style={{ padding: '16px 20px 8px', marginBottom: 16, direction: 'rtl' }}>
-        <h1 style={{
-          fontFamily: 'var(--font-playfair, serif)',
-          fontSize: 28, fontWeight: 600,
-          color: '#E8BC6F',
-          margin: 0,
-          letterSpacing: '0.02em',
-        }}>
-          المركز القيادي
-        </h1>
-        <p style={{
-          fontFamily: 'var(--font-cormorant, serif)',
-          fontStyle: 'italic',
-          fontSize: 14, color: 'rgba(247,236,214,0.5)',
-          margin: '4px 0 0',
-        }}>
-          {dateLabel}
-        </p>
+      <div style={{ padding: '24px 24px 16px', direction: 'rtl' }}>
+        <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: 4 }}>
+          <div>
+            <div style={{ fontFamily: 'var(--font-ibm, sans-serif)', fontSize: 13, fontWeight: 600, color: '#FFB085', marginBottom: 4 }}>
+              ☀️ {greeting}
+            </div>
+            <h1 style={{
+              fontFamily: 'var(--font-ibm, sans-serif)',
+              fontSize: 28, fontWeight: 800,
+              color: '#2D3142',
+              margin: 0,
+              letterSpacing: '-0.5px',
+            }}>
+              المركز القيادي
+            </h1>
+          </div>
+          <div style={{
+            fontFamily: 'var(--font-ibm, sans-serif)',
+            fontSize: 12, color: '#8B8F9F', fontWeight: 500,
+            textAlign: 'left',
+            marginTop: 4,
+          }}>
+            {dateLabel}
+          </div>
+        </div>
       </div>
 
-      {/* Brand Bottles Row */}
-      <div style={{ padding: '0 16px', marginBottom: 20 }}>
+      {/* Brand Cards Row */}
+      <div style={{ padding: '0 24px', marginBottom: 24 }}>
         <BrandHealthStrip brands={brands} activeTasks={activeTasks} />
       </div>
 
       {/* Main Grid */}
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 300px', gap: 20, padding: '0 16px' }}>
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 300px', gap: 20, padding: '0 24px 24px' }}>
         {/* Right Column */}
         <div>
           {/* Weekly Compass */}
@@ -1530,82 +1447,68 @@ export default function LeadershipClient({
           />
 
           {/* Decisions */}
-          <PaperCard rotate={0.5} delay={0.4} style={{ marginBottom: 20 }}>
-            <SectionTitle icon="⚖️" title="قرارات معلقة" badge={decisions.length} />
+          <SunriseCard accent="#FF6B6B" style={{ marginBottom: 20 }}>
+            <SectionTitle icon="⚖️" title="قرارات معلقة" badge={decisions.length} color="#FF6B6B" />
             <DecisionsPanel decisions={decisions} brands={brands} />
-          </PaperCard>
+          </SunriseCard>
         </div>
 
         {/* Left Column */}
         <div>
           {/* Calendar */}
-          <PaperCard rotate={-2} delay={0.5} style={{ marginBottom: 20, position: 'relative', paddingTop: 20 }}>
+          <SunriseCard accent="#FFD93D" style={{ marginBottom: 20 }}>
+            <SectionTitle icon="📅" title="التقويم" color="#FFD93D" />
             <CalendarMini upcomingEvents={upcomingEvents} brands={brands} />
-          </PaperCard>
+          </SunriseCard>
 
           {/* Inbox */}
-          <PaperCard rotate={0} delay={0.6} style={{ marginBottom: 20 }}>
-            <SectionTitle icon="📥" title="صندوق الوارد" badge={inboxTasks.length} />
+          <SunriseCard accent="#4ECDC4" style={{ marginBottom: 20 }}>
+            <SectionTitle icon="📥" title="صندوق الوارد" badge={inboxTasks.length} color="#4ECDC4" />
             <InboxPanel inboxTasks={inboxTasks} />
-          </PaperCard>
+          </SunriseCard>
 
           {/* Team */}
           {employees.length > 0 && (
-            <div style={{ marginBottom: 20 }}>
-              <div style={{ fontFamily: 'var(--font-caveat, cursive)', fontSize: 18, color: 'rgba(232,188,111,0.7)', marginBottom: 12, paddingBottom: 4, borderBottom: '1px dashed rgba(212,160,85,0.2)' }}>
-                👥 الفريق
-              </div>
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 12 }}>
-                {employees.slice(0, 4).map((e, idx) => {
-                  const rotations = [-1, 1.5, -1.5, 1];
-                  const rot = rotations[idx % rotations.length];
+            <SunriseCard accent="#A78BFA" style={{ marginBottom: 20 }}>
+              <SectionTitle icon="👥" title="الفريق" color="#A78BFA" />
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 10 }}>
+                {employees.slice(0, 4).map((e) => {
                   return (
                     <div key={e.id} style={{
-                      background: 'linear-gradient(135deg, #FBF3DF 0%, #F0E2BC 100%)',
-                      borderRadius: 4, padding: '12px 10px',
-                      position: 'relative',
-                      boxShadow: '0 3px 10px rgba(0,0,0,0.2)',
-                      transform: `rotate(${rot}deg)`,
-                      transition: 'transform 0.2s, box-shadow 0.2s',
-                      color: '#2B1810',
+                      background: '#FAFAFA',
+                      border: '1px solid #F0E6D6',
+                      borderRadius: 14, padding: '12px 10px',
+                      textAlign: 'center',
+                      transition: 'all 0.2s',
                     }}
                     onMouseEnter={(el) => {
-                      (el.currentTarget as HTMLElement).style.transform = `rotate(0deg) translateY(-4px)`;
-                      (el.currentTarget as HTMLElement).style.boxShadow = '0 6px 16px rgba(0,0,0,0.3)';
+                      (el.currentTarget as HTMLElement).style.transform = 'translateY(-2px)';
+                      (el.currentTarget as HTMLElement).style.boxShadow = '0 4px 12px rgba(167,139,250,0.15)';
                     }}
                     onMouseLeave={(el) => {
-                      (el.currentTarget as HTMLElement).style.transform = `rotate(${rot}deg)`;
-                      (el.currentTarget as HTMLElement).style.boxShadow = '0 3px 10px rgba(0,0,0,0.2)';
+                      (el.currentTarget as HTMLElement).style.transform = 'translateY(0)';
+                      (el.currentTarget as HTMLElement).style.boxShadow = 'none';
                     }}
                     >
-                      {/* شريط لاصق */}
                       <div style={{
-                        position: 'absolute', top: -8, right: '50%', transform: 'translateX(50%)',
-                        width: 36, height: 12,
-                        background: 'rgba(255,220,100,0.7)',
-                        borderRadius: 2,
-                        boxShadow: '0 1px 3px rgba(0,0,0,0.15)',
-                      }} />
-                      {/* Avatar */}
-                      <div style={{
-                        width: 36, height: 36, borderRadius: '50%',
-                        background: 'linear-gradient(135deg, #D4A055, #9C7231)',
+                        width: 40, height: 40, borderRadius: '50%',
+                        background: 'linear-gradient(135deg, #FF6B6B, #FFB085)',
                         display: 'flex', alignItems: 'center', justifyContent: 'center',
-                        fontFamily: 'var(--font-playfair, serif)', fontSize: 16, fontWeight: 600,
-                        color: 'white', boxShadow: '0 2px 6px rgba(0,0,0,0.2)',
-                        margin: '0 auto 6px',
+                        fontFamily: 'var(--font-ibm, sans-serif)', fontSize: 16, fontWeight: 800,
+                        color: 'white',
+                        margin: '0 auto 8px',
                       }}>
                         {e.name.charAt(0)}
                       </div>
-                      <div style={{ fontFamily: 'var(--font-caveat, cursive)', fontSize: 16, fontWeight: 700, color: '#2B1810', textAlign: 'center' }}>{e.name}</div>
-                      <div style={{ fontFamily: 'var(--font-cormorant, serif)', fontStyle: 'italic', fontSize: 11, color: '#8B6F42', textAlign: 'center' }}>{e.role}</div>
-                      <div style={{ textAlign: 'center', marginTop: 4 }}>
+                      <div style={{ fontFamily: 'var(--font-ibm, sans-serif)', fontSize: 13, fontWeight: 700, color: '#2D3142' }}>{e.name}</div>
+                      <div style={{ fontFamily: 'var(--font-ibm, sans-serif)', fontSize: 11, color: '#8B8F9F', marginTop: 2 }}>{e.role}</div>
+                      <div style={{ marginTop: 6 }}>
                         <span style={{
-                          fontFamily: 'var(--font-cormorant, serif)', fontStyle: 'italic',
-                          fontSize: 9,
-                          background: e.status === 'active' ? 'rgba(90,120,67,0.1)' : 'rgba(180,150,100,0.1)',
-                          color: e.status === 'active' ? '#5A7843' : '#8B6F42',
-                          padding: '2px 7px', borderRadius: 10, fontWeight: 600,
+                          fontFamily: 'var(--font-ibm, sans-serif)',
+                          fontSize: 9, fontWeight: 700,
+                          background: e.status === 'active' ? '#F0FFF4' : '#F5EDE4',
+                          color: e.status === 'active' ? '#6BCB77' : '#8B8F9F',
+                          padding: '2px 8px', borderRadius: 20,
                         }}>
                           {e.status === 'active' ? 'نشط' : e.status === 'on_leave' ? 'إجازة' : 'غير نشط'}
                         </span>
@@ -1615,12 +1518,12 @@ export default function LeadershipClient({
                 })}
               </div>
               <Link href="/team" style={{
-                fontFamily: 'var(--font-caveat, cursive)', fontSize: 15,
-                color: 'rgba(232,188,111,0.7)', display: 'block', marginTop: 8, textAlign: 'center',
+                fontFamily: 'var(--font-ibm, sans-serif)', fontSize: 12, fontWeight: 700,
+                color: '#A78BFA', display: 'block', marginTop: 12, textAlign: 'center',
               }}>
                 عرض الفريق كاملاً ←
               </Link>
-            </div>
+            </SunriseCard>
           )}
         </div>
       </div>
