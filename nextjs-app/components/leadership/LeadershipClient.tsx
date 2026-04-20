@@ -1012,37 +1012,9 @@ export default function LeadershipClient({
                 <DecisionsPanel decisions={decisions} brands={brands} />
               </section>
 
-              {/* الفريق */}
-              {employees.length > 0 && (
-                <section className="section">
-                  <div className="section-head">
-                    <div className="section-title-wrap">
-                      <div className="section-icon" style={{ background: 'var(--lavender-light)', color: '#7B5AD8' }}>👥</div>
-                      <div className="section-title">
-                        <div className="section-title-text">الفريق</div>
-                        <div className="section-subtitle">{employees.length} موظف</div>
-                      </div>
-                    </div>
-                    <Link href="/team" className="section-link">عرض الكل →</Link>
-                  </div>
-                  <div className="team-grid">
-                    {employees.slice(0, 6).map((e) => (
-                      <div key={e.id} className="team-card">
-                        <div className="team-avatar">{e.name.charAt(0)}</div>
-                        <div className="team-name">{e.name}</div>
-                        <div className="team-role">{e.role}</div>
-                        <span className={`team-status ${e.status === 'active' ? 'active' : ''}`}>
-                          {e.status === 'active' ? 'نشط' : e.status === 'on_leave' ? 'إجازة' : 'غير نشط'}
-                        </span>
-                      </div>
-                    ))}
-                  </div>
-                </section>
-              )}
-
             </div>{/* end عمود رئيسي */}
 
-            {/* العمود الجانبي: التقويم + الوارد */}
+            {/* العمود الجانبي: التقويم + الوارد + الفريق */}
             <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
 
               {/* التقويم */}
@@ -1072,6 +1044,34 @@ export default function LeadershipClient({
                 </div>
                 <InboxPanel inboxTasks={inboxTasks} />
               </section>
+
+              {/* الفريق */}
+              {employees.length > 0 && (
+                <section className="section">
+                  <div className="section-head">
+                    <div className="section-title-wrap">
+                      <div className="section-icon" style={{ background: 'var(--lavender-light)', color: '#7B5AD8' }}>👥</div>
+                      <div className="section-title">
+                        <div className="section-title-text">الفريق</div>
+                        <div className="section-subtitle">{employees.length} موظف</div>
+                      </div>
+                    </div>
+                    <Link href="/team" className="section-link">عرض الكل →</Link>
+                  </div>
+                  <div className="team-grid">
+                    {employees.slice(0, 6).map((e) => (
+                      <div key={e.id} className="team-card">
+                        <div className="team-avatar">{e.name.charAt(0)}</div>
+                        <div className="team-name">{e.name}</div>
+                        <div className="team-role">{e.role}</div>
+                        <span className={`team-status ${e.status === 'active' ? 'active' : ''}`}>
+                          {e.status === 'active' ? 'نشط' : e.status === 'on_leave' ? 'إجازة' : 'غير نشط'}
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+                </section>
+              )}
 
             </div>{/* end عمود جانبي */}
 
