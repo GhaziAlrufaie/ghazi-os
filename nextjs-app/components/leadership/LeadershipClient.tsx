@@ -930,9 +930,9 @@ export default function LeadershipClient({
         </div>
 
         {/* ── المحتوى الرئيسي ─────────────────────────────────────────────────── */}
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 20, padding: '0 24px 24px' }}>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 0 }}>
 
-          {/* FocusHero — كامل العرض */}
+          {/* FocusHero — كامل العرض بدون padding */}
           <FocusHero
             todayFocus={todayFocus}
             activeTasks={activeTasks}
@@ -941,6 +941,9 @@ export default function LeadershipClient({
             projects={projects}
             onOpenEditor={() => setEditorDate(todayISO())}
           />
+
+          {/* باقي المحتوى بـ padding جانبي */}
+          <div style={{ padding: '20px 24px 24px', display: 'flex', flexDirection: 'column', gap: 20 }}>
 
           {/* WeeklyCompass — كامل العرض */}
           <WeeklyCompass
@@ -1076,6 +1079,8 @@ export default function LeadershipClient({
             </div>{/* end عمود جانبي */}
 
           </div>{/* end grid عمودين */}
+
+          </div>{/* end padding wrapper */}
 
         </div>{/* end المحتوى الرئيسي */}
 
