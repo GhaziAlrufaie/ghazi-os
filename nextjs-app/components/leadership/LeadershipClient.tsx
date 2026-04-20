@@ -720,7 +720,7 @@ function DecisionsPanel({ decisions, brands }: { decisions: DecisionRow[]; brand
     <div>
       {decisions.slice(0, 5).map(d => {
         const brand = brands.find(b => b.id === d.brand_id);
-        const impact = d.impact_level ?? 'medium';
+        const impact = d.impact ?? 'medium';
         return (
           <div key={d.id} className={`decision-item ${impact}`}>
             <div className="decision-title">{d.title}</div>
