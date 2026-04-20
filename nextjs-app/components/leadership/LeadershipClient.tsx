@@ -558,7 +558,7 @@ function FocusHero({
   // Recharge mode
   if (todayFocus?.targetType === 'recharge') {
     return (
-      <section className="focus-hero recharge">
+      <section className="focus-hero recharge" style={{ marginLeft: -24, marginRight: -24, borderRadius: 0 }}>
         <div className="focus-content">
           <div>
             <div className="focus-label">
@@ -577,7 +577,7 @@ function FocusHero({
   // No focus
   if (!todayFocus) {
     return (
-      <section className="focus-hero no-focus">
+      <section className="focus-hero no-focus" style={{ marginLeft: -24, marginRight: -24, borderRadius: 0 }}>
         <div className="focus-content">
           <div>
             <div className="focus-label">
@@ -619,7 +619,7 @@ function FocusHero({
     ].slice(0, 3);
 
     return (
-      <section className="focus-hero" style={{ borderTop: `4px solid ${taskColor}` }}>
+      <section className="focus-hero" style={{ borderTop: `4px solid ${taskColor}`, marginLeft: -24, marginRight: -24, borderRadius: 0 }}>
         <div className="focus-content">
           <div style={{ flex: 1 }}>
             <div className="focus-label">
@@ -660,7 +660,7 @@ function FocusHero({
 
   // Main focus view
   return (
-    <section className="focus-hero" style={{ borderTop: `4px solid ${color}` }}>
+    <section className="focus-hero" style={{ borderTop: `4px solid ${color}`, marginLeft: -24, marginRight: -24, borderRadius: 0 }}>
       <div className="focus-content">
         <div style={{ flex: 1 }}>
           <div className="focus-label">
