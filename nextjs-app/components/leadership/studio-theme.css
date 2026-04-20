@@ -338,6 +338,8 @@ body::before {
 .focus-hero {
   position: relative;
   padding: 24px 32px;
+  min-height: unset;
+  height: auto;
   background: var(--sunrise-gradient);
   border-radius: 24px;
   overflow: hidden;
@@ -373,8 +375,8 @@ body::before {
   z-index: 2;
   display: grid;
   grid-template-columns: 1fr auto;
-  gap: 32px;
   align-items: center;
+  gap: 24px;
 }
 
 .focus-label {
@@ -405,7 +407,7 @@ body::before {
 }
 
 .focus-title {
-  font-size: 26px;
+  font-size: 24px;
   font-weight: 800;
   line-height: 1.2;
   margin-bottom: 8px;
@@ -435,15 +437,15 @@ body::before {
 }
 
 .focus-icon-big {
-  width: 100px;
-  height: 100px;
+  width: 80px;
+  height: 80px;
   background: rgba(255, 255, 255, 0.25);
   backdrop-filter: blur(20px);
   border-radius: 20px;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 48px;
+  font-size: 36px;
   border: 1px solid rgba(255, 255, 255, 0.3);
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
 }
