@@ -341,10 +341,12 @@ body::before {
   min-height: 235px;
   max-height: 235px;
   background: var(--sunrise-gradient);
-  border-radius: 24px;
+  border-radius: 0;
   overflow: hidden;
   box-shadow: 0 8px 32px rgba(255, 107, 107, 0.2);
   color: white;
+  margin: 0 -24px;
+  width: calc(100% + 48px);
 }
 
 /* Decorative elements */
