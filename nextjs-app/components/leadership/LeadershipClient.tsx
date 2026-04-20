@@ -929,140 +929,156 @@ export default function LeadershipClient({
           </div>
         </div>
 
-        {/* ── Focus Hero ───────────────────────────────────────────────────── */}
-        <FocusHero
-          todayFocus={todayFocus}
-          activeTasks={activeTasks}
-          personalTasks={personalTasks}
-          brands={brands}
-          projects={projects}
-          onOpenEditor={() => setEditorDate(todayISO())}
-        />
+        {/* ── المحتوى الرئيسي ─────────────────────────────────────────────────── */}
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
 
-        {/* ── Weekly Compass ───────────────────────────────────────────────── */}
-        <WeeklyCompass
-          weeklyFocus={weeklyFocus}
-          brands={brands}
-          activeTasks={activeTasks}
-          projects={projects}
-          onOpenEditor={(d) => setEditorDate(d)}
-        />
+          {/* FocusHero — كامل العرض */}
+          <FocusHero
+            todayFocus={todayFocus}
+            activeTasks={activeTasks}
+            personalTasks={personalTasks}
+            brands={brands}
+            projects={projects}
+            onOpenEditor={() => setEditorDate(todayISO())}
+          />
 
-        {/* ── Daily Tasks (روتينك اليومي) ──────────────────────────────────── */}
-        <div className="section">
-          <div className="section-head">
-            <div className="section-title-wrap">
-              <div className="section-icon" style={{ background: 'var(--mint-light)', color: 'var(--mint-deep)' }}>☑️</div>
-              <div className="section-title">
-                <div className="section-title-text">روتينك اليومي</div>
-                <div className="section-subtitle">مهام ثابتة كل يوم</div>
-              </div>
-            </div>
-          </div>
-          <div className="daily-progress">
-            <div className="daily-progress-bar" style={{ width: '33%' }}></div>
-          </div>
-          <div className="daily-grid">
-            {[
-              { title: 'راجع مبيعات الأمس', meta: '📊 من سلة', time: '8:00 ص', done: true },
-              { title: 'رد على رسائل العملاء', meta: '💬 بيت الجوزاء', time: '9:00 ص', done: true },
-              { title: 'افحص تحليلات السناب', meta: '📱 المحتوى', time: '11:00 ص', done: false },
-              { title: 'تابع الفريق وحدّث المهام', meta: '👥 الفريق', time: '2:00 م', done: false },
-              { title: 'اكتب ملاحظة يومية', meta: '📝 أهم إنجاز', time: '6:00 م', done: false },
-              { title: 'مراجعة قائمة الغد', meta: '🎯 التحضير', time: '9:00 م', done: false },
-            ].map((task, i) => (
-              <div key={i} className={`daily-task${task.done ? ' done' : ''}`}>
-                <div className={`daily-checkbox${task.done ? ' checked' : ''}`}>
-                  {task.done && (
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="3">
-                      <polyline points="20 6 9 17 4 12"/>
-                    </svg>
-                  )}
+          {/* WeeklyCompass — كامل العرض */}
+          <WeeklyCompass
+            weeklyFocus={weeklyFocus}
+            brands={brands}
+            activeTasks={activeTasks}
+            projects={projects}
+            onOpenEditor={(d) => setEditorDate(d)}
+          />
+
+          {/* Grid عمودين */}
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 300px', gap: 20 }}>
+
+            {/* العمود الرئيسي: Daily Tasks + Decisions + Team */}
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
+
+              {/* روتينك اليومي */}
+              <div className="section">
+                <div className="section-head">
+                  <div className="section-title-wrap">
+                    <div className="section-icon" style={{ background: 'var(--mint-light)', color: 'var(--mint-deep)' }}>☑️</div>
+                    <div className="section-title">
+                      <div className="section-title-text">روتينك اليومي</div>
+                      <div className="section-subtitle">مهام ثابتة كل يوم</div>
+                    </div>
+                  </div>
                 </div>
-                <div className="daily-task-body">
-                  <div className="daily-task-title">{task.title}</div>
-                  <div className="daily-task-meta">{task.meta}</div>
+                <div className="daily-progress">
+                  <div className="daily-progress-bar" style={{ width: '33%' }}></div>
                 </div>
-                <span className="daily-time">{task.time}</span>
-              </div>
-            ))}
-          </div>
-        </div>
-
-        {/* ── Triple Panel: الوارد + التقويم + القرارات ────────────────────── */}
-        <div className="triple">
-
-          {/* الوارد */}
-          <section className="section">
-            <div className="section-head">
-              <div className="section-title-wrap">
-                <div className="section-icon" style={{ background: 'var(--lavender-light)', color: '#7B5AD8' }}>💡</div>
-                <div className="section-title">
-                  <div className="section-title-text">الوارد</div>
-                  <div className="section-subtitle">أفكار سريعة</div>
+                <div className="daily-grid">
+                  {[
+                    { title: 'راجع مبيعات الأمس', meta: '📊 من سلة', time: '8:00 ص', done: true },
+                    { title: 'رد على رسائل العملاء', meta: '💬 بيت الجوزاء', time: '9:00 ص', done: true },
+                    { title: 'افحص تحليلات السناب', meta: '📱 المحتوى', time: '11:00 ص', done: false },
+                    { title: 'تابع الفريق وحدّث المهام', meta: '👥 الفريق', time: '2:00 م', done: false },
+                    { title: 'اكتب ملاحظة يومية', meta: '📝 أهم إنجاز', time: '6:00 م', done: false },
+                    { title: 'مراجعة قائمة الغد', meta: '🎯 التحضير', time: '9:00 م', done: false },
+                  ].map((task, i) => (
+                    <div key={i} className={`daily-task${task.done ? ' done' : ''}`}>
+                      <div className={`daily-checkbox${task.done ? ' checked' : ''}`}>
+                        {task.done && (
+                          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="3">
+                            <polyline points="20 6 9 17 4 12"/>
+                          </svg>
+                        )}
+                      </div>
+                      <div className="daily-task-body">
+                        <div className="daily-task-title">{task.title}</div>
+                        <div className="daily-task-meta">{task.meta}</div>
+                      </div>
+                      <span className="daily-time">{task.time}</span>
+                    </div>
+                  ))}
                 </div>
               </div>
-            </div>
-            <InboxPanel inboxTasks={inboxTasks} />
-          </section>
 
-          {/* التقويم */}
-          <section className="section">
-            <div className="section-head">
-              <div className="section-title-wrap">
-                <div className="section-icon" style={{ background: 'var(--sky-light)', color: 'var(--sky-deep)' }}>📅</div>
-                <div className="section-title">
-                  <div className="section-title-text">{MONTH_NAMES[d.getMonth()]}</div>
-                  <div className="section-subtitle">{upcomingEvents.length} أحداث قادمة</div>
+              {/* القرارات */}
+              <section className="section">
+                <div className="section-head">
+                  <div className="section-title-wrap">
+                    <div className="section-icon" style={{ background: 'var(--coral-light)', color: 'var(--coral-deep)' }}>⚖️</div>
+                    <div className="section-title">
+                      <div className="section-title-text">قرارات</div>
+                      <div className="section-subtitle">{decisions.length} معلقة</div>
+                    </div>
+                  </div>
                 </div>
-              </div>
-            </div>
-            <CalendarMini upcomingEvents={upcomingEvents} brands={brands} />
-          </section>
+                <DecisionsPanel decisions={decisions} brands={brands} />
+              </section>
 
-          {/* القرارات */}
-          <section className="section">
-            <div className="section-head">
-              <div className="section-title-wrap">
-                <div className="section-icon" style={{ background: 'var(--coral-light)', color: 'var(--coral-deep)' }}>⚖️</div>
-                <div className="section-title">
-                  <div className="section-title-text">قرارات</div>
-                  <div className="section-subtitle">{decisions.length} معلقة</div>
-                </div>
-              </div>
-            </div>
-            <DecisionsPanel decisions={decisions} brands={brands} />
-          </section>
+              {/* الفريق */}
+              {employees.length > 0 && (
+                <section className="section">
+                  <div className="section-head">
+                    <div className="section-title-wrap">
+                      <div className="section-icon" style={{ background: 'var(--lavender-light)', color: '#7B5AD8' }}>👥</div>
+                      <div className="section-title">
+                        <div className="section-title-text">الفريق</div>
+                        <div className="section-subtitle">{employees.length} موظف</div>
+                      </div>
+                    </div>
+                    <Link href="/team" className="section-link">عرض الكل →</Link>
+                  </div>
+                  <div className="team-grid">
+                    {employees.slice(0, 6).map((e) => (
+                      <div key={e.id} className="team-card">
+                        <div className="team-avatar">{e.name.charAt(0)}</div>
+                        <div className="team-name">{e.name}</div>
+                        <div className="team-role">{e.role}</div>
+                        <span className={`team-status ${e.status === 'active' ? 'active' : ''}`}>
+                          {e.status === 'active' ? 'نشط' : e.status === 'on_leave' ? 'إجازة' : 'غير نشط'}
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+                </section>
+              )}
 
-        </div>{/* end Triple Panel */}
+            </div>{/* end عمود رئيسي */}
 
-        {/* ── Team Section (كامل العرض) ─────────────────────────────────────── */}
-        {employees.length > 0 && (
-          <section className="section">
-            <div className="section-head">
-              <div className="section-title-wrap">
-                <div className="section-icon" style={{ background: 'var(--lavender-light)', color: '#7B5AD8' }}>👥</div>
-                <div className="section-title">
-                  <div className="section-title-text">الفريق</div>
-                  <div className="section-subtitle">{employees.length} موظف</div>
+            {/* العمود الجانبي: التقويم + الوارد */}
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
+
+              {/* التقويم */}
+              <section className="section">
+                <div className="section-head">
+                  <div className="section-title-wrap">
+                    <div className="section-icon" style={{ background: 'var(--sky-light)', color: 'var(--sky-deep)' }}>📅</div>
+                    <div className="section-title">
+                      <div className="section-title-text">{MONTH_NAMES[d.getMonth()]}</div>
+                      <div className="section-subtitle">{upcomingEvents.length} أحداث قادمة</div>
+                    </div>
+                  </div>
                 </div>
-              </div>
-              <Link href="/team" className="section-link">عرض الكل →</Link>
-            </div>
-            <div className="team-grid">
-              {employees.slice(0, 6).map((e) => (
-                <div key={e.id} className="team-card">
-                  <div className="team-avatar">{e.name.charAt(0)}</div>
-                  <div className="team-name">{e.name}</div>
-                  <div className="team-role">{e.role}</div>
-                  <span className={`team-status ${e.status === 'active' ? 'active' : ''}`}>
-                    {e.status === 'active' ? 'نشط' : e.status === 'on_leave' ? 'إجازة' : 'غير نشط'}
-                  </span>
+                <CalendarMini upcomingEvents={upcomingEvents} brands={brands} />
+              </section>
+
+              {/* الوارد */}
+              <section className="section">
+                <div className="section-head">
+                  <div className="section-title-wrap">
+                    <div className="section-icon" style={{ background: 'var(--lavender-light)', color: '#7B5AD8' }}>💡</div>
+                    <div className="section-title">
+                      <div className="section-title-text">الوارد</div>
+                      <div className="section-subtitle">أفكار سريعة</div>
+                    </div>
+                  </div>
                 </div>
-              ))}
-            </div>
-          </section>
-        )}
+                <InboxPanel inboxTasks={inboxTasks} />
+              </section>
+
+            </div>{/* end عمود جانبي */}
+
+          </div>{/* end grid عمودين */}
+
+        </div>{/* end المحتوى الرئيسي */}
+
 
       </main>
 
