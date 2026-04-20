@@ -558,7 +558,7 @@ function FocusHero({
   // Recharge mode
   if (todayFocus?.targetType === 'recharge') {
     return (
-      <section className="focus-hero recharge" style={{ marginLeft: -24, marginRight: 0, borderRadius: 0 }}>
+      <section className="focus-hero recharge" style={{ borderRadius: 0, marginLeft: -24, marginRight: -24 }}>
         <div className="focus-content">
           <div>
             <div className="focus-label">
@@ -577,7 +577,7 @@ function FocusHero({
   // No focus
   if (!todayFocus) {
     return (
-      <section className="focus-hero no-focus" style={{ marginLeft: -24, marginRight: 0, borderRadius: 0 }}>
+      <section className="focus-hero no-focus" style={{ borderRadius: 0, marginLeft: -24, marginRight: -24 }}>
         <div className="focus-content">
           <div>
             <div className="focus-label">
@@ -619,7 +619,7 @@ function FocusHero({
     ].slice(0, 3);
 
     return (
-      <section className="focus-hero" style={{ borderTop: `4px solid ${taskColor}`, marginLeft: -24, marginRight: 0, borderRadius: 0 }}>
+      <section className="focus-hero" style={{ borderTop: `4px solid ${taskColor}`, borderRadius: 0, marginLeft: -24, marginRight: -24 }}>
         <div className="focus-content">
           <div style={{ flex: 1 }}>
             <div className="focus-label">
@@ -660,7 +660,7 @@ function FocusHero({
 
   // Main focus view
   return (
-    <section className="focus-hero" style={{ borderTop: `4px solid ${color}`, marginLeft: -24, marginRight: 0, borderRadius: 0 }}>
+    <section className="focus-hero" style={{ borderTop: `4px solid ${color}`, borderRadius: 0, marginLeft: -24, marginRight: -24 }}>
       <div className="focus-content">
         <div style={{ flex: 1 }}>
           <div className="focus-label">
@@ -906,8 +906,8 @@ export default function LeadershipClient({
     <div className="app" style={{ direction: 'rtl' }}>
       <main className="main">
 
-        {/* ── Greeting ─────────────────────────────────────────────────────── */}
-        <div className="greeting">
+        {/* ── Greeting ────────────────────────────────────────────────────── */}
+        <div className="greeting" style={{ padding: '24px 24px 0' }}>
           <div className="greeting-title">
             <span className="greeting-emoji">👋</span>
             <div className="greeting-text">
@@ -930,7 +930,7 @@ export default function LeadershipClient({
         </div>
 
         {/* ── المحتوى الرئيسي ─────────────────────────────────────────────────── */}
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 20, padding: '0 24px 24px' }}>
 
           {/* FocusHero — كامل العرض */}
           <FocusHero
