@@ -49,10 +49,10 @@ export default function LayoutShell({ children, sidebar }: LayoutShellProps) {
     return 'Ghazi OS';
   })();
 
-  // صفحة تسجيل الدخول — لا تحتاج Sidebar
-  const isLoginPage = currentPath === '/login';
+  // صفحات بدون Sidebar خارجي (تحتوي على sidebar داخلي خاص)
+  const isFullWidthPage = currentPath === '/login' || currentPath.startsWith('/leadership');
 
-  if (isLoginPage) {
+  if (isFullWidthPage) {
     return <>{children}</>;
   }
 
