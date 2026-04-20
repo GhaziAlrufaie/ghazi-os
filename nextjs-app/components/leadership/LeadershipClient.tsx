@@ -929,42 +929,6 @@ export default function LeadershipClient({
           </div>
         </div>
 
-        {/* ── Hero Stats: 4 بطاقات إحصائية ────────────────────────────────── */}
-        <div className="hero-stats">
-          <div className="stat-card coral">
-            <div className="stat-head">
-              <div className="stat-icon">✅</div>
-              <span className="stat-trend up">↑ نشط</span>
-            </div>
-            <div className="stat-value">{activeTasks.length}</div>
-            <div className="stat-label">المهام النشطة</div>
-          </div>
-          <div className="stat-card sky">
-            <div className="stat-head">
-              <div className="stat-icon">💰</div>
-              <span className="stat-trend up">↑ اليوم</span>
-            </div>
-            <div className="stat-value">{todaySales.toLocaleString('ar-SA')}</div>
-            <div className="stat-label">المبيعات اليوم</div>
-          </div>
-          <div className="stat-card mint">
-            <div className="stat-head">
-              <div className="stat-icon">⚖️</div>
-              <span className="stat-trend down">معلقة</span>
-            </div>
-            <div className="stat-value">{decisions.length}</div>
-            <div className="stat-label">القرارات</div>
-          </div>
-          <div className="stat-card sunshine">
-            <div className="stat-head">
-              <div className="stat-icon">🏷️</div>
-              <span className="stat-trend up">↑ براند</span>
-            </div>
-            <div className="stat-value">{brands.length}</div>
-            <div className="stat-label">البراندات</div>
-          </div>
-        </div>
-
         {/* ── Focus Hero ───────────────────────────────────────────────────── */}
         <FocusHero
           todayFocus={todayFocus}
