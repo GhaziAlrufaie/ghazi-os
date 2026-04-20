@@ -955,7 +955,15 @@ export default function LeadershipClient({
           />
 
           {/* Grid عمودين */}
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 300px', gap: 20 }}>
+          <div style={{
+            display: 'grid',
+            gridTemplateColumns: '1fr 300px',
+            gap: 20,
+            marginLeft: -24,
+            marginRight: 'calc(-24px - 220px)',
+            width: 'calc(100% + 24px + 220px + 24px)',
+            padding: '0 24px'
+          }}>
 
             {/* العمود الرئيسي: Daily Tasks + Decisions + Team */}
             <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
