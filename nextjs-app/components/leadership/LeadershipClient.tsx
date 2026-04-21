@@ -555,6 +555,10 @@ function FocusHero({
 
   const selectedTask = selectedTaskId ? sorted.find(t => t.id === selectedTaskId) ?? null : null;
 
+  console.log('todayFocus:', todayFocus);
+  console.log('activeTasks count:', activeTasks.length);
+  console.log('sorted count:', sorted.length);
+
   // Recharge mode
   if (todayFocus?.targetType === 'recharge') {
     return (
