@@ -346,13 +346,15 @@ body::before {
 
 .focus-hero {
   position: relative;
-  padding: 28px 36px;
+  padding: 28px 36px 28px;
   min-height: 235px;
   background: var(--sunrise-gradient);
   border-radius: 20px;
-  overflow: visible;
+  overflow: hidden;
   box-shadow: 0 8px 32px rgba(255, 107, 107, 0.2);
   color: white;
+  display: flex;
+  flex-direction: column;
 }
 
 /* Decorative elements */
@@ -381,11 +383,11 @@ body::before {
 .focus-content {
   position: relative;
   z-index: 2;
-  display: grid;
-  grid-template-columns: 1fr auto;
-  align-items: center;
-  gap: 32px;
-  height: 100%;
+  display: flex;
+  flex-direction: row-reverse;
+  align-items: flex-start;
+  gap: 20px;
+  width: 100%;
 }
 
 .focus-label {
@@ -1566,7 +1568,7 @@ body::before {
 .focus-progress-bar { flex: 1; height: 6px; background: rgba(255,255,255,0.3); border-radius: 10px; overflow: hidden; }
 .focus-progress-fill { height: 6px; border-radius: 10px; background: white; transition: width 0.3s; }
 .focus-progress-label { font-size: 11px; opacity: 0.9; white-space: nowrap; }
-.focus-tasks { margin-top: 16px; border-top: 1px solid rgba(255,255,255,0.3); padding-top: 12px; }
+.focus-tasks { position: relative; z-index: 2; margin-top: 16px; border-top: 1px solid rgba(255,255,255,0.3); padding-top: 12px; display: flex; flex-direction: column; gap: 6px; }
 .focus-tasks-label { font-size: 11px; font-weight: 700; opacity: 0.8; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 8px; }
 .focus-task-item { width: 100%; display: flex; align-items: center; gap: 8px; padding: 8px 12px; background: rgba(255,255,255,0.2); backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.3); border-radius: 10px; cursor: pointer; margin-bottom: 6px; text-align: right; direction: rtl; transition: all 0.15s; font-family: inherit; color: white; font-size: 13px; }
 .focus-task-item:hover { background: rgba(255,255,255,0.3); }
