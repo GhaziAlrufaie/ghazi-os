@@ -16,7 +16,7 @@ async function getData(id: string) {
     supabase.from('projects').select('*').eq('id', id).single(),
     supabase
       .from('tasks')
-      .select('id,title,description,status,priority,due_date,brand_id,project_id,sort_order')
+      .select('id,title,description,status,priority,due_date,brand_id,project_id,sort_order,subtasks')
       .eq('project_id', id)
       .order('sort_order'),
     supabase.from('brands').select('id,name,name_en,color,icon,status,health_score,description,production_days,nav_order,main_tab_label').order('nav_order'),
@@ -51,6 +51,7 @@ async function getData(id: string) {
     projectId: row.project_id ?? null,
     sortOrder: row.sort_order ?? 0,
     hasDescription: !!(row.description?.trim()),
+    subtasks: Array.isArray(row.subtasks) ? row.subtasks : [],
   }));
 
   const brands: BrandRow[] = (brandsRes.data ?? []).map((b) => ({
