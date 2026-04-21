@@ -2,17 +2,11 @@
 // TaskPanel — لوحة تفاصيل المهمة الجانبية
 // Side drawer من اليمين — مطابق لـ index.html الأصلي
 import React, { useState, useEffect, useRef } from 'react';
-import type { Task, TaskStatus, TaskPriority } from '@/lib/tasks-actions';
+import type { Task, TaskStatus, TaskPriority, SubtaskItem } from '@/lib/tasks-actions';
 import { updateTask, deleteTask, archiveTask } from '@/lib/tasks-actions';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 interface BrandRow { id: string; name: string; color: string; }
-
-interface SubtaskItem {
-  id: string;
-  title: string;
-  done: boolean;
-}
 
 interface ActivityItem {
   id: string;
@@ -136,7 +130,10 @@ export default function TaskPanel({ task, onClose, onUpdate, onDelete, onArchive
     setStatus(task.status);
     setPriority(task.priority);
     setDueDate(task.dueDate ?? '');
-    setSubtasks([]);
+    // تحميل subtasks من Supabase
+    setSubtasks(Array.isArray((task as Task & { subtasks?: SubtaskItem[] }).subtasks)
+      ? ((task as Task & { subtasks?: SubtaskItem[] }).subtasks as SubtaskItem[])
+      : []);
     setActivity([]);
     setComment('');
     setTags([]);
@@ -207,23 +204,29 @@ export default function TaskPanel({ task, onClose, onUpdate, onDelete, onArchive
   function removeLink(id: string) { setLinks((prev) => prev.filter((l) => l.id !== id)); }
 
   // ── Subtasks ──
-  function addSubtask() {
+  async function addSubtask() {
     if (!newSt.trim()) return;
     const st: SubtaskItem = {
       id: `st_${Date.now()}`,
       title: newSt.trim(),
       done: false,
     };
-    setSubtasks((prev) => [...prev, st]);
+    const updated = [...subtasks, st];
+    setSubtasks(updated);
     setNewSt('');
+    await updateTask({ id: task!.id, subtasks: updated });
   }
 
-  function toggleSubtask(id: string) {
-    setSubtasks((prev) => prev.map((s) => s.id === id ? { ...s, done: !s.done } : s));
+  async function toggleSubtask(id: string) {
+    const updated = subtasks.map((s) => s.id === id ? { ...s, done: !s.done } : s);
+    setSubtasks(updated);
+    await updateTask({ id: task!.id, subtasks: updated });
   }
 
-  function removeSubtask(id: string) {
-    setSubtasks((prev) => prev.filter((s) => s.id !== id));
+  async function removeSubtask(id: string) {
+    const updated = subtasks.filter((s) => s.id !== id);
+    setSubtasks(updated);
+    await updateTask({ id: task!.id, subtasks: updated });
   }
 
   // ── Activity ──
