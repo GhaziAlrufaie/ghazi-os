@@ -348,10 +348,9 @@ body::before {
   position: relative;
   padding: 28px 36px;
   min-height: 235px;
-  max-height: 235px;
   background: var(--sunrise-gradient);
   border-radius: 20px;
-  overflow: hidden;
+  overflow: visible;
   box-shadow: 0 8px 32px rgba(255, 107, 107, 0.2);
   color: white;
 }
