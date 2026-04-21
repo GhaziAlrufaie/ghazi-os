@@ -1178,3 +1178,27 @@ textarea { resize: vertical; min-height: 80px; }
 .tp-brand-mini-name { font-size: 13px; font-weight: 700; color: var(--txt); }
 .tp-brand-mini-sub { font-size: 11px; color: var(--txt3); margin-top: 1px; }
 .tp-brand-mini-arrow { margin-right: auto; color: var(--txt3); font-size: 14px; }
+
+/* ── SubtaskGroups sg-* CSS — task-detail-v2 ── */
+.sg-add-group-btn { margin-right: auto; background: none; border: none; font-family: inherit; font-size: 11px; color: var(--danger, #EF4444); cursor: pointer; font-weight: 700; padding: 4px 10px; border-radius: 8px; transition: all 0.15s; }
+.sg-add-group-btn:hover { background: #FEE2E2; color: #DC2626; }
+.sg-group { border-bottom: 1px solid #F5EFE6; margin: 0 4px; }
+.sg-group:last-child { border-bottom: none; }
+.sg-header { display: flex; align-items: center; gap: 8px; padding: 10px 16px; cursor: pointer; border-radius: 10px; transition: background 0.15s; }
+.sg-header:hover { background: var(--bg2); }
+.sg-arrow { font-size: 12px; color: var(--txt3); transition: transform 0.2s; flex-shrink: 0; width: 14px; }
+.sg-name { flex: 1; border: none; outline: none; background: transparent; font-family: inherit; font-size: 13px; font-weight: 700; color: var(--txt); direction: rtl; cursor: pointer; }
+.sg-name:focus { cursor: text; }
+.sg-badge { font-size: 10px; font-weight: 700; color: var(--txt3); background: var(--bg2); padding: 2px 7px; border-radius: 20px; border: 1px solid var(--brd); flex-shrink: 0; }
+.sg-btn { width: 22px; height: 22px; border-radius: 6px; border: 1px solid var(--brd); background: var(--bg2); font-size: 12px; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.15s; flex-shrink: 0; opacity: 0; }
+.sg-header:hover .sg-btn { opacity: 1; }
+.sg-add-step:hover { background: #F0FFF4; border-color: var(--success); color: #15803D; }
+.sg-del:hover { background: #FEE2E2; border-color: #EF4444; color: #DC2626; }
+.sg-steps { padding: 4px 16px 10px 16px; display: flex; flex-direction: column; gap: 2px; }
+.sg-step-row { display: flex; align-items: center; gap: 8px; padding: 6px 4px; border-radius: 8px; transition: background 0.15s; direction: rtl; }
+.sg-step-row:hover { background: var(--bg2); }
+.sg-step-row:hover .tp-sub-del { opacity: 1; }
+.sg-conn { display: flex; flex-direction: column; align-items: center; width: 14px; flex-shrink: 0; margin-right: 8px; align-self: stretch; }
+.sg-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--brd); flex-shrink: 0; margin-top: 6px; }
+.sg-line { width: 2px; flex: 1; background: var(--brd); min-height: 16px; }
+.sg-line.last { background: transparent; }
