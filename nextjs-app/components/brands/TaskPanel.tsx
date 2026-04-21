@@ -139,14 +139,16 @@ function GroupRing({ done, total }: { done: number; total: number }) {
 // ─── SubtaskGroup Component ───────────────────────────────────────────────────
 interface GroupProps {
   group: SubtaskGroup;
+  newStepId: string | null;           // id of the step that needs auto-focus
   onToggleCollapse: (gid: string) => void;
   onRename: (gid: string, name: string) => void;
   onDelete: (gid: string) => void;
   onAddStep: (gid: string) => void;
   onToggleStep: (gid: string, sid: string) => void;
   onDeleteStep: (gid: string, sid: string) => void;
+  onRenameStep: (gid: string, sid: string, title: string) => void;
 }
-function SubtaskGroupRow({ group, onToggleCollapse, onRename, onDelete, onAddStep, onToggleStep, onDeleteStep }: GroupProps) {
+function SubtaskGroupRow({ group, newStepId, onToggleCollapse, onRename, onDelete, onAddStep, onToggleStep, onDeleteStep, onRenameStep }: GroupProps) {
   const done = group.steps.filter((s) => s.done).length;
   const total = group.steps.length;
   return (
@@ -171,6 +173,7 @@ function SubtaskGroupRow({ group, onToggleCollapse, onRename, onDelete, onAddSte
         <div className="sg-steps">
           {group.steps.map((step, idx) => {
             const isLast = idx === group.steps.length - 1;
+            const isNew = step.id === newStepId;
             return (
               <div key={step.id} className="sg-step-row">
                 {/* Connector */}
@@ -181,11 +184,25 @@ function SubtaskGroupRow({ group, onToggleCollapse, onRename, onDelete, onAddSte
                 {/* Checkbox */}
                 <div
                   className={`tp-sub-cb${step.done ? ' done' : ''}`}
-                  onClick={() => onToggleStep(group.id, step.id)}>
+                  onClick={() => !isNew && onToggleStep(group.id, step.id)}>
                   {step.done && <span style={{ color: '#fff', fontSize: 10, fontWeight: 700 }}>✓</span>}
                 </div>
-                {/* Text */}
-                <span className={`tp-sub-text${step.done ? ' done' : ''}`}>{step.title}</span>
+                {/* Inline editable title */}
+                <input
+                  className={`sg-step-input${step.done ? ' done' : ''}`}
+                  value={step.title}
+                  autoFocus={isNew}
+                  placeholder="اكتب الخطوة..."
+                  onChange={(e) => onRenameStep(group.id, step.id, e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter') (e.target as HTMLInputElement).blur();
+                    if (e.key === 'Escape') {
+                      if (!step.title.trim()) onDeleteStep(group.id, step.id);
+                      else (e.target as HTMLInputElement).blur();
+                    }
+                  }}
+                  onBlur={() => { if (!step.title.trim()) onDeleteStep(group.id, step.id); }}
+                />
                 {/* Delete */}
                 <button className="tp-sub-del" onClick={() => onDeleteStep(group.id, step.id)}>✕</button>
               </div>
@@ -208,6 +225,7 @@ export default function TaskPanel({ task, brands, onClose, onUpdate, onDelete, o
   const [priority, setPriority] = useState<TaskPriority>('medium');
   const [dueDate, setDueDate]   = useState('');
   const [groups, setGroups]     = useState<SubtaskGroup[]>([]);
+  const [newStepId, setNewStepId] = useState<string | null>(null);
   const [activity, setActivity] = useState<ActivityItem[]>([]);
   const [comment, setComment]   = useState('');
   const [tags, setTags]         = useState<string[]>([]);
@@ -336,19 +354,29 @@ export default function TaskPanel({ task, brands, onClose, onUpdate, onDelete, o
   }
 
   function addStep(gid: string) {
-    const title = ''; // will be set via inline input
-    const step: SubtaskItem = { id: `st_${Date.now()}`, title: 'مهمة جديدة', done: false };
+    const sid = `st_${Date.now()}`;
+    const step: SubtaskItem = { id: sid, title: '', done: false };
     const updated = groups.map((g) => g.id === gid
       ? { ...g, collapsed: false, steps: [...g.steps, step] }
+      : g
+    );
+    setGroups(updated);
+    setNewStepId(sid);
+    // Don't persist yet — will persist on blur/rename
+  }
+
+  function toggleStep(gid: string, sid: string) {
+    const updated = groups.map((g) => g.id === gid
+      ? { ...g, steps: g.steps.map((s) => s.id === sid ? { ...s, done: !s.done } : s) }
       : g
     );
     setGroups(updated);
     persistGroups(updated);
   }
 
-  function toggleStep(gid: string, sid: string) {
+  function renameStep(gid: string, sid: string, title: string) {
     const updated = groups.map((g) => g.id === gid
-      ? { ...g, steps: g.steps.map((s) => s.id === sid ? { ...s, done: !s.done } : s) }
+      ? { ...g, steps: g.steps.map((s) => s.id === sid ? { ...s, title } : s) }
       : g
     );
     setGroups(updated);
@@ -476,12 +504,14 @@ export default function TaskPanel({ task, brands, onClose, onUpdate, onDelete, o
                   <SubtaskGroupRow
                     key={group.id}
                     group={group}
+                    newStepId={newStepId}
                     onToggleCollapse={toggleCollapse}
                     onRename={renameGroup}
                     onDelete={deleteGroup}
                     onAddStep={addStep}
                     onToggleStep={toggleStep}
                     onDeleteStep={deleteStep}
+                    onRenameStep={renameStep}
                   />
                 ))}
                 {groups.length === 0 && (

@@ -1202,3 +1202,9 @@ textarea { resize: vertical; min-height: 80px; }
 .sg-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--brd); flex-shrink: 0; margin-top: 6px; }
 .sg-line { width: 2px; flex: 1; background: var(--brd); min-height: 16px; }
 .sg-line.last { background: transparent; }
+
+/* sg-step-input: inline editable step title */
+.sg-step-input { flex: 1; border: none; outline: none; background: transparent; font-family: inherit; font-size: 13px; font-weight: 500; color: var(--txt); direction: rtl; cursor: text; padding: 0; }
+.sg-step-input::placeholder { color: var(--txt3); font-style: italic; }
+.sg-step-input.done { text-decoration: line-through; color: var(--txt3); }
+.sg-step-input:focus { background: var(--bg2); border-radius: 4px; padding: 1px 4px; }
