@@ -19,6 +19,7 @@ export interface Task {
   sortOrder: number;
   hasDescription: boolean;
   subtasks: SubtaskItem[];
+  subtask_groups?: unknown[];
 }
 
 interface AddTaskInput {
@@ -65,6 +66,7 @@ export async function getTasks(): Promise<Task[]> {
     sortOrder: (r.sort_order as number) ?? 0,
     hasDescription: !!((r.description as string)?.trim()),
     subtasks: Array.isArray(r.subtasks) ? (r.subtasks as SubtaskItem[]) : [],
+    subtask_groups: Array.isArray(r.subtask_groups) ? r.subtask_groups : undefined,
   }));
 }
 
@@ -202,6 +204,7 @@ export async function getFinanceTasks(): Promise<Task[]> {
     sortOrder: (r.sort_order as number) ?? 0,
     hasDescription: !!((r.description as string)?.trim()),
     subtasks: Array.isArray(r.subtasks) ? (r.subtasks as SubtaskItem[]) : [],
+    subtask_groups: Array.isArray(r.subtask_groups) ? r.subtask_groups : undefined,
   }));
 }
 

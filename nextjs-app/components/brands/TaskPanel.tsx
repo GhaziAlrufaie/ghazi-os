@@ -763,11 +763,9 @@ export default function TaskPanel({ task, onClose, onUpdate, onDelete, onArchive
     setPriority(task.priority);
     setDueDate(task.dueDate ?? '');
     // تحميل subtasks من Supabase
-    setSubtasks(Array.isArray((task as Task & { subtasks?: SubtaskItem[] }).subtasks)
-      ? ((task as Task & { subtasks?: SubtaskItem[] }).subtasks as SubtaskItem[])
-      : []);
+    setSubtasks(Array.isArray(task.subtasks) ? (task.subtasks as SubtaskItem[]) : []);
     // تحميل subtask_groups من Supabase
-    const rawGroups = (task as Task & { subtask_groups?: SubtaskGroup[] }).subtask_groups;
+    const rawGroups = task.subtask_groups;
     setGroups(Array.isArray(rawGroups) ? rawGroups : []);
     setActivity([]);
     setComment('');
