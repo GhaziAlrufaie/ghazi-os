@@ -17,17 +17,11 @@ interface ActivityItem {
 
 interface LinkItem { id: string; url: string; label: string; }
 
-interface SubtaskStep {
-  id: string;
-  text: string;
-  done: boolean;
-}
-
 interface SubtaskGroup {
   id: string;
-  title: string;
+  name: string;
   collapsed: boolean;
-  steps: SubtaskStep[];
+  steps: SubtaskItem[];
 }
 
 // ─── Constants ────────────────────────────────────────────────────────────────
@@ -187,7 +181,7 @@ function SubtaskGroupsSection({
   function addGroup() {
     const newGroup: SubtaskGroup = {
       id: `grp_${Date.now()}`,
-      title: 'مجموعة جديدة',
+      name: 'مجموعة جديدة',
       collapsed: false,
       steps: [],
     };
@@ -201,14 +195,14 @@ function SubtaskGroupsSection({
   function deleteGroup(gid: string) {
     onChange(groups.filter((g) => g.id !== gid));
   }
-  function updateGroupTitle(gid: string, title: string) {
-    onChange(groups.map((g) => g.id === gid ? { ...g, title } : g));
+  function updateGroupTitle(gid: string, name: string) {
+    onChange(groups.map((g) => g.id === gid ? { ...g, name } : g));
   }
   function toggleCollapse(gid: string) {
     onChange(groups.map((g) => g.id === gid ? { ...g, collapsed: !g.collapsed } : g));
   }
   function addStep(gid: string) {
-    const newStep: SubtaskStep = { id: `stp_${Date.now()}`, text: 'مهمة جديدة', done: false };
+    const newStep: SubtaskItem = { id: `stp_${Date.now()}`, title: 'مهمة جديدة', done: false };
     const updated = groups.map((g) =>
       g.id === gid ? { ...g, collapsed: false, steps: [...g.steps, newStep] } : g
     );
@@ -233,10 +227,10 @@ function SubtaskGroupsSection({
         : g
     ));
   }
-  function updateStepText(gid: string, sid: string, text: string) {
+  function updateStepText(gid: string, sid: string, title: string) {
     onChange(groups.map((g) =>
       g.id === gid
-        ? { ...g, steps: g.steps.map((s) => s.id === sid ? { ...s, text } : s) }
+        ? { ...g, steps: g.steps.map((s) => s.id === sid ? { ...s, title } : s) }
         : g
     ));
   }
@@ -417,7 +411,7 @@ function SubtaskGroupsSection({
               {/* Title input */}
               <input
                 className="sg-group-name"
-                value={group.title}
+                value={group.name}
                 onChange={(e) => updateGroupTitle(group.id, e.target.value)}
                 onClick={(e) => e.stopPropagation()}
                 style={{
@@ -502,7 +496,7 @@ function SubtaskGroupsSection({
                         direction: 'rtl', cursor: 'text',
                       }}
                     >
-                      {step.text}
+                      {step.title}
                     </span>
                     {/* Delete step */}
                     <button
@@ -596,11 +590,21 @@ export default function TaskPanel({ task, onClose, onUpdate, onDelete, onArchive
     setStatus(task.status);
     setPriority(task.priority);
     setDueDate(task.dueDate ?? '');
-    // تحميل subtasks من Supabase
-    setSubtasks(Array.isArray(task.subtasks) ? (task.subtasks as SubtaskItem[]) : []);
-    // تحميل subtask_groups من Supabase
-    const rawGroups = task.subtask_groups;
-    setGroups(Array.isArray(rawGroups) ? (rawGroups as SubtaskGroup[]) : []);
+    // تحميل subtasks من Supabase (مع دعم __groups marker)
+    const rawSubtasks = Array.isArray(task.subtasks) ? task.subtasks : [];
+    const firstItem = rawSubtasks[0] as (SubtaskItem & { __groups?: SubtaskGroup[] }) | undefined;
+    if (firstItem && firstItem.__groups) {
+      // البيانات محفوظة كـ marker: [{id:'__marker', __groups:[...]}]
+      setGroups(firstItem.__groups);
+      setSubtasks([]);
+    } else if (rawSubtasks.length > 0) {
+      // flat subtasks — نضعها في مجموعة افتراضية
+      setGroups([{ id: 'g_default', name: 'الخطوات', collapsed: false, steps: rawSubtasks }]);
+      setSubtasks([]);
+    } else {
+      setGroups([]);
+      setSubtasks([]);
+    }
     setActivity([]);
     setComment('');
     setTags([]);
@@ -673,8 +677,10 @@ export default function TaskPanel({ task, onClose, onUpdate, onDelete, onArchive
   // ── SubtaskGroups ──
   async function handleGroupsChange(updated: SubtaskGroup[]) {
     setGroups(updated);
-    // حفظ في Supabase — نستخدم subtask_groups column مباشرة
-    await updateTask({ id: task!.id, subtask_groups: updated });
+    // حفظ في Supabase — نستخدم subtasks column مع __groups marker (مطابق للموقع القديم)
+    const marker = [{ id: '__marker', title: '', done: false, __groups: updated }] as unknown as SubtaskItem[];
+    await updateTask({ id: task!.id, subtasks: marker });
+    onUpdate({ subtasks: marker });
   }
 
   // ── Activity ──
