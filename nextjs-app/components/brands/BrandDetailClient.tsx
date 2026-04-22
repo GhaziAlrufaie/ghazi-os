@@ -147,6 +147,10 @@ function TaskCard({ task, project, index, colColor, brandColor, brandLight, isDo
           className={`bb-task-card${snapshot.isDragging ? ' dragging' : ''}${isDoneCol ? ' done' : ''}`}
           style={{
             ...provided.draggableProps.style,
+            position: snapshot.isDragging ? 'fixed' : 'relative',
+            transform: snapshot.isDragging
+              ? provided.draggableProps.style?.transform
+              : 'none',
             borderRight,
             cursor: 'pointer',
           }}
