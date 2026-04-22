@@ -160,7 +160,7 @@ function TaskCard({ task, project, index, colColor, brandColor, brandLight, isDo
           {/* Title row */}
           <div className="bb-task-top">
             <div className="bb-task-checkbox" style={{ borderColor: colColor }} />
-            <div className="bb-task-title">{task.title}</div>
+            <div className="bb-task-title" title={task.title}>{task.title}</div>
           </div>
 
           {/* Badges */}
