@@ -147,10 +147,6 @@ function TaskCard({ task, project, index, colColor, brandColor, brandLight, isDo
           className={`bb-task-card${snapshot.isDragging ? ' dragging' : ''}${isDoneCol ? ' done' : ''}`}
           style={{
             ...provided.draggableProps.style,
-            position: snapshot.isDragging ? 'fixed' : 'relative',
-            transform: snapshot.isDragging
-              ? provided.draggableProps.style?.transform
-              : 'none',
             borderRight,
             cursor: 'pointer',
           }}
@@ -280,7 +276,7 @@ function KanbanCol({ col, tasks, projects, brandId, brandColor, brandLight, acti
                 onClick={onCardClick}
               />
             ))}
-            <div style={{ display: 'none' }}>{provided.placeholder}</div>
+            {provided.placeholder}
           </div>
         )}
       </Droppable>
