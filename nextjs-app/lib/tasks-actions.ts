@@ -50,7 +50,7 @@ export async function getTasks(): Promise<Task[]> {
   const supabase = createServerClient();
   const { data } = await supabase
     .from('tasks')
-    .select('id,title,description,status,priority,due_date,brand_id,project_id,sort_order,subtasks')
+    .select('id,title,description,status,priority,due_date,brand_id,project_id,sort_order,subtasks,subtask_groups')
     .order('sort_order');
   return (data ?? []).map(r => ({
     id: r.id as string,
@@ -89,7 +89,7 @@ export async function addTask(
       project_id: input.projectId ?? null,
       sort_order: 0,
     })
-    .select('id,title,description,status,priority,due_date,brand_id,project_id,sort_order,subtasks')
+    .select('id,title,description,status,priority,due_date,brand_id,project_id,sort_order,subtasks,subtask_groups')
     .single();
 
   if (error) return { error: error.message };
@@ -130,7 +130,7 @@ export async function updateTask(
     .from('tasks')
     .update(patch)
     .eq('id', input.id)
-    .select('id,title,description,status,priority,due_date,brand_id,project_id,sort_order,subtasks')
+    .select('id,title,description,status,priority,due_date,brand_id,project_id,sort_order,subtasks,subtask_groups')
     .single();
 
   if (error) return { error: error.message };
@@ -185,7 +185,7 @@ export async function getFinanceTasks(): Promise<Task[]> {
   const supabase = createServerClient();
   const { data } = await supabase
     .from('tasks')
-    .select('id,title,description,status,priority,due_date,brand_id,project_id,sort_order,category,subtasks')
+    .select('id,title,description,status,priority,due_date,brand_id,project_id,sort_order,category,subtasks,subtask_groups')
     .eq('category', 'financial')
     .order('sort_order');
   return (data ?? []).map(r => ({
@@ -221,7 +221,7 @@ export async function addFinanceTask(
       sort_order: 0,
       category: 'financial',
     })
-    .select('id,title,description,status,priority,due_date,brand_id,project_id,sort_order,subtasks')
+    .select('id,title,description,status,priority,due_date,brand_id,project_id,sort_order,subtasks,subtask_groups')
     .single();
   if (error) return { error: error.message };
   revalidatePath('/finance');
