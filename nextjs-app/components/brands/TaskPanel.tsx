@@ -842,10 +842,7 @@ export default function TaskPanel({ task, onClose, onUpdate, onDelete, onArchive
   async function handleGroupsChange(updated: SubtaskGroup[]) {
     setGroups(updated);
     // حفظ في Supabase — نستخدم subtask_groups column مباشرة
-    await (updateTask as (input: { id: string; subtask_groups?: SubtaskGroup[] }) => Promise<unknown>)({
-      id: task!.id,
-      subtask_groups: updated,
-    });
+    await updateTask({ id: task!.id, subtask_groups: updated });
   }
 
   // ── Activity ──

@@ -44,6 +44,7 @@ interface UpdateTaskInput {
   dueDate?: string | null;
   sortOrder?: number;
   subtasks?: SubtaskItem[];
+  subtask_groups?: unknown[];
 }
 
 export async function getTasks(): Promise<Task[]> {
@@ -125,6 +126,7 @@ export async function updateTask(
   if (input.dueDate !== undefined)     patch.due_date = input.dueDate;
   if (input.sortOrder !== undefined)   patch.sort_order = input.sortOrder;
   if (input.subtasks !== undefined)    patch.subtasks = input.subtasks;
+  if (input.subtask_groups !== undefined) patch.subtask_groups = input.subtask_groups;
 
   const { data, error } = await supabase
     .from('tasks')
