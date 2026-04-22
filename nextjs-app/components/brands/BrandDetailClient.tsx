@@ -1,9 +1,14 @@
 'use client';
 // BrandDetailClient — تصميم brand-board.html
 // Header strip + Kanban 4 cols + Ideas section
-// HTML5 native drag & drop (no react-beautiful-dnd)
-import React, { useState, useCallback, useRef } from 'react';
+import React, { useState, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
+import {
+  DragDropContext,
+  Droppable,
+  Draggable,
+  type DropResult,
+} from '@hello-pangea/dnd';
 import type { BrandRow } from '@/lib/brands-types';
 import type { Task, TaskStatus, TaskPriority } from '@/lib/tasks-actions';
 import { addTask, updateTask, deleteTask, archiveTask, restoreTask } from '@/lib/tasks-actions';
@@ -109,6 +114,7 @@ function PriPicker({ onSelect, onClose }: { onSelect: (p: TaskPriority) => void;
 interface TaskCardProps {
   task: Task;
   project: ProjectRow | undefined;
+  index: number;
   colColor: string;
   brandColor: string;
   brandLight: string;
@@ -116,9 +122,8 @@ interface TaskCardProps {
   onArchive: (id: string) => void;
   onDelete: (id: string) => void;
   onClick: (task: Task) => void;
-  onDragStart: (e: React.DragEvent, taskId: string) => void;
 }
-function TaskCard({ task, project, colColor, brandColor, brandLight, isDoneCol, onArchive, onDelete, onClick, onDragStart }: TaskCardProps) {
+function TaskCard({ task, project, index, colColor, brandColor, brandLight, isDoneCol, onArchive, onDelete, onClick }: TaskCardProps) {
   const overdue  = isOverdue(task);
   const dueLabel = daysLeftLabel(task.dueDate);
   const dateStr  = formatDate(task.dueDate);
@@ -133,51 +138,60 @@ function TaskCard({ task, project, colColor, brandColor, brandLight, isDoneCol, 
     : task.priority === 'high' ? `3px solid #F59E0B` : undefined;
 
   return (
-    <div
-      draggable="true"
-      onDragStart={(e) => onDragStart(e, task.id)}
-      className={`bb-task-card${isDoneCol ? ' done' : ''}`}
-      style={{ borderRight, cursor: 'grab' }}
-      onClick={() => onClick(task)}>
-      {/* Quick actions */}
-      <div className="ptc-actions" onClick={(e) => e.stopPropagation()}>
-        <button className="ptc-btn arch" title="أرشفة" onClick={() => onArchive(task.id)}>🗄️</button>
-        <button className="ptc-btn del"  title="حذف"   onClick={() => onDelete(task.id)}>🗑️</button>
-      </div>
-
-      {/* Title row */}
-      <div className="bb-task-top">
-        <div className="bb-task-checkbox" style={{ borderColor: colColor }} />
-        <div className="bb-task-title" title={task.title}>{task.title}</div>
-      </div>
-
-      {/* Badges */}
-      <div className="bb-task-badges">
-        <span className={`bb-badge ${PRIORITY_BADGE_CLASS[task.priority]}`}>{PRIORITY_LABELS[task.priority]}</span>
-        {project && <span className="bb-badge bb-badge-project" style={{ background: `${brandColor}18`, color: brandColor }}>{project.title}</span>}
-      </div>
-
-      {/* Subtasks progress */}
-      {totalSub > 0 && (
-        <div className="bb-task-progress">
-          <div className="bb-progress-bar">
-            <div className="bb-progress-fill" style={{ width: `${subPct}%`, background: brandColor }} />
+    <Draggable draggableId={task.id} index={index}>
+      {(provided, snapshot) => (
+        <div
+          ref={provided.innerRef}
+          {...provided.draggableProps}
+          {...provided.dragHandleProps}
+          className={`bb-task-card${snapshot.isDragging ? ' dragging' : ''}${isDoneCol ? ' done' : ''}`}
+          style={{
+            ...provided.draggableProps.style,
+            borderRight,
+            cursor: 'pointer',
+          }}
+          onClick={() => onClick(task)}>
+          {/* Quick actions */}
+          <div className="ptc-actions" onClick={(e) => e.stopPropagation()}>
+            <button className="ptc-btn arch" title="أرشفة" onClick={() => onArchive(task.id)}>🗄️</button>
+            <button className="ptc-btn del"  title="حذف"   onClick={() => onDelete(task.id)}>🗑️</button>
           </div>
-          <div className="bb-progress-label">{doneSub} / {totalSub} مهام فرعية</div>
-        </div>
-      )}
 
-      {/* Meta */}
-      {(task.dueDate || overdue) && (
-        <div className="bb-task-meta">
-          {task.dueDate && <div className="bb-meta-item">📅 <span>{dateStr}</span></div>}
-          {overdue
-            ? <div className="bb-meta-item" style={{ color: '#EF4444' }}>⚠️ <span>{dueLabel}</span></div>
-            : task.dueDate && <div className="bb-meta-item">⏰ <span>{dueLabel}</span></div>
-          }
+          {/* Title row */}
+          <div className="bb-task-top">
+            <div className="bb-task-checkbox" style={{ borderColor: colColor }} />
+            <div className="bb-task-title">{task.title}</div>
+          </div>
+
+          {/* Badges */}
+          <div className="bb-task-badges">
+            <span className={`bb-badge ${PRIORITY_BADGE_CLASS[task.priority]}`}>{PRIORITY_LABELS[task.priority]}</span>
+            {project && <span className="bb-badge bb-badge-project" style={{ background: `${brandColor}18`, color: brandColor }}>{project.title}</span>}
+          </div>
+
+          {/* Subtasks progress */}
+          {totalSub > 0 && (
+            <div className="bb-task-progress">
+              <div className="bb-progress-bar">
+                <div className="bb-progress-fill" style={{ width: `${subPct}%`, background: brandColor }} />
+              </div>
+              <div className="bb-progress-label">{doneSub} / {totalSub} مهام فرعية</div>
+            </div>
+          )}
+
+          {/* Meta */}
+          {(task.dueDate || overdue) && (
+            <div className="bb-task-meta">
+              {task.dueDate && <div className="bb-meta-item">📅 <span>{dateStr}</span></div>}
+              {overdue
+                ? <div className="bb-meta-item" style={{ color: '#EF4444' }}>⚠️ <span>{dueLabel}</span></div>
+                : task.dueDate && <div className="bb-meta-item">⏰ <span>{dueLabel}</span></div>
+              }
+            </div>
+          )}
         </div>
       )}
-    </div>
+    </Draggable>
   );
 }
 
@@ -194,14 +208,11 @@ interface KanbanColProps {
   onDelete: (id: string) => void;
   onAdd: (task: Task) => void;
   onCardClick: (task: Task) => void;
-  onDragStart: (e: React.DragEvent, taskId: string) => void;
-  onDrop: (e: React.DragEvent, colId: TaskStatus) => void;
 }
-function KanbanCol({ col, tasks, projects, brandId, brandColor, brandLight, activeProjectId, onArchive, onDelete, onAdd, onCardClick, onDragStart, onDrop }: KanbanColProps) {
+function KanbanCol({ col, tasks, projects, brandId, brandColor, brandLight, activeProjectId, onArchive, onDelete, onAdd, onCardClick }: KanbanColProps) {
   const [value, setValue]     = useState('');
   const [showPri, setShowPri] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [dragOver, setDragOver] = useState(false);
   const isDoneCol = col.id === 'done';
 
   async function handleAdd(priority: TaskPriority) {
@@ -227,22 +238,6 @@ function KanbanCol({ col, tasks, projects, brandId, brandColor, brandLight, acti
     if (e.key === 'Enter' && value.trim()) setShowPri(true);
   }
 
-  function handleDragOver(e: React.DragEvent) {
-    e.preventDefault();
-    e.dataTransfer.dropEffect = 'move';
-    setDragOver(true);
-  }
-
-  function handleDragLeave() {
-    setDragOver(false);
-  }
-
-  function handleDrop(e: React.DragEvent) {
-    e.preventDefault();
-    setDragOver(false);
-    onDrop(e, col.id);
-  }
-
   return (
     <div className="bb-col">
       {/* Column header */}
@@ -253,34 +248,38 @@ function KanbanCol({ col, tasks, projects, brandId, brandColor, brandLight, acti
       </div>
 
       {/* Cards */}
-      <div
-        className="bb-col-body"
-        onDragOver={handleDragOver}
-        onDragLeave={handleDragLeave}
-        onDrop={handleDrop}
-        style={{ background: dragOver ? `${brandColor}08` : undefined }}>
-        {tasks.length === 0 && (
-          <div className="bb-col-empty">
-            <div style={{ fontSize: 24, marginBottom: 6 }}>{isDoneCol ? '📭' : '🎉'}</div>
-            <div>{isDoneCol ? 'لا توجد مهام منجزة بعد' : 'لا توجد مهام'}</div>
+      <Droppable droppableId={col.id}>
+        {(provided, snapshot) => (
+          <div
+            ref={provided.innerRef}
+            {...provided.droppableProps}
+            className="bb-col-body"
+            style={{ background: snapshot.isDraggingOver ? `${brandColor}08` : undefined }}>
+            {tasks.length === 0 && (
+              <div className="bb-col-empty">
+                <div style={{ fontSize: 24, marginBottom: 6 }}>{isDoneCol ? '📭' : '🎉'}</div>
+                <div>{isDoneCol ? 'لا توجد مهام منجزة بعد' : 'لا توجد مهام'}</div>
+              </div>
+            )}
+            {tasks.map((task, index) => (
+              <TaskCard
+                key={task.id}
+                task={task}
+                project={projects.find((p) => p.id === task.projectId)}
+                index={index}
+                colColor={col.color}
+                brandColor={brandColor}
+                brandLight={brandLight}
+                isDoneCol={isDoneCol}
+                onArchive={onArchive}
+                onDelete={onDelete}
+                onClick={onCardClick}
+              />
+            ))}
+            {provided.placeholder}
           </div>
         )}
-        {tasks.map((task) => (
-          <TaskCard
-            key={task.id}
-            task={task}
-            project={projects.find((p) => p.id === task.projectId)}
-            colColor={col.color}
-            brandColor={brandColor}
-            brandLight={brandLight}
-            isDoneCol={isDoneCol}
-            onArchive={onArchive}
-            onDelete={onDelete}
-            onClick={onCardClick}
-            onDragStart={onDragStart}
-          />
-        ))}
-      </div>
+      </Droppable>
 
       {/* Quick add */}
       <div style={{ position: 'relative' }}>
@@ -319,31 +318,18 @@ export default function BrandDetailClient({ brand: initialBrand, initialTasks, i
   const [menuOpen, setMenuOpen]               = useState(false);
   const [panelTask, setPanelTask]             = useState<Task | null>(null);
   const [showAddModal, setShowAddModal]       = useState(false);
-  const dragTaskIdRef = useRef<string | null>(null);
 
   const bc = getBrandColor(brand);
 
-  // ── HTML5 Drag & Drop ──
-  const handleDragStart = useCallback((e: React.DragEvent, taskId: string) => {
-    dragTaskIdRef.current = taskId;
-    e.dataTransfer.effectAllowed = 'move';
-    e.dataTransfer.setData('text/plain', taskId);
-    // Add dragging class after a tick
-    const el = e.currentTarget as HTMLElement;
-    requestAnimationFrame(() => el.classList.add('dragging'));
-  }, []);
-
-  const handleDrop = useCallback(async (_e: React.DragEvent, newStatus: TaskStatus) => {
-    const taskId = dragTaskIdRef.current;
-    if (!taskId) return;
-    dragTaskIdRef.current = null;
-
-    const task = tasks.find((t) => t.id === taskId);
+  // ── Drag & Drop ──
+  const onDragEnd = useCallback(async (result: DropResult) => {
+    const { draggableId, destination } = result;
+    if (!destination) return;
+    const newStatus = destination.droppableId as TaskStatus;
+    const task = tasks.find((t) => t.id === draggableId);
     if (!task || task.status === newStatus) return;
-
-    // Optimistic update
-    setTasks((prev) => prev.map((t) => t.id === taskId ? { ...t, status: newStatus } : t));
-    await updateTask({ id: taskId, status: newStatus });
+    setTasks((prev) => prev.map((t) => t.id === draggableId ? { ...t, status: newStatus } : t));
+    await updateTask({ id: draggableId, status: newStatus });
   }, [tasks]);
 
   // ── Task actions ──
@@ -484,26 +470,26 @@ export default function BrandDetailClient({ brand: initialBrand, initialTasks, i
 
       {/* ── Board Area ── */}
       <div className="bb-board-area">
-        <div className="bb-board-cols">
-          {KANBAN_COLS.map((col) => (
-            <KanbanCol
-              key={col.id}
-              col={col}
-              tasks={visibleTasks.filter((t) => t.status === col.id)}
-              projects={projects}
-              brandId={brand.id}
-              brandColor={bc.color}
-              brandLight={bc.light}
-              activeProjectId={activeProjectId}
-              onArchive={handleArchive}
-              onDelete={handleDelete}
-              onAdd={handleAdd}
-              onCardClick={(task) => setPanelTask(task)}
-              onDragStart={handleDragStart}
-              onDrop={handleDrop}
-            />
-          ))}
-        </div>
+        <DragDropContext onDragEnd={onDragEnd}>
+          <div className="bb-board-cols">
+            {KANBAN_COLS.map((col) => (
+              <KanbanCol
+                key={col.id}
+                col={col}
+                tasks={visibleTasks.filter((t) => t.status === col.id)}
+                projects={projects}
+                brandId={brand.id}
+                brandColor={bc.color}
+                brandLight={bc.light}
+                activeProjectId={activeProjectId}
+                onArchive={handleArchive}
+                onDelete={handleDelete}
+                onAdd={handleAdd}
+                onCardClick={(task) => setPanelTask(task)}
+              />
+            ))}
+          </div>
+        </DragDropContext>
 
         {/* ── Ideas Section ── */}
         <div className="bb-ideas-section">
