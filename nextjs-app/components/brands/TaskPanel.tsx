@@ -745,7 +745,6 @@ export default function TaskPanel({ task, onClose, onUpdate, onDelete, onArchive
   const [priority, setPriority] = useState<TaskPriority>('medium');
   const [dueDate, setDueDate]   = useState('');
   const [subtasks, setSubtasks] = useState<SubtaskItem[]>([]);
-  const [newSt, setNewSt]       = useState('');
   const [activity, setActivity] = useState<ActivityItem[]>([]);
   const [comment, setComment]   = useState('');
   const [tags, setTags]         = useState<string[]>([]);
@@ -839,32 +838,6 @@ export default function TaskPanel({ task, onClose, onUpdate, onDelete, onArchive
   }
   function removeLink(id: string) { setLinks((prev) => prev.filter((l) => l.id !== id)); }
 
-  // ── Subtasks (flat) ──
-  async function addSubtask() {
-    if (!newSt.trim()) return;
-    const st: SubtaskItem = {
-      id: `st_${Date.now()}`,
-      title: newSt.trim(),
-      done: false,
-    };
-    const updated = [...subtasks, st];
-    setSubtasks(updated);
-    setNewSt('');
-    await updateTask({ id: task!.id, subtasks: updated });
-  }
-
-  async function toggleSubtask(id: string) {
-    const updated = subtasks.map((s) => s.id === id ? { ...s, done: !s.done } : s);
-    setSubtasks(updated);
-    await updateTask({ id: task!.id, subtasks: updated });
-  }
-
-  async function removeSubtask(id: string) {
-    const updated = subtasks.filter((s) => s.id !== id);
-    setSubtasks(updated);
-    await updateTask({ id: task!.id, subtasks: updated });
-  }
-
   // ── SubtaskGroups ──
   async function handleGroupsChange(updated: SubtaskGroup[]) {
     setGroups(updated);
@@ -900,7 +873,6 @@ export default function TaskPanel({ task, onClose, onUpdate, onDelete, onArchive
   }
 
   const stDone = subtasks.filter((s) => s.done).length;
-  const stPct = subtasks.length > 0 ? Math.round((stDone / subtasks.length) * 100) : 0;
 
   // حساب الإجمالي الكلي (flat subtasks + group steps)
   const allGroupSteps = groups.reduce((acc, g) => acc + g.steps.length, 0);
