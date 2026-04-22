@@ -3,7 +3,7 @@
 // Side drawer من اليمين — مطابق لـ index.html الأصلي
 import React, { useState, useEffect, useRef } from 'react';
 import type { Task, TaskStatus, TaskPriority, SubtaskItem } from '@/lib/tasks-actions';
-import { updateTask, deleteTask, archiveTask } from '@/lib/tasks-actions';
+import { updateTask } from '@/lib/tasks-actions';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 interface BrandRow { id: string; name: string; color: string; }
@@ -16,6 +16,19 @@ interface ActivityItem {
 }
 
 interface LinkItem { id: string; url: string; label: string; }
+
+interface SubtaskStep {
+  id: string;
+  text: string;
+  done: boolean;
+}
+
+interface SubtaskGroup {
+  id: string;
+  title: string;
+  collapsed: boolean;
+  steps: SubtaskStep[];
+}
 
 // ─── Constants ────────────────────────────────────────────────────────────────
 const STATUS_CHIPS: { v: TaskStatus; lbl: string; color: string }[] = [
@@ -105,6 +118,366 @@ function Dropdown<T extends string>({
   );
 }
 
+// ─── GroupRing SVG ─────────────────────────────────────────────────────────────
+function GroupRing({ done, total }: { done: number; total: number }) {
+  const r = 8;
+  const circ = 2 * Math.PI * r;
+  const pct = total > 0 ? done / total : 0;
+  const offset = circ * (1 - pct);
+  const color = pct === 1 ? '#22c55e' : pct > 0 ? '#4D96FF' : '#EDE0CC';
+
+  return (
+    <svg width="22" height="22" viewBox="0 0 22 22" style={{ flexShrink: 0 }}>
+      <circle cx="11" cy="11" r={r} fill="none" stroke="#EDE0CC" strokeWidth="2.5" />
+      {pct > 0 && (
+        <circle
+          cx="11" cy="11" r={r}
+          fill="none"
+          stroke={color}
+          strokeWidth="2.5"
+          strokeDasharray={circ}
+          strokeDashoffset={offset}
+          strokeLinecap="round"
+          transform="rotate(-90 11 11)"
+        />
+      )}
+    </svg>
+  );
+}
+
+// ─── SubtaskGroupsSection ──────────────────────────────────────────────────────
+function SubtaskGroupsSection({
+  groups,
+  onChange,
+}: {
+  groups: SubtaskGroup[];
+  onChange: (groups: SubtaskGroup[]) => void;
+}) {
+  // حساب الإجمالي لكل المجموعات
+  const totalSteps = groups.reduce((acc, g) => acc + g.steps.length, 0);
+  const doneSteps  = groups.reduce((acc, g) => acc + g.steps.filter((s) => s.done).length, 0);
+  const pct = totalSteps > 0 ? Math.round((doneSteps / totalSteps) * 100) : 0;
+
+  function addGroup() {
+    const newGroup: SubtaskGroup = {
+      id: `grp_${Date.now()}`,
+      title: 'مجموعة جديدة',
+      collapsed: false,
+      steps: [],
+    };
+    onChange([...groups, newGroup]);
+    // Focus the title after render
+    setTimeout(() => {
+      const inputs = document.querySelectorAll<HTMLInputElement>('.sg-group-name');
+      const last = inputs[inputs.length - 1];
+      if (last) { last.focus(); last.select(); }
+    }, 50);
+  }
+
+  function deleteGroup(gid: string) {
+    onChange(groups.filter((g) => g.id !== gid));
+  }
+
+  function updateGroupTitle(gid: string, title: string) {
+    onChange(groups.map((g) => g.id === gid ? { ...g, title } : g));
+  }
+
+  function toggleCollapse(gid: string) {
+    onChange(groups.map((g) => g.id === gid ? { ...g, collapsed: !g.collapsed } : g));
+  }
+
+  function addStep(gid: string) {
+    const newStep: SubtaskStep = { id: `stp_${Date.now()}`, text: 'مهمة جديدة', done: false };
+    const updated = groups.map((g) =>
+      g.id === gid ? { ...g, collapsed: false, steps: [...g.steps, newStep] } : g
+    );
+    onChange(updated);
+    setTimeout(() => {
+      const spans = document.querySelectorAll<HTMLSpanElement>(`[data-group="${gid}"] .sg-step-text`);
+      const last = spans[spans.length - 1];
+      if (last) {
+        last.focus();
+        const range = document.createRange();
+        const sel = window.getSelection();
+        range.selectNodeContents(last);
+        sel?.removeAllRanges();
+        sel?.addRange(range);
+      }
+    }, 50);
+  }
+
+  function toggleStep(gid: string, sid: string) {
+    onChange(groups.map((g) =>
+      g.id === gid
+        ? { ...g, steps: g.steps.map((s) => s.id === sid ? { ...s, done: !s.done } : s) }
+        : g
+    ));
+  }
+
+  function updateStepText(gid: string, sid: string, text: string) {
+    onChange(groups.map((g) =>
+      g.id === gid
+        ? { ...g, steps: g.steps.map((s) => s.id === sid ? { ...s, text } : s) }
+        : g
+    ));
+  }
+
+  function deleteStep(gid: string, sid: string) {
+    onChange(groups.map((g) =>
+      g.id === gid ? { ...g, steps: g.steps.filter((s) => s.id !== sid) } : g
+    ));
+  }
+
+  return (
+    <div style={{ marginTop: 16 }}>
+      {/* Header */}
+      <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 8 }}>
+        <span className="tp-section-label" style={{ margin: 0, flex: 1 }}>✅ المهام الفرعية</span>
+        {totalSteps > 0 && (
+          <span style={{
+            fontFamily: 'monospace', fontSize: 11, fontWeight: 700,
+            color: 'var(--txt3)', background: 'rgba(255,255,255,0.05)',
+            padding: '2px 8px', borderRadius: 20, border: '1px solid rgba(255,255,255,0.08)',
+          }}>
+            {doneSteps}/{totalSteps}
+          </span>
+        )}
+        <button
+          onClick={addGroup}
+          style={{
+            background: 'none', border: 'none', fontFamily: 'inherit',
+            fontSize: 11, color: 'var(--accent)', cursor: 'pointer',
+            fontWeight: 700, padding: '4px 10px', borderRadius: 8,
+            transition: 'all 0.15s',
+          }}
+          onMouseEnter={(e) => (e.currentTarget.style.background = 'rgba(255,107,107,0.1)')}
+          onMouseLeave={(e) => (e.currentTarget.style.background = 'none')}
+        >
+          + مجموعة
+        </button>
+      </div>
+
+      {/* Progress bar */}
+      {totalSteps > 0 && (
+        <div style={{ height: 6, background: 'rgba(255,255,255,0.06)', borderRadius: 6, overflow: 'hidden', marginBottom: 12 }}>
+          <div style={{
+            height: '100%', borderRadius: 6,
+            background: pct === 100 ? '#22c55e' : 'linear-gradient(90deg, #FF6B6B, #FFD93D)',
+            width: `${pct}%`, transition: 'width 0.4s ease',
+          }} />
+        </div>
+      )}
+
+      {/* Groups */}
+      {groups.map((group) => {
+        const gDone  = group.steps.filter((s) => s.done).length;
+        const gTotal = group.steps.length;
+
+        return (
+          <div
+            key={group.id}
+            data-group={group.id}
+            style={{
+              borderBottom: '1px solid rgba(255,255,255,0.06)',
+              marginBottom: 2,
+            }}
+          >
+            {/* Group Header */}
+            <div
+              className="sg-group-header"
+              onClick={() => toggleCollapse(group.id)}
+              style={{
+                display: 'flex', alignItems: 'center', gap: 8,
+                padding: '8px 12px', cursor: 'pointer', borderRadius: 10,
+                transition: 'background 0.15s',
+              }}
+              onMouseEnter={(e) => (e.currentTarget.style.background = 'rgba(255,255,255,0.04)')}
+              onMouseLeave={(e) => (e.currentTarget.style.background = 'transparent')}
+            >
+              {/* Arrow */}
+              <span style={{
+                fontSize: 11, color: 'var(--txt3)', flexShrink: 0, width: 14,
+                transition: 'transform 0.2s',
+                transform: group.collapsed ? 'rotate(-90deg)' : 'rotate(0deg)',
+                display: 'inline-block',
+              }}>▾</span>
+
+              {/* Ring */}
+              <GroupRing done={gDone} total={gTotal} />
+
+              {/* Title */}
+              <input
+                className="sg-group-name"
+                value={group.title}
+                onClick={(e) => e.stopPropagation()}
+                onChange={(e) => updateGroupTitle(group.id, e.target.value)}
+                style={{
+                  flex: 1, border: 'none', outline: 'none',
+                  background: 'transparent', fontFamily: 'inherit',
+                  fontSize: 13, fontWeight: 700, color: 'var(--txt)',
+                  direction: 'rtl', cursor: 'pointer',
+                }}
+                onFocus={(e) => (e.currentTarget.style.cursor = 'text')}
+                onBlur={(e) => (e.currentTarget.style.cursor = 'pointer')}
+              />
+
+              {/* Badge */}
+              <span style={{
+                fontFamily: 'monospace', fontSize: 10, fontWeight: 700,
+                color: 'var(--txt3)', background: 'rgba(255,255,255,0.05)',
+                padding: '2px 7px', borderRadius: 20,
+                border: '1px solid rgba(255,255,255,0.08)', flexShrink: 0,
+              }}>
+                {gDone}/{gTotal}
+              </span>
+
+              {/* Add step btn */}
+              <button
+                onClick={(e) => { e.stopPropagation(); addStep(group.id); }}
+                className="sg-g-btn"
+                style={{
+                  width: 22, height: 22, borderRadius: 6,
+                  border: '1px solid rgba(255,255,255,0.1)',
+                  background: 'rgba(255,255,255,0.04)',
+                  fontSize: 13, cursor: 'pointer',
+                  display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  transition: 'all 0.15s', flexShrink: 0,
+                  color: 'var(--txt2)',
+                }}
+                title="إضافة خطوة"
+              >+</button>
+
+              {/* Delete group btn */}
+              <button
+                onClick={(e) => { e.stopPropagation(); deleteGroup(group.id); }}
+                className="sg-g-btn"
+                style={{
+                  width: 22, height: 22, borderRadius: 6,
+                  border: '1px solid rgba(255,255,255,0.1)',
+                  background: 'rgba(255,255,255,0.04)',
+                  fontSize: 11, cursor: 'pointer',
+                  display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  transition: 'all 0.15s', flexShrink: 0,
+                  color: 'var(--txt3)',
+                }}
+                title="حذف المجموعة"
+                onMouseEnter={(e) => { e.currentTarget.style.background = 'rgba(239,68,68,0.15)'; e.currentTarget.style.color = '#ef4444'; }}
+                onMouseLeave={(e) => { e.currentTarget.style.background = 'rgba(255,255,255,0.04)'; e.currentTarget.style.color = 'var(--txt3)'; }}
+              >✕</button>
+            </div>
+
+            {/* Steps */}
+            {!group.collapsed && (
+              <div style={{ padding: '4px 12px 10px 12px', display: 'flex', flexDirection: 'column', gap: 2 }}>
+                {group.steps.map((step, idx) => {
+                  const isLast = idx === group.steps.length - 1;
+                  return (
+                    <div
+                      key={step.id}
+                      className="sg-step-row"
+                      style={{
+                        display: 'flex', alignItems: 'center', gap: 8,
+                        padding: '6px 4px', borderRadius: 8,
+                        transition: 'background 0.15s', direction: 'rtl',
+                        position: 'relative',
+                      }}
+                      onMouseEnter={(e) => (e.currentTarget.style.background = 'rgba(255,255,255,0.04)')}
+                      onMouseLeave={(e) => (e.currentTarget.style.background = 'transparent')}
+                    >
+                      {/* Connector */}
+                      <div style={{
+                        display: 'flex', flexDirection: 'column', alignItems: 'center',
+                        width: 14, flexShrink: 0, marginRight: 8, alignSelf: 'stretch',
+                      }}>
+                        <div style={{
+                          width: 7, height: 7, borderRadius: '50%',
+                          background: 'rgba(255,255,255,0.15)', flexShrink: 0, marginTop: 6,
+                        }} />
+                        <div style={{
+                          width: 2, flex: 1,
+                          background: isLast ? 'transparent' : 'rgba(255,255,255,0.1)',
+                          minHeight: 16,
+                        }} />
+                      </div>
+
+                      {/* Checkbox */}
+                      <div
+                        onClick={() => toggleStep(group.id, step.id)}
+                        style={{
+                          width: 18, height: 18, borderRadius: 5, flexShrink: 0,
+                          border: step.done ? 'none' : '2px solid rgba(255,255,255,0.2)',
+                          background: step.done ? '#22c55e' : 'transparent',
+                          display: 'flex', alignItems: 'center', justifyContent: 'center',
+                          cursor: 'pointer', transition: 'all 0.2s',
+                        }}
+                      >
+                        {step.done && <span style={{ color: '#fff', fontSize: 10, fontWeight: 700 }}>✓</span>}
+                      </div>
+
+                      {/* Text */}
+                      <span
+                        className="sg-step-text"
+                        contentEditable
+                        suppressContentEditableWarning
+                        onBlur={(e) => {
+                          const text = e.currentTarget.textContent?.trim() || '';
+                          if (!text) { deleteStep(group.id, step.id); return; }
+                          updateStepText(group.id, step.id, text);
+                        }}
+                        style={{
+                          flex: 1, outline: 'none', fontSize: 13,
+                          color: step.done ? 'var(--txt3)' : 'var(--txt)',
+                          textDecoration: step.done ? 'line-through' : 'none',
+                          direction: 'rtl', cursor: 'text',
+                        }}
+                      >
+                        {step.text}
+                      </span>
+
+                      {/* Delete step btn */}
+                      <button
+                        onClick={() => deleteStep(group.id, step.id)}
+                        className="sg-step-del"
+                        style={{
+                          background: 'none', border: 'none', cursor: 'pointer',
+                          color: 'var(--txt3)', fontSize: 10, padding: '2px 4px',
+                          opacity: 0, transition: 'opacity 0.15s',
+                          borderRadius: 4,
+                        }}
+                      >✕</button>
+                    </div>
+                  );
+                })}
+
+                {/* Empty state */}
+                {group.steps.length === 0 && (
+                  <div
+                    onClick={() => addStep(group.id)}
+                    style={{
+                      padding: '8px 22px', fontSize: 12, color: 'var(--txt3)',
+                      cursor: 'pointer', borderRadius: 8, transition: 'background 0.15s',
+                    }}
+                    onMouseEnter={(e) => (e.currentTarget.style.background = 'rgba(255,255,255,0.04)')}
+                    onMouseLeave={(e) => (e.currentTarget.style.background = 'transparent')}
+                  >
+                    + أضف خطوة
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
+        );
+      })}
+
+      {/* Inline CSS for hover effects */}
+      <style>{`
+        .sg-step-row:hover .sg-step-del { opacity: 1 !important; }
+        .sg-group-header:hover .sg-g-btn { opacity: 1 !important; }
+      `}</style>
+    </div>
+  );
+}
+
 // ─── Main TaskPanel ───────────────────────────────────────────────────────────
 export default function TaskPanel({ task, onClose, onUpdate, onDelete, onArchive }: TaskPanelProps) {
   const [title, setTitle]       = useState('');
@@ -121,6 +494,7 @@ export default function TaskPanel({ task, onClose, onUpdate, onDelete, onArchive
   const [links, setLinks]       = useState<LinkItem[]>([]);
   const [newLink, setNewLink]   = useState({ url: '', label: '' });
   const [showLinkForm, setShowLinkForm] = useState(false);
+  const [groups, setGroups]     = useState<SubtaskGroup[]>([]);
 
   // Sync state when task changes
   useEffect(() => {
@@ -134,6 +508,9 @@ export default function TaskPanel({ task, onClose, onUpdate, onDelete, onArchive
     setSubtasks(Array.isArray((task as Task & { subtasks?: SubtaskItem[] }).subtasks)
       ? ((task as Task & { subtasks?: SubtaskItem[] }).subtasks as SubtaskItem[])
       : []);
+    // تحميل subtask_groups من Supabase
+    const rawGroups = (task as Task & { subtask_groups?: SubtaskGroup[] }).subtask_groups;
+    setGroups(Array.isArray(rawGroups) ? rawGroups : []);
     setActivity([]);
     setComment('');
     setTags([]);
@@ -203,7 +580,7 @@ export default function TaskPanel({ task, onClose, onUpdate, onDelete, onArchive
   }
   function removeLink(id: string) { setLinks((prev) => prev.filter((l) => l.id !== id)); }
 
-  // ── Subtasks ──
+  // ── Subtasks (flat) ──
   async function addSubtask() {
     if (!newSt.trim()) return;
     const st: SubtaskItem = {
@@ -227,6 +604,16 @@ export default function TaskPanel({ task, onClose, onUpdate, onDelete, onArchive
     const updated = subtasks.filter((s) => s.id !== id);
     setSubtasks(updated);
     await updateTask({ id: task!.id, subtasks: updated });
+  }
+
+  // ── SubtaskGroups ──
+  async function handleGroupsChange(updated: SubtaskGroup[]) {
+    setGroups(updated);
+    // حفظ في Supabase — نستخدم subtask_groups column مباشرة
+    await (updateTask as (input: { id: string; subtask_groups?: SubtaskGroup[] }) => Promise<unknown>)({
+      id: task!.id,
+      subtask_groups: updated,
+    });
   }
 
   // ── Activity ──
@@ -255,6 +642,13 @@ export default function TaskPanel({ task, onClose, onUpdate, onDelete, onArchive
 
   const stDone = subtasks.filter((s) => s.done).length;
   const stPct = subtasks.length > 0 ? Math.round((stDone / subtasks.length) * 100) : 0;
+
+  // حساب الإجمالي الكلي (flat subtasks + group steps)
+  const allGroupSteps = groups.reduce((acc, g) => acc + g.steps.length, 0);
+  const allGroupDone  = groups.reduce((acc, g) => acc + g.steps.filter((s) => s.done).length, 0);
+  const totalAll = subtasks.length + allGroupSteps;
+  const doneAll  = stDone + allGroupDone;
+  const pctAll   = totalAll > 0 ? Math.round((doneAll / totalAll) * 100) : 0;
 
   return (
     <>
@@ -315,7 +709,7 @@ export default function TaskPanel({ task, onClose, onUpdate, onDelete, onArchive
             <div className="tp-section-label" style={{ marginTop: 16 }}>🏷️ التصنيفات</div>
             <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6, marginBottom: 8 }}>
               {tags.map((tag) => (
-                <span key={tag} style={{ display: 'inline-flex', alignItems: 'center', gap: 4, padding: '2px 8px', borderRadius: 12, fontSize: 11, background: 'rgba(201,168,76,0.15)', color: 'var(--gold)', border: '1px solid rgba(201,168,76,0.25)' }}>
+                <span key={tag} style={{ display: 'flex', alignItems: 'center', gap: 4, padding: '3px 8px', borderRadius: 20, background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.1)', fontSize: 11, color: 'var(--txt2)' }}>
                   #{tag}
                   <button onClick={() => removeTag(tag)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--txt3)', padding: 0, fontSize: 10 }}>✕</button>
                 </span>
@@ -348,10 +742,10 @@ export default function TaskPanel({ task, onClose, onUpdate, onDelete, onArchive
               <button className="btn btn-sm btn-plain" onClick={() => setShowLinkForm(true)}>+ رابط جديد</button>
             )}
 
-            {/* Subtasks */}
-            <div className="tp-section-label" style={{ marginTop: 16 }}>✅ الخطوات</div>
+            {/* Flat Subtasks (القديمة) */}
             {subtasks.length > 0 && (
               <>
+                <div className="tp-section-label" style={{ marginTop: 16 }}>📋 الخطوات</div>
                 <div className="tp-st-progress">
                   <div className="tp-st-progress-fill" style={{ width: `${stPct}%` }} />
                 </div>
@@ -366,16 +760,22 @@ export default function TaskPanel({ task, onClose, onUpdate, onDelete, onArchive
                     <button className="tp-st-del" onClick={() => removeSubtask(st.id)}>✕</button>
                   </div>
                 ))}
+                <div className="tp-st-add">
+                  <input
+                    value={newSt}
+                    onChange={(e) => setNewSt(e.target.value)}
+                    onKeyDown={(e) => { if (e.key === 'Enter') addSubtask(); }}
+                    placeholder="+ أضف خطوة... اضغط Enter"
+                  />
+                </div>
               </>
             )}
-            <div className="tp-st-add">
-              <input
-                value={newSt}
-                onChange={(e) => setNewSt(e.target.value)}
-                onKeyDown={(e) => { if (e.key === 'Enter') addSubtask(); }}
-                placeholder="+ أضف خطوة... اضغط Enter"
-              />
-            </div>
+
+            {/* SubtaskGroups — النظام الجديد */}
+            <SubtaskGroupsSection
+              groups={groups}
+              onChange={handleGroupsChange}
+            />
 
             {/* Activity */}
             <div className="tp-section-label" style={{ marginTop: 24 }}>💬 النشاط</div>
@@ -441,6 +841,28 @@ export default function TaskPanel({ task, onClose, onUpdate, onDelete, onArchive
               value={dueDate}
               onChange={(e) => changeDueDate(e.target.value)}
             />
+
+            {/* Progress summary */}
+            {totalAll > 0 && (
+              <div style={{ marginTop: 16 }}>
+                <div className="tp-section-label">📊 التقدم الكلي</div>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginTop: 6 }}>
+                  <div style={{ flex: 1, height: 6, background: 'rgba(255,255,255,0.06)', borderRadius: 6, overflow: 'hidden' }}>
+                    <div style={{
+                      height: '100%', borderRadius: 6,
+                      background: pctAll === 100 ? '#22c55e' : 'linear-gradient(90deg, #FF6B6B, #FFD93D)',
+                      width: `${pctAll}%`, transition: 'width 0.4s ease',
+                    }} />
+                  </div>
+                  <span style={{ fontFamily: 'monospace', fontSize: 12, fontWeight: 700, color: 'var(--txt2)', minWidth: 36 }}>
+                    {pctAll}%
+                  </span>
+                </div>
+                <div style={{ fontSize: 11, color: 'var(--txt3)', marginTop: 4 }}>
+                  {doneAll} من {totalAll} خطوة مكتملة
+                </div>
+              </div>
+            )}
 
             {/* Actions */}
             <div style={{ marginTop: 24, display: 'flex', flexDirection: 'column', gap: 6 }}>
