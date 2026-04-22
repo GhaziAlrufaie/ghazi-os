@@ -91,6 +91,7 @@ body {
 
 /* MAIN */
 .main { margin-right: 220px; min-height: 100vh; position: relative; z-index: 1; }
+.main:has(.bb-wrap) { height: calc(100dvh - 56px); overflow: hidden; min-height: unset; }
 
 .topbar { padding: 0 24px; height: 56px; border-bottom: 1px solid var(--brd); display: flex; align-items: center; justify-content: space-between; background: rgba(255,255,255,0.92); backdrop-filter: blur(20px); position: sticky; top: 0; z-index: 40; }
 .topbar h2 { font-size: 15px; font-weight: 700; }
