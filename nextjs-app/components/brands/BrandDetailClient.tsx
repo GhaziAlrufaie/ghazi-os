@@ -276,7 +276,7 @@ function KanbanCol({ col, tasks, projects, brandId, brandColor, brandLight, acti
                 onClick={onCardClick}
               />
             ))}
-            {provided.placeholder}
+            <div style={{ display: 'none' }}>{provided.placeholder}</div>
           </div>
         )}
       </Droppable>
