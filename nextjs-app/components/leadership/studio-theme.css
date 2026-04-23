@@ -1663,14 +1663,15 @@ body::before {
   border-radius: 16px;
 }
 
-/* Reset margins for mobile and fix triple panel */
+
+/* Desktop layout (Restore edge-to-edge) */
 .focus-hero,
 .weekly-compass-section,
 .daily-tasks-section,
 .triple-panel {
-  margin-left: 0;
-  margin-right: 0;
-  width: 100%;
+  margin-left: -24px;
+  margin-right: calc(-24px - 220px);
+  width: calc(100% + 24px + 220px + 24px);
 }
 
 .triple-panel {
@@ -1679,12 +1680,22 @@ body::before {
   gap: 20px;
 }
 
-@media (max-width: 900px) {
+/* Mobile fixes: Prevent off-screen overflow and GPU freezes */
+@media (max-width: 768px) {
+  .focus-hero,
+  .weekly-compass-section,
+  .daily-tasks-section,
+  .triple-panel {
+    margin-left: 0;
+    margin-right: 0;
+    width: 100%;
+  }
+
   .triple-panel {
     grid-template-columns: 1fr;
   }
 
-  /* Disable expensive GPU blur on mobile for buttery smooth scrolling */
+  /* Disable expensive GPU blur on mobile for smooth scrolling */
   .focus-task-item, .focus-icon-big, .focus-label {
     backdrop-filter: none !important;
     -webkit-backdrop-filter: none !important;
