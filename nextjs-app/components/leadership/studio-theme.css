@@ -1663,104 +1663,80 @@ body::before {
   border-radius: 16px;
 }
 
+/* =============================================================================
+   TRIPLE PANEL — Fixed height + internal scroll + responsive
+   ============================================================================= */
+.triple-panel {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20px;
+  align-items: start;
+}
 
-/* Desktop layout (Restore edge-to-edge) */
+/* Desktop: edge-to-edge stretch */
+.triple-panel,
 .focus-hero,
 .weekly-compass-section,
-.daily-tasks-section,
-.triple-panel {
+.daily-tasks-section {
   margin-left: -24px;
   margin-right: calc(-24px - 220px);
   width: calc(100% + 24px + 220px + 24px);
 }
 
-.triple-panel {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 20px;
-}
-
-/* Mobile fixes: Prevent off-screen overflow and GPU freezes */
-@media (max-width: 768px) {
-  .focus-hero,
-  .weekly-compass-section,
-  .daily-tasks-section,
-  .triple-panel {
-    margin-left: 0;
-    margin-right: 0;
-    width: 100%;
-  }
-
-  .triple-panel {
-    grid-template-columns: 1fr;
-  }
-
-  /* Disable expensive GPU blur on mobile for smooth scrolling */
-  .focus-task-item, .focus-icon-big, .focus-label {
-    backdrop-filter: none !important;
-    -webkit-backdrop-filter: none !important;
-    background: rgba(255, 255, 255, 0.15) !important;
-  }
-}
-
-/* ═══════════════════════════════════════════════════════════════════════════
-   BUG FIXES — Inbox dropdown overflow + triple panel height
-   ═══════════════════════════════════════════════════════════════════════════ */
-
-/* Bug 1: Allow dropdown to break out of clipping containers */
-.inbox-item,
-.inbox-list {
-  overflow: visible !important;
-}
+/* Fixed height for perfect visual symmetry */
 .triple-panel .section {
-  overflow: visible !important;
-}
-
-/* Bug 3: Triple panel columns stretch evenly */
-.triple-panel .section {
-  min-height: 420px;
-  height: 100%;
+  height: 420px;
+  min-width: 0;
   display: flex;
   flex-direction: column;
-}
-.triple-panel .section > div:last-child {
-  flex: 1;
+  overflow: hidden;
 }
 
-/* ═══════════════════════════════════════════════════════════════════════════
-   BUG FIX — Long text wrapping + triple panel height (Bug 1)
-   ═══════════════════════════════════════════════════════════════════════════ */
-.inbox-item {
-  min-width: 0;
-}
-.inbox-item-text {
-  flex: 1;
-  min-width: 0;
-  word-break: break-word;
-  white-space: pre-wrap;
-  line-height: 1.5;
-}
-.triple-panel .section {
-  display: flex;
-  flex-direction: column;
-  min-height: 420px;
-  height: 100%;
-}
+/* Scrollable inner content */
 .triple-panel .section > div:last-child {
   flex: 1;
   overflow-y: auto;
+  padding-right: 4px;
+  min-height: 0;
 }
 
-/* ═══════════════════════════════════════════════════════════════════════════
-   BUG FIX — Long unbroken text (no spaces) layout blowout
-   ═══════════════════════════════════════════════════════════════════════════ */
-.triple-panel .section {
-  min-width: 0;
-  overflow: hidden;
+/* Clean scrollbar */
+.triple-panel .section > div:last-child::-webkit-scrollbar {
+  width: 4px;
 }
+.triple-panel .section > div:last-child::-webkit-scrollbar-thumb {
+  background: var(--border-soft);
+  border-radius: 4px;
+}
+
+/* Long unbroken text fix */
 .inbox-item-text {
   word-break: break-all !important;
   overflow-wrap: anywhere !important;
   white-space: normal !important;
   min-width: 0;
+}
+
+/* Mobile: reset overflow + single column */
+@media (max-width: 900px) {
+  .triple-panel,
+  .focus-hero,
+  .weekly-compass-section,
+  .daily-tasks-section {
+    margin-left: 0;
+    margin-right: 0;
+    width: 100%;
+  }
+  .triple-panel {
+    grid-template-columns: 1fr;
+  }
+  .triple-panel .section {
+    height: auto;
+    min-height: 400px;
+  }
+  .focus-task-item, .focus-icon-big, .focus-label {
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+    background: rgba(255, 255, 255, 0.15) !important;
+  }
 }

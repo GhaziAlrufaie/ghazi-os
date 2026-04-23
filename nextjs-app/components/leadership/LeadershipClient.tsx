@@ -1160,8 +1160,8 @@ export default function LeadershipClient({
 
           {/* DailyTasks — كامل العرض */}
           <DailyTasksSection routines={dailyRoutines} />
-          {/* عمودان: القرارات + التقويم */}
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '20px', marginBottom: '20px' }}>
+          {/* ثلاثة أعمدة: القرارات + التقويم + الوارد */}
+          <div className="triple-panel">
             {/* القرارات */}
             <section className="section">
               <div className="section-head">
@@ -1188,20 +1188,20 @@ export default function LeadershipClient({
               </div>
               <CalendarMini upcomingEvents={upcomingEvents} brands={brands} />
             </section>
-          </div>
-          {/* الوارد — كامل العرض */}
-          <section className="section">
-            <div className="section-head">
-              <div className="section-title-wrap">
-                <div className="section-icon" style={{ background: 'var(--lavender-light)', color: '#7B5AD8' }}>💡</div>
-                <div className="section-title">
-                  <div className="section-title-text">الوارد</div>
-                  <div className="section-subtitle">أفكار سريعة</div>
+            {/* الوارد */}
+            <section className="section">
+              <div className="section-head">
+                <div className="section-title-wrap">
+                  <div className="section-icon" style={{ background: 'var(--lavender-light)', color: '#7B5AD8' }}>💡</div>
+                  <div className="section-title">
+                    <div className="section-title-text">الوارد</div>
+                    <div className="section-subtitle">أفكار سريعة</div>
+                  </div>
                 </div>
               </div>
-            </div>
-            <InboxPanel inboxTasks={inboxTasks} brands={brands} />
-          </section>
+              <InboxPanel inboxTasks={inboxTasks} brands={brands} />
+            </section>
+          </div>
 
           </div>{/* end padding wrapper */}
 
