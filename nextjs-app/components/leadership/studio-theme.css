@@ -1750,3 +1750,17 @@ body::before {
   flex: 1;
   overflow-y: auto;
 }
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   BUG FIX — Long unbroken text (no spaces) layout blowout
+   ═══════════════════════════════════════════════════════════════════════════ */
+.triple-panel .section {
+  min-width: 0;
+  overflow: hidden;
+}
+.inbox-item-text {
+  word-break: break-all !important;
+  overflow-wrap: anywhere !important;
+  white-space: normal !important;
+  min-width: 0;
+}

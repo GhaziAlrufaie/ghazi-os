@@ -42,8 +42,7 @@ export async function addInboxTask(
     .single();
 
   if (error) return { error: error.message };
-  revalidatePath('/inbox');
-  revalidatePath('/leadership');
+  revalidatePath('/', 'layout');
   return {
     task: {
       id: data.id,
@@ -64,8 +63,7 @@ export async function updateInboxTask(
     .eq('id', id);
 
   if (error) return { error: error.message };
-  revalidatePath('/inbox');
-  revalidatePath('/leadership');
+  revalidatePath('/', 'layout');
   return {};
 }
 
@@ -77,7 +75,6 @@ export async function deleteInboxTask(id: string): Promise<{ error?: string }> {
     .eq('id', id);
 
   if (error) return { error: error.message };
-  revalidatePath('/inbox');
-  revalidatePath('/leadership');
+  revalidatePath('/', 'layout');
   return {};
 }

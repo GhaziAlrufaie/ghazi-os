@@ -47,7 +47,7 @@ export async function addDecision(input: {
     updated_at: new Date().toISOString(),
   });
   if (error) throw new Error(error.message);
-  revalidatePath('/leadership');
+  revalidatePath('/', 'layout');
 }
 
 export async function updateDecision(id: string, input: {
@@ -71,14 +71,14 @@ export async function updateDecision(id: string, input: {
     updated_at: new Date().toISOString(),
   }).eq('id', id);
   if (error) throw new Error(error.message);
-  revalidatePath('/leadership');
+  revalidatePath('/', 'layout');
 }
 
 export async function deleteDecision(id: string) {
   const sb = getSupabase();
   const { error } = await sb.from('decisions').delete().eq('id', id);
   if (error) throw new Error(error.message);
-  revalidatePath('/leadership');
+  revalidatePath('/', 'layout');
 }
 
 // ─── Employees ───────────────────────────────────────────────────────────────
@@ -117,7 +117,7 @@ export async function addEmployee(input: {
     updated_at: new Date().toISOString(),
   });
   if (error) throw new Error(error.message);
-  revalidatePath('/leadership');
+  revalidatePath('/', 'layout');
 }
 
 export async function updateEmployee(id: string, input: {
@@ -141,12 +141,12 @@ export async function updateEmployee(id: string, input: {
     updated_at: new Date().toISOString(),
   }).eq('id', id);
   if (error) throw new Error(error.message);
-  revalidatePath('/leadership');
+  revalidatePath('/', 'layout');
 }
 
 export async function deleteEmployee(id: string) {
   const sb = getSupabase();
   const { error } = await sb.from('employees').delete().eq('id', id);
   if (error) throw new Error(error.message);
-  revalidatePath('/leadership');
+  revalidatePath('/', 'layout');
 }

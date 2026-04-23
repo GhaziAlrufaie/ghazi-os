@@ -93,8 +93,7 @@ export async function addTask(
     .single();
 
   if (error) return { error: error.message };
-  revalidatePath('/tasks');
-  revalidatePath('/leadership');
+  revalidatePath('/', 'layout');
 
   return {
     task: {
@@ -135,8 +134,7 @@ export async function updateTask(
     .single();
 
   if (error) return { error: error.message };
-  revalidatePath('/tasks');
-  revalidatePath('/leadership');
+  revalidatePath('/', 'layout');
 
   return {
     task: {
@@ -159,8 +157,7 @@ export async function deleteTask(id: string): Promise<{ error?: string }> {
   const supabase = createServerClient();
   const { error } = await supabase.from('tasks').delete().eq('id', id);
   if (error) return { error: error.message };
-  revalidatePath('/tasks');
-  revalidatePath('/leadership');
+  revalidatePath('/', 'layout');
   return {};
 }
 
@@ -178,9 +175,7 @@ export async function restoreTask(task: Task): Promise<{ error?: string }> {
     sort_order: task.sortOrder,
   });
   if (error) return { error: error.message };
-  revalidatePath('/tasks');
-  revalidatePath('/brands');
-  revalidatePath('/leadership');
+  revalidatePath('/', 'layout');
   return {};
 }
 
@@ -228,7 +223,7 @@ export async function addFinanceTask(
     .select('id,title,description,status,priority,due_date,brand_id,project_id,sort_order,subtasks')
     .single();
   if (error) return { error: error.message };
-  revalidatePath('/finance');
+  revalidatePath('/', 'layout');
   return {
     task: {
       id: data.id,
@@ -279,8 +274,6 @@ export async function archiveTask(
   const { error: delErr } = await supabase.from('tasks').delete().eq('id', task.id);
   if (delErr) return { error: delErr.message };
 
-  revalidatePath('/tasks');
-  revalidatePath('/archive');
-  revalidatePath('/leadership');
+  revalidatePath('/', 'layout');
   return {};
 }
