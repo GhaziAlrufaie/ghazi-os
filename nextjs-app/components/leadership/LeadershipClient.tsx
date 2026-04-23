@@ -952,19 +952,11 @@ function formatInboxDate(dateStr: string): string {
 function InboxPanel({ inboxTasks, brands }: { inboxTasks: InboxTask[]; brands: Brand[] }) {
   const [tasks, setTasks] = useState<InboxTask[]>(inboxTasks);
   const [newText, setNewText] = useState('');
-  const [openMenuId, setOpenMenuId] = useState<string | null>(null);
+  const [expandedId, setExpandedId] = useState<string | null>(null);
   const [, startTransition] = useTransition();
 
-  // Sync when prop changes (after page re-render)
+  // Sync when prop changes (after server revalidation)
   useMemo(() => { setTasks(inboxTasks); }, [inboxTasks]);
-
-  // Close dropdown on outside click
-  useMemo(() => {
-    if (!openMenuId) return;
-    const handler = () => setOpenMenuId(null);
-    document.addEventListener('click', handler);
-    return () => document.removeEventListener('click', handler);
-  }, [openMenuId]);
 
   async function handleAdd() {
     if (!newText.trim()) return;
@@ -982,7 +974,7 @@ function InboxPanel({ inboxTasks, brands }: { inboxTasks: InboxTask[]; brands: B
 
   async function handleMove(task: InboxTask, target: 'personal' | string) {
     setTasks(prev => prev.filter(t => t.id !== task.id));
-    setOpenMenuId(null);
+    setExpandedId(null);
     try {
       if (target === 'personal') {
         await addPersonalTask({ title: task.text, status: 'todo', priority: 'medium', category: 'ideas' });
@@ -991,7 +983,7 @@ function InboxPanel({ inboxTasks, brands }: { inboxTasks: InboxTask[]; brands: B
       }
       await deleteInboxTask(task.id);
     } catch {
-      // Keep removed optimistically
+      // Keep removed optimistically — server action failed silently
     }
   }
 
@@ -1009,47 +1001,57 @@ function InboxPanel({ inboxTasks, brands }: { inboxTasks: InboxTask[]; brands: B
         <div className="empty-state">صندوق الوارد فارغ ✨</div>
       ) : (
         tasks.slice(0, 8).map(t => (
-          <div key={t.id} className="inbox-item" style={{ position: 'relative', alignItems: 'flex-start' }}>
-            <div className="inbox-icon" style={{ marginTop: 2 }}>💡</div>
-            <div style={{ flex: 1, minWidth: 0 }}>
-              <div style={{ fontSize: 13, lineHeight: 1.4 }}>{t.text}</div>
-              <div style={{ fontSize: 10, color: 'var(--ink-faded, #aaa)', marginTop: 2 }}>{formatInboxDate(t.created_at)}</div>
-            </div>
-            <div style={{ display: 'flex', gap: 4, alignItems: 'center', flexShrink: 0 }}>
-              <div style={{ position: 'relative' }}>
+          <div key={t.id} style={{ marginBottom: 6 }}>
+            {/* Main task row */}
+            <div className="inbox-item" style={{ alignItems: 'flex-start', flexWrap: 'wrap', minWidth: 0 }}>
+              <div className="inbox-icon" style={{ marginTop: 2, flexShrink: 0 }}>💡</div>
+              <div className="inbox-item-text">
+                <div>{t.text}</div>
+                <div style={{ fontSize: 10, color: 'var(--ink-faded, #aaa)', marginTop: 2 }}>{formatInboxDate(t.created_at)}</div>
+              </div>
+              <div style={{ display: 'flex', gap: 4, alignItems: 'center', flexShrink: 0, marginTop: 2 }}>
                 <button
-                  onClick={e => { e.stopPropagation(); setOpenMenuId(openMenuId === t.id ? null : t.id); }}
+                  onClick={() => setExpandedId(expandedId === t.id ? null : t.id)}
                   className="inbox-delete"
                   title="نقل إلى..."
-                  style={{ fontSize: 12 }}
+                  style={{ fontSize: 12, padding: '0 6px' }}
                 >📁</button>
-                {openMenuId === t.id && (
-                  <div
-                    onClick={e => e.stopPropagation()}
-                    style={{
-                      position: 'absolute', left: 0, top: '100%', marginTop: 4,
-                      background: 'white', border: '1px solid #e5e7eb', borderRadius: 10,
-                      boxShadow: '0 8px 24px rgba(0,0,0,0.12)', zIndex: 999,
-                      minWidth: 160, padding: '6px 0', direction: 'rtl',
-                    }}
-                  >
-                    <button
-                      onClick={() => handleMove(t, 'personal')}
-                      style={{ width: '100%', padding: '7px 14px', background: 'none', border: 'none', cursor: 'pointer', textAlign: 'right', fontSize: 13, fontFamily: 'inherit', display: 'flex', alignItems: 'center', gap: 6 }}
-                    >👤 شخصي</button>
-                    <div style={{ height: 1, background: '#f0f0f0', margin: '4px 0' }} />
-                    {brands.map(b => (
-                      <button
-                        key={b.id}
-                        onClick={() => handleMove(t, b.id)}
-                        style={{ width: '100%', padding: '7px 14px', background: 'none', border: 'none', cursor: 'pointer', textAlign: 'right', fontSize: 13, fontFamily: 'inherit', display: 'flex', alignItems: 'center', gap: 6 }}
-                      >{b.icon} {b.name}</button>
-                    ))}
-                  </div>
-                )}
+                <button onClick={() => handleDelete(t.id)} className="inbox-delete">✕</button>
               </div>
-              <button onClick={() => handleDelete(t.id)} className="inbox-delete">✕</button>
             </div>
+            {/* Inline accordion — move targets */}
+            {expandedId === t.id && (
+              <div style={{
+                background: 'var(--bg-soft)',
+                border: '1px solid var(--border-soft)',
+                borderRadius: '0 0 12px 12px',
+                padding: '6px 8px',
+                display: 'flex',
+                flexWrap: 'wrap',
+                gap: 6,
+                direction: 'rtl',
+              }}>
+                <button
+                  onClick={() => handleMove(t, 'personal')}
+                  style={{
+                    padding: '4px 10px', background: 'var(--lavender-light)', border: 'none',
+                    borderRadius: 20, fontSize: 12, fontFamily: 'inherit', cursor: 'pointer',
+                    color: 'var(--ink)', fontWeight: 600,
+                  }}
+                >👤 شخصي</button>
+                {brands.map(b => (
+                  <button
+                    key={b.id}
+                    onClick={() => handleMove(t, b.id)}
+                    style={{
+                      padding: '4px 10px', background: 'var(--bg-card)', border: '1px solid var(--border-soft)',
+                      borderRadius: 20, fontSize: 12, fontFamily: 'inherit', cursor: 'pointer',
+                      color: 'var(--ink)', fontWeight: 500,
+                    }}
+                  >{b.icon} {b.name}</button>
+                ))}
+              </div>
+            )}
           </div>
         ))
       )}

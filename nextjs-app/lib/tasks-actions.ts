@@ -94,6 +94,7 @@ export async function addTask(
 
   if (error) return { error: error.message };
   revalidatePath('/tasks');
+  revalidatePath('/leadership');
 
   return {
     task: {
@@ -135,6 +136,7 @@ export async function updateTask(
 
   if (error) return { error: error.message };
   revalidatePath('/tasks');
+  revalidatePath('/leadership');
 
   return {
     task: {
@@ -158,6 +160,7 @@ export async function deleteTask(id: string): Promise<{ error?: string }> {
   const { error } = await supabase.from('tasks').delete().eq('id', id);
   if (error) return { error: error.message };
   revalidatePath('/tasks');
+  revalidatePath('/leadership');
   return {};
 }
 
@@ -177,6 +180,7 @@ export async function restoreTask(task: Task): Promise<{ error?: string }> {
   if (error) return { error: error.message };
   revalidatePath('/tasks');
   revalidatePath('/brands');
+  revalidatePath('/leadership');
   return {};
 }
 
@@ -277,5 +281,6 @@ export async function archiveTask(
 
   revalidatePath('/tasks');
   revalidatePath('/archive');
+  revalidatePath('/leadership');
   return {};
 }
