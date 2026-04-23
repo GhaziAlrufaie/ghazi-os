@@ -261,12 +261,30 @@ function DailyTasksSection({ routines: initialRoutines }: { routines: DailyRouti
   }
 
   async function handleAdd() {
-    if (!newTitle.trim()) return;
-    const result = await addDailyRoutine({ title: newTitle.trim(), meta: newMeta.trim(), timeStr: newTime.trim() });
-    if (result.routine) {
-      setRoutines(prev => [...prev, result.routine!]);
-      setNewTitle(''); setNewMeta(''); setNewTime('');
-      setShowAddForm(false);
+    const title = newTitle.trim();
+    if (!title) return;
+    // Optimistic update — add immediately with temp id
+    const tempId = `temp-${Date.now()}`;
+    const optimistic: DailyRoutine = {
+      id: tempId,
+      title,
+      meta: newMeta.trim(),
+      timeStr: newTime.trim(),
+      isDone: false,
+      sortOrder: routines.length + 1,
+    };
+    setRoutines(prev => [...prev, optimistic]);
+    setNewTitle(''); setNewMeta(''); setNewTime('');
+    setShowAddForm(false);
+    // Persist to Supabase in background
+    try {
+      const result = await addDailyRoutine({ title, meta: newMeta.trim(), timeStr: newTime.trim() });
+      if (result.routine) {
+        // Replace temp with real id from DB
+        setRoutines(prev => prev.map(r => r.id === tempId ? result.routine! : r));
+      }
+    } catch {
+      // Keep optimistic item even if server fails — will sync on next page load
     }
   }
 
@@ -314,7 +332,7 @@ function DailyTasksSection({ routines: initialRoutines }: { routines: DailyRouti
             style={{ padding: '6px 16px', borderRadius: 8, background: 'var(--mint-deep)', color: 'white', border: 'none', cursor: 'pointer', fontFamily: 'inherit', fontSize: 13 }}
           >حفظ</button>
           <button
-            onClick={() => setShowAddForm(false)}
+            onClick={() => { setShowAddForm(false); setNewTitle(''); setNewMeta(''); setNewTime(''); }}
             style={{ padding: '6px 12px', borderRadius: 8, background: '#f0f0f0', border: 'none', cursor: 'pointer', fontFamily: 'inherit', fontSize: 13 }}
           >إلغاء</button>
         </div>
