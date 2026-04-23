@@ -6,7 +6,7 @@
  */
 'use client';
 import './studio-theme.css';
-import { useState, useTransition } from 'react';
+import { useState, useTransition, useMemo } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import {
@@ -543,7 +543,7 @@ function FocusHero({
   const [selectedTaskId, setSelectedTaskId] = useState<string | null>(null);
   const tip = DAILY_TIPS[new Date().getDay() % DAILY_TIPS.length];
 
-  const sorted = todayFocus ? activeTasks.filter(t => {
+  const sorted = useMemo(() => todayFocus ? activeTasks.filter(t => {
     if (todayFocus.targetType === 'brand') return t.brandId === todayFocus.targetId;
     if (todayFocus.targetType === 'project') return t.projectId === todayFocus.targetId;
     if (todayFocus.targetType === 'task') return t.id === todayFocus.targetId;
@@ -551,7 +551,7 @@ function FocusHero({
   }).sort((a, b) => {
     const order = { critical: 0, high: 1, medium: 2, low: 3 };
     return (order[a.priority as keyof typeof order] ?? 4) - (order[b.priority as keyof typeof order] ?? 4);
-  }) : [];
+  }) : [], [todayFocus, activeTasks]);
 
   const selectedTask = selectedTaskId ? sorted.find(t => t.id === selectedTaskId) ?? null : null;
 
