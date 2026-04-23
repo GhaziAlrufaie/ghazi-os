@@ -1662,17 +1662,15 @@ body::before {
 .daily-grid .daily-task {
   border-radius: 16px;
 }
-
 /* =============================================================================
    TRIPLE PANEL — Fixed height + internal scroll + responsive
    ============================================================================= */
 .triple-panel {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 20px;
   align-items: start;
 }
-
 /* Desktop: edge-to-edge stretch */
 .triple-panel,
 .focus-hero,
@@ -1682,16 +1680,14 @@ body::before {
   margin-right: calc(-24px - 220px);
   width: calc(100% + 24px + 220px + 24px);
 }
-
 /* Fixed height for perfect visual symmetry */
 .triple-panel .section {
-  height: 420px;
-  min-width: 0;
   display: flex;
   flex-direction: column;
+  height: 420px;
+  min-width: 0;
   overflow: hidden;
 }
-
 /* Scrollable inner content */
 .triple-panel .section > div:last-child {
   flex: 1;
@@ -1699,7 +1695,6 @@ body::before {
   padding-right: 4px;
   min-height: 0;
 }
-
 /* Clean scrollbar */
 .triple-panel .section > div:last-child::-webkit-scrollbar {
   width: 4px;
@@ -1708,15 +1703,21 @@ body::before {
   background: var(--border-soft);
   border-radius: 4px;
 }
-
-/* Long unbroken text fix */
-.inbox-item-text {
-  word-break: break-all !important;
-  overflow-wrap: anywhere !important;
-  white-space: normal !important;
+/* Inbox item — prevent grid blowout */
+.inbox-item {
+  width: 100%;
   min-width: 0;
 }
-
+/* Long unbroken text fix */
+.inbox-item-text {
+  flex: 1;
+  min-width: 0;
+  word-wrap: break-word !important;
+  overflow-wrap: break-word !important;
+  word-break: break-all !important;
+  white-space: normal !important;
+  line-height: 1.5;
+}
 /* Mobile: reset overflow + single column */
 @media (max-width: 900px) {
   .triple-panel,
