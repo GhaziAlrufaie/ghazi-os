@@ -335,14 +335,6 @@ body::before {
    FOCUS HERO — The big one
    ═══════════════════════════════════════════════════════════════════════════ */
 
-.focus-hero,
-.weekly-compass-section,
-.daily-tasks-section,
-.triple-panel {
-  margin-left: -24px;
-  margin-right: calc(-24px - 220px);
-  width: calc(100% + 24px + 220px + 24px);
-}
 
 .focus-hero {
   position: relative;
