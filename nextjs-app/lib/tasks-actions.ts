@@ -19,7 +19,6 @@ export interface Task {
   sortOrder: number;
   hasDescription: boolean;
   subtasks: SubtaskItem[];
-  subtask_groups?: unknown[];
 }
 
 interface AddTaskInput {
@@ -45,14 +44,13 @@ interface UpdateTaskInput {
   dueDate?: string | null;
   sortOrder?: number;
   subtasks?: SubtaskItem[];
-  subtask_groups?: unknown[];
 }
 
 export async function getTasks(): Promise<Task[]> {
   const supabase = createServerClient();
   const { data } = await supabase
     .from('tasks')
-    .select('id,title,description,status,priority,due_date,brand_id,project_id,sort_order,subtasks,subtask_groups')
+    .select('id,title,description,status,priority,due_date,brand_id,project_id,sort_order,subtasks')
     .order('sort_order');
   return (data ?? []).map(r => ({
     id: r.id as string,
@@ -66,7 +64,6 @@ export async function getTasks(): Promise<Task[]> {
     sortOrder: (r.sort_order as number) ?? 0,
     hasDescription: !!((r.description as string)?.trim()),
     subtasks: Array.isArray(r.subtasks) ? (r.subtasks as SubtaskItem[]) : [],
-    subtask_groups: Array.isArray(r.subtask_groups) ? r.subtask_groups : undefined,
   }));
 }
 
@@ -92,7 +89,7 @@ export async function addTask(
       project_id: input.projectId ?? null,
       sort_order: 0,
     })
-    .select('id,title,description,status,priority,due_date,brand_id,project_id,sort_order,subtasks,subtask_groups')
+    .select('id,title,description,status,priority,due_date,brand_id,project_id,sort_order,subtasks')
     .single();
 
   if (error) return { error: error.message };
@@ -128,13 +125,12 @@ export async function updateTask(
   if (input.dueDate !== undefined)     patch.due_date = input.dueDate;
   if (input.sortOrder !== undefined)   patch.sort_order = input.sortOrder;
   if (input.subtasks !== undefined)    patch.subtasks = input.subtasks;
-  if (input.subtask_groups !== undefined) patch.subtask_groups = input.subtask_groups;
 
   const { data, error } = await supabase
     .from('tasks')
     .update(patch)
     .eq('id', input.id)
-    .select('id,title,description,status,priority,due_date,brand_id,project_id,sort_order,subtasks,subtask_groups')
+    .select('id,title,description,status,priority,due_date,brand_id,project_id,sort_order,subtasks')
     .single();
 
   if (error) return { error: error.message };
@@ -189,7 +185,7 @@ export async function getFinanceTasks(): Promise<Task[]> {
   const supabase = createServerClient();
   const { data } = await supabase
     .from('tasks')
-    .select('id,title,description,status,priority,due_date,brand_id,project_id,sort_order,category,subtasks,subtask_groups')
+    .select('id,title,description,status,priority,due_date,brand_id,project_id,sort_order,category,subtasks')
     .eq('category', 'financial')
     .order('sort_order');
   return (data ?? []).map(r => ({
@@ -204,7 +200,6 @@ export async function getFinanceTasks(): Promise<Task[]> {
     sortOrder: (r.sort_order as number) ?? 0,
     hasDescription: !!((r.description as string)?.trim()),
     subtasks: Array.isArray(r.subtasks) ? (r.subtasks as SubtaskItem[]) : [],
-    subtask_groups: Array.isArray(r.subtask_groups) ? r.subtask_groups : undefined,
   }));
 }
 
@@ -226,7 +221,7 @@ export async function addFinanceTask(
       sort_order: 0,
       category: 'financial',
     })
-    .select('id,title,description,status,priority,due_date,brand_id,project_id,sort_order,subtasks,subtask_groups')
+    .select('id,title,description,status,priority,due_date,brand_id,project_id,sort_order,subtasks')
     .single();
   if (error) return { error: error.message };
   revalidatePath('/finance');
