@@ -21,6 +21,10 @@ import {
   type WeeklyFocusEntry, type FocusTargetType,
 } from '@/lib/weekly-focus-actions';
 import type { DecisionRow, EmployeeRow } from '@/lib/leadership-types';
+import {
+  addDailyRoutine, toggleDailyRoutine, updateDailyRoutineTime, deleteDailyRoutine,
+  type DailyRoutine,
+} from '@/lib/daily-routines-actions';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 interface ChecklistItem { id: string; text: string; done: boolean; }
@@ -51,6 +55,7 @@ interface Props {
   dailyTasks: string[];
   projects: Project[];
   personalTasks: PersonalTask[];
+  dailyRoutines: DailyRoutine[];
 }
 
 // ─── Constants ────────────────────────────────────────────────────────────────
@@ -220,22 +225,53 @@ function WeeklyCompass({
 }
 
 // ─── Daily Tasks ──────────────────────────────────────────────────────────────
-function DailyTasksSection() {
-  const tasks = [
-    { title: 'راجع مبيعات الأمس', meta: '📊 من سلة', time: '8:00 ص', done: true },
-    { title: 'رد على رسائل العملاء', meta: '💬 بيت الجوزاء', time: '9:00 ص', done: true },
-    { title: 'افحص تحليلات السناب', meta: '📱 المحتوى', time: '11:00 ص', done: false },
-    { title: 'تابع الفريق وحدّث المهام', meta: '👥 الفريق', time: '2:00 م', done: false },
-    { title: 'اكتب ملاحظة يومية', meta: '📝 أهم إنجاز', time: '6:00 م', done: false },
-    { title: 'مراجعة قائمة الغد', meta: '🎯 التحضير', time: '9:00 م', done: false },
-  ];
-  const [doneStates, setDoneStates] = useState<boolean[]>(tasks.map(t => t.done));
-  const doneCount = doneStates.filter(Boolean).length;
-  const total = tasks.length;
-  const pct = Math.round((doneCount / total) * 100);
+function DailyTasksSection({ routines: initialRoutines }: { routines: DailyRoutine[] }) {
+  const [routines, setRoutines] = useState<DailyRoutine[]>(initialRoutines);
+  const [showAddForm, setShowAddForm] = useState(false);
+  const [newTitle, setNewTitle] = useState('');
+  const [newMeta, setNewMeta] = useState('');
+  const [newTime, setNewTime] = useState('');
+  const [editingTimeId, setEditingTimeId] = useState<string | null>(null);
+  const [editingTimeVal, setEditingTimeVal] = useState('');
+  const [, startTransition] = useTransition();
+
+  const doneCount = routines.filter(r => r.isDone).length;
+  const total = routines.length;
+  const pct = total > 0 ? Math.round((doneCount / total) * 100) : 0;
+
+  function handleToggle(id: string, current: boolean) {
+    setRoutines(prev => prev.map(r => r.id === id ? { ...r, isDone: !current } : r));
+    startTransition(async () => { await toggleDailyRoutine(id, !current); });
+  }
+
+  function handleDelete(id: string) {
+    setRoutines(prev => prev.filter(r => r.id !== id));
+    startTransition(async () => { await deleteDailyRoutine(id); });
+  }
+
+  function handleTimeClick(r: DailyRoutine) {
+    setEditingTimeId(r.id);
+    setEditingTimeVal(r.timeStr);
+  }
+
+  function handleTimeSave(id: string) {
+    setRoutines(prev => prev.map(r => r.id === id ? { ...r, timeStr: editingTimeVal } : r));
+    setEditingTimeId(null);
+    startTransition(async () => { await updateDailyRoutineTime(id, editingTimeVal); });
+  }
+
+  async function handleAdd() {
+    if (!newTitle.trim()) return;
+    const result = await addDailyRoutine({ title: newTitle.trim(), meta: newMeta.trim(), timeStr: newTime.trim() });
+    if (result.routine) {
+      setRoutines(prev => [...prev, result.routine!]);
+      setNewTitle(''); setNewMeta(''); setNewTime('');
+      setShowAddForm(false);
+    }
+  }
 
   return (
-    <section className="section">
+    <section className="section daily-tasks-section">
       <div className="section-head">
         <div className="section-title-wrap">
           <div className="section-icon" style={{ background: 'var(--mint-light)', color: 'var(--mint-deep)' }}>☑️</div>
@@ -244,33 +280,84 @@ function DailyTasksSection() {
             <div className="section-subtitle">مهام ثابتة كل يوم · <span>{doneCount}</span> من {total} منجزة</div>
           </div>
         </div>
-        <span className="section-link">+ إضافة</span>
+        <button
+          className="section-link"
+          style={{ background: 'none', border: 'none', cursor: 'pointer', fontFamily: 'inherit' }}
+          onClick={() => setShowAddForm(v => !v)}
+        >+ إضافة</button>
       </div>
       <div className="daily-progress">
         <div className="daily-progress-bar" style={{ width: `${pct}%` }} />
       </div>
+      {showAddForm && (
+        <div style={{ display: 'flex', gap: 8, marginBottom: 12, flexWrap: 'wrap', direction: 'rtl' }}>
+          <input
+            placeholder="اسم المهمة *"
+            value={newTitle}
+            onChange={e => setNewTitle(e.target.value)}
+            style={{ flex: '1 1 140px', padding: '6px 10px', borderRadius: 8, border: '1px solid #ddd', fontFamily: 'inherit', fontSize: 13 }}
+          />
+          <input
+            placeholder="التفاصيل (مثال: 📊 من سلة)"
+            value={newMeta}
+            onChange={e => setNewMeta(e.target.value)}
+            style={{ flex: '1 1 140px', padding: '6px 10px', borderRadius: 8, border: '1px solid #ddd', fontFamily: 'inherit', fontSize: 13 }}
+          />
+          <input
+            placeholder="الوقت (مثال: 8:00 ص)"
+            value={newTime}
+            onChange={e => setNewTime(e.target.value)}
+            style={{ flex: '0 1 110px', padding: '6px 10px', borderRadius: 8, border: '1px solid #ddd', fontFamily: 'inherit', fontSize: 13 }}
+          />
+          <button
+            onClick={handleAdd}
+            style={{ padding: '6px 16px', borderRadius: 8, background: 'var(--mint-deep)', color: 'white', border: 'none', cursor: 'pointer', fontFamily: 'inherit', fontSize: 13 }}
+          >حفظ</button>
+          <button
+            onClick={() => setShowAddForm(false)}
+            style={{ padding: '6px 12px', borderRadius: 8, background: '#f0f0f0', border: 'none', cursor: 'pointer', fontFamily: 'inherit', fontSize: 13 }}
+          >إلغاء</button>
+        </div>
+      )}
       <div className="daily-grid">
-        {tasks.map((task, i) => (
-          <div key={i} className={`daily-task${doneStates[i] ? ' done' : ''}`}>
+        {routines.map((r) => (
+          <div key={r.id} className={`daily-task${r.isDone ? ' done' : ''}`}>
             <div
-              className={`daily-checkbox${doneStates[i] ? ' checked' : ''}`}
-              onClick={() => {
-                const next = [...doneStates];
-                next[i] = !next[i];
-                setDoneStates(next);
-              }}
+              className={`daily-checkbox${r.isDone ? ' checked' : ''}`}
+              onClick={() => handleToggle(r.id, r.isDone)}
             >
-              {doneStates[i] && (
+              {r.isDone && (
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="3">
                   <polyline points="20 6 9 17 4 12" />
                 </svg>
               )}
             </div>
             <div className="daily-task-body">
-              <div className="daily-task-title">{task.title}</div>
-              <div className="daily-task-meta">{task.meta}</div>
+              <div className="daily-task-title">{r.title}</div>
+              {r.meta && <div className="daily-task-meta">{r.meta}</div>}
             </div>
-            <span className="daily-time">{task.time}</span>
+            {editingTimeId === r.id ? (
+              <input
+                value={editingTimeVal}
+                onChange={e => setEditingTimeVal(e.target.value)}
+                onBlur={() => handleTimeSave(r.id)}
+                onKeyDown={e => e.key === 'Enter' && handleTimeSave(r.id)}
+                autoFocus
+                style={{ width: 80, padding: '2px 6px', borderRadius: 6, border: '1px solid #ccc', fontSize: 12, fontFamily: 'inherit', textAlign: 'center' }}
+              />
+            ) : (
+              <span
+                className="daily-time"
+                onClick={() => handleTimeClick(r)}
+                title="انقر لتعديل الوقت"
+                style={{ cursor: 'pointer' }}
+              >{r.timeStr || '—'}</span>
+            )}
+            <button
+              onClick={() => handleDelete(r.id)}
+              title="حذف"
+              style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#ccc', fontSize: 16, padding: '0 4px', lineHeight: 1 }}
+            >✕</button>
           </div>
         ))}
       </div>
@@ -898,8 +985,10 @@ function BrandHealthStrip({ brands, activeTasks }: { brands: Brand[]; activeTask
 export default function LeadershipClient({
   decisions, employees, brands, inboxTasks, weeklyFocus,
   todaySales, upcomingEvents, activeTasks, dailyTasks, projects, personalTasks,
+  dailyRoutines: initialDailyRoutines,
 }: Props) {
   const [editorDate, setEditorDate] = useState<string | null>(null);
+  const [dailyRoutines] = useState<DailyRoutine[]>(initialDailyRoutines);
   const router = useRouter();
 
   const focusMap: Record<string, WeeklyFocusEntry> = {};
@@ -969,46 +1058,7 @@ export default function LeadershipClient({
           />
 
           {/* DailyTasks — كامل العرض */}
-          <div className="section daily-tasks-section">
-            <div className="section-head">
-              <div className="section-title-wrap">
-                <div className="section-icon" style={{ background: 'var(--mint-light)', color: 'var(--mint-deep)' }}>☑️</div>
-                <div className="section-title">
-                  <div className="section-title-text">روتينك اليومي</div>
-                  <div className="section-subtitle">مهام ثابتة كل يوم</div>
-                </div>
-              </div>
-            </div>
-            <div className="daily-progress">
-              <div className="daily-progress-bar" style={{ width: '33%' }}></div>
-            </div>
-            <div className="daily-grid">
-              {[
-                { title: 'راجع مبيعات الأمس', meta: '📊 من سلة', time: '8:00 ص', done: true },
-                { title: 'رد على رسائل العملاء', meta: '💬 بيت الجوزاء', time: '9:00 ص', done: true },
-                { title: 'افحص تحليلات السناب', meta: '📱 المحتوى', time: '11:00 ص', done: false },
-                { title: 'تابع الفريق وحدّث المهام', meta: '👥 الفريق', time: '2:00 م', done: false },
-                { title: 'اكتب ملاحظة يومية', meta: '📝 أهم إنجاز', time: '6:00 م', done: false },
-                { title: 'مراجعة قائمة الغد', meta: '🎯 التحضير', time: '9:00 م', done: false },
-              ].map((task, i) => (
-                <div key={i} className={`daily-task${task.done ? ' done' : ''}`}>
-                  <div className={`daily-checkbox${task.done ? ' checked' : ''}`}>
-                    {task.done && (
-                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="3">
-                        <polyline points="20 6 9 17 4 12"/>
-                      </svg>
-                    )}
-                  </div>
-                  <div className="daily-task-body">
-                    <div className="daily-task-title">{task.title}</div>
-                    <div className="daily-task-meta">{task.meta}</div>
-                  </div>
-                  <span className="daily-time">{task.time}</span>
-                </div>
-              ))}
-            </div>
-          </div>
-
+          <DailyTasksSection routines={dailyRoutines} />
           {/* ثلاثة أعمدة متساوية: القرارات + التقويم + الوارد */}
           <div className="triple-panel">
 

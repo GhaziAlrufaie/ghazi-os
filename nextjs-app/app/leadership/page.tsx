@@ -10,6 +10,7 @@ import LeadershipClient from '@/components/leadership/LeadershipClient';
 import type { WeeklyFocusEntry, FocusTargetType } from '@/lib/weekly-focus-actions';
 import type { InboxTask } from '@/lib/inbox-actions';
 import type { DecisionRow, EmployeeRow } from '@/lib/leadership-types';
+import type { DailyRoutine } from '@/lib/daily-routines-actions';
 
 // ── Helper: today + 6 days ──
 function getWeekDates(): string[] {
@@ -40,6 +41,7 @@ export default async function LeadershipPage() {
     inboxRes,
     eventsRes,
     salesRes,
+    dailyRoutinesRes,
   ] = await Promise.allSettled([
     supabase.from('brands').select('id, name, icon, color, status, nav_order').order('nav_order'),
     supabase.from('weekly_focus').select('id, focus_date, target_type, target_id, target_name, target_color, notes, metrics_cache').in('focus_date', weekDates),
@@ -51,6 +53,7 @@ export default async function LeadershipPage() {
     supabase.from('inbox_tasks').select('id, text, created_at').order('created_at', { ascending: false }),
     supabase.from('events').select('id, title, day, month, year, brand_id').gte('day', new Date().getDate()).eq('month', new Date().getMonth() + 1).eq('year', new Date().getFullYear()).order('day'),
     supabase.from('salla_orders').select('total_amount').gte('created_at', `${todayStr}T00:00:00`).lte('created_at', `${todayStr}T23:59:59`),
+    supabase.from('daily_routines').select('id, title, meta, time_str, is_done, sort_order').order('sort_order'),
   ]);
 
   // ── معالجة البيانات ──
@@ -184,6 +187,16 @@ export default async function LeadershipPage() {
   const rawSales = salesRes.status === 'fulfilled' && !salesRes.value.error ? (salesRes.value.data ?? []) : [];
   const todaySales = rawSales.reduce((sum: number, o: Record<string, unknown>) => sum + ((o.total_amount as number) ?? 0), 0);
 
+  const rawDailyRoutines = dailyRoutinesRes.status === 'fulfilled' && !dailyRoutinesRes.value.error ? (dailyRoutinesRes.value.data ?? []) : [];
+  const dailyRoutines: DailyRoutine[] = rawDailyRoutines.map((r: Record<string, unknown>) => ({
+    id: r.id as string,
+    title: r.title as string,
+    meta: (r.meta as string) ?? '',
+    timeStr: (r.time_str as string) ?? '',
+    isDone: (r.is_done as boolean) ?? false,
+    sortOrder: (r.sort_order as number) ?? 0,
+  }));
+
   return (
     <LeadershipClient
       brands={brands}
@@ -197,6 +210,7 @@ export default async function LeadershipPage() {
       upcomingEvents={upcomingEvents}
       todaySales={todaySales}
       dailyTasks={[]}
+      dailyRoutines={dailyRoutines}
     />
   );
 }
