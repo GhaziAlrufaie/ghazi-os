@@ -1160,9 +1160,8 @@ export default function LeadershipClient({
 
           {/* DailyTasks — كامل العرض */}
           <DailyTasksSection routines={dailyRoutines} />
-          {/* ثلاثة أعمدة متساوية: القرارات + التقويم + الوارد */}
-          <div className="triple-panel">
-
+          {/* عمودان: القرارات + التقويم */}
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '20px', marginBottom: '20px' }}>
             {/* القرارات */}
             <section className="section">
               <div className="section-head">
@@ -1176,7 +1175,6 @@ export default function LeadershipClient({
               </div>
               <DecisionsPanel decisions={decisions} brands={brands} />
             </section>
-
             {/* التقويم */}
             <section className="section">
               <div className="section-head">
@@ -1190,22 +1188,20 @@ export default function LeadershipClient({
               </div>
               <CalendarMini upcomingEvents={upcomingEvents} brands={brands} />
             </section>
-
-            {/* الوارد */}
-            <section className="section">
-              <div className="section-head">
-                <div className="section-title-wrap">
-                  <div className="section-icon" style={{ background: 'var(--lavender-light)', color: '#7B5AD8' }}>💡</div>
-                  <div className="section-title">
-                    <div className="section-title-text">الوارد</div>
-                    <div className="section-subtitle">أفكار سريعة</div>
-                  </div>
+          </div>
+          {/* الوارد — كامل العرض */}
+          <section className="section">
+            <div className="section-head">
+              <div className="section-title-wrap">
+                <div className="section-icon" style={{ background: 'var(--lavender-light)', color: '#7B5AD8' }}>💡</div>
+                <div className="section-title">
+                  <div className="section-title-text">الوارد</div>
+                  <div className="section-subtitle">أفكار سريعة</div>
                 </div>
               </div>
-              <InboxPanel inboxTasks={inboxTasks} brands={brands} />
-            </section>
-
-          </div>{/* end ثلاثة أعمدة */}
+            </div>
+            <InboxPanel inboxTasks={inboxTasks} brands={brands} />
+          </section>
 
           </div>{/* end padding wrapper */}
 
