@@ -1010,11 +1010,7 @@ export default function LeadershipClient({
           </div>
 
           {/* ثلاثة أعمدة متساوية: القرارات + التقويم + الوارد */}
-          <div className="triple-panel" style={{
-            display: 'grid',
-            gridTemplateColumns: '1fr 1fr 1fr',
-            gap: 20
-          }}>
+          <div className="triple-panel">
 
             {/* القرارات */}
             <section className="section">
