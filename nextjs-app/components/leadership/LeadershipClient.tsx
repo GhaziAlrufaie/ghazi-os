@@ -954,9 +954,8 @@ function InboxPanel({ inboxTasks, brands }: { inboxTasks: InboxTask[]; brands: B
   const [newText, setNewText] = useState('');
   const [openMenuId, setOpenMenuId] = useState<string | null>(null);
   const [, startTransition] = useTransition();
-  const router = useRouter();
 
-  // Sync when prop changes (after router.refresh)
+  // Sync when prop changes (after page re-render)
   useMemo(() => { setTasks(inboxTasks); }, [inboxTasks]);
 
   // Close dropdown on outside click
@@ -973,12 +972,12 @@ function InboxPanel({ inboxTasks, brands }: { inboxTasks: InboxTask[]; brands: B
     setNewText('');
     const tempItem: InboxTask = { id: `temp-${Date.now()}`, text, created_at: new Date().toISOString() };
     setTasks(prev => [tempItem, ...prev]);
-    startTransition(async () => { await addInboxTask(text); router.refresh(); });
+    startTransition(async () => { await addInboxTask(text); });
   }
 
   async function handleDelete(id: string) {
     setTasks(prev => prev.filter(t => t.id !== id));
-    startTransition(async () => { await deleteInboxTask(id); router.refresh(); });
+    startTransition(async () => { await deleteInboxTask(id); });
   }
 
   async function handleMove(task: InboxTask, target: 'personal' | string) {
@@ -991,7 +990,6 @@ function InboxPanel({ inboxTasks, brands }: { inboxTasks: InboxTask[]; brands: B
         await addTask({ title: task.text, status: 'todo', priority: 'medium', brandId: target });
       }
       await deleteInboxTask(task.id);
-      router.refresh();
     } catch {
       // Keep removed optimistically
     }

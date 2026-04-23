@@ -1702,3 +1702,27 @@ body::before {
     background: rgba(255, 255, 255, 0.15) !important;
   }
 }
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   BUG FIXES — Inbox dropdown overflow + triple panel height
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* Bug 1: Allow dropdown to break out of clipping containers */
+.inbox-item,
+.inbox-list {
+  overflow: visible !important;
+}
+.triple-panel .section {
+  overflow: visible !important;
+}
+
+/* Bug 3: Triple panel columns stretch evenly */
+.triple-panel .section {
+  min-height: 420px;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+.triple-panel .section > div:last-child {
+  flex: 1;
+}
