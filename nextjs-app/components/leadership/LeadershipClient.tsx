@@ -15,7 +15,7 @@ import {
 import { addTask } from '@/lib/tasks-actions';
 import { addPersonalTask } from '@/lib/personal-actions';
 import {
-  addInboxTask, deleteInboxTask,
+  addInboxTask, deleteInboxTask, updateInboxTask,
   type InboxTask,
 } from '@/lib/inbox-actions';
 import {
@@ -953,11 +953,11 @@ function InboxPanel({ inboxTasks, brands }: { inboxTasks: InboxTask[]; brands: B
   const [tasks, setTasks] = useState<InboxTask[]>(inboxTasks);
   const [newText, setNewText] = useState('');
   const [expandedId, setExpandedId] = useState<string | null>(null);
+  const [editingId, setEditingId] = useState<string | null>(null);
+  const [editText, setEditText] = useState('');
   const [, startTransition] = useTransition();
-
   // Sync when prop changes (after server revalidation)
   useMemo(() => { setTasks(inboxTasks); }, [inboxTasks]);
-
   async function handleAdd() {
     if (!newText.trim()) return;
     const text = newText.trim();
@@ -966,12 +966,10 @@ function InboxPanel({ inboxTasks, brands }: { inboxTasks: InboxTask[]; brands: B
     setTasks(prev => [tempItem, ...prev]);
     startTransition(async () => { await addInboxTask(text); });
   }
-
   async function handleDelete(id: string) {
     setTasks(prev => prev.filter(t => t.id !== id));
     startTransition(async () => { await deleteInboxTask(id); });
   }
-
   async function handleMove(task: InboxTask, target: 'personal' | string) {
     setTasks(prev => prev.filter(t => t.id !== task.id));
     setExpandedId(null);
@@ -986,7 +984,18 @@ function InboxPanel({ inboxTasks, brands }: { inboxTasks: InboxTask[]; brands: B
       // Keep removed optimistically — server action failed silently
     }
   }
-
+  function startEdit(task: InboxTask) {
+    setEditingId(task.id);
+    setEditText(task.text);
+    setExpandedId(null);
+  }
+  function handleSaveEdit(id: string) {
+    const text = editText.trim();
+    if (!text) { setEditingId(null); return; }
+    setTasks(prev => prev.map(t => t.id === id ? { ...t, text } : t));
+    setEditingId(null);
+    startTransition(async () => { await updateInboxTask(id, text); });
+  }
   return (
     <div>
       <input
@@ -1005,11 +1014,38 @@ function InboxPanel({ inboxTasks, brands }: { inboxTasks: InboxTask[]; brands: B
             {/* Main task row */}
             <div className="inbox-item" style={{ alignItems: 'flex-start', flexWrap: 'wrap', minWidth: 0 }}>
               <div className="inbox-icon" style={{ marginTop: 2, flexShrink: 0 }}>💡</div>
-              <div className="inbox-item-text">
-                <div>{t.text}</div>
+              <div className="inbox-item-text" style={{ flex: 1, minWidth: 0 }}>
+                {editingId === t.id ? (
+                  <input
+                    autoFocus
+                    value={editText}
+                    onChange={e => setEditText(e.target.value)}
+                    onKeyDown={e => {
+                      if (e.key === 'Enter') handleSaveEdit(t.id);
+                      if (e.key === 'Escape') setEditingId(null);
+                    }}
+                    onBlur={() => handleSaveEdit(t.id)}
+                    style={{
+                      width: '100%', background: 'transparent', border: 'none',
+                      borderBottom: '1px solid var(--gold, #f0a500)', fontSize: '13px',
+                      color: 'var(--txt, var(--ink))', outline: 'none', fontFamily: 'inherit', padding: '2px 0',
+                    }}
+                  />
+                ) : (
+                  <div
+                    onClick={() => startEdit(t)}
+                    style={{ cursor: 'text', wordBreak: 'break-word', whiteSpace: 'pre-wrap', lineHeight: 1.5 }}
+                  >{t.text}</div>
+                )}
                 <div style={{ fontSize: 10, color: 'var(--ink-faded, #aaa)', marginTop: 2 }}>{formatInboxDate(t.created_at)}</div>
               </div>
               <div style={{ display: 'flex', gap: 4, alignItems: 'center', flexShrink: 0, marginTop: 2 }}>
+                <button
+                  onClick={() => startEdit(t)}
+                  className="inbox-delete"
+                  title="تعديل"
+                  style={{ fontSize: 12, padding: '0 6px' }}
+                >✏️</button>
                 <button
                   onClick={() => setExpandedId(expandedId === t.id ? null : t.id)}
                   className="inbox-delete"
