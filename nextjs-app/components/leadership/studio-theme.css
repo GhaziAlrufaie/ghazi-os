@@ -355,8 +355,6 @@ body::before {
   color: white;
   display: flex;
   flex-direction: column;
-  transform: translateZ(0);
-  will-change: transform;
 }
 
 /* Decorative elements */
