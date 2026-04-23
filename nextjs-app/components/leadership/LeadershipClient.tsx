@@ -12,6 +12,8 @@ import { useRouter } from 'next/navigation';
 import {
   addDecision, deleteDecision,
 } from '@/lib/leadership-actions';
+import { addTask } from '@/lib/tasks-actions';
+import { addPersonalTask } from '@/lib/personal-actions';
 import {
   addInboxTask, deleteInboxTask,
   type InboxTask,
@@ -935,20 +937,64 @@ function CalendarMini({ upcomingEvents, brands }: { upcomingEvents: UpcomingEven
 }
 
 // ─── Inbox Panel ──────────────────────────────────────────────────────────────
-function InboxPanel({ inboxTasks }: { inboxTasks: InboxTask[] }) {
+function formatInboxDate(dateStr: string): string {
+  const d = new Date(dateStr);
+  const now = new Date();
+  const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+  const yesterday = new Date(today.getTime() - 86400000);
+  const itemDay = new Date(d.getFullYear(), d.getMonth(), d.getDate());
+  if (itemDay.getTime() === today.getTime()) return 'اليوم';
+  if (itemDay.getTime() === yesterday.getTime()) return 'أمس';
+  const MONTHS = ['يناير','فبراير','مارس','أبريل','مايو','يونيو','يوليو','أغسطس','سبتمبر','أكتوبر','نوفمبر','ديسمبر'];
+  return `${d.getDate()} ${MONTHS[d.getMonth()]}`;
+}
+
+function InboxPanel({ inboxTasks, brands }: { inboxTasks: InboxTask[]; brands: Brand[] }) {
+  const [tasks, setTasks] = useState<InboxTask[]>(inboxTasks);
   const [newText, setNewText] = useState('');
-  const [isPending, startTransition] = useTransition();
+  const [openMenuId, setOpenMenuId] = useState<string | null>(null);
+  const [, startTransition] = useTransition();
   const router = useRouter();
+
+  // Sync when prop changes (after router.refresh)
+  useMemo(() => { setTasks(inboxTasks); }, [inboxTasks]);
+
+  // Close dropdown on outside click
+  useMemo(() => {
+    if (!openMenuId) return;
+    const handler = () => setOpenMenuId(null);
+    document.addEventListener('click', handler);
+    return () => document.removeEventListener('click', handler);
+  }, [openMenuId]);
 
   async function handleAdd() {
     if (!newText.trim()) return;
     const text = newText.trim();
     setNewText('');
+    const tempItem: InboxTask = { id: `temp-${Date.now()}`, text, created_at: new Date().toISOString() };
+    setTasks(prev => [tempItem, ...prev]);
     startTransition(async () => { await addInboxTask(text); router.refresh(); });
   }
 
   async function handleDelete(id: string) {
+    setTasks(prev => prev.filter(t => t.id !== id));
     startTransition(async () => { await deleteInboxTask(id); router.refresh(); });
+  }
+
+  async function handleMove(task: InboxTask, target: 'personal' | string) {
+    setTasks(prev => prev.filter(t => t.id !== task.id));
+    setOpenMenuId(null);
+    try {
+      if (target === 'personal') {
+        await addPersonalTask({ title: task.text, status: 'todo', priority: 'medium', category: 'ideas' });
+      } else {
+        await addTask({ title: task.text, status: 'todo', priority: 'medium', brandId: target });
+      }
+      await deleteInboxTask(task.id);
+      router.refresh();
+    } catch {
+      // Keep removed optimistically
+    }
   }
 
   return (
@@ -961,14 +1007,51 @@ function InboxPanel({ inboxTasks }: { inboxTasks: InboxTask[] }) {
         onChange={e => setNewText(e.target.value)}
         onKeyDown={e => e.key === 'Enter' && handleAdd()}
       />
-      {inboxTasks.length === 0 ? (
+      {tasks.length === 0 ? (
         <div className="empty-state">صندوق الوارد فارغ ✨</div>
       ) : (
-        inboxTasks.slice(0, 8).map(t => (
-          <div key={t.id} className="inbox-item">
-            <div className="inbox-icon">💡</div>
-            <span>{t.text}</span>
-            <button onClick={() => handleDelete(t.id)} className="inbox-delete">✕</button>
+        tasks.slice(0, 8).map(t => (
+          <div key={t.id} className="inbox-item" style={{ position: 'relative', alignItems: 'flex-start' }}>
+            <div className="inbox-icon" style={{ marginTop: 2 }}>💡</div>
+            <div style={{ flex: 1, minWidth: 0 }}>
+              <div style={{ fontSize: 13, lineHeight: 1.4 }}>{t.text}</div>
+              <div style={{ fontSize: 10, color: 'var(--ink-faded, #aaa)', marginTop: 2 }}>{formatInboxDate(t.created_at)}</div>
+            </div>
+            <div style={{ display: 'flex', gap: 4, alignItems: 'center', flexShrink: 0 }}>
+              <div style={{ position: 'relative' }}>
+                <button
+                  onClick={e => { e.stopPropagation(); setOpenMenuId(openMenuId === t.id ? null : t.id); }}
+                  className="inbox-delete"
+                  title="نقل إلى..."
+                  style={{ fontSize: 12 }}
+                >📁</button>
+                {openMenuId === t.id && (
+                  <div
+                    onClick={e => e.stopPropagation()}
+                    style={{
+                      position: 'absolute', left: 0, top: '100%', marginTop: 4,
+                      background: 'white', border: '1px solid #e5e7eb', borderRadius: 10,
+                      boxShadow: '0 8px 24px rgba(0,0,0,0.12)', zIndex: 999,
+                      minWidth: 160, padding: '6px 0', direction: 'rtl',
+                    }}
+                  >
+                    <button
+                      onClick={() => handleMove(t, 'personal')}
+                      style={{ width: '100%', padding: '7px 14px', background: 'none', border: 'none', cursor: 'pointer', textAlign: 'right', fontSize: 13, fontFamily: 'inherit', display: 'flex', alignItems: 'center', gap: 6 }}
+                    >👤 شخصي</button>
+                    <div style={{ height: 1, background: '#f0f0f0', margin: '4px 0' }} />
+                    {brands.map(b => (
+                      <button
+                        key={b.id}
+                        onClick={() => handleMove(t, b.id)}
+                        style={{ width: '100%', padding: '7px 14px', background: 'none', border: 'none', cursor: 'pointer', textAlign: 'right', fontSize: 13, fontFamily: 'inherit', display: 'flex', alignItems: 'center', gap: 6 }}
+                      >{b.icon} {b.name}</button>
+                    ))}
+                  </div>
+                )}
+              </div>
+              <button onClick={() => handleDelete(t.id)} className="inbox-delete">✕</button>
+            </div>
           </div>
         ))
       )}
@@ -1119,7 +1202,7 @@ export default function LeadershipClient({
                   </div>
                 </div>
               </div>
-              <InboxPanel inboxTasks={inboxTasks} />
+              <InboxPanel inboxTasks={inboxTasks} brands={brands} />
             </section>
 
           </div>{/* end ثلاثة أعمدة */}
