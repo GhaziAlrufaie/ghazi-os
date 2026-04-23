@@ -1349,8 +1349,8 @@ export default function LeadershipClient({
 
           {/* DailyTasks — كامل العرض */}
           <DailyTasksSection routines={dailyRoutines} />
-          {/* ثلاثة أعمدة: القرارات + التقويم + الوارد */}
-          <div className="triple-panel">
+          {/* Bento Grid: القرارات + التقويم (صف 1) | الوارد كامل العرض (صف 2) */}
+          <div className="dashboard-bottom-grid">
             {/* القرارات */}
             <section className="section">
               <div className="section-head">
@@ -1377,8 +1377,8 @@ export default function LeadershipClient({
               </div>
               <CalendarMini upcomingEvents={upcomingEvents} brands={brands} activeTasks={activeTasks} />
             </section>
-            {/* الوارد */}
-            <section className="section">
+            {/* الوارد — كامل العرض */}
+            <section className="section inbox-full-width">
               <div className="section-head">
                 <div className="section-title-wrap">
                   <div className="section-icon" style={{ background: 'var(--lavender-light)', color: '#7B5AD8' }}>💡</div>

@@ -1741,3 +1741,70 @@ body::before {
     background: rgba(255, 255, 255, 0.15) !important;
   }
 }
+
+/* =============================================================================
+   DASHBOARD BOTTOM GRID — Bento: 50/50 row 1, full-width inbox row 2
+   ============================================================================= */
+.dashboard-bottom-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 20px;
+  align-items: start;
+  margin-left: -24px;
+  margin-right: calc(-24px - 220px);
+  width: calc(100% + 24px + 220px + 24px);
+}
+
+/* Inbox spans full width (both columns) */
+.inbox-full-width {
+  grid-column: 1 / -1;
+}
+
+/* Fixed height + internal scroll for decisions & calendar */
+.dashboard-bottom-grid .section {
+  display: flex;
+  flex-direction: column;
+  height: 420px;
+  min-width: 0;
+  overflow: hidden;
+}
+
+/* Inbox: auto height with max cap */
+.dashboard-bottom-grid .inbox-full-width {
+  height: auto;
+  max-height: 360px;
+}
+
+/* Scrollable inner content */
+.dashboard-bottom-grid .section > div:last-child {
+  flex: 1;
+  overflow-y: auto;
+  min-height: 0;
+  padding-right: 4px;
+}
+
+/* Clean scrollbar */
+.dashboard-bottom-grid .section > div:last-child::-webkit-scrollbar {
+  width: 4px;
+}
+.dashboard-bottom-grid .section > div:last-child::-webkit-scrollbar-thumb {
+  background: var(--border-soft);
+  border-radius: 4px;
+}
+
+/* Mobile: single column */
+@media (max-width: 900px) {
+  .dashboard-bottom-grid {
+    grid-template-columns: 1fr;
+    margin-left: 0;
+    margin-right: 0;
+    width: 100%;
+  }
+  .dashboard-bottom-grid .section {
+    height: auto;
+    min-height: 400px;
+  }
+  .dashboard-bottom-grid .inbox-full-width {
+    max-height: none;
+  }
+}
