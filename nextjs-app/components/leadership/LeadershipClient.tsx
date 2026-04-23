@@ -859,78 +859,231 @@ function DecisionsPanel({ decisions, brands }: { decisions: DecisionRow[]; brand
 }
 
 // ─── Calendar Mini ────────────────────────────────────────────────────────────
-function CalendarMini({ upcomingEvents, brands }: { upcomingEvents: UpcomingEvent[]; brands: Brand[] }) {
+function CalendarMini({ upcomingEvents, brands, activeTasks }: { upcomingEvents: UpcomingEvent[]; brands: Brand[]; activeTasks: ActiveTask[] }) {
   const now = new Date();
   const year = now.getFullYear();
   const month = now.getMonth();
   const today = now.getDate();
   const firstDay = new Date(year, month, 1).getDay();
   const daysInMonth = new Date(year, month + 1, 0).getDate();
+  const [selectedDate, setSelectedDate] = useState<number | null>(null);
 
+  // Build a set of days that have events
   const eventDays = new Set(upcomingEvents.map(e => e.day));
-  const nextEvent = upcomingEvents.find(e => e.day > today);
+
+  // Build a set of days that have tasks with due dates in the current month/year
+  const taskDays = new Set<number>();
+  activeTasks.forEach(t => {
+    if (!t.dueDate) return;
+    const d = new Date(t.dueDate);
+    if (d.getFullYear() === year && d.getMonth() === month) {
+      taskDays.add(d.getDate());
+    }
+  });
+
+  // Tomorrow's date
+  const tomorrow = new Date(now);
+  tomorrow.setDate(today + 1);
+  const tomorrowDay = tomorrow.getDate();
+  const tomorrowMonth = tomorrow.getMonth(); // 0-indexed
+  const tomorrowYear = tomorrow.getFullYear();
+
+  // Items for the selected date
+  const selectedEvents = selectedDate
+    ? upcomingEvents.filter(e => e.day === selectedDate && e.month === month + 1 && e.year === year)
+    : [];
+  const selectedTasks = selectedDate
+    ? activeTasks.filter(t => {
+        if (!t.dueDate) return false;
+        const d = new Date(t.dueDate);
+        return d.getFullYear() === year && d.getMonth() === month && d.getDate() === selectedDate;
+      })
+    : [];
+
+  // Tomorrow's items
+  const tomorrowEvents = upcomingEvents.filter(e =>
+    e.day === tomorrowDay && e.month === tomorrowMonth + 1 && e.year === tomorrowYear
+  );
+  const tomorrowTasks = activeTasks.filter(t => {
+    if (!t.dueDate) return false;
+    const d = new Date(t.dueDate);
+    return d.getFullYear() === tomorrowYear && d.getMonth() === tomorrowMonth && d.getDate() === tomorrowDay;
+  });
 
   const cells: React.ReactNode[] = [];
-  // Header
-  ['Su','Mo','Tu','We','Th','Fr','Sa'].forEach(d => (
-    cells.push(<div key={`h-${d}`} className="cal-cell header">{d}</div>)
+  // Header row
+  ['أح','اث','ث','أر','خ','ج','س'].forEach((d, i) => (
+    cells.push(<div key={`h-${i}`} className="cal-cell header">{d}</div>)
   ));
-  // Empty cells
+  // Empty cells before first day
   for (let i = 0; i < firstDay; i++) {
     cells.push(<div key={`e-${i}`} className="cal-cell" />);
   }
-  // Days
+  // Day cells
   for (let d = 1; d <= daysInMonth; d++) {
     const isToday = d === today;
     const hasEvent = eventDays.has(d);
-    const isPast = d < today && hasEvent;
-    const isSoon = nextEvent && d === nextEvent.day;
+    const hasTask = taskDays.has(d);
+    const isSelected = d === selectedDate;
     let cls = 'cal-cell';
     if (isToday) cls += ' today';
-    else if (isPast) cls += ' past-event';
-    else if (isSoon) cls += ' soon-event';
-    else if (hasEvent) cls += ' upcoming-event';
-    cells.push(<div key={d} className={cls}>{d}</div>);
+    if (isSelected) cls += ' selected';
+    cells.push(
+      <div key={d} className={cls} onClick={() => setSelectedDate(d === selectedDate ? null : d)}
+        style={{ cursor: 'pointer', position: 'relative' }}>
+        {d}
+        {(hasEvent || hasTask) && (
+          <div style={{
+            position: 'absolute', bottom: 2, left: '50%', transform: 'translateX(-50%)',
+            display: 'flex', gap: 2,
+          }}>
+            {hasEvent && <span style={{ width: 4, height: 4, borderRadius: '50%', background: 'var(--coral, #ff6b6b)', display: 'block' }} />}
+            {hasTask && <span style={{ width: 4, height: 4, borderRadius: '50%', background: 'var(--gold, #f0a500)', display: 'block' }} />}
+          </div>
+        )}
+      </div>
+    );
   }
+
+  const ARABIC_MONTHS = ['يناير','فبراير','مارس','أبريل','مايو','يونيو','يوليو','أغسطس','سبتمبر','أكتوبر','نوفمبر','ديسمبر'];
 
   return (
     <div>
-      {upcomingEvents.length > 0 && (() => {
-        const next = upcomingEvents[0];
-        const dateStr = `${next.year}-${String(next.month+1).padStart(2,'0')}-${String(next.day).padStart(2,'0')}`;
-        const dl = Math.ceil((new Date(dateStr+'T00:00:00').getTime() - new Date().setHours(0,0,0,0)) / 86400000);
-        const label = dl === 0 ? 'اليوم' : dl === 1 ? 'غداً' : dl === 2 ? 'بعد يومين' : `بعد ${dl} أيام`;
-        return (
-          <div className="cal-alert">
-            <div className="cal-alert-dot"></div>
-            <div className="cal-alert-text">
-              <strong>{label}:</strong> {next.title}
-            </div>
-          </div>
-        );
-      })()}
+      {/* Calendar grid */}
       <div className="cal-mini">{cells}</div>
-      <div className="upcoming-list">
-        {upcomingEvents.slice(0, 4).map(e => {
-          const brand = brands.find(b => b.id === e.brandId);
-          const dl = daysLeft(`${e.year}-${String(e.month).padStart(2,'0')}-${String(e.day).padStart(2,'0')}`);
-          const isUrgent = dl <= 3;
-          return (
-            <div key={e.id} className={`upcoming-item${isUrgent ? ' urgent' : ''}`}>
-              <div className="upcoming-date">
-                <div className="upcoming-day">{e.day}</div>
-                <div className="upcoming-month">{MONTH_NAMES[e.month - 1]?.slice(0, 3)}</div>
-              </div>
-              <div className="upcoming-body">
-                <div className="upcoming-title">{e.title}</div>
-                <div className="upcoming-when">
-                  {dl <= 0 ? 'اليوم' : dl === 1 ? 'غداً' : `بعد ${dl} أيام`}
-                  {brand && ` · ${brand.name}`}
-                </div>
+
+      {/* Day Details Modal */}
+      {selectedDate && (selectedEvents.length > 0 || selectedTasks.length > 0) && (
+        <div
+          onClick={() => setSelectedDate(null)}
+          style={{
+            position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.4)',
+            zIndex: 9999, display: 'flex', alignItems: 'center', justifyContent: 'center',
+          }}
+        >
+          <div
+            onClick={e => e.stopPropagation()}
+            style={{
+              background: 'var(--bg-card, #fff)', borderRadius: 16, padding: '20px 24px',
+              minWidth: 300, maxWidth: 420, width: '90vw', direction: 'rtl',
+              boxShadow: '0 20px 60px rgba(0,0,0,0.2)',
+            }}
+          >
+            {/* Modal header */}
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
+              <button
+                onClick={() => setSelectedDate(null)}
+                style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: 18, color: 'var(--ink-faded, #aaa)' }}
+              >✕</button>
+              <div style={{ fontWeight: 700, fontSize: 16, color: 'var(--ink)' }}>
+                {selectedDate} {ARABIC_MONTHS[month]}
               </div>
             </div>
-          );
-        })}
+
+            {/* Events */}
+            {selectedEvents.length > 0 && (
+              <div style={{ marginBottom: 12 }}>
+                <div style={{ fontSize: 11, color: 'var(--txt3, #aaa)', marginBottom: 6, fontWeight: 600 }}>📅 أحداث</div>
+                {selectedEvents.map(e => {
+                  const brand = brands.find(b => b.id === e.brandId);
+                  return (
+                    <div key={e.id} style={{
+                      display: 'flex', alignItems: 'center', gap: 8, padding: '8px 10px',
+                      background: 'var(--bg-soft, #f8f8f8)', borderRadius: 10, marginBottom: 6,
+                    }}>
+                      <span style={{ flex: 1, fontSize: 13, color: 'var(--ink)' }}>{e.title}</span>
+                      {brand && (
+                        <span style={{
+                          fontSize: 11, padding: '2px 8px', borderRadius: 20,
+                          background: `${brand.color}22`, color: brand.color, fontWeight: 600,
+                        }}>{brand.icon} {brand.name}</span>
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
+            )}
+
+            {/* Tasks */}
+            {selectedTasks.length > 0 && (
+              <div>
+                <div style={{ fontSize: 11, color: 'var(--txt3, #aaa)', marginBottom: 6, fontWeight: 600 }}>✅ مهام</div>
+                {selectedTasks.map(t => {
+                  const brand = brands.find(b => b.id === t.brandId);
+                  const isDone = t.status === 'done';
+                  return (
+                    <div key={t.id} style={{
+                      display: 'flex', alignItems: 'center', gap: 8, padding: '8px 10px',
+                      background: 'var(--bg-soft, #f8f8f8)', borderRadius: 10, marginBottom: 6,
+                    }}>
+                      <span style={{ fontSize: 14 }}>{isDone ? '☑️' : '⬜'}</span>
+                      <span style={{ flex: 1, fontSize: 13, color: 'var(--ink)', textDecoration: isDone ? 'line-through' : 'none' }}>{t.title}</span>
+                      {brand && (
+                        <span style={{
+                          fontSize: 11, padding: '2px 8px', borderRadius: 20,
+                          background: `${brand.color}22`, color: brand.color, fontWeight: 600,
+                        }}>{brand.icon} {brand.name}</span>
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+
+      {/* Tomorrow section */}
+      <div style={{ marginTop: 12 }}>
+        <div style={{ fontSize: 11, color: 'var(--gold, #f0a500)', fontWeight: 700, textAlign: 'right', marginBottom: 6 }}>📌 قادم</div>
+        {tomorrowEvents.length === 0 && tomorrowTasks.length === 0 ? (
+          <div style={{
+            textAlign: 'center', color: 'var(--txt3, #aaa)', fontSize: 12,
+            padding: '24px 0', border: '1px solid var(--border-soft, #eee)',
+            borderRadius: 12, marginTop: 8,
+          }}>لا توجد أحداث قادمة</div>
+        ) : (
+          <div>
+            {tomorrowEvents.map(e => {
+              const brand = brands.find(b => b.id === e.brandId);
+              return (
+                <div key={e.id} style={{
+                  display: 'flex', alignItems: 'center', gap: 8, padding: '7px 10px',
+                  background: 'var(--bg-soft, #f8f8f8)', borderRadius: 10, marginBottom: 5,
+                  direction: 'rtl',
+                }}>
+                  <span style={{ fontSize: 12 }}>📅</span>
+                  <span style={{ flex: 1, fontSize: 12, color: 'var(--ink)' }}>{e.title}</span>
+                  {brand && (
+                    <span style={{
+                      fontSize: 10, padding: '2px 6px', borderRadius: 20,
+                      background: `${brand.color}22`, color: brand.color, fontWeight: 600,
+                    }}>{brand.icon}</span>
+                  )}
+                </div>
+              );
+            })}
+            {tomorrowTasks.map(t => {
+              const brand = brands.find(b => b.id === t.brandId);
+              return (
+                <div key={t.id} style={{
+                  display: 'flex', alignItems: 'center', gap: 8, padding: '7px 10px',
+                  background: 'var(--bg-soft, #f8f8f8)', borderRadius: 10, marginBottom: 5,
+                  direction: 'rtl',
+                }}>
+                  <span style={{ fontSize: 12 }}>⬜</span>
+                  <span style={{ flex: 1, fontSize: 12, color: 'var(--ink)' }}>{t.title}</span>
+                  {brand && (
+                    <span style={{
+                      fontSize: 10, padding: '2px 6px', borderRadius: 20,
+                      background: `${brand.color}22`, color: brand.color, fontWeight: 600,
+                    }}>{brand.icon}</span>
+                  )}
+                </div>
+              );
+            })}
+          </div>
+        )}
       </div>
     </div>
   );
@@ -1222,7 +1375,7 @@ export default function LeadershipClient({
                   </div>
                 </div>
               </div>
-              <CalendarMini upcomingEvents={upcomingEvents} brands={brands} />
+              <CalendarMini upcomingEvents={upcomingEvents} brands={brands} activeTasks={activeTasks} />
             </section>
             {/* الوارد */}
             <section className="section">
