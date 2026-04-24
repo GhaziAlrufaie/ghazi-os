@@ -1,23 +1,19 @@
 'use client';
 // TaskPanel — VIP Premium 2-Column Modal (Notion/Linear Style)
 import React, { useState, useEffect } from 'react';
-import type { Task, TaskStatus, TaskPriority, TaskType } from '@/lib/tasks-actions';
+import type { Task, TaskStatus, TaskPriority } from '@/lib/tasks-actions';
 import { updateTask } from '@/lib/tasks-actions';
 
 interface ChecklistItem { id: string; text: string; isCompleted: boolean; }
 interface ChecklistGroup { id: string; title: string; items: ChecklistItem[]; }
 
 const STATUS_OPTIONS: { v: TaskStatus; lbl: string; bg: string; color: string }[] = [
+  { v: 'todo',        lbl: 'قيد الانتظار',  bg: '#EFF6FF', color: '#1D4ED8' },
+  { v: 'in_progress', lbl: 'جاري التنفيذ',  bg: '#FFF7ED', color: '#C2410C' },
+  { v: 'on_hold',     lbl: 'معلق',           bg: '#FDF4FF', color: '#7E22CE' },
+  { v: 'done',        lbl: '✅ منجز',        bg: '#F0FDF4', color: '#166534' },
   { v: 'ideas',       lbl: '💡 أفكار',       bg: '#F5F3FF', color: '#6D28D9' },
-  { v: 'todo',        lbl: '📝 قيد الانتظار', bg: '#EFF6FF', color: '#1D4ED8' },
-  { v: 'in_progress', lbl: '🚀 جاري التنفيذ', bg: '#FFF7ED', color: '#C2410C' },
-  { v: 'on_hold',     lbl: '✋ معلق',          bg: '#FDF4FF', color: '#7E22CE' },
-  { v: 'done',        lbl: '✅ مكتمل',         bg: '#F0FDF4', color: '#166534' },
-];
-const TYPE_OPTIONS: { v: TaskType; lbl: string; bg: string; color: string }[] = [
-  { v: 'task',    lbl: '☑️ مهمة تشغيلية', bg: '#F8FAFC', color: '#475569' },
-  { v: 'project', lbl: '🚀 مشروع',         bg: '#F3E8FF', color: '#7E22CE' },
-  { v: 'idea',    lbl: '💡 فكرة',           bg: '#FFFBEB', color: '#D97706' },
+  { v: 'projects',    lbl: '🚀 مشاريع',      bg: '#F0F9FF', color: '#0369A1' },
 ];
 const PRIORITY_OPTIONS: { v: TaskPriority; lbl: string; bg: string; color: string }[] = [
   { v: 'critical', lbl: '🔴 حرج',    bg: '#FEF2F2', color: '#DC2626' },
@@ -53,7 +49,6 @@ export default function TaskPanel({ task, onClose, onUpdate, onDelete, onArchive
   const [status, setStatus]     = useState<TaskStatus>('todo');
   const [priority, setPriority] = useState<TaskPriority>('medium');
   const [dueDate, setDueDate]   = useState('');
-  const [localType, setLocalType] = useState<TaskType>('task');
   const [groups, setGroups]     = useState<ChecklistGroup[]>([]);
   const [saving, setSaving]     = useState(false);
 
@@ -64,7 +59,6 @@ export default function TaskPanel({ task, onClose, onUpdate, onDelete, onArchive
     setStatus(task.status);
     setPriority(task.priority);
     setDueDate(task.dueDate ?? '');
-    setLocalType((task.type as TaskType) ?? 'task');
     setGroups(parseGroups(task.subtasks));
   }, [task?.id]);
 
@@ -125,7 +119,6 @@ export default function TaskPanel({ task, onClose, onUpdate, onDelete, onArchive
   function handleArchive() { onArchive(task!); onClose(); }
 
   const activeStatus   = STATUS_OPTIONS.find(s => s.v === status)    ?? STATUS_OPTIONS[0];
-  const activeType     = TYPE_OPTIONS.find(t => t.v === localType)    ?? TYPE_OPTIONS[0];
   const activePriority = PRIORITY_OPTIONS.find(p => p.v === priority) ?? PRIORITY_OPTIONS[2];
   const totalItems = groups.reduce((s, g) => s + g.items.length, 0);
   const doneItems  = groups.reduce((s, g) => s + g.items.filter(i => i.isCompleted).length, 0);
@@ -163,14 +156,6 @@ export default function TaskPanel({ task, onClose, onUpdate, onDelete, onArchive
             <input type="date" className="vip-meta-badge" value={dueDate}
               onChange={e => { setDueDate(e.target.value); saveField({ id: task!.id, dueDate: e.target.value || null }); }}
               style={{ fontFamily: 'inherit', cursor: 'pointer' }} />
-          </div>
-          <div className="vip-meta-section" style={{ marginTop: '4px' }}>
-            <span className="vip-meta-label">📌 نوع العنصر</span>
-            <select className="vip-meta-badge" value={localType}
-              onChange={e => { const v = e.target.value as TaskType; setLocalType(v); saveField({ id: task!.id, type: v }); }}
-              style={{ background: activeType.bg, color: activeType.color, borderColor: activeType.color + '40', outline: 'none' }}>
-              {TYPE_OPTIONS.map(t => <option key={t.v} value={t.v}>{t.lbl}</option>)}
-            </select>
           </div>
 
           {totalItems > 0 && (

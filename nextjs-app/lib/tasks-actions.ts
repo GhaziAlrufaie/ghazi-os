@@ -4,8 +4,7 @@
 import { createServerClient } from '@/lib/supabase';
 import { revalidatePath } from 'next/cache';
 
-export type TaskStatus = 'todo' | 'in_progress' | 'on_hold' | 'waiting' | 'done' | 'ideas';
-export type TaskType = 'task' | 'project' | 'idea';
+export type TaskStatus = 'todo' | 'in_progress' | 'on_hold' | 'waiting' | 'done' | 'ideas' | 'projects';
 export type TaskPriority = 'critical' | 'high' | 'medium' | 'low';
 
 export interface Task {
@@ -20,7 +19,6 @@ export interface Task {
   sortOrder: number;
   hasDescription: boolean;
   subtasks: SubtaskItem[];
-  type: TaskType;
 }
 
 interface AddTaskInput {
@@ -29,7 +27,6 @@ interface AddTaskInput {
   priority: TaskPriority;
   brandId?: string | null;
   projectId?: string | null;
-  type?: TaskType;
 }
 
 export interface SubtaskItem {
@@ -47,14 +44,13 @@ interface UpdateTaskInput {
   dueDate?: string | null;
   sortOrder?: number;
   subtasks?: SubtaskItem[];
-  type?: TaskType;
 }
 
 export async function getTasks(): Promise<Task[]> {
   const supabase = createServerClient();
   const { data } = await supabase
     .from('tasks')
-    .select('id,title,description,status,priority,due_date,brand_id,project_id,sort_order,subtasks,type')
+    .select('id,title,description,status,priority,due_date,brand_id,project_id,sort_order,subtasks')
     .order('sort_order');
   return (data ?? []).map(r => ({
     id: r.id as string,
@@ -68,39 +64,7 @@ export async function getTasks(): Promise<Task[]> {
     sortOrder: (r.sort_order as number) ?? 0,
     hasDescription: !!((r.description as string)?.trim()),
     subtasks: Array.isArray(r.subtasks) ? (r.subtasks as SubtaskItem[]) : [],
-    type: ((r.type as TaskType) ?? 'task'),
   }));
-}
-
-
-export async function getProjectTypeTasks(): Promise<Task[]> {
-  const supabase = createServerClient();
-  const { data } = await supabase
-    .from('tasks')
-    .select('id,title,description,status,priority,due_date,brand_id,project_id,sort_order,subtasks,type')
-    .eq('type', 'project')
-    .order('sort_order');
-  const VALID_STATUSES = ['ideas', 'todo', 'in_progress', 'on_hold', 'waiting', 'done'];
-  return (data ?? []).map(r => {
-    const rawStatus = (r.status as string) ?? 'todo';
-    const status = (rawStatus === 'projects' || rawStatus === 'مشاريع' || !VALID_STATUSES.includes(rawStatus))
-      ? 'ideas'
-      : rawStatus;
-    return {
-      id: r.id as string,
-      title: r.title as string,
-      description: (r.description as string) ?? '',
-      status: status as TaskStatus,
-      priority: (r.priority as TaskPriority) ?? 'medium',
-      dueDate: (r.due_date as string | null) ?? null,
-      brandId: (r.brand_id as string | null) ?? null,
-      projectId: (r.project_id as string | null) ?? null,
-      sortOrder: (r.sort_order as number) ?? 0,
-      hasDescription: !!((r.description as string)?.trim()),
-      subtasks: Array.isArray(r.subtasks) ? (r.subtasks as SubtaskItem[]) : [],
-      type: ((r.type as TaskType) ?? 'project'),
-    };
-  });
 }
 
 function genId(): string {
@@ -124,9 +88,8 @@ export async function addTask(
       brand_id: input.brandId ?? null,
       project_id: input.projectId ?? null,
       sort_order: 0,
-      type: input.type ?? 'task',
     })
-    .select('id,title,description,status,priority,due_date,brand_id,project_id,sort_order,subtasks,type')
+    .select('id,title,description,status,priority,due_date,brand_id,project_id,sort_order,subtasks')
     .single();
 
   if (error) return { error: error.message };
@@ -145,7 +108,6 @@ export async function addTask(
       sortOrder: data.sort_order ?? 0,
       hasDescription: !!(data.description?.trim()),
       subtasks: Array.isArray(data.subtasks) ? (data.subtasks as SubtaskItem[]) : [],
-      type: (data.type as TaskType) ?? 'task',
     },
   };
 }
@@ -163,13 +125,12 @@ export async function updateTask(
   if (input.dueDate !== undefined)     patch.due_date = input.dueDate;
   if (input.sortOrder !== undefined)   patch.sort_order = input.sortOrder;
   if (input.subtasks !== undefined)    patch.subtasks = input.subtasks;
-  if (input.type !== undefined)         patch.type = input.type;
 
   const { data, error } = await supabase
     .from('tasks')
     .update(patch)
     .eq('id', input.id)
-    .select('id,title,description,status,priority,due_date,brand_id,project_id,sort_order,subtasks,type')
+    .select('id,title,description,status,priority,due_date,brand_id,project_id,sort_order,subtasks')
     .single();
 
   if (error) return { error: error.message };
@@ -188,7 +149,6 @@ export async function updateTask(
       sortOrder: data.sort_order ?? 0,
       hasDescription: !!(data.description?.trim()),
       subtasks: Array.isArray(data.subtasks) ? (data.subtasks as SubtaskItem[]) : [],
-      type: (data.type as TaskType) ?? 'task',
     },
   };
 }
@@ -224,7 +184,7 @@ export async function getFinanceTasks(): Promise<Task[]> {
   const supabase = createServerClient();
   const { data } = await supabase
     .from('tasks')
-    .select('id,title,description,status,priority,due_date,brand_id,project_id,sort_order,category,subtasks,type')
+    .select('id,title,description,status,priority,due_date,brand_id,project_id,sort_order,category,subtasks')
     .eq('category', 'financial')
     .order('sort_order');
   return (data ?? []).map(r => ({
@@ -239,7 +199,6 @@ export async function getFinanceTasks(): Promise<Task[]> {
     sortOrder: (r.sort_order as number) ?? 0,
     hasDescription: !!((r.description as string)?.trim()),
     subtasks: Array.isArray(r.subtasks) ? (r.subtasks as SubtaskItem[]) : [],
-    type: ((r.type as TaskType) ?? 'task'),
   }));
 }
 
@@ -261,7 +220,7 @@ export async function addFinanceTask(
       sort_order: 0,
       category: 'financial',
     })
-    .select('id,title,description,status,priority,due_date,brand_id,project_id,sort_order,subtasks,type')
+    .select('id,title,description,status,priority,due_date,brand_id,project_id,sort_order,subtasks')
     .single();
   if (error) return { error: error.message };
   revalidatePath('/', 'layout');
@@ -278,7 +237,6 @@ export async function addFinanceTask(
       sortOrder: data.sort_order ?? 0,
       hasDescription: !!(data.description?.trim()),
       subtasks: [],
-      type: (data.type as TaskType) ?? 'task',
     },
   };
 }

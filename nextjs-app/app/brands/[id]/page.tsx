@@ -38,32 +38,23 @@ async function getBrandTasks(brandId: string): Promise<Task[]> {
   const supabase = createServerClient();
   const { data } = await supabase
     .from('tasks')
-    .select('id,title,description,status,priority,due_date,brand_id,project_id,sort_order,subtasks,subtask_groups,type')
+    .select('*')
     .eq('brand_id', brandId)
     .order('sort_order');
-  const VALID_STATUSES = ['ideas', 'todo', 'in_progress', 'on_hold', 'waiting', 'done'];
-  return (data ?? []).map((r) => {
-    // Self-healing: remap orphaned 'projects' or 'مشاريع' status to 'ideas'
-    const rawStatus = r.status ?? 'todo';
-    const status = (rawStatus === 'projects' || rawStatus === 'مشاريع' || !VALID_STATUSES.includes(rawStatus))
-      ? 'ideas'
-      : rawStatus;
-    return {
-      id: r.id,
-      title: r.title,
-      description: r.description ?? '',
-      status: status as import('@/lib/tasks-actions').TaskStatus,
-      priority: r.priority ?? 'medium',
-      dueDate: r.due_date ?? null,
-      brandId: r.brand_id ?? null,
-      projectId: r.project_id ?? null,
-      sortOrder: r.sort_order ?? 0,
-      hasDescription: !!(r.description?.trim()),
-      subtasks: Array.isArray(r.subtasks) ? r.subtasks : [],
-      subtask_groups: Array.isArray(r.subtask_groups) ? r.subtask_groups : undefined,
-      type: (r.type ?? 'task') as import('@/lib/tasks-actions').TaskType,
-    };
-  });
+  return (data ?? []).map((r) => ({
+    id: r.id,
+    title: r.title,
+    description: r.description ?? '',
+    status: r.status ?? 'todo',
+    priority: r.priority ?? 'medium',
+    dueDate: r.due_date ?? null,
+    brandId: r.brand_id ?? null,
+    projectId: r.project_id ?? null,
+    sortOrder: r.sort_order ?? 0,
+    hasDescription: !!(r.description?.trim()),
+    subtasks: Array.isArray(r.subtasks) ? r.subtasks : [],
+    subtask_groups: Array.isArray(r.subtask_groups) ? r.subtask_groups : undefined,
+  }));
 }
 
 async function getBrandProjects(brandId: string): Promise<ProjectRow[]> {

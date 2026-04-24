@@ -298,7 +298,7 @@ export default function ProjectDetailClient({ project, initialTasks, brands }: P
       id: tempId, title: quickAdd.title, description: '',
       status: quickAdd.colId, priority,
       dueDate: null, brandId: project.brandId,
-      projectId: project.id, sortOrder: 0, hasDescription: false, subtasks: [], type: 'task' as const,
+      projectId: project.id, sortOrder: 0, hasDescription: false, subtasks: [],
     };
     setTasks((prev) => [...prev, newTask]);
     setQuickAdd(null);

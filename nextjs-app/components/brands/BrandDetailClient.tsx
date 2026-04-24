@@ -10,7 +10,7 @@ import {
   type DropResult,
 } from '@hello-pangea/dnd';
 import type { BrandRow } from '@/lib/brands-types';
-import type { Task, TaskStatus, TaskPriority, TaskType } from '@/lib/tasks-actions';
+import type { Task, TaskStatus, TaskPriority } from '@/lib/tasks-actions';
 import { addTask, updateTask, deleteTask, archiveTask, restoreTask } from '@/lib/tasks-actions';
 import type { ProjectRow } from '@/lib/projects-types';
 import { updateBrand, deleteBrand } from '@/lib/brands-actions';
@@ -20,10 +20,12 @@ import { useGlobal } from '@/components/GlobalProviders';
 
 // ─── Constants ────────────────────────────────────────────────────────────────
 const KANBAN_COLS: { id: TaskStatus; name: string; color: string }[] = [
-  { id: 'ideas',       name: '💡 أفكار',      color: '#8B5CF6' },
-  { id: 'todo',        name: '📝 قيد الانتظار', color: '#3B82F6' },
-  { id: 'in_progress', name: '🚀 جاري التنفيذ', color: '#C9A84C' },
-  { id: 'done',        name: '✅ مكتمل',       color: '#10B981' },
+  { id: 'todo',        name: 'قيد الانتظار', color: '#3B82F6' },
+  { id: 'in_progress', name: 'جاري التنفيذ', color: '#C9A84C' },
+  { id: 'on_hold',     name: 'معلق',         color: '#F97316' },
+  { id: 'done',        name: 'منجز',         color: '#10B981' },
+  { id: 'ideas',       name: '💡 أفكار',     color: '#8B5CF6' },
+  { id: 'projects',    name: '🚀 مشاريع',    color: '#0EA5E9' },
 ];
 
 const PRIORITY_COLORS: Record<TaskPriority, string> = {
@@ -271,8 +273,6 @@ function TaskCard({ task, project, index, onArchive, onDelete, onClick }: TaskCa
           </div>
           <h4 className="vip-task-title">{task.title}</h4>
           <div className="vip-card-tags">
-            {task.type === 'project' && <span className="vip-tag" style={{ background: '#F3E8FF', color: '#7E22CE', border: '1px solid #E9D5FF', fontWeight: 900 }}>🚀 مشروع</span>}
-            {task.type === 'idea' && <span className="vip-tag" style={{ background: '#FFFBEB', color: '#D97706', border: '1px solid #FEF3C7', fontWeight: 900 }}>💡 فكرة</span>}
             {task.priority === 'critical' && <span className="vip-tag" style={{ background: '#FEF2F2', color: '#DC2626' }}>🔴 حرج</span>}
             {task.priority === 'high' && <span className="vip-tag" style={{ background: '#FFF7ED', color: '#EA580C' }}>🟠 عالي</span>}
             {task.priority === 'medium' && <span className="vip-tag" style={{ background: '#EFF6FF', color: '#2563EB' }}>🟡 متوسط</span>}
@@ -314,6 +314,7 @@ function KanbanCol({ col, tasks, projects, brandId, activeProjectId, onArchive, 
     <div className="vip-kanban-column">
       <div className="vip-column-header">
         <h3 className="vip-column-title">
+          <span>{getColEmoji(col.id)}</span>
           <span>{col.name}</span>
         </h3>
         <div className="vip-column-count">{tasks.length}</div>
@@ -346,6 +347,92 @@ function KanbanCol({ col, tasks, projects, brandId, activeProjectId, onArchive, 
 }
 
 // ─── Stacked Ideas + Projects Column ─────────────────────────────────────────
+interface StackedColProps {
+  ideasTasks: Task[];
+  projectsTasks: Task[];
+  projects: ProjectRow[];
+  brandId: string;
+  activeProjectId: string | null;
+  onArchive: (id: string) => void;
+  onDelete: (id: string) => void;
+  onAdd: (task: Task) => void;
+  onCardClick: (task: Task) => void;
+}
+function StackedIdeasProjects({ ideasTasks, projectsTasks, projects, brandId, activeProjectId, onArchive, onDelete, onAdd, onCardClick }: StackedColProps) {
+  const ideasCol = { id: 'ideas' as const, name: 'أفكار', color: '#8B5CF6' };
+  const projCol  = { id: 'projects' as const, name: 'مشاريع', color: '#0EA5E9' };
+  return (
+    <div className="vip-kanban-column" style={{ display: 'flex', flexDirection: 'column', overflowY: 'auto' }}>
+      {/* ── IDEAS ZONE ── */}
+      <div style={{ display: 'flex', flexDirection: 'column' }}>
+        <div className="vip-column-header" style={{ borderBottom: 'none', paddingBottom: '8px' }}>
+          <h3 className="vip-column-title"><span>💡</span><span>{ideasCol.name}</span></h3>
+          <div className="vip-column-count">{ideasTasks.length}</div>
+        </div>
+        <Droppable droppableId="ideas">
+          {(provided, snapshot) => (
+            <div
+              ref={provided.innerRef}
+              {...provided.droppableProps}
+              className={`vip-tasks-container${snapshot.isDraggingOver ? ' vip-kanban-drag-over' : ''}`}
+              style={{ minHeight: 80, overflow: 'visible', paddingBottom: 0 }}>
+              {ideasTasks.map((task, index) => (
+                <TaskCard
+                  key={task.id}
+                  task={task}
+                  project={projects.find(p => p.id === task.projectId)}
+                  index={index}
+                  onArchive={onArchive}
+                  onDelete={onDelete}
+                  onClick={onCardClick}
+                />
+              ))}
+              {provided.placeholder}
+            </div>
+          )}
+        </Droppable>
+        <QuickAdd colId={ideasCol.id} brandId={brandId} projectId={activeProjectId} onAdd={onAdd} />
+      </div>
+
+      {/* ── ELEGANT DASHED DIVIDER ── */}
+      <div style={{ display: 'flex', alignItems: 'center', margin: '20px 16px 12px', color: '#94A3B8', fontSize: '13px', fontWeight: 800 }}>
+        <div style={{ flex: 1, borderBottom: '2px dashed rgba(0,0,0,0.08)' }} />
+        <span style={{ margin: '0 10px', display: 'flex', alignItems: 'center', gap: '6px' }}>
+          🚀 مشاريع
+          <span className="vip-column-count" style={{ background: '#F8FAFC' }}>{projectsTasks.length}</span>
+        </span>
+        <div style={{ flex: 1, borderBottom: '2px dashed rgba(0,0,0,0.08)' }} />
+      </div>
+
+      {/* ── PROJECTS ZONE ── */}
+      <div style={{ display: 'flex', flexDirection: 'column' }}>
+        <Droppable droppableId="projects">
+          {(provided, snapshot) => (
+            <div
+              ref={provided.innerRef}
+              {...provided.droppableProps}
+              className={`vip-tasks-container${snapshot.isDraggingOver ? ' vip-kanban-drag-over' : ''}`}
+              style={{ minHeight: 80, overflow: 'visible' }}>
+              {projectsTasks.map((task, index) => (
+                <TaskCard
+                  key={task.id}
+                  task={task}
+                  project={projects.find(p => p.id === task.projectId)}
+                  index={index}
+                  onArchive={onArchive}
+                  onDelete={onDelete}
+                  onClick={onCardClick}
+                />
+              ))}
+              {provided.placeholder}
+            </div>
+          )}
+        </Droppable>
+        <QuickAdd colId={projCol.id} brandId={brandId} projectId={activeProjectId} onAdd={onAdd} />
+      </div>
+    </div>
+  );
+}
 // ─── Stats Column ─────────────────────────────────────────────────────────────
 interface StatsColProps { brand: BrandRow; tasks: Task[]; onBrandUpdate: (b: BrandRow) => void; }
 function StatsCol({ brand, tasks, onBrandUpdate }: StatsColProps) {
@@ -427,14 +514,28 @@ export default function BrandDetailClient({ brand: initialBrand, initialTasks, i
 
   // ── Drag & Drop ──
   const onDragEnd = useCallback(async (result: DropResult) => {
-    const { draggableId, destination } = result;
+    const { draggableId, source, destination } = result;
     if (!destination) return;
+    // Same position — no-op
+    if (source.droppableId === destination.droppableId && source.index === destination.index) return;
     const newStatus = destination.droppableId as TaskStatus;
     const task = tasks.find((t) => t.id === draggableId);
-    if (!task || task.status === newStatus) return;
-    // Optimistic update
-    setTasks((prev) => prev.map((t) => t.id === draggableId ? { ...t, status: newStatus } : t));
-    await updateTask({ id: draggableId, status: newStatus });
+    if (!task) return;
+    // Optimistic update: move card to new column or reorder within same column
+    setTasks((prev) => {
+      const without = prev.filter((t) => t.id !== draggableId);
+      const updated = { ...task, status: newStatus };
+      const destColTasks = without.filter((t) => t.status === newStatus);
+      const insertAt = without.findIndex((t) => t.status === newStatus && destColTasks.indexOf(t) === destination.index);
+      if (insertAt === -1) return [...without, updated];
+      const arr = [...without];
+      arr.splice(insertAt, 0, updated);
+      return arr;
+    });
+    // Persist status change to Supabase only if column changed
+    if (task.status !== newStatus) {
+      await updateTask({ id: draggableId, status: newStatus });
+    }
   }, [tasks]);
 
   // ── Task actions ──
@@ -556,8 +657,8 @@ export default function BrandDetailClient({ brand: initialBrand, initialTasks, i
       <div style={{ flex: 1, overflow: 'hidden' }}>
         <DragDropContext onDragEnd={onDragEnd}>
           <div className="vip-kanban-board">
-            {/* Pure status columns — ideas → todo → in_progress → done */}
-            {KANBAN_COLS.map((col) => (
+            {/* Normal columns — exclude ideas and projects (stacked together) */}
+            {KANBAN_COLS.filter(col => col.id !== 'ideas' && col.id !== 'projects').map((col) => (
               <KanbanCol
                 key={col.id}
                 col={col}
@@ -571,6 +672,18 @@ export default function BrandDetailClient({ brand: initialBrand, initialTasks, i
                 onCardClick={(task) => setPanelTask(task)}
               />
             ))}
+            {/* Stacked Column: أفكار + مشاريع in one visual column */}
+            <StackedIdeasProjects
+              ideasTasks={visibleTasks.filter(t => t.status === 'ideas')}
+              projectsTasks={visibleTasks.filter(t => t.status === 'projects')}
+              projects={projects}
+              brandId={brand.id}
+              activeProjectId={activeProjectId}
+              onArchive={handleArchive}
+              onDelete={handleDelete}
+              onAdd={handleAdd}
+              onCardClick={(task) => setPanelTask(task)}
+            />
           </div>
         </DragDropContext>
       </div>

@@ -6,8 +6,6 @@ import React, { useState, useTransition, useEffect, useRef } from 'react';
 import { DragDropContext, Droppable, Draggable, type DropResult } from '@hello-pangea/dnd';
 import { useRouter } from 'next/navigation';
 import type { BrandRow } from '@/lib/brands-types';
-import type { Task, TaskStatus, TaskType } from '@/lib/tasks-actions';
-import { updateTask } from '@/lib/tasks-actions';
 import type { ProjectRow } from '@/lib/projects-types';
 import { addProject, updateProject, deleteProject, updateProjectStatus } from '@/lib/projects-actions';
 
@@ -19,12 +17,6 @@ const KANBAN_COLS: { id: ProjectRow['status']; label: string; emoji: string }[] 
   { id: 'done',     label: 'مكتمل',  emoji: '✅' },
 ];
 
-const TASK_KANBAN_COLS: { id: TaskStatus; label: string }[] = [
-  { id: 'ideas',       label: '💡 أفكار' },
-  { id: 'todo',        label: '📝 قيد الانتظار' },
-  { id: 'in_progress', label: '🚀 جاري التنفيذ' },
-  { id: 'done',        label: '✅ مكتمل' },
-];
 const PRI_LABELS: Record<string, string> = {
   critical: '🔴 حرج', high: '🟠 عالي', medium: '🟡 متوسط', low: '⬇️ منخفض',
 };
@@ -396,35 +388,18 @@ interface Props {
   initialProjects: ProjectRow[];
   brands: BrandRow[];
   taskStats?: Record<string, { total: number; done: number }>;
-  initialProjectTypeTasks?: Task[];
 }
 
-export default function ProjectsClient({ initialProjects, brands, taskStats = {}, initialProjectTypeTasks = [] }: Props) {
+export default function ProjectsClient({ initialProjects, brands, taskStats = {} }: Props) {
   const router = useRouter();
   const [projects, setProjects] = useState<ProjectRow[]>(initialProjects);
   const [view, setView] = useState<'kanban' | 'list'>('kanban');
   const [filterBrand, setFilterBrand] = useState<string>('all');
   const [selectedProject, setSelectedProject] = useState<ProjectRow | null>(null);
-  const [projectTypeTasks, setProjectTypeTasks] = useState<Task[]>(initialProjectTypeTasks);
-  const [activeTab, setActiveTab] = useState<'projects' | 'tasks'>('tasks');
   const [, startTransition] = useTransition();
 
   const brandMap = Object.fromEntries(brands.map((b) => [b.id, b]));
   const filtered = filterBrand === 'all' ? projects : projects.filter((p) => p.brandId === filterBrand);
-  const filteredTasks = filterBrand === 'all' ? projectTypeTasks : projectTypeTasks.filter(t => t.brandId === filterBrand);
-
-  function handleTaskUpdate(patch: Partial<Task> & { id: string }) {
-    setProjectTypeTasks(prev => prev.map(t => t.id === patch.id ? { ...t, ...patch } : t));
-  }
-  function handleTaskDragEnd(result: DropResult) {
-    const { source, destination } = result;
-    if (!destination || source.droppableId === destination.droppableId) return;
-    const taskId = filteredTasks.filter(t => t.status === source.droppableId)[source.index]?.id;
-    if (!taskId) return;
-    const newStatus = destination.droppableId as TaskStatus;
-    setProjectTypeTasks(prev => prev.map(t => t.id === taskId ? { ...t, status: newStatus } : t));
-    startTransition(async () => { await updateTask({ id: taskId, status: newStatus }); });
-  }
 
   const totalProjects = projects.length;
   const doneProjects = projects.filter((p) => p.status === 'done').length;
@@ -480,24 +455,6 @@ export default function ProjectsClient({ initialProjects, brands, taskStats = {}
             <option value="all">كل البراندات</option>
             {brands.map((b) => <option key={b.id} value={b.id}>{b.name}</option>)}
           </select>
-          <div style={{ display: 'flex', gap: '4px', background: '#F1F5F9', borderRadius: '12px', padding: '4px', border: '1px solid #E2E8F0' }}>
-            <button
-              onClick={() => setActiveTab('tasks')}
-              style={{ padding: '6px 14px', borderRadius: '8px', border: 'none', cursor: 'pointer', fontFamily: 'inherit', fontSize: '13px', fontWeight: 800,
-                background: activeTab === 'tasks' ? '#FF6B35' : 'transparent',
-                color: activeTab === 'tasks' ? 'white' : '#64748B',
-                boxShadow: activeTab === 'tasks' ? '0 2px 4px rgba(255,107,53,0.3)' : 'none' }}>
-              🚀 مهام المشاريع
-            </button>
-            <button
-              onClick={() => setActiveTab('projects')}
-              style={{ padding: '6px 14px', borderRadius: '8px', border: 'none', cursor: 'pointer', fontFamily: 'inherit', fontSize: '13px', fontWeight: 800,
-                background: activeTab === 'projects' ? '#FF6B35' : 'transparent',
-                color: activeTab === 'projects' ? 'white' : '#64748B',
-                boxShadow: activeTab === 'projects' ? '0 2px 4px rgba(255,107,53,0.3)' : 'none' }}>
-              📁 مشاريع رسمية
-            </button>
-          </div>
           <div style={{ display: 'flex', background: '#F1F5F9', border: '1px solid #E2E8F0', borderRadius: '12px', padding: '4px' }}>
             <button onClick={() => setView('kanban')}
               style={{ background: view === 'kanban' ? '#fff' : 'transparent', color: view === 'kanban' ? '#0F172A' : '#64748B', border: 'none', padding: '6px 16px', borderRadius: '8px', fontSize: '13px', fontWeight: '800', boxShadow: view === 'kanban' ? '0 2px 4px rgba(0,0,0,0.06)' : 'none', cursor: 'pointer' }}>كانبان</button>
@@ -508,49 +465,7 @@ export default function ProjectsClient({ initialProjects, brands, taskStats = {}
       </div>
 
       {/* Kanban View */}
-      {view === 'kanban' && activeTab === 'tasks' && (
-        <DragDropContext onDragEnd={handleTaskDragEnd}>
-          <div className="vip-kanban-board" dir="rtl">
-            {TASK_KANBAN_COLS.map(col => {
-              const colTasks = filteredTasks.filter(t => t.status === col.id);
-              return (
-                <div key={col.id} className="vip-kanban-column">
-                  <div className="vip-column-header">
-                    <h3 className="vip-column-title"><span>{col.label}</span></h3>
-                    <div className="vip-column-count">{colTasks.length}</div>
-                  </div>
-                  <Droppable droppableId={col.id}>
-                    {(provided) => (
-                      <div className="vip-tasks-container" ref={provided.innerRef} {...provided.droppableProps}>
-                        {colTasks.map((task, index) => (
-                          <Draggable key={task.id} draggableId={task.id} index={index}>
-                            {(prov) => (
-                              <div className="vip-task-card" ref={prov.innerRef} {...prov.draggableProps} {...prov.dragHandleProps} style={{ ...prov.draggableProps.style }}>
-                                <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap', marginBottom: '6px' }}>
-                                  <span className="vip-tag" style={{ background: '#F3E8FF', color: '#7E22CE', border: '1px solid #E9D5FF', fontWeight: 900 }}>🚀 مشروع</span>
-                                  {task.brandId && brands.find(b => b.id === task.brandId) && (
-                                    <span className="vip-tag" style={{ background: '#F0F9FF', color: '#0369A1', border: '1px solid #BAE6FD' }}>
-                                      {brands.find(b => b.id === task.brandId)?.name}
-                                    </span>
-                                  )}
-                                </div>
-                                <div className="vip-task-title">{task.title}</div>
-                                {task.dueDate && <div style={{ fontSize: '11px', color: '#94A3B8', marginTop: '6px' }}>🗓 {task.dueDate}</div>}
-                              </div>
-                            )}
-                          </Draggable>
-                        ))}
-                        {provided.placeholder}
-                      </div>
-                    )}
-                  </Droppable>
-                </div>
-              );
-            })}
-          </div>
-        </DragDropContext>
-      )}
-      {view === 'kanban' && activeTab === 'projects' && (
+      {view === 'kanban' && (
         <DragDropContext onDragEnd={onDragEnd}>
           <div className="vip-kanban-board">
             {KANBAN_COLS.map((col) => {
