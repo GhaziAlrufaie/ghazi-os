@@ -67,6 +67,29 @@ export async function getTasks(): Promise<Task[]> {
   }));
 }
 
+// Fetch ONLY ideas (for Central Ideas Bank / بنك الأفكار المركزي)
+export async function getIdeasTasks(): Promise<Task[]> {
+  const supabase = createServerClient();
+  const { data } = await supabase
+    .from('tasks')
+    .select('id,title,description,status,priority,due_date,brand_id,project_id,sort_order,subtasks')
+    .in('status', ['ideas', 'projects'])
+    .order('sort_order');
+  return (data ?? []).map(r => ({
+    id: r.id as string,
+    title: r.title as string,
+    description: (r.description as string) ?? '',
+    status: r.status as TaskStatus,
+    priority: r.priority as TaskPriority,
+    dueDate: (r.due_date as string | null) ?? null,
+    brandId: (r.brand_id as string | null) ?? null,
+    projectId: (r.project_id as string | null) ?? null,
+    sortOrder: (r.sort_order as number) ?? 0,
+    hasDescription: !!((r.description as string)?.trim()),
+    subtasks: Array.isArray(r.subtasks) ? (r.subtasks as SubtaskItem[]) : [],
+  }));
+}
+
 function genId(): string {
   return `tsk_${Date.now()}_${Math.random().toString(36).slice(2, 7)}`;
 }

@@ -1,7 +1,8 @@
 'use client';
-// ProjectsClient — Master Aggregator Kanban (Global Mirror of all Brand tasks)
-// Columns EXACTLY match BrandDetailClient: ideas → todo → in_progress → on_hold → done
-// Fetches from the same `tasks` table as Brands, with Brand Filter + DnD + VIP Modal
+// ProjectsClient — بنك الأفكار المركزي (Idea Dispatcher)
+// Shows ONLY tasks with status='ideas' from all brands
+// Drop zones for other columns allow dispatching ideas to workflow
+// DnD updates the shared tasks table → instantly reflected in Brand boards
 import React, { useState, useCallback, useTransition } from 'react';
 import {
   DragDropContext,
@@ -52,12 +53,17 @@ export default function ProjectsClient({ initialTasks, brands }: Props) {
   const [panelTask, setPanelTask]     = useState<Task | null>(null);
   const [, startTransition]           = useTransition();
 
-  // ── Brand filter ──────────────────────────────────────────────────────────
-  const visibleTasks = filterBrand === 'all'
+  // ── Brand filter + Ideas-only filter ────────────────────────────────────────────────────────────────────────────────────
+  // All tasks in state (includes dispatched tasks temporarily until page refresh)
+  const brandFiltered = filterBrand === 'all'
     ? tasks
     : tasks.filter(t => t.brandId === filterBrand);
 
-  // ── Stats ─────────────────────────────────────────────────────────────────
+  // visibleTasks: only ideas (+ legacy 'projects') that haven't been dispatched yet
+  // Once a task is dragged to another column, it stays visible locally until refresh
+  const visibleTasks = brandFiltered;
+
+  // ── Stats (ideas-focused) ─────────────────────────────────────────────────────────────────────────────────────
   const totalTasks  = visibleTasks.length;
   const doneTasks   = visibleTasks.filter(t => t.status === 'done').length;
   const activeTasks = visibleTasks.filter(t => t.status === 'in_progress').length;
@@ -65,7 +71,7 @@ export default function ProjectsClient({ initialTasks, brands }: Props) {
     t.status === 'ideas' || (t.status as string) === 'projects'
   ).length;
 
-  // ── DnD — updates same tasks table as Brands ──────────────────────────────
+  // ── DnD — updates same tasks table as Brands ────────────────────────────────────────────────────────────────────────────────────
   const onDragEnd = useCallback(async (result: DropResult) => {
     const { draggableId, source, destination } = result;
     if (!destination) return;
@@ -118,11 +124,11 @@ export default function ProjectsClient({ initialTasks, brands }: Props) {
       {/* ── VIP Header ── */}
       <div className="vip-brand-header" style={{ marginBottom: 20 }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
-          <div style={{ background: '#F5F3FF', padding: 12, borderRadius: 12, fontSize: 24 }}>🗂️</div>
+          <div style={{ background: '#F5F3FF', padding: 12, borderRadius: 12, fontSize: 24 }}>💡</div>
           <div>
-            <h1 style={{ margin: 0, fontSize: 20, fontWeight: 900, color: '#0F172A' }}>لوحة المهام المركزية</h1>
+            <h1 style={{ margin: 0, fontSize: 20, fontWeight: 900, color: '#0F172A' }}>💡 بنك الأفكار المركزي</h1>
             <p style={{ margin: 0, fontSize: 13, color: '#64748B', marginTop: 2 }}>
-              مرآة شاملة لجميع المهام والأفكار عبر كل البراندات
+              غرفة مراجعة واعتماد الأفكار من جميع البراندات — اسحب الفكرة لاعتمادها وسيتم ترحيلها للبراند
             </p>
           </div>
         </div>
@@ -153,10 +159,10 @@ export default function ProjectsClient({ initialTasks, brands }: Props) {
             background: '#FFFFFF', cursor: 'pointer', outline: 'none',
             boxShadow: '0 1px 4px rgba(0,0,0,0.04)',
           }}>
-          <option value="all">🌐 جميع البراندات ({tasks.length} مهمة)</option>
+          <option value="all">🌐 جميع البراندات ({tasks.filter(t => t.status === 'ideas' || (t.status as string) === 'projects').length} فكرة)</option>
           {brands.map(b => (
             <option key={b.id} value={b.id}>
-              {b.name} ({tasks.filter(t => t.brandId === b.id).length} مهمة)
+              {b.name} ({tasks.filter(t => t.brandId === b.id && (t.status === 'ideas' || (t.status as string) === 'projects')).length} فكرة)
             </option>
           ))}
         </select>
