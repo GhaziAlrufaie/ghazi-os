@@ -12,7 +12,7 @@ import { useRouter } from 'next/navigation';
 import {
   addDecision, deleteDecision,
 } from '@/lib/leadership-actions';
-import { addTask } from '@/lib/tasks-actions';
+import { addTask, updateTask } from '@/lib/tasks-actions';
 import { addPersonalTask } from '@/lib/personal-actions';
 import {
   addInboxTask, deleteInboxTask, updateInboxTask,
@@ -648,6 +648,8 @@ function FocusHero({
   onOpenEditor: () => void;
 }) {
   const [selectedTaskId, setSelectedTaskId] = useState<string | null>(null);
+  const [localStatuses, setLocalStatuses] = useState<Record<string, string>>({});
+  const [, startTransition] = useTransition();
   const tip = DAILY_TIPS[new Date().getDay() % DAILY_TIPS.length];
 
   const sorted = useMemo(() => todayFocus ? activeTasks.filter(t => {
@@ -856,14 +858,45 @@ function FocusHero({
             {sorted.slice(0, 5).map(t => {
               const pColor = PRIORITY_COLORS[t.priority] ?? '#8B8F9F';
               const pLabel = PRIORITY_LABELS[t.priority];
+              const effectiveStatus = localStatuses[t.id] ?? t.status;
+              const isDone = effectiveStatus === 'done';
               return (
-                <div key={t.id} className="premium-subtask" onClick={() => setSelectedTaskId(t.id)}>
-                  <input type="checkbox" readOnly checked={false} onClick={e => e.stopPropagation()} />
-                  <span>{t.title}</span>
+                <label key={t.id} className="premium-subtask" style={{
+                  cursor: 'pointer',
+                  opacity: isDone ? 0.6 : 1,
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 12,
+                  transition: 'all 0.2s ease',
+                }}>
+                  <input
+                    type="checkbox"
+                    checked={isDone}
+                    onChange={(e) => {
+                      const newStatus = e.target.checked ? 'done' : 'todo';
+                      // Optimistic UI update
+                      setLocalStatuses(prev => ({ ...prev, [t.id]: newStatus }));
+                      // Persist to DB
+                      startTransition(async () => {
+                        const result = await updateTask({ id: t.id, status: newStatus as 'todo' | 'in_progress' | 'on_hold' | 'done' });
+                        if (result.error) {
+                          // Revert on error
+                          setLocalStatuses(prev => ({ ...prev, [t.id]: t.status }));
+                        }
+                      });
+                    }}
+                    style={{ cursor: 'pointer', width: 20, height: 20, accentColor: '#EA580C', flexShrink: 0 }}
+                  />
+                  <span style={{
+                    flex: 1,
+                    textDecoration: isDone ? 'line-through' : 'none',
+                    color: isDone ? '#9A6B4B' : '#431407',
+                    transition: 'all 0.2s',
+                  }}>{t.title}</span>
                   <span className="premium-subtask-priority" style={{ background: `${pColor}18`, color: pColor }}>
                     {pLabel}
                   </span>
-                </div>
+                </label>
               );
             })}
             {sorted.length > 5 && (
