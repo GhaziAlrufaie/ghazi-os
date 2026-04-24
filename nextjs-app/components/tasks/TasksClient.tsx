@@ -197,7 +197,7 @@ export default function TasksClient({ initialTasks, brands, projects }: Props) {
     const newTask: Task = {
       id: tempId, title: quickAdd.title, description: '',
       status: quickAdd.colId, priority, dueDate: null,
-      brandId: null, projectId: null, sortOrder: 0, hasDescription: false, subtasks: [],
+      brandId: null, projectId: null, sortOrder: 0, hasDescription: false, subtasks: [], type: 'task' as const,
     };
     setTasks((prev) => [...prev, newTask]);
     setQuickAdd(null); setShowPicker(false);
