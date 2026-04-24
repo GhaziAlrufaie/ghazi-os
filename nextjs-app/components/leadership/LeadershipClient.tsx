@@ -641,7 +641,7 @@ function FocusEditorModal({
 // ─── Focus Hero ───────────────────────────────────────────────────────────────
 function FocusHero({
   todayFocus, activeTasks, personalTasks, brands, projects, onOpenEditor, onBlockTask, onSetFocusTask,
-  onOpenSnooze, onOpenVault,
+  onOpenSnooze, onOpenVault, onCompleteTask,
 }: {
   todayFocus: WeeklyFocusEntry | null;
   activeTasks: ActiveTask[];
@@ -653,6 +653,7 @@ function FocusHero({
   onSetFocusTask: (task: ActiveTask) => void;
   onOpenSnooze: (task: ActiveTask) => void;
   onOpenVault: () => void;
+  onCompleteTask: (task: ActiveTask) => void;
 }) {
   const [selectedTaskId, setSelectedTaskId] = useState<string | null>(null);
   const [localStatuses, setLocalStatuses] = useState<Record<string, string>>({});
@@ -808,7 +809,7 @@ function FocusHero({
           )}
           {/* 2x2 Action buttons */}
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12, marginTop: 'auto' }}>
-            <button style={{ background: '#DCFCE7', color: '#166534', padding: '14px 16px', borderRadius: 14, fontWeight: 800, border: 'none', cursor: 'pointer', fontSize: 14, display: 'flex', justifyContent: 'center', alignItems: 'center', gap: 8, fontFamily: 'inherit' }}>✓ خلصت</button>
+            <button onClick={(e) => { e.preventDefault(); e.stopPropagation(); if (selectedTask) onCompleteTask(selectedTask); }} style={{ background: '#DCFCE7', color: '#166534', padding: '14px 16px', borderRadius: 14, fontWeight: 800, border: 'none', cursor: 'pointer', fontSize: 14, display: 'flex', justifyContent: 'center', alignItems: 'center', gap: 8, fontFamily: 'inherit' }}>✓ خلصت</button>
             <button onClick={() => selectedTask && onBlockTask(selectedTask)} style={{ background: '#FEE2E2', color: '#991B1B', padding: '14px 16px', borderRadius: 14, fontWeight: 800, border: 'none', cursor: 'pointer', fontSize: 14, display: 'flex', justifyContent: 'center', alignItems: 'center', gap: 8, fontFamily: 'inherit' }}>✋ عالق</button>
             <button onClick={(e) => { e.preventDefault(); e.stopPropagation(); if (selectedTask) onOpenSnooze(selectedTask); }} style={{ background: '#FFEDD5', color: '#9A3412', padding: '14px 16px', borderRadius: 14, fontWeight: 800, border: 'none', cursor: 'pointer', fontSize: 14, display: 'flex', justifyContent: 'center', alignItems: 'center', gap: 8, fontFamily: 'inherit' }}>⏰ بعدين</button>
             <button onClick={(e) => { e.preventDefault(); e.stopPropagation(); onOpenVault(); }} style={{ background: '#F1F5F9', color: '#334155', padding: '14px 16px', borderRadius: 14, fontWeight: 800, border: 'none', cursor: 'pointer', fontSize: 14, display: 'flex', justifyContent: 'center', alignItems: 'center', gap: 8, fontFamily: 'inherit' }}>🔄 تغيير</button>
@@ -1435,6 +1436,28 @@ export default function LeadershipClient({
       alert(`حدث خطأ غير متوقع: ${msg}`);
     }
   };
+  const handleCompleteTask = async (task: ActiveTask) => {
+    // 1. Optimistic UI: instantly hide the task from FocusHero (reuse blockedTaskIds set)
+    setBlockedTaskIds(prev => new Set([...prev, task.id]));
+    try {
+      // 2. Update task status to 'done' in DB
+      const result = await updateTask({ id: task.id, status: 'done' as TaskStatus });
+      if (result.error) {
+        // Revert optimistic UI on failure
+        setBlockedTaskIds(prev => { const next = new Set(prev); next.delete(task.id); return next; });
+        alert(`خطأ في إنجاز المهمة: ${result.error}`);
+        return;
+      }
+      // 3. Auto-open Task Vault so user can pick their next task (Momentum UX)
+      setIsVaultModalOpen(true);
+      // 4. Refresh in background to sync server state
+      router.refresh();
+    } catch (e: unknown) {
+      const msg = e instanceof Error ? e.message : String(e);
+      setBlockedTaskIds(prev => { const next = new Set(prev); next.delete(task.id); return next; });
+      alert(`حدث خطأ أثناء إنجاز المهمة: ${msg}`);
+    }
+  };
   const handleSetFocusTask = async (task: ActiveTask) => {
     const today = todayISO();
     const result = await setDayFocus({
@@ -1512,6 +1535,7 @@ export default function LeadershipClient({
             onSetFocusTask={handleSetFocusTask}
             onOpenSnooze={(task) => { setSnoozeTask(task); setIsSnoozeModalOpen(true); }}
             onOpenVault={() => setIsVaultModalOpen(true)}
+            onCompleteTask={handleCompleteTask}
           />
 
           {/* باقي المحتوى بـ padding جانبي */}
