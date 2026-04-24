@@ -810,7 +810,24 @@ function FocusHero({
         </div>
         <div className="focus-icon-big">🎯</div>
       </div>
-
+      {/* Tasks list */}
+      {sorted.length > 0 && (
+        <div className="focus-tasks">
+          <div className="focus-tasks-label">المهام المرتبطة ({sorted.length})</div>
+          {sorted.slice(0, 5).map(t => {
+            const pColor = PRIORITY_COLORS[t.priority] ?? '#8B8F9F';
+            return (
+              <button key={t.id} onClick={() => setSelectedTaskId(t.id)} className="focus-task-item"
+                style={{ borderRight: `3px solid ${pColor}` }}>
+                <span className="priority-dot" style={{ background: pColor }} />
+                <span className="flex-1">{t.title}</span>
+                <span className="priority-badge" style={{ background: `${pColor}18`, color: pColor }}>{PRIORITY_LABELS[t.priority]}</span>
+              </button>
+            );
+          })}
+          {sorted.length > 5 && <div className="focus-tasks-more">+ {sorted.length - 5} مهمة أخرى</div>}
+        </div>
+      )}
     </section>
   );
 }
@@ -1282,32 +1299,25 @@ export default function LeadershipClient({
     <div className="app" style={{ direction: 'rtl' }}>
       <main className="main">
 
-        {/* ── Top Header Bar ─────────────────────────────────────────────── */}
-        <div className="dashboard-header">
-          {/* يمين: تحية + تاريخ */}
-          <div className="dashboard-header-right">
-            <div className="dashboard-greeting">
-              {greeting} <span className="dashboard-name">غازي</span> 👋
+        {/* ── Greeting ────────────────────────────────────────────────────── */}
+        <div className="greeting" style={{ padding: '8px 24px 0' }}>
+          <div className="greeting-title">
+            <span className="greeting-emoji">👋</span>
+            <div className="greeting-text">
+              <div className="greeting-hello">
+                {greeting} <span className="name">غازي</span>
+              </div>
+              <div className="greeting-date">{dateLabel}</div>
             </div>
-            <div className="dashboard-date">{dateLabel}</div>
           </div>
-          {/* يسار: بحث + زر مهمة جديدة */}
-          <div className="dashboard-header-left">
-            <div className="dashboard-search-wrap">
-              <span className="dashboard-search-icon">🔍</span>
-              <input
-                className="dashboard-search-input"
-                type="text"
-                placeholder="ابحث في المهام والبراندات..."
-                dir="rtl"
-              />
-            </div>
-            <button
-              className="dashboard-new-task-btn"
-              onClick={() => setEditorDate(todayISO())}
-            >
+          <div className="greeting-meta">
+            <button className="quick-action">
+              <span>🔍</span>
+              <span>بحث</span>
+            </button>
+            <button className="quick-action primary" onClick={() => setEditorDate(todayISO())}>
               <span>+</span>
-              <span>مهمة جديدة</span>
+              <span>فوكس اليوم</span>
             </button>
           </div>
         </div>

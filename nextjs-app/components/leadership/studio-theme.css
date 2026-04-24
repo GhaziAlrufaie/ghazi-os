@@ -1676,8 +1676,8 @@ body::before {
 .weekly-compass-section,
 .daily-tasks-section {
   margin-left: -24px;
-  margin-right: -24px;
-  width: calc(100% + 48px);
+  margin-right: calc(-24px - 220px);
+  width: calc(100% + 24px + 220px + 24px);
 }
 /* Fixed height for perfect visual symmetry */
 .triple-panel .section {
@@ -1750,8 +1750,8 @@ body::before {
   gap: 20px;
   align-items: start;
   margin-left: -24px;
-  margin-right: -24px;
-  width: calc(100% + 48px);
+  margin-right: calc(-24px - 220px);
+  width: calc(100% + 24px + 220px + 24px);
 }
 
 /* Inbox spans full width (both columns) */
