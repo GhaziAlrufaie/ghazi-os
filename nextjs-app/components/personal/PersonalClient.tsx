@@ -1,99 +1,89 @@
 'use client';
-// Design: Personal section — category filter tabs + Kanban 4 cols + DnD (@hello-pangea/dnd)
-// Layout: .scr.on wrapper — same as /brands /calendar /reminders
-import { useState, useTransition, useRef } from 'react';
-import { DragDropContext, Droppable, Draggable, DropResult } from '@hello-pangea/dnd';
+// PersonalClient — VIP Kanban (mirrors Brands page design)
+import React, { useState, useRef, useEffect, useTransition, useMemo } from 'react';
+import { DragDropContext, Droppable, Draggable, type DropResult } from '@hello-pangea/dnd';
+import type { PersonalTask, TaskStatus, TaskPriority, TaskCategory } from '@/lib/personal-actions';
 import {
   addPersonalTask,
   updatePersonalTask,
   deletePersonalTask,
-  archivePersonalTask,
   restorePersonalTask,
-  type PersonalTask,
-  type TaskStatus,
-  type TaskPriority,
-  type TaskCategory,
+  archivePersonalTask,
 } from '@/lib/personal-actions';
 import { useGlobal } from '@/components/GlobalProviders';
 
 // ─── Constants ────────────────────────────────────────────────────────────────
-const COLUMNS: { id: TaskStatus; label: string; color: string }[] = [
-  { id: 'todo',        label: 'قيد الانتظار', color: '#6B7280' },
-  { id: 'in_progress', label: 'قيد التنفيذ',  color: '#3B82F6' },
-  { id: 'on_hold',     label: 'معلّق',         color: '#F59E0B' },
-  { id: 'done',        label: 'مكتمل',         color: '#10B981' },
-];
-const PRIORITY_META: Record<TaskPriority, { label: string; bg: string; color: string }> = {
-  critical: { label: 'حرج',   bg: 'rgba(239,68,68,0.1)',  color: '#ef4444' },
-  high:     { label: 'عالي',  bg: 'rgba(249,115,22,0.1)', color: '#f97316' },
-  medium:   { label: 'متوسط', bg: 'rgba(234,179,8,0.1)',  color: '#ca8a04' },
-  low:      { label: 'منخفض', bg: 'rgba(59,130,246,0.1)', color: '#3b82f6' },
-};
-const PRIORITIES: TaskPriority[] = ['critical', 'high', 'medium', 'low'];
-const DEFAULT_CATEGORIES: { id: TaskCategory; label: string; emoji: string }[] = [
-  { id: 'personal',    label: 'شخصي',        emoji: '👤' },
-  { id: 'health',      label: 'صحة',          emoji: '💪' },
-  { id: 'family',      label: 'عائلة',        emoji: '👨‍👩‍👧' },
-  { id: 'development', label: 'تطوير ذاتي',   emoji: '📚' },
-  { id: 'financial',   label: 'مالي',         emoji: '💰' },
-  { id: 'ideas',       label: 'أفكار',        emoji: '💡' },
+const COLUMNS: { id: TaskStatus; name: string; emoji: string; color: string }[] = [
+  { id: 'todo',        name: 'قيد الانتظار', emoji: '📥', color: '#3B82F6' },
+  { id: 'in_progress', name: 'جاري التنفيذ', emoji: '🚀', color: '#F97316' },
+  { id: 'on_hold',     name: 'معلق',          emoji: '✋', color: '#8B5CF6' },
+  { id: 'done',        name: 'منجز',          emoji: '✅', color: '#10B981' },
 ];
 
-interface Props { initialTasks: PersonalTask[] }
-interface QuickAdd { colId: TaskStatus; title: string; category: TaskCategory }
+const PRIORITY_META: Record<TaskPriority, { label: string; bg: string; color: string }> = {
+  critical: { label: '🔴 حرج',    bg: '#FEF2F2', color: '#DC2626' },
+  high:     { label: '🟠 عالي',   bg: '#FFF7ED', color: '#EA580C' },
+  medium:   { label: '🟡 متوسط',  bg: '#FEFCE8', color: '#CA8A04' },
+  low:      { label: '⬇️ منخفض', bg: '#F0FDF4', color: '#16A34A' },
+};
+const PRIORITIES: TaskPriority[] = ['critical', 'high', 'medium', 'low'];
+
+const DEFAULT_CATEGORIES: { id: TaskCategory; label: string; emoji: string }[] = [
+  { id: 'personal',    label: 'شخصي',      emoji: '👤' },
+  { id: 'health',      label: 'صحة',        emoji: '💪' },
+  { id: 'family',      label: 'عائلة',      emoji: '👨‍👩‍👧' },
+  { id: 'development', label: 'تطوير ذاتي', emoji: '📚' },
+  { id: 'financial',   label: 'مالي',       emoji: '💰' },
+  { id: 'ideas',       label: 'أفكار',      emoji: '💡' },
+];
 
 // ─── PriorityPicker ───────────────────────────────────────────────────────────
 function PriorityPicker({ onSelect, onCancel }: { onSelect: (p: TaskPriority) => void; onCancel: () => void }) {
+  useEffect(() => {
+    const t = setTimeout(onCancel, 10000);
+    return () => clearTimeout(t);
+  }, [onCancel]);
   return (
-    <div style={{ position: 'absolute', zIndex: 20, bottom: 'calc(100% + 4px)', right: 0, background: 'var(--card)', border: '1px solid var(--brd)', borderRadius: 10, boxShadow: '0 8px 24px rgba(0,0,0,0.12)', padding: 8, display: 'flex', flexDirection: 'column', gap: 4, minWidth: 120 }}>
-      {PRIORITIES.map((p) => (
-        <button key={p} onClick={() => onSelect(p)}
-          style={{ fontSize: 12, padding: '5px 10px', borderRadius: 6, border: 'none', background: PRIORITY_META[p].bg, color: PRIORITY_META[p].color, fontWeight: 600, cursor: 'pointer', fontFamily: 'inherit', textAlign: 'right' }}>
-          {PRIORITY_META[p].label}
-        </button>
-      ))}
-      <button onClick={onCancel} style={{ fontSize: 11, color: 'var(--txt3)', background: 'none', border: 'none', cursor: 'pointer', marginTop: 2, fontFamily: 'inherit' }}>إلغاء</button>
+    <div style={{ position: 'absolute', zIndex: 30, bottom: 'calc(100% + 6px)', right: 0, background: '#fff', border: '1px solid #E2E8F0', borderRadius: 14, boxShadow: '0 8px 24px rgba(0,0,0,0.12)', padding: 10, display: 'flex', flexDirection: 'column', gap: 6, minWidth: 140 }}>
+      <div style={{ fontSize: 11, color: '#94A3B8', fontWeight: 700, marginBottom: 2, textAlign: 'center' }}>اختر الأولوية</div>
+      {PRIORITIES.map((p) => {
+        const m = PRIORITY_META[p];
+        return (
+          <button key={p} onClick={() => onSelect(p)} style={{ fontSize: 13, padding: '8px 14px', borderRadius: 10, border: 'none', background: m.bg, color: m.color, fontWeight: 800, cursor: 'pointer', fontFamily: 'inherit', textAlign: 'right' }}>
+            {m.label}
+          </button>
+        );
+      })}
     </div>
   );
 }
 
-// ─── TaskCard ─────────────────────────────────────────────────────────────────
-function TaskCard({ task, index, categories, onDelete, onArchive, onEdit, onClick }: {
+// ─── VIP Task Card ────────────────────────────────────────────────────────────
+function VIPTaskCard({ task, index, categories, onClick }: {
   task: PersonalTask; index: number;
   categories: { id: TaskCategory; label: string; emoji: string }[];
-  onDelete: (id: string) => void;
-  onArchive: (t: PersonalTask) => void;
-  onEdit: (t: PersonalTask) => void;
   onClick: (t: PersonalTask) => void;
 }) {
   const pm = PRIORITY_META[task.priority];
   const cat = categories.find((c) => c.id === task.category);
+  const isOverdue = task.dueDate && new Date(task.dueDate) < new Date();
   return (
     <Draggable draggableId={task.id} index={index}>
       {(provided, snapshot) => (
-        <div ref={provided.innerRef} {...provided.draggableProps} {...provided.dragHandleProps}
+        <div
+          ref={provided.innerRef} {...provided.draggableProps} {...provided.dragHandleProps}
           onClick={() => onClick(task)}
-          style={{
-            ...provided.draggableProps.style,
-            background: 'var(--card)', border: `1px solid ${snapshot.isDragging ? 'var(--gold-b)' : 'var(--brd)'}`,
-            borderRadius: 12, padding: '10px 12px', boxShadow: snapshot.isDragging ? '0 8px 20px rgba(0,0,0,0.12)' : 'none',
-            transition: 'border-color .15s', cursor: 'pointer',
-          }}>
-          <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 8, marginBottom: 8 }}>
-            <p style={{ fontSize: 13, color: 'var(--txt)', flex: 1, lineHeight: 1.5, margin: 0 }}>{task.title}</p>
-            <div style={{ display: 'flex', gap: 2, flexShrink: 0 }} onClick={(e) => e.stopPropagation()}>
-              <button onClick={() => onEdit(task)} title="تعديل" style={{ background: 'none', border: 'none', color: 'var(--txt3)', cursor: 'pointer', fontSize: 12, padding: '0 3px' }}>✏</button>
-              <button onClick={() => onArchive(task)} title="أرشفة" style={{ background: 'none', border: 'none', color: 'var(--txt3)', cursor: 'pointer', fontSize: 12, padding: '0 3px' }}>📦</button>
-              <button onClick={() => onDelete(task.id)} title="حذف" style={{ background: 'none', border: 'none', color: 'var(--txt3)', cursor: 'pointer', fontSize: 12, padding: '0 3px' }}>✕</button>
-            </div>
-          </div>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 6, flexWrap: 'wrap' }}>
-            <span style={{ fontSize: 10, padding: '2px 8px', borderRadius: 10, background: pm.bg, color: pm.color, fontWeight: 600 }}>{pm.label}</span>
-            {cat && <span style={{ fontSize: 10, color: 'var(--txt3)' }}>{cat.emoji} {cat.label}</span>}
-            {task.hasDescription && <span style={{ fontSize: 10, color: 'var(--txt3)' }}>📝</span>}
+          className={`vip-task-card${snapshot.isDragging ? ' dragging' : ''}`}
+          style={{ ...provided.draggableProps.style }}
+        >
+          <div className="vip-task-title">{task.title}</div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 6, flexWrap: 'wrap', marginTop: 8 }}>
+            <span style={{ fontSize: 11, padding: '3px 9px', borderRadius: 20, background: pm.bg, color: pm.color, fontWeight: 700 }}>{pm.label}</span>
+            {cat && <span style={{ fontSize: 11, color: '#64748B', fontWeight: 600 }}>{cat.emoji} {cat.label}</span>}
+            {task.hasDescription && <span style={{ fontSize: 11, color: '#94A3B8' }}>📝</span>}
             {task.dueDate && (
-              <span style={{ fontSize: 10, color: new Date(task.dueDate) < new Date() ? '#ef4444' : 'var(--txt3)' }}>
-                {new Date(task.dueDate) < new Date() ? '⚠️ متأخر' : `📅 ${task.dueDate}`}
+              <span style={{ fontSize: 11, padding: '3px 9px', borderRadius: 20, background: isOverdue ? '#FEF2F2' : '#F0FDF4', color: isOverdue ? '#DC2626' : '#16A34A', fontWeight: 700 }}>
+                {isOverdue ? `⚠️ متأخر` : `🗓 ${task.dueDate}`}
               </span>
             )}
           </div>
@@ -103,110 +93,59 @@ function TaskCard({ task, index, categories, onDelete, onArchive, onEdit, onClic
   );
 }
 
-// ─── AddTaskModal ─────────────────────────────────────────────────────────────
-function AddTaskModal({ categories, defaultStatus, onClose, onAdd }: {
-  categories: { id: TaskCategory; label: string; emoji: string }[];
-  defaultStatus: TaskStatus;
-  onClose: () => void;
-  onAdd: (task: PersonalTask) => void;
+// ─── VIP QuickAdd ─────────────────────────────────────────────────────────────
+function VIPQuickAdd({ colId, defaultCategory, onAdd }: {
+  colId: TaskStatus;
+  defaultCategory: TaskCategory;
+  onAdd: (title: string, priority: TaskPriority) => void;
 }) {
-  const [title, setTitle] = useState('');
-  const [description, setDescription] = useState('');
-  const [status, setStatus] = useState<TaskStatus>(defaultStatus);
-  const [priority, setPriority] = useState<TaskPriority>('medium');
-  const [category, setCategory] = useState<TaskCategory>('personal');
-  const [dueDate, setDueDate] = useState('');
-  const [saving, setSaving] = useState(false);
+  const [isOpen, setIsOpen] = useState(false);
+  const [value, setValue] = useState('');
+  const [showPicker, setShowPicker] = useState(false);
+  const inputRef = useRef<HTMLInputElement>(null);
 
-  async function handleSave() {
-    if (!title.trim()) return;
-    setSaving(true);
-    const result = await addPersonalTask({ title: title.trim(), status, priority, category });
-    if (result.task) {
-      // update description and dueDate if provided
-      if (description.trim() || dueDate) {
-        await updatePersonalTask({ id: result.task.id, description: description.trim() || undefined, dueDate: dueDate || null });
-        onAdd({ ...result.task, description: description.trim(), dueDate: dueDate || null, hasDescription: !!description.trim() });
-      } else {
-        onAdd(result.task);
-      }
-    }
-    setSaving(false);
-    onClose();
+  useEffect(() => {
+    if (isOpen) setTimeout(() => inputRef.current?.focus(), 50);
+  }, [isOpen]);
+
+  function handleKeyDown(e: React.KeyboardEvent) {
+    if (e.key === 'Enter' && value.trim()) setShowPicker(true);
+    else if (e.key === 'Escape') { setIsOpen(false); setValue(''); setShowPicker(false); }
   }
 
-  const inputStyle: React.CSSProperties = { width: '100%', background: 'var(--bg2)', border: '1px solid var(--brd)', borderRadius: 8, padding: '8px 10px', fontSize: 13, color: 'var(--txt)', outline: 'none', fontFamily: 'inherit', boxSizing: 'border-box', marginBottom: 10 };
+  function handleSelect(p: TaskPriority) {
+    if (!value.trim()) return;
+    onAdd(value.trim(), p);
+    setValue(''); setIsOpen(false); setShowPicker(false);
+  }
 
+  if (!isOpen) {
+    return (
+      <button className="vip-add-task-btn" onClick={() => setIsOpen(true)}>
+        + إضافة مهمة جديدة
+      </button>
+    );
+  }
   return (
-    <div className="modal-bg on" onClick={onClose}>
-      <div className="modal-box" onClick={(e) => e.stopPropagation()} style={{ maxWidth: 480 }}>
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 16 }}>
-          <h3 style={{ fontSize: 16, fontWeight: 700, color: 'var(--txt)', margin: 0 }}>+ مهمة شخصية جديدة</h3>
-          <button onClick={onClose} style={{ background: 'none', border: 'none', color: 'var(--txt3)', cursor: 'pointer', fontSize: 18 }}>✕</button>
-        </div>
-        <input value={title} onChange={(e) => setTitle(e.target.value)} style={inputStyle} placeholder="عنوان المهمة *" autoFocus />
-        <textarea value={description} onChange={(e) => setDescription(e.target.value)}
-          style={{ ...inputStyle, resize: 'none', height: 70 }} placeholder="الوصف (اختياري)" />
-
-        {/* Status */}
-        <div style={{ marginBottom: 10 }}>
-          <div style={{ fontSize: 11, color: 'var(--txt3)', marginBottom: 5 }}>الحالة</div>
-          <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
-            {COLUMNS.map((col) => (
-              <button key={col.id} onClick={() => setStatus(col.id)}
-                style={{ fontSize: 11, padding: '4px 10px', borderRadius: 10, border: `1px solid ${status === col.id ? col.color : 'var(--brd)'}`, background: status === col.id ? col.color + '20' : 'transparent', color: status === col.id ? col.color : 'var(--txt3)', cursor: 'pointer', fontFamily: 'inherit', fontWeight: status === col.id ? 700 : 400 }}>
-                {col.label}
-              </button>
-            ))}
-          </div>
-        </div>
-
-        {/* Priority */}
-        <div style={{ marginBottom: 10 }}>
-          <div style={{ fontSize: 11, color: 'var(--txt3)', marginBottom: 5 }}>الأولوية</div>
-          <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
-            {PRIORITIES.map((p) => (
-              <button key={p} onClick={() => setPriority(p)}
-                style={{ fontSize: 11, padding: '4px 10px', borderRadius: 10, border: `1px solid ${priority === p ? PRIORITY_META[p].color : 'var(--brd)'}`, background: priority === p ? PRIORITY_META[p].bg : 'transparent', color: priority === p ? PRIORITY_META[p].color : 'var(--txt3)', cursor: 'pointer', fontFamily: 'inherit', fontWeight: priority === p ? 700 : 400 }}>
-                {PRIORITY_META[p].label}
-              </button>
-            ))}
-          </div>
-        </div>
-
-        {/* Category */}
-        <div style={{ marginBottom: 10 }}>
-          <div style={{ fontSize: 11, color: 'var(--txt3)', marginBottom: 5 }}>الفئة</div>
-          <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
-            {categories.map((c) => (
-              <button key={c.id} onClick={() => setCategory(c.id)}
-                style={{ fontSize: 11, padding: '4px 10px', borderRadius: 10, border: `1px solid ${category === c.id ? 'var(--gold-b)' : 'var(--brd)'}`, background: category === c.id ? 'var(--gold-dim)' : 'transparent', color: category === c.id ? 'var(--gold)' : 'var(--txt3)', cursor: 'pointer', fontFamily: 'inherit', fontWeight: category === c.id ? 700 : 400 }}>
-                {c.emoji} {c.label}
-              </button>
-            ))}
-          </div>
-        </div>
-
-        {/* Due Date */}
-        <div style={{ marginBottom: 16 }}>
-          <div style={{ fontSize: 11, color: 'var(--txt3)', marginBottom: 5 }}>تاريخ الاستحقاق (اختياري)</div>
-          <input type="date" value={dueDate} onChange={(e) => setDueDate(e.target.value)} style={{ ...inputStyle, marginBottom: 0 }} />
-        </div>
-
-        <div style={{ display: 'flex', gap: 8, justifyContent: 'flex-end' }}>
-          <button onClick={onClose} style={{ padding: '7px 16px', fontSize: 13, color: 'var(--txt3)', background: 'none', border: '1px solid var(--brd)', borderRadius: 8, cursor: 'pointer', fontFamily: 'inherit' }}>إلغاء</button>
-          <button onClick={handleSave} disabled={!title.trim() || saving}
-            style={{ padding: '7px 18px', fontSize: 13, background: title.trim() ? 'var(--gold)' : 'var(--brd)', color: title.trim() ? '#fff' : 'var(--txt3)', border: 'none', borderRadius: 8, cursor: title.trim() ? 'pointer' : 'not-allowed', fontFamily: 'inherit', fontWeight: 700 }}>
-            {saving ? 'جاري الحفظ...' : 'حفظ'}
-          </button>
-        </div>
-      </div>
+    <div style={{ position: 'relative', marginTop: 8 }}>
+      <input
+        ref={inputRef}
+        value={value}
+        onChange={(e) => setValue(e.target.value)}
+        onKeyDown={handleKeyDown}
+        placeholder="اسم المهمة ثم Enter..."
+        style={{ width: '100%', background: '#fff', border: '2px solid #EA580C', borderRadius: 12, padding: '10px 14px', fontSize: 14, color: '#1E293B', outline: 'none', fontFamily: 'inherit', boxSizing: 'border-box', boxShadow: '0 0 0 4px rgba(234,88,12,0.08)' }}
+      />
+      {showPicker && <PriorityPicker onSelect={handleSelect} onCancel={() => { setIsOpen(false); setValue(''); setShowPicker(false); }} />}
     </div>
   );
 }
 
-// ─── TaskPanel (Side Panel) ───────────────────────────────────────────────────
-function TaskPanel({ task, categories, onClose, onUpdate, onDelete, onArchive }: {
+// ─── Personal Task Modal ──────────────────────────────────────────────────────
+interface ChecklistItem { id: string; text: string; isCompleted: boolean; }
+interface ChecklistGroup { id: string; title: string; items: ChecklistItem[]; }
+
+function PersonalTaskModal({ task, categories, onClose, onUpdate, onDelete, onArchive }: {
   task: PersonalTask;
   categories: { id: TaskCategory; label: string; emoji: string }[];
   onClose: () => void;
@@ -221,208 +160,162 @@ function TaskPanel({ task, categories, onClose, onUpdate, onDelete, onArchive }:
   const [category, setCategory] = useState<TaskCategory>(task.category);
   const [dueDate, setDueDate] = useState(task.dueDate ?? '');
   const [saving, setSaving] = useState(false);
+  const [groups, setGroups] = useState<ChecklistGroup[]>([]);
+  const [newGroupTitle, setNewGroupTitle] = useState('');
+  const [newItemTexts, setNewItemTexts] = useState<Record<string, string>>({});
 
-  async function handleSave() {
+  const totalItems = groups.reduce((s, g) => s + g.items.length, 0);
+  const doneItems = groups.reduce((s, g) => s + g.items.filter(i => i.isCompleted).length, 0);
+  const progressPct = totalItems > 0 ? Math.round((doneItems / totalItems) * 100) : 0;
+
+  async function save() {
     setSaving(true);
-    const patch = { title, description, status, priority, category, dueDate: dueDate || null };
-    await updatePersonalTask({ id: task.id, ...patch });
+    const patch: Partial<PersonalTask> = { title, description, status, priority, category, dueDate: dueDate || null };
     onUpdate(patch);
+    await updatePersonalTask({ id: task.id, title, description, status, priority, category, dueDate: dueDate || null });
     setSaving(false);
-    onClose();
   }
 
-  const chipStyle = (active: boolean, color: string, bg: string): React.CSSProperties => ({
-    fontSize: 11, padding: '3px 9px', borderRadius: 10, border: `1px solid ${active ? color : 'var(--brd)'}`,
-    background: active ? bg : 'transparent', color: active ? color : 'var(--txt3)',
-    cursor: 'pointer', fontFamily: 'inherit', fontWeight: active ? 700 : 400,
-  });
+  function toggleItem(groupId: string, itemId: string) {
+    setGroups(prev => prev.map(g => g.id !== groupId ? g : {
+      ...g, items: g.items.map(i => i.id !== itemId ? i : { ...i, isCompleted: !i.isCompleted })
+    }));
+  }
+
+  function addGroup() {
+    if (!newGroupTitle.trim()) return;
+    const g: ChecklistGroup = { id: `g_${Date.now()}`, title: newGroupTitle.trim(), items: [] };
+    setGroups(prev => [...prev, g]);
+    setNewGroupTitle('');
+  }
+
+  function addItem(groupId: string) {
+    const text = newItemTexts[groupId]?.trim();
+    if (!text) return;
+    const item: ChecklistItem = { id: `i_${Date.now()}`, text, isCompleted: false };
+    setGroups(prev => prev.map(g => g.id !== groupId ? g : { ...g, items: [...g.items, item] }));
+    setNewItemTexts(prev => ({ ...prev, [groupId]: '' }));
+  }
+
+  const pm = PRIORITY_META[priority];
+  const cat = categories.find(c => c.id === category);
 
   return (
-    <>
-      {/* Overlay */}
-      <div onClick={onClose} style={{ position: 'fixed', inset: 0, zIndex: 40, background: 'rgba(0,0,0,0.25)' }} />
-      {/* Panel */}
-      <div style={{ position: 'fixed', top: 0, left: 0, bottom: 0, width: 380, zIndex: 50, background: 'var(--bg)', borderRight: '1px solid var(--brd)', boxShadow: '4px 0 24px rgba(0,0,0,0.1)', display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
-        {/* Header */}
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '16px 20px', borderBottom: '1px solid var(--brd)', flexShrink: 0 }}>
-          <span style={{ fontSize: 13, fontWeight: 700, color: 'var(--txt)' }}>تفاصيل المهمة</span>
-          <button onClick={onClose} style={{ background: 'none', border: 'none', color: 'var(--txt3)', cursor: 'pointer', fontSize: 18 }}>✕</button>
-        </div>
-        {/* Body */}
-        <div style={{ flex: 1, overflowY: 'auto', padding: '16px 20px' }}>
+    <div style={{ position: 'fixed', inset: 0, background: 'rgba(15,23,42,0.6)', backdropFilter: 'blur(4px)', zIndex: 1000, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 24 }}
+      onClick={(e) => { if (e.target === e.currentTarget) onClose(); }}>
+      <div style={{ background: '#FFFFFF', borderRadius: 24, width: '100%', maxWidth: 1000, maxHeight: '90vh', overflow: 'hidden', display: 'flex', boxShadow: '0 25px 60px rgba(0,0,0,0.2)' }}>
+        {/* Left: Main Content */}
+        <div style={{ flex: 1, padding: 32, overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: 24 }}>
           {/* Title */}
-          <div style={{ marginBottom: 14 }}>
-            <div style={{ fontSize: 11, color: 'var(--txt3)', marginBottom: 4 }}>العنوان</div>
-            <input value={title} onChange={(e) => setTitle(e.target.value)}
-              style={{ width: '100%', background: 'var(--bg2)', border: '1px solid var(--brd)', borderRadius: 8, padding: '8px 10px', fontSize: 14, fontWeight: 600, color: 'var(--txt)', outline: 'none', fontFamily: 'inherit', boxSizing: 'border-box' }} />
+          <div>
+            <div style={{ fontSize: 11, color: '#94A3B8', fontWeight: 700, marginBottom: 8, textTransform: 'uppercase', letterSpacing: 1 }}>عنوان المهمة</div>
+            <textarea value={title} onChange={e => setTitle(e.target.value)} rows={2}
+              style={{ width: '100%', fontSize: 20, fontWeight: 900, color: '#0F172A', border: 'none', outline: 'none', resize: 'none', fontFamily: 'inherit', background: 'transparent', lineHeight: 1.4 }} />
           </div>
           {/* Description */}
-          <div style={{ marginBottom: 14 }}>
-            <div style={{ fontSize: 11, color: 'var(--txt3)', marginBottom: 4 }}>الوصف</div>
-            <textarea value={description} onChange={(e) => setDescription(e.target.value)}
-              style={{ width: '100%', background: 'var(--bg2)', border: '1px solid var(--brd)', borderRadius: 8, padding: '8px 10px', fontSize: 13, color: 'var(--txt)', outline: 'none', fontFamily: 'inherit', resize: 'none', height: 80, boxSizing: 'border-box' }}
-              placeholder="أضف وصفاً..." />
+          <div>
+            <div style={{ fontSize: 11, color: '#94A3B8', fontWeight: 700, marginBottom: 8, textTransform: 'uppercase', letterSpacing: 1 }}>الوصف</div>
+            <textarea value={description} onChange={e => setDescription(e.target.value)} rows={3} placeholder="أضف وصفاً للمهمة..."
+              style={{ width: '100%', fontSize: 14, color: '#475569', border: '1px solid #E2E8F0', borderRadius: 12, padding: '12px 16px', outline: 'none', resize: 'vertical', fontFamily: 'inherit', background: '#F8FAFC', lineHeight: 1.6 }} />
           </div>
-          {/* Status */}
-          <div style={{ marginBottom: 14 }}>
-            <div style={{ fontSize: 11, color: 'var(--txt3)', marginBottom: 6 }}>الحالة</div>
-            <div style={{ display: 'flex', gap: 5, flexWrap: 'wrap' }}>
-              {COLUMNS.map((col) => (
-                <button key={col.id} onClick={() => setStatus(col.id)}
-                  style={chipStyle(status === col.id, col.color, col.color + '20')}>
-                  {col.label}
-                </button>
-              ))}
+          {/* Checklists */}
+          <div>
+            <div style={{ fontSize: 11, color: '#94A3B8', fontWeight: 700, marginBottom: 12, textTransform: 'uppercase', letterSpacing: 1 }}>قوائم المراجعة</div>
+            {groups.map(group => (
+              <div key={group.id} style={{ marginBottom: 20, background: '#F8FAFC', borderRadius: 16, padding: 16 }}>
+                <h5 style={{ margin: '0 0 12px', fontSize: 14, fontWeight: 900, color: '#475569', display: 'flex', alignItems: 'center', gap: 8 }}>
+                  <span style={{ color: '#EA580C' }}>❖</span> {group.title}
+                </h5>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+                  {group.items.map(item => (
+                    <div key={item.id} style={{ display: 'flex', alignItems: 'center', gap: 12, background: '#fff', padding: '10px 14px', borderRadius: 10, border: `1px solid ${item.isCompleted ? '#86EFAC' : '#E2E8F0'}`, opacity: item.isCompleted ? 0.6 : 1 }}>
+                      <input type="checkbox" checked={item.isCompleted} onChange={() => toggleItem(group.id, item.id)} style={{ width: 18, height: 18, accentColor: '#10B981', cursor: 'pointer', flexShrink: 0 }} />
+                      <span style={{ fontSize: 14, fontWeight: 700, color: item.isCompleted ? '#94A3B8' : '#1E293B', textDecoration: item.isCompleted ? 'line-through' : 'none', flex: 1 }}>{item.text}</span>
+                    </div>
+                  ))}
+                </div>
+                <div style={{ display: 'flex', gap: 8, marginTop: 10 }}>
+                  <input value={newItemTexts[group.id] ?? ''} onChange={e => setNewItemTexts(prev => ({ ...prev, [group.id]: e.target.value }))}
+                    onKeyDown={e => { if (e.key === 'Enter') addItem(group.id); }}
+                    placeholder="+ خطوة جديدة..."
+                    style={{ flex: 1, fontSize: 13, padding: '8px 12px', borderRadius: 10, border: '1px dashed #CBD5E1', outline: 'none', fontFamily: 'inherit', background: '#fff' }} />
+                  <button onClick={() => addItem(group.id)} style={{ padding: '8px 14px', borderRadius: 10, border: 'none', background: '#EA580C', color: '#fff', fontWeight: 800, cursor: 'pointer', fontSize: 13 }}>+</button>
+                </div>
+              </div>
+            ))}
+            <div style={{ display: 'flex', gap: 8 }}>
+              <input value={newGroupTitle} onChange={e => setNewGroupTitle(e.target.value)}
+                onKeyDown={e => { if (e.key === 'Enter') addGroup(); }}
+                placeholder="+ إضافة مجموعة جديدة..."
+                style={{ flex: 1, fontSize: 13, padding: '10px 14px', borderRadius: 12, border: '1px dashed #CBD5E1', outline: 'none', fontFamily: 'inherit', background: '#F8FAFC' }} />
+              <button onClick={addGroup} style={{ padding: '10px 16px', borderRadius: 12, border: 'none', background: '#1E293B', color: '#fff', fontWeight: 800, cursor: 'pointer', fontSize: 13 }}>+ مجموعة</button>
             </div>
+          </div>
+          {/* Save */}
+          <button onClick={save} disabled={saving}
+            style={{ padding: '14px 24px', borderRadius: 14, border: 'none', background: saving ? '#94A3B8' : '#EA580C', color: '#fff', fontWeight: 900, cursor: saving ? 'not-allowed' : 'pointer', fontSize: 15, fontFamily: 'inherit' }}>
+            {saving ? 'جارٍ الحفظ...' : '💾 حفظ التغييرات'}
+          </button>
+        </div>
+        {/* Right: Sidebar */}
+        <div style={{ width: 260, background: '#F8FAFC', borderRight: '1px solid #E2E8F0', padding: 24, display: 'flex', flexDirection: 'column', gap: 20, overflowY: 'auto' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <div style={{ fontSize: 13, fontWeight: 900, color: '#0F172A' }}>تفاصيل المهمة</div>
+            <button onClick={onClose} style={{ background: '#E2E8F0', border: 'none', borderRadius: '50%', width: 32, height: 32, cursor: 'pointer', fontSize: 16, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>✕</button>
+          </div>
+          {/* Progress */}
+          {totalItems > 0 && (
+            <div>
+              <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 6 }}>
+                <span style={{ fontSize: 11, color: '#94A3B8', fontWeight: 700 }}>التقدم</span>
+                <span style={{ fontSize: 12, fontWeight: 900, color: '#EA580C' }}>{doneItems}/{totalItems}</span>
+              </div>
+              <div style={{ height: 8, background: '#E2E8F0', borderRadius: 100, overflow: 'hidden' }}>
+                <div style={{ height: '100%', background: '#EA580C', borderRadius: 100, width: `${progressPct}%`, transition: 'width 0.4s ease' }} />
+              </div>
+            </div>
+          )}
+          {/* Status */}
+          <div>
+            <div style={{ fontSize: 11, color: '#94A3B8', fontWeight: 700, marginBottom: 6 }}>الحالة</div>
+            <select value={status} onChange={e => setStatus(e.target.value as TaskStatus)}
+              style={{ width: '100%', padding: '8px 12px', borderRadius: 10, border: '1px solid #E2E8F0', fontSize: 13, fontWeight: 700, fontFamily: 'inherit', background: '#fff', cursor: 'pointer' }}>
+              {COLUMNS.map(c => <option key={c.id} value={c.id}>{c.emoji} {c.name}</option>)}
+            </select>
           </div>
           {/* Priority */}
-          <div style={{ marginBottom: 14 }}>
-            <div style={{ fontSize: 11, color: 'var(--txt3)', marginBottom: 6 }}>الأولوية</div>
-            <div style={{ display: 'flex', gap: 5, flexWrap: 'wrap' }}>
-              {PRIORITIES.map((p) => (
-                <button key={p} onClick={() => setPriority(p)}
-                  style={chipStyle(priority === p, PRIORITY_META[p].color, PRIORITY_META[p].bg)}>
-                  {PRIORITY_META[p].label}
-                </button>
-              ))}
-            </div>
+          <div>
+            <div style={{ fontSize: 11, color: '#94A3B8', fontWeight: 700, marginBottom: 6 }}>الأولوية</div>
+            <select value={priority} onChange={e => setPriority(e.target.value as TaskPriority)}
+              style={{ width: '100%', padding: '8px 12px', borderRadius: 10, border: '1px solid #E2E8F0', fontSize: 13, fontWeight: 700, fontFamily: 'inherit', background: pm.bg, color: pm.color, cursor: 'pointer' }}>
+              {PRIORITIES.map(p => <option key={p} value={p}>{PRIORITY_META[p].label}</option>)}
+            </select>
           </div>
           {/* Category */}
-          <div style={{ marginBottom: 14 }}>
-            <div style={{ fontSize: 11, color: 'var(--txt3)', marginBottom: 6 }}>الفئة</div>
-            <div style={{ display: 'flex', gap: 5, flexWrap: 'wrap' }}>
-              {categories.map((c) => (
-                <button key={c.id} onClick={() => setCategory(c.id)}
-                  style={chipStyle(category === c.id, 'var(--gold)', 'var(--gold-dim)')}>
-                  {c.emoji} {c.label}
-                </button>
-              ))}
-            </div>
+          <div>
+            <div style={{ fontSize: 11, color: '#94A3B8', fontWeight: 700, marginBottom: 6 }}>الفئة</div>
+            <select value={category} onChange={e => setCategory(e.target.value as TaskCategory)}
+              style={{ width: '100%', padding: '8px 12px', borderRadius: 10, border: '1px solid #E2E8F0', fontSize: 13, fontWeight: 700, fontFamily: 'inherit', background: '#fff', cursor: 'pointer' }}>
+              {categories.map(c => <option key={c.id} value={c.id}>{c.emoji} {c.label}</option>)}
+            </select>
           </div>
           {/* Due Date */}
-          <div style={{ marginBottom: 14 }}>
-            <div style={{ fontSize: 11, color: 'var(--txt3)', marginBottom: 4 }}>تاريخ الاستحقاق</div>
-            <input type="date" value={dueDate} onChange={(e) => setDueDate(e.target.value)}
-              style={{ width: '100%', background: 'var(--bg2)', border: '1px solid var(--brd)', borderRadius: 8, padding: '8px 10px', fontSize: 13, color: 'var(--txt)', outline: 'none', fontFamily: 'inherit', boxSizing: 'border-box' }} />
+          <div>
+            <div style={{ fontSize: 11, color: '#94A3B8', fontWeight: 700, marginBottom: 6 }}>الموعد النهائي</div>
+            <input type="date" value={dueDate} onChange={e => setDueDate(e.target.value)}
+              style={{ width: '100%', padding: '8px 12px', borderRadius: 10, border: '1px solid #E2E8F0', fontSize: 13, fontFamily: 'inherit', background: '#fff', cursor: 'pointer' }} />
           </div>
-          {/* Danger Zone */}
-          <div style={{ borderTop: '1px solid var(--brd)', paddingTop: 14, display: 'flex', gap: 8 }}>
+          {/* Actions */}
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 8, marginTop: 'auto' }}>
             <button onClick={() => { onArchive(task); onClose(); }}
-              style={{ flex: 1, padding: '7px 0', fontSize: 12, background: 'rgba(234,179,8,0.08)', color: '#ca8a04', border: '1px solid rgba(234,179,8,0.2)', borderRadius: 8, cursor: 'pointer', fontFamily: 'inherit' }}>
+              style={{ padding: '10px', borderRadius: 10, border: '1px solid #E2E8F0', background: '#fff', color: '#475569', fontWeight: 700, cursor: 'pointer', fontSize: 13, fontFamily: 'inherit' }}>
               📦 أرشفة
             </button>
-            <button onClick={() => { if (confirm('حذف هذه المهمة؟')) { onDelete(task.id); onClose(); } }}
-              style={{ flex: 1, padding: '7px 0', fontSize: 12, background: 'rgba(239,68,68,0.08)', color: '#ef4444', border: '1px solid rgba(239,68,68,0.2)', borderRadius: 8, cursor: 'pointer', fontFamily: 'inherit' }}>
-              🗑 حذف
+            <button onClick={() => { if (window.confirm('هل أنت متأكد من حذف هذه المهمة نهائياً؟')) { onDelete(task.id); onClose(); } }}
+              style={{ padding: '10px', borderRadius: 10, border: '1px solid #FCA5A5', background: '#FEF2F2', color: '#DC2626', fontWeight: 700, cursor: 'pointer', fontSize: 13, fontFamily: 'inherit' }}>
+              🗑️ حذف نهائياً
             </button>
           </div>
-        </div>
-        {/* Footer */}
-        <div style={{ padding: '12px 20px', borderTop: '1px solid var(--brd)', display: 'flex', gap: 8, flexShrink: 0 }}>
-          <button onClick={onClose} style={{ flex: 1, padding: '8px 0', fontSize: 13, color: 'var(--txt3)', background: 'none', border: '1px solid var(--brd)', borderRadius: 8, cursor: 'pointer', fontFamily: 'inherit' }}>إلغاء</button>
-          <button onClick={handleSave} disabled={saving}
-            style={{ flex: 2, padding: '8px 0', fontSize: 13, background: 'var(--gold)', color: '#fff', border: 'none', borderRadius: 8, cursor: 'pointer', fontFamily: 'inherit', fontWeight: 700 }}>
-            {saving ? 'جاري الحفظ...' : 'حفظ التغييرات'}
-          </button>
-        </div>
-      </div>
-    </>
-  );
-}
-
-// ─── AddCategoryModal ─────────────────────────────────────────────────────────
-const EMOJI_OPTIONS = ['🏃', '🧘', '📖', '💼', '🎯', '🌟', '🔥', '💡', '🎨', '🏋️', '🍎', '✈️', '🎵', '🌱', '💻'];
-function AddCategoryModal({ onClose, onAdd }: {
-  onClose: () => void;
-  onAdd: (cat: { id: TaskCategory; label: string; emoji: string }) => void;
-}) {
-  const [label, setLabel] = useState('');
-  const [emoji, setEmoji] = useState('🎯');
-  return (
-    <div className="modal-bg on" onClick={onClose}>
-      <div className="modal-box" onClick={(e) => e.stopPropagation()} style={{ maxWidth: 360 }}>
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 16 }}>
-          <h3 style={{ fontSize: 15, fontWeight: 700, color: 'var(--txt)', margin: 0 }}>+ فئة جديدة</h3>
-          <button onClick={onClose} style={{ background: 'none', border: 'none', color: 'var(--txt3)', cursor: 'pointer', fontSize: 18 }}>✕</button>
-        </div>
-        <div style={{ marginBottom: 12 }}>
-          <div style={{ fontSize: 11, color: 'var(--txt3)', marginBottom: 4 }}>اسم الفئة</div>
-          <input value={label} onChange={(e) => setLabel(e.target.value)} autoFocus
-            style={{ width: '100%', background: 'var(--bg2)', border: '1px solid var(--brd)', borderRadius: 8, padding: '8px 10px', fontSize: 13, color: 'var(--txt)', outline: 'none', fontFamily: 'inherit', boxSizing: 'border-box' }}
-            placeholder="مثال: رياضة، قراءة..." />
-        </div>
-        <div style={{ marginBottom: 16 }}>
-          <div style={{ fontSize: 11, color: 'var(--txt3)', marginBottom: 6 }}>الإيموجي</div>
-          <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
-            {EMOJI_OPTIONS.map((e) => (
-              <button key={e} onClick={() => setEmoji(e)}
-                style={{ fontSize: 18, padding: '4px 6px', borderRadius: 8, border: `2px solid ${emoji === e ? 'var(--gold)' : 'transparent'}`, background: emoji === e ? 'var(--gold-dim)' : 'var(--bg2)', cursor: 'pointer' }}>
-                {e}
-              </button>
-            ))}
-          </div>
-        </div>
-        <div style={{ display: 'flex', gap: 8, justifyContent: 'flex-end' }}>
-          <button onClick={onClose} style={{ padding: '7px 14px', fontSize: 13, color: 'var(--txt3)', background: 'none', border: '1px solid var(--brd)', borderRadius: 8, cursor: 'pointer', fontFamily: 'inherit' }}>إلغاء</button>
-          <button onClick={() => {
-            if (!label.trim()) return;
-            const id = label.trim().toLowerCase().replace(/\s+/g, '_') as TaskCategory;
-            onAdd({ id, label: label.trim(), emoji });
-            onClose();
-          }} disabled={!label.trim()}
-            style={{ padding: '7px 16px', fontSize: 13, background: label.trim() ? 'var(--gold)' : 'var(--brd)', color: label.trim() ? '#fff' : 'var(--txt3)', border: 'none', borderRadius: 8, cursor: label.trim() ? 'pointer' : 'not-allowed', fontFamily: 'inherit', fontWeight: 700 }}>
-            إضافة
-          </button>
-        </div>
-      </div>
-    </div>
-  );
-}
-
-// ─── EditModal ────────────────────────────────────────────────────────────────
-function EditModal({ task, categories, onSave, onClose }: {
-  task: PersonalTask;
-  categories: { id: TaskCategory; label: string; emoji: string }[];
-  onSave: (patch: Partial<PersonalTask>) => void;
-  onClose: () => void;
-}) {
-  const [title, setTitle] = useState(task.title);
-  const [description, setDescription] = useState(task.description);
-  const [priority, setPriority] = useState<TaskPriority>(task.priority);
-  const [category, setCategory] = useState<TaskCategory>(task.category);
-  const [dueDate, setDueDate] = useState(task.dueDate ?? '');
-  return (
-    <div className="modal-bg on" onClick={onClose}>
-      <div className="modal-box" onClick={(e) => e.stopPropagation()} style={{ maxWidth: 460 }}>
-        <h3 style={{ fontSize: 16, fontWeight: 700, color: 'var(--txt)', marginBottom: 16 }}>تعديل المهمة</h3>
-        <input value={title} onChange={(e) => setTitle(e.target.value)}
-          style={{ width: '100%', background: 'var(--bg2)', border: '1px solid var(--brd)', borderRadius: 8, padding: '8px 10px', fontSize: 13, color: 'var(--txt)', outline: 'none', fontFamily: 'inherit', marginBottom: 10, boxSizing: 'border-box' }}
-          placeholder="عنوان المهمة" />
-        <textarea value={description} onChange={(e) => setDescription(e.target.value)}
-          style={{ width: '100%', background: 'var(--bg2)', border: '1px solid var(--brd)', borderRadius: 8, padding: '8px 10px', fontSize: 13, color: 'var(--txt)', outline: 'none', fontFamily: 'inherit', marginBottom: 10, resize: 'none', height: 80, boxSizing: 'border-box' }}
-          placeholder="الوصف (اختياري)" />
-        <div style={{ display: 'flex', gap: 6, marginBottom: 10, flexWrap: 'wrap' }}>
-          {PRIORITIES.map((p) => (
-            <button key={p} onClick={() => setPriority(p)}
-              style={{ fontSize: 11, padding: '4px 10px', borderRadius: 10, border: `1px solid ${priority === p ? PRIORITY_META[p].color : 'var(--brd)'}`, background: priority === p ? PRIORITY_META[p].bg : 'transparent', color: priority === p ? PRIORITY_META[p].color : 'var(--txt3)', cursor: 'pointer', fontFamily: 'inherit', fontWeight: priority === p ? 700 : 400 }}>
-              {PRIORITY_META[p].label}
-            </button>
-          ))}
-        </div>
-        <div style={{ display: 'flex', gap: 6, marginBottom: 10, flexWrap: 'wrap' }}>
-          {categories.map((c) => (
-            <button key={c.id} onClick={() => setCategory(c.id)}
-              style={{ fontSize: 11, padding: '4px 10px', borderRadius: 10, border: `1px solid ${category === c.id ? 'var(--gold-b)' : 'var(--brd)'}`, background: category === c.id ? 'var(--gold-dim)' : 'transparent', color: category === c.id ? 'var(--gold)' : 'var(--txt3)', cursor: 'pointer', fontFamily: 'inherit', fontWeight: category === c.id ? 700 : 400 }}>
-              {c.emoji} {c.label}
-            </button>
-          ))}
-        </div>
-        <input type="date" value={dueDate} onChange={(e) => setDueDate(e.target.value)}
-          style={{ width: '100%', background: 'var(--bg2)', border: '1px solid var(--brd)', borderRadius: 8, padding: '8px 10px', fontSize: 13, color: 'var(--txt)', outline: 'none', fontFamily: 'inherit', marginBottom: 16, boxSizing: 'border-box' }} />
-        <div style={{ display: 'flex', gap: 8, justifyContent: 'flex-end' }}>
-          <button onClick={onClose} style={{ padding: '7px 16px', fontSize: 13, color: 'var(--txt3)', background: 'none', border: '1px solid var(--brd)', borderRadius: 8, cursor: 'pointer', fontFamily: 'inherit' }}>إلغاء</button>
-          <button onClick={() => { onSave({ title, description, priority, category, dueDate: dueDate || null }); onClose(); }}
-            style={{ padding: '7px 16px', fontSize: 13, background: 'var(--gold)', color: '#fff', border: 'none', borderRadius: 8, cursor: 'pointer', fontFamily: 'inherit', fontWeight: 700 }}>حفظ</button>
         </div>
       </div>
     </div>
@@ -430,77 +323,53 @@ function EditModal({ task, categories, onSave, onClose }: {
 }
 
 // ─── Main Component ───────────────────────────────────────────────────────────
+interface Props { initialTasks: PersonalTask[] }
+
 export default function PersonalClient({ initialTasks }: Props) {
   const { pushUndo } = useGlobal();
   const [tasks, setTasks] = useState<PersonalTask[]>(initialTasks);
-  const [categories, setCategories] = useState(DEFAULT_CATEGORIES);
+  const [categories] = useState(DEFAULT_CATEGORIES);
   const [activeCategory, setActiveCategory] = useState<TaskCategory | 'all'>('all');
-  const [quickAdd, setQuickAdd] = useState<QuickAdd | null>(null);
-  const [showPicker, setShowPicker] = useState(false);
-  const [editingTask, setEditingTask] = useState<PersonalTask | null>(null);
   const [selectedTask, setSelectedTask] = useState<PersonalTask | null>(null);
-  const [showAddTask, setShowAddTask] = useState(false);
-  const [showAddCategory, setShowAddCategory] = useState(false);
-  const [addTaskDefaultStatus, setAddTaskDefaultStatus] = useState<TaskStatus>('todo');
   const [, startTransition] = useTransition();
-  const inputRef = useRef<HTMLInputElement>(null);
 
-  const filteredTasks = activeCategory === 'all' ? tasks : tasks.filter((t) => t.category === activeCategory);
+  const filteredTasks = useMemo(() =>
+    activeCategory === 'all' ? tasks : tasks.filter(t => t.category === activeCategory),
+    [tasks, activeCategory]
+  );
 
-  function handleQuickAddKeyDown(e: React.KeyboardEvent) {
-    if (e.key === 'Enter' && quickAdd?.title.trim()) setShowPicker(true);
-    else if (e.key === 'Escape') { setQuickAdd(null); setShowPicker(false); }
-  }
-
-  function handlePrioritySelect(priority: TaskPriority) {
-    if (!quickAdd?.title.trim()) return;
-    const { colId, title, category } = quickAdd;
-    setShowPicker(false);
-    setQuickAdd(null);
+  function handleAdd(colId: TaskStatus, title: string, priority: TaskPriority) {
+    const defaultCat: TaskCategory = activeCategory === 'all' ? 'personal' : activeCategory;
     const tempId = `temp_${Date.now()}`;
-    const tempTask: PersonalTask = {
-      id: tempId, title, description: '', status: colId,
-      priority, category, dueDate: null, sortOrder: 0, hasDescription: false,
-    };
-    setTasks((prev) => [...prev, tempTask]);
+    const tempTask: PersonalTask = { id: tempId, title, description: '', status: colId, priority, category: defaultCat, dueDate: null, sortOrder: 0, hasDescription: false };
+    setTasks(prev => [...prev, tempTask]);
     startTransition(async () => {
-      const result = await addPersonalTask({ title, status: colId, priority, category });
-      if (result.task) setTasks((prev) => prev.map((t) => t.id === tempId ? result.task! : t));
-      else setTasks((prev) => prev.filter((t) => t.id !== tempId));
+      const result = await addPersonalTask({ title, status: colId, priority, category: defaultCat });
+      if (result.task) setTasks(prev => prev.map(t => t.id === tempId ? result.task! : t));
+      else setTasks(prev => prev.filter(t => t.id !== tempId));
     });
   }
 
   function handleDelete(id: string) {
-    const task = tasks.find((t) => t.id === id);
+    const task = tasks.find(t => t.id === id);
     if (!task) return;
-    setTasks((prev) => prev.filter((t) => t.id !== id));
+    setTasks(prev => prev.filter(t => t.id !== id));
     startTransition(async () => { await deletePersonalTask(id); });
     pushUndo({
       label: `حذف "${task.title}"`,
-      undo: async () => {
-        await restorePersonalTask(task);
-        setTasks((prev) => [...prev, task]);
-      },
+      undo: async () => { await restorePersonalTask(task); setTasks(prev => [...prev, task]); },
     });
   }
 
   function handleArchive(task: PersonalTask) {
-    setTasks((prev) => prev.filter((t) => t.id !== task.id));
+    setTasks(prev => prev.filter(t => t.id !== task.id));
     startTransition(async () => { await archivePersonalTask(task); });
   }
 
-  function handleSaveEdit(patch: Partial<PersonalTask>) {
-    if (!editingTask) return;
-    setTasks((prev) => prev.map((t) => t.id === editingTask.id ? { ...t, ...patch } : t));
-    startTransition(async () => {
-      await updatePersonalTask({ id: editingTask.id, title: patch.title, description: patch.description,
-        priority: patch.priority, category: patch.category, dueDate: patch.dueDate });
-    });
-  }
-
-  function handlePanelUpdate(patch: Partial<PersonalTask>) {
+  function handleUpdate(patch: Partial<PersonalTask>) {
     if (!selectedTask) return;
-    setTasks((prev) => prev.map((t) => t.id === selectedTask.id ? { ...t, ...patch } : t));
+    setTasks(prev => prev.map(t => t.id === selectedTask.id ? { ...t, ...patch } : t));
+    setSelectedTask(prev => prev ? { ...prev, ...patch } : prev);
   }
 
   function onDragEnd(result: DropResult) {
@@ -508,154 +377,95 @@ export default function PersonalClient({ initialTasks }: Props) {
     const { draggableId, source, destination } = result;
     if (source.droppableId === destination.droppableId && source.index === destination.index) return;
     const newStatus = destination.droppableId as TaskStatus;
-    setTasks((prev) => prev.map((t) => t.id === draggableId ? { ...t, status: newStatus } : t));
+    setTasks(prev => prev.map(t => t.id === draggableId ? { ...t, status: newStatus } : t));
     startTransition(async () => { await updatePersonalTask({ id: draggableId, status: newStatus }); });
   }
 
   const tasksByStatus = (status: TaskStatus) =>
-    filteredTasks.filter((t) => t.status === status).sort((a, b) => a.sortOrder - b.sortOrder);
+    filteredTasks.filter(t => t.status === status).sort((a, b) => a.sortOrder - b.sortOrder);
+
+  const defaultCat: TaskCategory = activeCategory === 'all' ? 'personal' : activeCategory;
 
   return (
-    <div className="scr on">
-      {/* Header */}
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 16 }}>
-        <h1 style={{ fontSize: 20, fontWeight: 800, color: 'var(--txt)', margin: 0 }}>المهام الشخصية</h1>
-        <div style={{ display: 'flex', gap: 8 }}>
-          <button onClick={() => setShowAddCategory(true)}
-            style={{ fontSize: 12, padding: '6px 12px', borderRadius: 8, border: '1px solid var(--brd)', background: 'transparent', color: 'var(--txt3)', cursor: 'pointer', fontFamily: 'inherit' }}>
-            + فئة
+    <div style={{ padding: '28px 24px 24px', height: '100%', display: 'flex', flexDirection: 'column', gap: 0 }}>
+      {/* VIP Header */}
+      <div className="vip-brand-header" style={{ marginBottom: 20 }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
+          <div style={{ background: '#EFF6FF', padding: 12, borderRadius: 12, fontSize: 24 }}>👤</div>
+          <div>
+            <h2 style={{ margin: 0, fontSize: 20, fontWeight: 900, color: '#0F172A' }}>المهام الشخصية</h2>
+            <div style={{ fontSize: 13, color: '#64748B', fontWeight: 600, marginTop: 2 }}>
+              {tasks.length} مهمة · {tasks.filter(t => t.status === 'done').length} منجزة
+            </div>
+          </div>
+        </div>
+        {/* Category Pills */}
+        <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+          <button onClick={() => setActiveCategory('all')}
+            style={{ background: activeCategory === 'all' ? '#1E293B' : '#F8FAFC', color: activeCategory === 'all' ? '#fff' : '#475569', padding: '8px 16px', borderRadius: 100, fontSize: 13, fontWeight: 800, border: activeCategory === 'all' ? 'none' : '1px solid #E2E8F0', cursor: 'pointer', fontFamily: 'inherit' }}>
+            الكل ({tasks.length})
           </button>
-          <button onClick={() => { setAddTaskDefaultStatus('todo'); setShowAddTask(true); }}
-            style={{ fontSize: 12, padding: '6px 14px', borderRadius: 8, border: 'none', background: 'var(--gold)', color: '#fff', cursor: 'pointer', fontFamily: 'inherit', fontWeight: 700 }}>
-            + مهمة
-          </button>
+          {categories.map(c => {
+            const count = tasks.filter(t => t.category === c.id).length;
+            const isActive = activeCategory === c.id;
+            return (
+              <button key={c.id} onClick={() => setActiveCategory(c.id)}
+                style={{ background: isActive ? '#1E293B' : '#F8FAFC', color: isActive ? '#fff' : '#475569', padding: '8px 16px', borderRadius: 100, fontSize: 13, fontWeight: 800, border: isActive ? 'none' : '1px solid #E2E8F0', cursor: 'pointer', fontFamily: 'inherit' }}>
+                {c.emoji} {c.label} ({count})
+              </button>
+            );
+          })}
         </div>
       </div>
 
-      {/* Category Tabs */}
-      <div style={{ display: 'flex', gap: 6, marginBottom: 20, flexWrap: 'wrap' }}>
-        <button onClick={() => setActiveCategory('all')}
-          style={{
-            fontSize: 12, padding: '5px 12px', borderRadius: 20, border: '1px solid',
-            borderColor: activeCategory === 'all' ? 'var(--gold-b)' : 'var(--brd)',
-            background: activeCategory === 'all' ? 'var(--gold-dim)' : 'transparent',
-            color: activeCategory === 'all' ? 'var(--gold)' : 'var(--txt3)',
-            fontWeight: activeCategory === 'all' ? 700 : 400,
-            cursor: 'pointer', fontFamily: 'inherit', transition: 'all .15s',
-          }}>
-          الكل ({tasks.length})
-        </button>
-        {categories.map((c) => {
-          const count = tasks.filter((t) => t.category === c.id).length;
-          const isActive = activeCategory === c.id;
-          return (
-            <button key={c.id} onClick={() => setActiveCategory(c.id)}
-              style={{
-                fontSize: 12, padding: '5px 12px', borderRadius: 20, border: '1px solid',
-                borderColor: isActive ? 'var(--gold-b)' : 'var(--brd)',
-                background: isActive ? 'var(--gold-dim)' : 'transparent',
-                color: isActive ? 'var(--gold)' : 'var(--txt3)',
-                fontWeight: isActive ? 700 : 400,
-                cursor: 'pointer', fontFamily: 'inherit', transition: 'all .15s',
-              }}>
-              {c.emoji} {c.label} ({count})
-            </button>
-          );
-        })}
-      </div>
-
-      {/* Kanban */}
+      {/* VIP Kanban Board */}
       <DragDropContext onDragEnd={onDragEnd}>
-        <div style={{ display: 'flex', gap: 14, overflowX: 'auto', paddingBottom: 16 }}>
-          {COLUMNS.map((col) => {
+        <div className="vip-kanban-board" style={{ flex: 1 }}>
+          {COLUMNS.map(col => {
             const colTasks = tasksByStatus(col.id);
-            const isAddingHere = quickAdd?.colId === col.id;
-            const defaultCat: TaskCategory = activeCategory === 'all' ? 'personal' : activeCategory;
             return (
-              <div key={col.id} style={{ flexShrink: 0, width: 260, display: 'flex', flexDirection: 'column' }}>
+              <div key={col.id} className="vip-kanban-column">
                 {/* Column Header */}
-                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 10 }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-                    <span style={{ width: 8, height: 8, borderRadius: '50%', background: col.color, flexShrink: 0 }} />
-                    <span style={{ fontSize: 13, fontWeight: 600, color: 'var(--txt)' }}>{col.label}</span>
-                    <span style={{ fontSize: 11, color: 'var(--txt3)', background: 'var(--bg2)', padding: '1px 6px', borderRadius: 8 }}>{colTasks.length}</span>
+                <div className="vip-column-header">
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                    <span style={{ fontSize: 20 }}>{col.emoji}</span>
+                    <span style={{ fontSize: 14, fontWeight: 900, color: '#1E293B' }}>{col.name}</span>
                   </div>
-                  <button onClick={() => {
-                    setAddTaskDefaultStatus(col.id);
-                    setShowAddTask(true);
-                  }} style={{ background: 'none', border: 'none', color: 'var(--txt3)', fontSize: 20, cursor: 'pointer', lineHeight: 1, fontFamily: 'inherit', padding: '0 4px' }}>+</button>
+                  <span style={{ background: '#FFF7ED', color: '#EA580C', border: '1px solid #FED7AA', borderRadius: 20, padding: '3px 10px', fontSize: 12, fontWeight: 800 }}>{colTasks.length}</span>
                 </div>
-
-                {/* Quick Add Input */}
-                {isAddingHere && (
-                  <div style={{ position: 'relative', marginBottom: 8 }}>
-                    <input ref={inputRef} value={quickAdd.title}
-                      onChange={(e) => setQuickAdd({ ...quickAdd, title: e.target.value })}
-                      onKeyDown={handleQuickAddKeyDown}
-                      placeholder="اسم المهمة ثم Enter..."
-                      style={{ width: '100%', background: 'var(--bg2)', border: '1px solid var(--gold-b)', borderRadius: 8, padding: '7px 10px', fontSize: 13, color: 'var(--txt)', outline: 'none', fontFamily: 'inherit', boxSizing: 'border-box' }} />
-                    {showPicker && (
-                      <PriorityPicker onSelect={handlePrioritySelect}
-                        onCancel={() => { setQuickAdd(null); setShowPicker(false); }} />
-                    )}
-                  </div>
-                )}
-
-                {/* Droppable */}
+                {/* Tasks Container */}
                 <Droppable droppableId={col.id}>
                   {(provided, snapshot) => (
-                    <div ref={provided.innerRef} {...provided.droppableProps}
-                      style={{
-                        display: 'flex', flexDirection: 'column', gap: 8, flex: 1,
-                        overflowY: 'auto', minHeight: 80, borderRadius: 10, padding: 4,
-                        background: snapshot.isDraggingOver ? 'rgba(201,168,76,0.04)' : 'transparent',
-                        border: snapshot.isDraggingOver ? '1px dashed var(--gold-b)' : '1px dashed transparent',
-                        transition: 'all .15s',
-                      }}>
+                    <div
+                      ref={provided.innerRef} {...provided.droppableProps}
+                      className="vip-tasks-container"
+                      style={{ background: snapshot.isDraggingOver ? 'rgba(234,88,12,0.04)' : 'transparent', border: snapshot.isDraggingOver ? '1px dashed rgba(234,88,12,0.3)' : '1px dashed transparent', borderRadius: 12, transition: 'all 0.2s' }}
+                    >
                       {colTasks.map((task, index) => (
-                        <TaskCard key={task.id} task={task} index={index} categories={categories}
-                          onDelete={handleDelete} onArchive={handleArchive} onEdit={setEditingTask}
-                          onClick={setSelectedTask} />
+                        <VIPTaskCard key={task.id} task={task} index={index} categories={categories} onClick={setSelectedTask} />
                       ))}
                       {provided.placeholder}
-                      {colTasks.length === 0 && !isAddingHere && !snapshot.isDraggingOver && (
-                        <div style={{ textAlign: 'center', color: 'var(--txt3)', fontSize: 12, padding: '24px 0', border: '1px dashed var(--brd)', borderRadius: 10 }}>
-                          لا توجد مهام
-                        </div>
+                      {colTasks.length === 0 && !snapshot.isDraggingOver && (
+                        <div style={{ textAlign: 'center', color: '#CBD5E1', fontSize: 13, padding: '24px 0', border: '1px dashed #E2E8F0', borderRadius: 12 }}>لا توجد مهام</div>
                       )}
                     </div>
                   )}
                 </Droppable>
+                {/* Inline QuickAdd */}
+                <VIPQuickAdd colId={col.id} defaultCategory={defaultCat} onAdd={(title, priority) => handleAdd(col.id, title, priority)} />
               </div>
             );
           })}
         </div>
       </DragDropContext>
 
-      {/* Modals & Panels */}
-      {showAddTask && (
-        <AddTaskModal
-          categories={categories}
-          defaultStatus={addTaskDefaultStatus}
-          onClose={() => setShowAddTask(false)}
-          onAdd={(task) => setTasks((prev) => [...prev, task])}
-        />
-      )}
-      {showAddCategory && (
-        <AddCategoryModal
-          onClose={() => setShowAddCategory(false)}
-          onAdd={(cat) => setCategories((prev) => [...prev, cat])}
-        />
-      )}
-      {editingTask && (
-        <EditModal task={editingTask} categories={categories} onSave={handleSaveEdit} onClose={() => setEditingTask(null)} />
-      )}
+      {/* Task Modal */}
       {selectedTask && (
-        <TaskPanel
+        <PersonalTaskModal
           task={selectedTask}
           categories={categories}
           onClose={() => setSelectedTask(null)}
-          onUpdate={handlePanelUpdate}
+          onUpdate={handleUpdate}
           onDelete={handleDelete}
           onArchive={handleArchive}
         />

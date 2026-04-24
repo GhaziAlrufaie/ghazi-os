@@ -80,10 +80,10 @@ export default function LayoutShell({ children, sidebar }: LayoutShellProps) {
       )}
       <div className="main" style={{ marginRight: collapsed ? 0 : undefined, transition: 'margin-right 0.3s cubic-bezier(0.4,0,0.2,1)' }}>
         {/* Topbar — مخفي في /leadership لأن الترويسة المخصصة تكفي */}
-        {currentPath !== '/leadership' && !currentPath.startsWith('/brands/') && <Topbar title={pageTitle} />}
+        {currentPath !== '/leadership' && !currentPath.startsWith('/brands/') && currentPath !== '/personal' && <Topbar title={pageTitle} />}
 
         {/* Month Navigation Bar — مخفي في /leadership */}
-        {currentPath !== '/leadership' && !currentPath.startsWith('/brands/') && <MonthNav />}
+        {currentPath !== '/leadership' && !currentPath.startsWith('/brands/') && currentPath !== '/personal' && <MonthNav />}
 
         {/* محتوى الصفحة */}
         {children}
