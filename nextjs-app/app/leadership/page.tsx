@@ -45,10 +45,10 @@ export default async function LeadershipPage() {
   ] = await Promise.allSettled([
     supabase.from('brands').select('id, name, icon, color, status, nav_order').order('nav_order'),
     supabase.from('weekly_focus').select('id, focus_date, target_type, target_id, target_name, target_color, notes, metrics_cache').in('focus_date', weekDates),
-    supabase.from('tasks').select('id, title, status, priority, due_date, brand_id, project_id, subtasks, subtask_groups, checklist, description').not('status', 'in', '("done","cancelled")').order('sort_order'),
+    supabase.from('tasks').select('id, title, status, priority, due_date, brand_id, project_id, subtasks, subtask_groups, checklist, description').not('status', 'in', '("done","cancelled","on_hold")').order('sort_order'),
     supabase.from('projects').select('id, brand_id, title, status, priority, target_date, progress').eq('status', 'active').order('sort_order'),
     supabase.from('personal_tasks').select('id, title, status, priority, category').not('status', 'in', '("done","cancelled")').order('sort_order'),
-    supabase.from('decisions').select('id, brand_id, project_id, title, context, options, chosen_option_id, status, impact, deadline, decided_at, decided_by, notes, updated_at').eq('status', 'open').order('updated_at', { ascending: false }),
+    supabase.from('decisions').select('id, brand_id, project_id, title, context, options, chosen_option_id, status, impact, deadline, decided_at, decided_by, notes').eq('status', 'pending').order('id', { ascending: false }),
     supabase.from('employees').select('id, name, role, brand_ids, salary_type, salary_amount, salary_unit, reports_to, status, created_at, updated_at').order('created_at'),
     supabase.from('inbox_tasks').select('id, text, created_at').order('created_at', { ascending: false }),
     supabase.from('events').select('id, title, day, month, year, brand_id').gte('day', new Date().getDate()).eq('month', new Date().getMonth() + 1).eq('year', new Date().getFullYear()).order('day'),
@@ -144,7 +144,7 @@ export default async function LeadershipPage() {
     decided_at: (d.decided_at as string | null) ?? null,
     decided_by: (d.decided_by as string | null) ?? null,
     notes: (d.notes as string | null) ?? null,
-    updated_at: (d.updated_at as string) ?? new Date().toISOString(),
+    updated_at: (d.updated_at as string | null) ?? new Date().toISOString(),
   }));
 
   const rawEmployees = employeesRes.status === 'fulfilled' && !employeesRes.value.error ? (employeesRes.value.data ?? []) : [];
