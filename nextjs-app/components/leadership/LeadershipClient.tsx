@@ -1345,7 +1345,13 @@ export default function LeadershipClient({
   const [isBlockedModalOpen, setIsBlockedModalOpen] = useState(false);
   const [blockedReason, setBlockedReason] = useState('');
   const [taskToBlock, setTaskToBlock] = useState<ActiveTask | null>(null);
+  const [blockedTaskIds, setBlockedTaskIds] = useState<Set<string>>(new Set());
   const [, startBlockTransition] = useTransition();
+  // Filter out optimistically-blocked tasks so they disappear instantly from FocusHero
+  const visibleActiveTasks = useMemo(
+    () => activeTasks.filter(t => !blockedTaskIds.has(t.id)),
+    [activeTasks, blockedTaskIds]
+  );
   const [dailyRoutines] = useState<DailyRoutine[]>(initialDailyRoutines);
   const router = useRouter();
 
@@ -1370,10 +1376,14 @@ export default function LeadershipClient({
     setIsBlockedModalOpen(false);
     setBlockedReason('');
     setTaskToBlock(null);
+    // Optimistic UI: instantly hide the task from FocusHero without waiting for server
+    setBlockedTaskIds(prev => new Set([...prev, task.id]));
     try {
       // 1. Update task status to on_hold (valid value per tasks-actions.ts TaskStatus)
       const taskResult = await updateTask({ id: task.id, status: 'on_hold' as const });
       if (taskResult.error) {
+        // Revert optimistic UI on failure
+        setBlockedTaskIds(prev => { const next = new Set(prev); next.delete(task.id); return next; });
         alert(`خطأ في تحديث المهمة: ${taskResult.error}`);
         return;
       }
@@ -1395,6 +1405,8 @@ export default function LeadershipClient({
       };
       const decResult = await addDecisionAction(newDecision);
       if (!decResult.ok) {
+        // Revert optimistic UI on decision failure
+        setBlockedTaskIds(prev => { const next = new Set(prev); next.delete(task.id); return next; });
         alert(`خطأ في إنشاء القرار: ${decResult.error}`);
         return;
       }
@@ -1402,6 +1414,8 @@ export default function LeadershipClient({
       router.refresh();
     } catch (e: unknown) {
       const msg = e instanceof Error ? e.message : String(e);
+      // Revert optimistic UI on unexpected error
+      setBlockedTaskIds(prev => { const next = new Set(prev); next.delete(task.id); return next; });
       console.error('Failed to block task:', msg);
       alert(`حدث خطأ غير متوقع: ${msg}`);
     }
@@ -1458,7 +1472,7 @@ export default function LeadershipClient({
           {/* ── FocusHero ─────────────────────────────────────────────────── */}
           <FocusHero
             todayFocus={todayFocus}
-            activeTasks={activeTasks}
+            activeTasks={visibleActiveTasks}
             personalTasks={personalTasks}
             brands={brands}
             projects={projects}
