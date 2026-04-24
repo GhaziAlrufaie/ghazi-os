@@ -40,6 +40,7 @@ const STATUS_CHIP_CLASS: Record<TaskStatus, string> = {
   waiting:     'status-on_hold',
   done:        'status-done',
   ideas:       'status-ideas',
+  projects:    'status-ideas',
 };
 
 const PRI_CHIP_CLASS: Record<TaskPriority, string> = {

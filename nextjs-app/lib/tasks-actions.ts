@@ -4,7 +4,7 @@
 import { createServerClient } from '@/lib/supabase';
 import { revalidatePath } from 'next/cache';
 
-export type TaskStatus = 'todo' | 'in_progress' | 'on_hold' | 'waiting' | 'done' | 'ideas';
+export type TaskStatus = 'todo' | 'in_progress' | 'on_hold' | 'waiting' | 'done' | 'ideas' | 'projects';
 export type TaskPriority = 'critical' | 'high' | 'medium' | 'low';
 
 export interface Task {
