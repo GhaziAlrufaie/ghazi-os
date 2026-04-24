@@ -1359,28 +1359,35 @@ export default function LeadershipClient({
     setBlockedReason('');
     setIsBlockedModalOpen(true);
   };
-  const handleConfirmBlock = () => {
+  const handleConfirmBlock = async () => {
     if (!taskToBlock || !blockedReason.trim()) return;
-    const decisionTitle = `${taskToBlock.title} — أكمل أم ألغي؟`;
-    startBlockTransition(async () => {
-      try {
-        await updateTask({ id: taskToBlock.id, status: 'on_hold' });
-        await addDecision({
-          title: decisionTitle,
-          brandId: taskToBlock.brandId ?? '',
-          impact: 'high',
-          status: 'open',
-          context: blockedReason,
-          deadline: '',
-          notes: `تم إنشاؤه تلقائياً من مهمة عالقة: ${taskToBlock.title}`,
-        });
-        router.refresh();
-      } catch (e) {
-        console.error('Failed to block task:', e);
-      }
-    });
+    const task = taskToBlock;
+    const reason = blockedReason;
+    const decisionTitle = `${task.title} — أكمل أم ألغي؟`;
+    // Close modal immediately for UX
     setIsBlockedModalOpen(false);
+    setBlockedReason('');
     setTaskToBlock(null);
+    try {
+      // 1. Update task status to on_hold in Supabase
+      const taskResult = await updateTask({ id: task.id, status: 'on_hold' as const });
+      if (taskResult.error) throw new Error(taskResult.error);
+      // 2. Create a decision in Supabase decisions table
+      await addDecision({
+        title: decisionTitle,
+        brandId: task.brandId ?? '',
+        impact: 'high',
+        status: 'open',
+        context: reason,
+        deadline: '',
+        notes: `تم إنشاؤه تلقائياً من مهمة عالقة: ${task.title}`,
+      });
+      // 3. Refresh the page to reflect updated data from Supabase
+      router.refresh();
+    } catch (e) {
+      console.error('Failed to block task:', e);
+      alert('حدث خطأ أثناء تحويل المهمة لقرار. يرجى المحاولة مرة أخرى.');
+    }
   };
   const d = new Date();
   const hour = d.getHours();
