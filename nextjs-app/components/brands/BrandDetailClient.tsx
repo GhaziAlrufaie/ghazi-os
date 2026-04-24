@@ -198,12 +198,29 @@ function QuickAdd({ colId, brandId, projectId, onAdd }: QuickAddProps) {
     if (e.key === 'Escape') { setValue(''); setShowPri(false); }
   }
   return (
-    <div className="brand-board-add">
-      <div className="brand-board-add-row" style={{ position: 'relative' }}>
-        <input value={value} onChange={(e) => setValue(e.target.value)} onKeyDown={handleKeyDown} placeholder="+ مهمة..." disabled={loading} />
-        <button onClick={() => { if (value.trim()) setShowPri(true); }} disabled={loading}>{loading ? '...' : '+'}</button>
-        {showPri && <PriPicker onSelect={handleAdd} onClose={() => setShowPri(false)} />}
-      </div>
+    <div style={{ position: 'relative', flexShrink: 0 }}>
+      {value.trim() ? (
+        <div className="vip-add-form">
+          <input
+            className="vip-add-input"
+            value={value}
+            onChange={(e) => setValue(e.target.value)}
+            onKeyDown={handleKeyDown}
+            placeholder="اكتب اسم المهمة ثم Enter..."
+            disabled={loading}
+            autoFocus
+            onBlur={() => { if (!value.trim()) setValue(''); }}
+          />
+          {showPri && <PriPicker onSelect={handleAdd} onClose={() => setShowPri(false)} />}
+        </div>
+      ) : (
+        <button
+          className="vip-add-task-btn"
+          onClick={() => setValue(' ')}
+        >
+          <span>+</span> إضافة مهمة جديدة
+        </button>
+      )}
     </div>
   );
 }
@@ -227,21 +244,24 @@ function TaskCard({ task, project, index, onArchive, onDelete, onClick }: TaskCa
           ref={provided.innerRef}
           {...provided.draggableProps}
           {...provided.dragHandleProps}
-          className={`brand-task-card${snapshot.isDragging ? ' dragging' : ''}`}
+          className={`vip-task-card${snapshot.isDragging ? ' dragging' : ''}`}
           onClick={() => onClick(task)}
           style={{ ...provided.draggableProps.style, cursor: 'pointer' }}>
           <div className="ptc-actions" onClick={(e) => e.stopPropagation()}>
             <button className="ptc-btn arch" title="أرشفة" onClick={() => onArchive(task.id)}>🗄️</button>
             <button className="ptc-btn del"  title="حذف"   onClick={() => onDelete(task.id)}>🗑️</button>
           </div>
-          <div className="btc-title">{task.title}</div>
-          <div className="btc-meta">
-            <span className={`priority-dot ${task.priority}`} />
-            {project && <span className="btc-proj">{project.title}</span>}
-            {overdue && <span className="btc-overdue">متأخر {Math.abs(daysLeft(task.dueDate))} يوم</span>}
-            {!overdue && task.dueDate && <span className="btc-due">{dueLabel}</span>}
+          <h4 className="vip-task-title">{task.title}</h4>
+          <div className="vip-card-tags">
+            {task.priority === 'critical' && <span className="vip-tag" style={{ background: '#FEF2F2', color: '#DC2626' }}>🔴 حرج</span>}
+            {task.priority === 'high' && <span className="vip-tag" style={{ background: '#FFF7ED', color: '#EA580C' }}>🟠 عالي</span>}
+            {task.priority === 'medium' && <span className="vip-tag" style={{ background: '#EFF6FF', color: '#2563EB' }}>🟡 متوسط</span>}
+            {task.priority === 'low' && <span className="vip-tag" style={{ background: '#F0FDF4', color: '#16A34A' }}>⬇️ منخفض</span>}
+            {project && <span className="vip-tag">📁 {project.title}</span>}
+            {overdue && <span className="vip-tag-overdue">⚠️ متأخر {Math.abs(daysLeft(task.dueDate))} يوم</span>}
+            {!overdue && task.dueDate && <span className="vip-tag-due">🗓 {dueLabel}</span>}
+            {task.hasDescription && <span className="vip-tag">📝</span>}
           </div>
-          {task.hasDescription && <div className="btc-icons"><span className="btc-icon">📝</span></div>}
         </div>
       )}
     </Draggable>
@@ -260,21 +280,31 @@ interface KanbanColProps {
   onAdd: (task: Task) => void;
   onCardClick: (task: Task) => void;
 }
+function getColEmoji(colId: string): string {
+  if (colId === 'todo') return '📥';
+  if (colId === 'in_progress') return '🚀';
+  if (colId === 'on_hold') return '✋';
+  if (colId === 'done') return '✅';
+  if (colId === 'ideas') return '💡';
+  return '';
+}
 function KanbanCol({ col, tasks, projects, brandId, activeProjectId, onArchive, onDelete, onAdd, onCardClick }: KanbanColProps) {
   return (
-    <div className="brand-board-col">
-      <div className="brand-board-col-header">
-        <span className="brand-board-col-dot" style={{ background: col.color }} />
-        <span className="brand-board-col-name">{col.name}</span>
-        <span className="brand-board-col-count">{tasks.length}</span>
+    <div className="vip-kanban-column">
+      <div className="vip-column-header">
+        <h3 className="vip-column-title">
+          <span>{getColEmoji(col.id)}</span>
+          <span>{col.name}</span>
+        </h3>
+        <div className="vip-column-count">{tasks.length}</div>
       </div>
       <Droppable droppableId={col.id}>
         {(provided, snapshot) => (
           <div
             ref={provided.innerRef}
             {...provided.droppableProps}
-            className="brand-board-cards"
-            style={{ minHeight: 80, background: snapshot.isDraggingOver ? 'rgba(201,168,76,0.05)' : undefined, borderRadius: 8, transition: 'background .2s' }}>
+            className={`vip-tasks-container${snapshot.isDraggingOver ? ' vip-kanban-drag-over' : ''}`}
+            style={{ minHeight: 80 }}>
             {tasks.map((task, index) => (
               <TaskCard
                 key={task.id}
@@ -463,7 +493,7 @@ export default function BrandDetailClient({ brand: initialBrand, initialTasks, i
 
             {/* Kanban Board with DnD */}
             <DragDropContext onDragEnd={onDragEnd}>
-              <div className="brand-board-cols" style={{ gridTemplateColumns: 'repeat(5, 1fr)' }}>
+              <div className="vip-kanban-board">
                 {KANBAN_COLS.map((col) => (
                   <KanbanCol
                     key={col.id}
