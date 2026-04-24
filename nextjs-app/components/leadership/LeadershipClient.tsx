@@ -657,6 +657,23 @@ function FocusHero({
 }) {
   const [selectedTaskId, setSelectedTaskId] = useState<string | null>(null);
   const [localStatuses, setLocalStatuses] = useState<Record<string, string>>({});
+  const [localGroups, setLocalGroups] = useState<Record<string, ChecklistGroup[]>>({});
+
+  const handleToggleFocusSubtask = async (taskId: string, groupId: string, itemId: string) => {
+    const currentGroups = localGroups[taskId] ?? sorted.find(t => t.id === taskId)?.groups ?? [];
+    const updatedGroups: ChecklistGroup[] = currentGroups.map(g => {
+      if (g.id !== groupId) return g;
+      return { ...g, items: g.items.map(i => i.id === itemId ? { ...i, isCompleted: !i.isCompleted } : i) };
+    });
+    setLocalGroups(prev => ({ ...prev, [taskId]: updatedGroups }));
+    try {
+      const { createClient } = await import('@supabase/supabase-js');
+      const sb = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!);
+      await sb.from('tasks').update({ subtasks: updatedGroups }).eq('id', taskId);
+    } catch (err) {
+      console.error('Toggle subtask error:', err);
+    }
+  };
   const [, startTransition] = useTransition();
   const tip = DAILY_TIPS[new Date().getDay() % DAILY_TIPS.length];
 
@@ -724,13 +741,10 @@ function FocusHero({
   if (selectedTask) {
     const taskBrand = brands.find(b => b.id === selectedTask.brandId);
     const taskColor = taskBrand?.color || color;
-    const groups = selectedTask.groups ?? [];
+    const groups = localGroups[selectedTask.id] ?? selectedTask.groups ?? [];
     const totalItems = groups.reduce((s, g) => s + g.items.length, 0);
     const doneItems = groups.reduce((s, g) => s + g.items.filter(i => i.isCompleted).length, 0);
     const isOverdue = selectedTask.dueDate && daysLeft(selectedTask.dueDate) < 0;
-    const nextSteps = groups.flatMap(g =>
-      g.items.filter(i => !i.isCompleted).map(i => ({ id: i.id, title: i.text || 'خطوة', groupTitle: g.title }))
-    ).slice(0, 3);
 
     const progressPct = totalItems > 0 ? Math.round((doneItems / totalItems) * 100) : 0;
     return (
@@ -781,29 +795,39 @@ function FocusHero({
               </div>
             </div>
           )}
-          {/* Next steps */}
-          {nextSteps.length > 0 && (
-            <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 10, marginBottom: 20 }}>
-              {nextSteps.map(step => (
-                <div key={step.id} style={{
-                  display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-                  background: '#FFFFFF', padding: '14px 18px', borderRadius: 14,
-                  border: '1px solid rgba(0,0,0,0.04)', boxShadow: '0 4px 12px rgba(0,0,0,0.02)', gap: 14,
-                }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 14, flex: 1 }}>
-                    <input type="checkbox" checked={false} onChange={() => {}} onClick={(e) => e.stopPropagation()} style={{ width: 20, height: 20, accentColor: '#EA580C', cursor: 'pointer', flexShrink: 0, margin: 0 }} />
-                    <span style={{ fontSize: 14, fontWeight: 700, color: '#1E293B' }}>{step.title}</span>
-                  </div>
-                  {step.groupTitle && <span style={{ background: '#FFF7ED', color: '#C2410C', padding: '4px 10px', borderRadius: 8, fontSize: 11, fontWeight: 700, whiteSpace: 'nowrap' }}>{step.groupTitle}</span>}
+          {/* Grouped checklists — 2-level render */}
+          <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 20, maxHeight: 350, overflowY: 'auto', paddingRight: 8, marginBottom: 20 }}>
+            {groups.map(group => (
+              <div key={group.id} style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+                {group.items.length > 0 && (
+                  <h5 style={{ margin: 0, fontSize: 15, fontWeight: 900, color: '#475569', borderBottom: '2px dashed #E2E8F0', paddingBottom: 8, display: 'flex', alignItems: 'center', gap: 8 }}>
+                    <span style={{ color: '#EA580C', fontSize: 18 }}>❖</span>
+                    {group.title || 'مجموعة خطوات'}
+                  </h5>
+                )}
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+                  {group.items.map(item => (
+                    <div key={item.id} style={{ display: 'flex', alignItems: 'center', gap: 12, background: '#FFFFFF', padding: '12px 16px', borderRadius: 12, border: `1px solid ${item.isCompleted ? '#86EFAC' : '#E2E8F0'}`, boxShadow: '0 2px 4px rgba(0,0,0,0.02)', transition: 'all 0.2s', opacity: item.isCompleted ? 0.6 : 1 }}>
+                      <input
+                        type="checkbox"
+                        checked={item.isCompleted || false}
+                        onChange={() => handleToggleFocusSubtask(selectedTask.id, group.id, item.id)}
+                        style={{ width: 22, height: 22, cursor: 'pointer', accentColor: '#10B981', flexShrink: 0 }}
+                      />
+                      <span style={{ fontSize: 14.5, fontWeight: 800, color: item.isCompleted ? '#94A3B8' : '#1E293B', textDecoration: item.isCompleted ? 'line-through' : 'none', flex: 1 }}>
+                        {item.text || 'خطوة بدون اسم'}
+                      </span>
+                    </div>
+                  ))}
                 </div>
-              ))}
-              {totalItems - doneItems > nextSteps.length && (
-                <div style={{ fontSize: 12, color: '#9A6B4B', textAlign: 'center', padding: 8, fontWeight: 500 }}>
-                  + {totalItems - doneItems - nextSteps.length} أخرى...
-                </div>
-              )}
-            </div>
-          )}
+              </div>
+            ))}
+            {groups.length === 0 && (
+              <div style={{ textAlign: 'center', color: '#94A3B8', fontSize: 14, padding: 20, background: '#F8FAFC', borderRadius: 12 }}>
+                لا توجد مجموعات أو خطوات مسجلة لهذه المهمة
+              </div>
+            )}
+          </div>
           {/* 2x2 Action buttons */}
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12, marginTop: 'auto' }}>
             <button onClick={(e) => { e.preventDefault(); e.stopPropagation(); if (selectedTask) onCompleteTask(selectedTask); }} style={{ background: '#DCFCE7', color: '#166534', padding: '14px 16px', borderRadius: 14, fontWeight: 800, border: 'none', cursor: 'pointer', fontSize: 14, display: 'flex', justifyContent: 'center', alignItems: 'center', gap: 8, fontFamily: 'inherit' }}>✓ خلصت</button>
