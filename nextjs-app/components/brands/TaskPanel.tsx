@@ -8,12 +8,11 @@ interface ChecklistItem { id: string; text: string; isCompleted: boolean; }
 interface ChecklistGroup { id: string; title: string; items: ChecklistItem[]; }
 
 const STATUS_OPTIONS: { v: TaskStatus; lbl: string; bg: string; color: string }[] = [
-  { v: 'todo',        lbl: 'قيد الانتظار',  bg: '#EFF6FF', color: '#1D4ED8' },
-  { v: 'in_progress', lbl: 'جاري التنفيذ',  bg: '#FFF7ED', color: '#C2410C' },
-  { v: 'on_hold',     lbl: 'معلق',           bg: '#FDF4FF', color: '#7E22CE' },
-  { v: 'done',        lbl: '✅ منجز',        bg: '#F0FDF4', color: '#166534' },
   { v: 'ideas',       lbl: '💡 أفكار',       bg: '#F5F3FF', color: '#6D28D9' },
-  { v: 'projects',    lbl: '🚀 مشاريع',      bg: '#F0F9FF', color: '#0369A1' },
+  { v: 'todo',        lbl: '📝 قيد الانتظار', bg: '#EFF6FF', color: '#1D4ED8' },
+  { v: 'in_progress', lbl: '🚀 جاري التنفيذ', bg: '#FFF7ED', color: '#C2410C' },
+  { v: 'on_hold',     lbl: '✋ معلق',         bg: '#FDF4FF', color: '#7E22CE' },
+  { v: 'done',        lbl: '✅ منجز',         bg: '#F0FDF4', color: '#166534' },
 ];
 const PRIORITY_OPTIONS: { v: TaskPriority; lbl: string; bg: string; color: string }[] = [
   { v: 'critical', lbl: '🔴 حرج',    bg: '#FEF2F2', color: '#DC2626' },
