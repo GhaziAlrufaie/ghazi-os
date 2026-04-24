@@ -112,6 +112,7 @@ export default function DecisionsClient({ initialPending, initialDecided, brands
   function handleDelete(decId: string) {
     const dec = [...pending, ...decided].find((d) => d.id === decId);
     if (!dec) return;
+    if (!window.confirm('هل أنت متأكد من حذف هذا القرار نهائياً؟')) return;
     startTransition(async () => {
       const res = await deleteDecision(decId);
       if (res.ok) {
@@ -306,10 +307,17 @@ export default function DecisionsClient({ initialPending, initialDecided, brands
                 </button>
                 <button
                   className="btn-archive"
-                  onClick={() => handleArchive(dec.id)}
+                  onClick={(e) => { e.preventDefault(); e.stopPropagation(); handleArchive(dec.id); }}
                   disabled={isPending}
                 >
-                  أرشف
+                  📦 أرشفة
+                </button>
+                <button
+                  className="btn-del-sm"
+                  onClick={(e) => { e.preventDefault(); e.stopPropagation(); handleDelete(dec.id); }}
+                  disabled={isPending}
+                >
+                  🗑️ حذف
                 </button>
               </div>
             </div>
