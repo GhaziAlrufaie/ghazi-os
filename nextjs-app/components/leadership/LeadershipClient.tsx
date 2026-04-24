@@ -14,7 +14,7 @@ import {
 } from '@/lib/leadership-actions';
 import { addDecision as addDecisionAction } from '@/lib/decisions-actions';
 import type { Decision as DecisionFull } from '@/app/decisions/page';
-import { addTask, updateTask } from '@/lib/tasks-actions';
+import { addTask, updateTask, type TaskStatus } from '@/lib/tasks-actions';
 import { addPersonalTask } from '@/lib/personal-actions';
 import {
   addInboxTask, deleteInboxTask, updateInboxTask,
@@ -655,6 +655,7 @@ function FocusHero({
   const [localStatuses, setLocalStatuses] = useState<Record<string, string>>({});
   const [, startTransition] = useTransition();
   const [isAllTasksModalOpen, setIsAllTasksModalOpen] = useState(false);
+  const [isSnoozeModalOpen, setIsSnoozeModalOpen] = useState(false);
   const tip = DAILY_TIPS[new Date().getDay() % DAILY_TIPS.length];
 
   const sorted = useMemo(() => todayFocus ? activeTasks.filter(t => {
@@ -808,7 +809,7 @@ function FocusHero({
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12, marginTop: 'auto' }}>
             <button style={{ background: '#DCFCE7', color: '#166534', padding: '14px 16px', borderRadius: 14, fontWeight: 800, border: 'none', cursor: 'pointer', fontSize: 14, display: 'flex', justifyContent: 'center', alignItems: 'center', gap: 8, fontFamily: 'inherit' }}>✓ خلصت</button>
             <button onClick={() => selectedTask && onBlockTask(selectedTask)} style={{ background: '#FEE2E2', color: '#991B1B', padding: '14px 16px', borderRadius: 14, fontWeight: 800, border: 'none', cursor: 'pointer', fontSize: 14, display: 'flex', justifyContent: 'center', alignItems: 'center', gap: 8, fontFamily: 'inherit' }}>✋ عالق</button>
-            <button style={{ background: '#FFEDD5', color: '#9A3412', padding: '14px 16px', borderRadius: 14, fontWeight: 800, border: 'none', cursor: 'pointer', fontSize: 14, display: 'flex', justifyContent: 'center', alignItems: 'center', gap: 8, fontFamily: 'inherit' }}>⏰ بعدين</button>
+            <button onClick={() => setIsSnoozeModalOpen(true)} style={{ background: '#FFEDD5', color: '#9A3412', padding: '14px 16px', borderRadius: 14, fontWeight: 800, border: 'none', cursor: 'pointer', fontSize: 14, display: 'flex', justifyContent: 'center', alignItems: 'center', gap: 8, fontFamily: 'inherit' }}>⏰ بعدين</button>
             <button onClick={() => setSelectedTaskId(null)} style={{ background: '#F1F5F9', color: '#334155', padding: '14px 16px', borderRadius: 14, fontWeight: 800, border: 'none', cursor: 'pointer', fontSize: 14, display: 'flex', justifyContent: 'center', alignItems: 'center', gap: 8, fontFamily: 'inherit' }}>🔄 تغيير</button>
           </div>
           {/* Open details link */}
@@ -953,6 +954,68 @@ function FocusHero({
                 👀 استعراض {sorted.length - 5} مهمة مخفية وتصفح القائمة
               </button>
             )}
+            {/* ── Task Vault Modal ─────────────────────────────────────────── */}
+            {/* ── Smart Snooze Modal ──────────────────────────────────────── */}
+            {isSnoozeModalOpen && selectedTask && (() => { const task = selectedTask as ActiveTask; return (
+              <div style={{ position: 'fixed', inset: 0, zIndex: 9999, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(15, 23, 42, 0.4)', backdropFilter: 'blur(8px)' }} onClick={() => setIsSnoozeModalOpen(false)}>
+                <div style={{ background: '#FFFFFF', width: '100%', maxWidth: '400px', borderRadius: '24px', padding: '32px', boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.25)', border: '1px solid rgba(0,0,0,0.06)' }} onClick={(e) => e.stopPropagation()}>
+                  {/* Header */}
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '8px' }}>
+                    <div style={{ background: '#FFEDD5', color: '#9A3412', width: '40px', height: '40px', borderRadius: '12px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '20px', flexShrink: 0 }}>⏰</div>
+                    <h3 style={{ margin: 0, fontSize: '20px', fontWeight: 800, color: '#0F172A', fontFamily: 'inherit' }}>تأجيل المهمة</h3>
+                  </div>
+                  <p style={{ margin: '0 0 24px 0', fontSize: '15px', color: '#64748B', lineHeight: 1.5 }}>
+                    متى تبي ترجع تشتغل على <strong style={{ color: '#0F172A' }}>{task.title}</strong>؟
+                  </p>
+                  {/* Options */}
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', marginBottom: '24px' }}>
+                    {/* Option 1: Tomorrow */}
+                    <button onClick={async () => {
+                      const taskId = task.id;
+                      const tomorrow = new Date();
+                      tomorrow.setDate(tomorrow.getDate() + 1);
+                      const tomorrowStr = tomorrow.toISOString().split('T')[0];
+                      setIsSnoozeModalOpen(false);
+                      setSelectedTaskId(null);
+                      setIsAllTasksModalOpen(true);
+                      const result = await updateTask({ id: taskId, dueDate: tomorrowStr });
+                      if (result.error) alert(`خطأ في تأجيل المهمة: ${result.error}`);
+                    }} style={{ padding: '14px', background: '#F8FAFC', border: '1px solid #E2E8F0', borderRadius: '14px', fontSize: '15px', fontWeight: 800, color: '#334155', cursor: 'pointer', textAlign: 'right', display: 'flex', gap: '12px', fontFamily: 'inherit' }}>
+                      <span>🌅</span> تأجيل إلى الغد
+                    </button>
+                    {/* Option 2: Next Week */}
+                    <button onClick={async () => {
+                      const taskId = task.id;
+                      const nextWeek = new Date();
+                      nextWeek.setDate(nextWeek.getDate() + 7);
+                      const nextWeekStr = nextWeek.toISOString().split('T')[0];
+                      setIsSnoozeModalOpen(false);
+                      setSelectedTaskId(null);
+                      setIsAllTasksModalOpen(true);
+                      const result = await updateTask({ id: taskId, dueDate: nextWeekStr });
+                      if (result.error) alert(`خطأ في تأجيل المهمة: ${result.error}`);
+                    }} style={{ padding: '14px', background: '#F8FAFC', border: '1px solid #E2E8F0', borderRadius: '14px', fontSize: '15px', fontWeight: 800, color: '#334155', cursor: 'pointer', textAlign: 'right', display: 'flex', gap: '12px', fontFamily: 'inherit' }}>
+                      <span>📅</span> تأجيل للأسبوع القادم
+                    </button>
+                    {/* Option 3: Back to Pending (todo) */}
+                    <button onClick={async () => {
+                      const taskId = task.id;
+                      setIsSnoozeModalOpen(false);
+                      setSelectedTaskId(null);
+                      setIsAllTasksModalOpen(true);
+                      const result = await updateTask({ id: taskId, status: 'todo' as TaskStatus });
+                      if (result.error) alert(`خطأ في إرجاع المهمة: ${result.error}`);
+                    }} style={{ padding: '14px', background: '#FFF7ED', border: '1px solid #FED7AA', borderRadius: '14px', fontSize: '15px', fontWeight: 800, color: '#C2410C', cursor: 'pointer', textAlign: 'right', display: 'flex', gap: '12px', fontFamily: 'inherit' }}>
+                      <span>📥</span> إرجاع لقائمة "قيد الانتظار"
+                    </button>
+                  </div>
+                  {/* Cancel */}
+                  <button onClick={() => setIsSnoozeModalOpen(false)} style={{ width: '100%', padding: '14px', background: 'transparent', color: '#64748B', border: 'none', fontSize: '15px', fontWeight: 800, cursor: 'pointer', fontFamily: 'inherit' }}>
+                    إلغاء
+                  </button>
+                </div>
+              </div>
+            ); })()}
             {/* ── Task Vault Modal ─────────────────────────────────────────── */}
             {isAllTasksModalOpen && (
               <div style={{ position: 'fixed', inset: 0, zIndex: 9998, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(15, 23, 42, 0.4)', backdropFilter: 'blur(8px)' }} onClick={() => setIsAllTasksModalOpen(false)}>
