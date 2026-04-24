@@ -1300,32 +1300,46 @@ export default function LeadershipClient({
       <main className="main">
 
         {/* ── Greeting ────────────────────────────────────────────────────── */}
-        <div className="greeting" style={{ padding: '8px 40px 0' }}>
-          <div className="greeting-title">
-            <span className="greeting-emoji">👋</span>
-            <div className="greeting-text">
-              <div className="greeting-hello">
-                {greeting} <span className="name">غازي</span>
+        {/* ── الغلاف الرئيسي — fluid، padding موحد 40px ─────────────────── */}
+        <div style={{
+          flex: 1,
+          width: '100%',
+          padding: '24px 40px 40px',
+          boxSizing: 'border-box',
+          overflowX: 'hidden',
+          display: 'flex',
+          flexDirection: 'column',
+          gap: 20,
+        }}>
+          {/* ── Header: تحية يمين + أزرار يسار ─────────────────────────── */}
+          <div style={{
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            width: '100%',
+            marginBottom: '4px',
+          }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+              <span className="greeting-emoji">👋</span>
+              <div className="greeting-text">
+                <div className="greeting-hello">
+                  {greeting} <span className="name">غازي</span>
+                </div>
+                <div className="greeting-date">{dateLabel}</div>
               </div>
-              <div className="greeting-date">{dateLabel}</div>
+            </div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+              <button className="quick-action">
+                <span>🔍</span>
+                <span>بحث</span>
+              </button>
+              <button className="quick-action primary" onClick={() => setEditorDate(todayISO())}>
+                <span>+</span>
+                <span>فوكس اليوم</span>
+              </button>
             </div>
           </div>
-          <div className="greeting-meta">
-            <button className="quick-action">
-              <span>🔍</span>
-              <span>بحث</span>
-            </button>
-            <button className="quick-action primary" onClick={() => setEditorDate(todayISO())}>
-              <span>+</span>
-              <span>فوكس اليوم</span>
-            </button>
-          </div>
-        </div>
-
-        {/* ── المحتوى الرئيسي ─────────────────────────────────────────────────── */}
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 0 }}>
-
-          {/* FocusHero — كامل العرض بدون padding */}
+          {/* ── FocusHero ─────────────────────────────────────────────────── */}
           <FocusHero
             todayFocus={todayFocus}
             activeTasks={activeTasks}
@@ -1336,7 +1350,7 @@ export default function LeadershipClient({
           />
 
           {/* باقي المحتوى بـ padding جانبي */}
-          <div style={{ padding: '20px 40px 40px', display: 'flex', flexDirection: 'column', gap: 20, width: '100%', boxSizing: 'border-box' }}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 20, width: '100%' }}>
 
           {/* WeeklyCompass — كامل العرض */}
           <WeeklyCompass
@@ -1392,9 +1406,9 @@ export default function LeadershipClient({
             </section>
           </div>
 
-          </div>{/* end padding wrapper */}
+          </div>{/* end باقي المحتوى */}
 
-        </div>{/* end المحتوى الرئيسي */}
+        </div>{/* end الغلاف الرئيسي */}
 
 
       </main>

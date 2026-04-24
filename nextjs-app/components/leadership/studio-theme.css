@@ -1668,14 +1668,16 @@ body::before {
   gap: 20px;
   align-items: start;
 }
-/* Desktop: fluid width — no negative margins */
+/* Desktop: fluid width — fill wrapper, no negative margins */
 .triple-panel,
 .focus-hero,
 .weekly-compass-section,
-.daily-tasks-section {
-  width: 100%;
-  margin-left: 0;
-  margin-right: 0;
+.daily-tasks-section,
+.dashboard-bottom-grid {
+  width: 100% !important;
+  max-width: 100% !important;
+  margin-left: 0 !important;
+  margin-right: 0 !important;
   box-sizing: border-box;
 }
 /* Fixed height for perfect visual symmetry */
