@@ -1,7 +1,7 @@
 'use client';
 // BrandDetailClient — تفاصيل البراند
 // @hello-pangea/dnd للـ Drag & Drop + TaskPanel + AddTaskModal
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import {
   DragDropContext,
@@ -180,47 +180,66 @@ function PriPicker({ onSelect, onClose }: { onSelect: (p: TaskPriority) => void;
 // ─── Quick Add ────────────────────────────────────────────────────────────────
 interface QuickAddProps { colId: TaskStatus; brandId: string; projectId: string | null; onAdd: (task: Task) => void; }
 function QuickAdd({ colId, brandId, projectId, onAdd }: QuickAddProps) {
+  const [isOpen, setIsOpen]   = useState(false);
   const [value, setValue]     = useState('');
   const [showPri, setShowPri] = useState(false);
   const [loading, setLoading] = useState(false);
 
+  // 10-second auto-timeout for priority picker (per user preference)
+  useEffect(() => {
+    if (!showPri) return;
+    const timer = setTimeout(() => {
+      handleAdd('low');
+    }, 10000);
+    return () => clearTimeout(timer);
+  }, [showPri]);
+
   async function handleAdd(priority: TaskPriority) {
     const title = value.trim();
-    if (!title) return;
+    if (!title) { setIsOpen(false); setValue(''); setShowPri(false); return; }
     setShowPri(false);
     setLoading(true);
     const res = await addTask({ title, status: colId, priority, brandId, projectId: projectId ?? undefined });
     setLoading(false);
-    if (res.task) { onAdd(res.task); setValue(''); }
+    if (res.task) { onAdd(res.task); setValue(''); setIsOpen(false); }
   }
+
   function handleKeyDown(e: React.KeyboardEvent) {
-    if (e.key === 'Enter' && value.trim()) setShowPri(true);
-    if (e.key === 'Escape') { setValue(''); setShowPri(false); }
+    if (e.key === 'Enter' && value.trim()) { e.preventDefault(); setShowPri(true); }
+    if (e.key === 'Escape') { setValue(''); setShowPri(false); setIsOpen(false); }
   }
+
+  function handleClose() { setValue(''); setShowPri(false); setIsOpen(false); }
+
+  if (!isOpen) {
+    return (
+      <button
+        className="vip-add-task-btn"
+        onClick={() => setIsOpen(true)}
+      >
+        <span>+</span> إضافة مهمة جديدة
+      </button>
+    );
+  }
+
   return (
-    <div style={{ position: 'relative', flexShrink: 0 }}>
-      {value.trim() ? (
-        <div className="vip-add-form">
-          <input
-            className="vip-add-input"
-            value={value}
-            onChange={(e) => setValue(e.target.value)}
-            onKeyDown={handleKeyDown}
-            placeholder="اكتب اسم المهمة ثم Enter..."
-            disabled={loading}
-            autoFocus
-            onBlur={() => { if (!value.trim()) setValue(''); }}
-          />
-          {showPri && <PriPicker onSelect={handleAdd} onClose={() => setShowPri(false)} />}
-        </div>
-      ) : (
-        <button
-          className="vip-add-task-btn"
-          onClick={() => setValue(' ')}
-        >
-          <span>+</span> إضافة مهمة جديدة
+    <div style={{ margin: '0 12px 14px', display: 'flex', flexDirection: 'column', gap: '8px', position: 'relative' }}>
+      <input
+        autoFocus
+        disabled={loading}
+        value={value}
+        onChange={(e) => setValue(e.target.value)}
+        onKeyDown={handleKeyDown}
+        placeholder="اكتب اسم المهمة واضغط Enter..."
+        style={{ width: '100%', padding: '12px 14px', borderRadius: '12px', border: '2px solid #EA580C', outline: 'none', fontSize: '13px', fontWeight: '600', color: '#0F172A', background: '#FFFFFF', boxShadow: '0 4px 12px rgba(234,88,12,0.1)', boxSizing: 'border-box', fontFamily: 'inherit' }}
+      />
+      <div style={{ display: 'flex', gap: '8px' }}>
+        <button disabled={loading || !value.trim()} onClick={() => { if (value.trim()) setShowPri(true); }} style={{ background: '#EA580C', color: 'white', border: 'none', padding: '7px 12px', borderRadius: '8px', fontSize: '12px', fontWeight: '800', cursor: 'pointer', flex: 1, fontFamily: 'inherit' }}>
+          {loading ? 'جاري الحفظ...' : 'إضافة (Enter)'}
         </button>
-      )}
+        <button disabled={loading} onClick={handleClose} style={{ background: '#F1F5F9', color: '#64748B', border: 'none', padding: '7px 12px', borderRadius: '8px', fontSize: '12px', fontWeight: '800', cursor: 'pointer', flex: 1, fontFamily: 'inherit' }}>إلغاء</button>
+      </div>
+      {showPri && <PriPicker onSelect={handleAdd} onClose={() => setShowPri(false)} />}
     </div>
   );
 }
