@@ -337,38 +337,31 @@ body::before {
 
 
 .focus-hero {
-  position: relative;
-  padding: 24px 32px;
-  background: var(--sunrise-gradient);
-  border-radius: 24px;
+  background: linear-gradient(135deg, #FFFDF8 0%, #FFF0DF 100%) !important;
+  color: #431407 !important;
+  border: 1px solid rgba(249, 115, 22, 0.15) !important;
+  border-radius: 28px !important;
+  padding: 40px !important;
+  box-shadow: 0 16px 40px rgba(249, 115, 22, 0.06) !important;
+  display: grid !important;
+  grid-template-columns: 1.5fr 1fr !important;
+  gap: 40px !important;
+  align-items: stretch !important;
   overflow: hidden;
-  box-shadow: 0 8px 32px rgba(255, 107, 107, 0.2);
-  color: white;
-  display: flex;
-  flex-direction: column;
+  position: relative;
 }
 
-/* Decorative elements */
+/* Subtle decorative orb */
 .focus-hero::before {
   content: '';
   position: absolute;
-  top: -100px;
-  right: -100px;
-  width: 300px;
-  height: 300px;
-  background: radial-gradient(circle, rgba(255, 255, 255, 0.2) 0%, transparent 60%);
+  top: -60px;
+  left: -60px;
+  width: 200px;
+  height: 200px;
+  background: radial-gradient(circle, rgba(249, 115, 22, 0.06) 0%, transparent 70%);
   border-radius: 50%;
-}
-
-.focus-hero::after {
-  content: '';
-  position: absolute;
-  bottom: -80px;
-  left: -80px;
-  width: 250px;
-  height: 250px;
-  background: radial-gradient(circle, rgba(255, 255, 255, 0.15) 0%, transparent 60%);
-  border-radius: 50%;
+  pointer-events: none;
 }
 
 .focus-content {
@@ -386,19 +379,20 @@ body::before {
   align-items: center;
   gap: 8px;
   padding: 4px 12px;
-  background: rgba(255, 255, 255, 0.25);
+  background: rgba(249, 115, 22, 0.08);
   backdrop-filter: blur(10px);
   border-radius: 20px;
   font-size: 11px;
   font-weight: 600;
   margin-bottom: 10px;
-  border: 1px solid rgba(255, 255, 255, 0.3);
+  border: 1px solid rgba(249, 115, 22, 0.2);
+  color: #EA580C;
 }
 
 .focus-label-dot {
   width: 8px;
   height: 8px;
-  background: white;
+  background: #EA580C;
   border-radius: 50%;
   animation: blink 1.5s ease-in-out infinite;
 }
@@ -414,7 +408,7 @@ body::before {
   line-height: 1.2;
   margin-bottom: 8px;
   letter-spacing: -0.5px;
-  color: white;
+  color: #431407;
 }
 
 .focus-subtitle {
@@ -443,7 +437,7 @@ body::before {
 .focus-icon-big {
   width: 80px;
   height: 80px;
-  background: rgba(255, 255, 255, 0.25);
+  background: rgba(249, 115, 22, 0.08);
   backdrop-filter: blur(20px);
   border-radius: 20px;
   display: flex;
@@ -451,9 +445,9 @@ body::before {
   justify-content: center;
   font-size: 48px;
   flex-shrink: 0;
-  border: 1px solid rgba(255, 255, 255, 0.3);
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
-  opacity: 0.9;
+  border: 1px solid rgba(249, 115, 22, 0.15);
+  box-shadow: 0 8px 24px rgba(249, 115, 22, 0.08);
+  opacity: 1;
 }
 
 .focus-cta {
@@ -463,35 +457,37 @@ body::before {
 }
 
 .focus-btn {
-  padding: 8px 16px;
-  background: rgba(255, 255, 255, 0.25);
+  padding: 10px 20px;
+  background: linear-gradient(135deg, #EA580C 0%, #F97316 100%);
   color: white;
   font-family: inherit;
   font-size: 14px;
   font-weight: 600;
-  border: 1px solid rgba(255, 255, 255, 0.4);
+  border: none;
   border-radius: 12px;
   cursor: pointer;
-  transition: background 0.2s, transform 0.2s;
+  transition: all 0.2s;
   display: flex;
   align-items: center;
   gap: 8px;
+  box-shadow: 0 4px 12px rgba(234, 88, 12, 0.3);
 }
 
 .focus-btn:hover {
   transform: translateY(-2px);
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+  box-shadow: 0 8px 24px rgba(234, 88, 12, 0.4);
 }
 
 .focus-btn.ghost {
-  background: rgba(255, 255, 255, 0.15);
-  backdrop-filter: blur(10px);
-  color: white;
-  border: 1px solid rgba(255, 255, 255, 0.3);
+  background: rgba(249, 115, 22, 0.08);
+  color: #EA580C;
+  border: 1px solid rgba(249, 115, 22, 0.25);
+  box-shadow: none;
 }
 
 .focus-btn.ghost:hover {
-  background: rgba(255, 255, 255, 0.3);
+  background: rgba(249, 115, 22, 0.15);
+  box-shadow: 0 4px 12px rgba(249, 115, 22, 0.1);
 }
 
 /* ═══════════════════════════════════════════════════════════════════════════
@@ -1557,6 +1553,68 @@ body::before {
 .focus-progress-bar { flex: 1; height: 6px; background: rgba(255,255,255,0.3); border-radius: 10px; overflow: hidden; }
 .focus-progress-fill { height: 6px; border-radius: 10px; background: white; transition: width 0.3s; }
 .focus-progress-label { font-size: 11px; opacity: 0.9; white-space: nowrap; }
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   PREMIUM SUBTASK — checklist items in FocusHero right column
+   ═══════════════════════════════════════════════════════════════════════════ */
+.focus-hero-right-col {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  justify-content: flex-start;
+}
+.focus-hero-right-col-label {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+  color: #9A6B4B;
+  margin-bottom: 12px;
+}
+.premium-subtask {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: rgba(255, 255, 255, 0.7);
+  padding: 14px 16px;
+  border-radius: 14px;
+  margin-bottom: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.9);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.02);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+.premium-subtask:hover { background: #FFFFFF; box-shadow: 0 4px 16px rgba(249, 115, 22, 0.08); }
+.premium-subtask input[type="checkbox"] {
+  width: 20px;
+  height: 20px;
+  accent-color: #EA580C;
+  cursor: pointer;
+  margin: 0;
+  flex-shrink: 0;
+}
+.premium-subtask span {
+  font-size: 14px;
+  font-weight: 600;
+  color: #431407;
+  line-height: 1.4;
+  flex: 1;
+}
+.premium-subtask-priority {
+  font-size: 10px;
+  font-weight: 700;
+  padding: 2px 8px;
+  border-radius: 8px;
+  flex-shrink: 0;
+}
+.premium-subtask-more {
+  font-size: 12px;
+  color: #9A6B4B;
+  text-align: center;
+  padding: 8px;
+  font-weight: 500;
+}
+
 .focus-tasks { position: relative; z-index: 2; margin-top: 16px; border-top: 1px solid rgba(255,255,255,0.3); padding-top: 12px; display: flex; flex-direction: column; gap: 6px; }
 .focus-tasks-label { font-size: 11px; font-weight: 700; opacity: 0.8; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 8px; }
 .focus-task-item { width: 100%; display: flex; align-items: center; gap: 8px; padding: 8px 12px; background: rgba(255,255,255,0.2); border: 1px solid rgba(255,255,255,0.3); border-radius: 10px; cursor: pointer; margin-bottom: 6px; text-align: right; direction: rtl; transition: background-color 0.15s ease, transform 0.15s ease; font-family: inherit; color: white; font-size: 13px; }

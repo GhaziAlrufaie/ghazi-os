@@ -779,55 +779,104 @@ function FocusHero({
     );
   }
 
-  // Main focus view
+  // Main focus view — Premium 2-column layout
   return (
-    <section className="focus-hero" style={{ borderTop: `4px solid ${color}` }}>
-      <div className="focus-content">
-        <div style={{ flex: 1 }}>
-          <div className="focus-label">
-            <span className="focus-label-dot" style={{ background: color }} />
-            <span>الشيء الواحد الآن · Today&apos;s ONE Thing</span>
-          </div>
-          <h1 className="focus-title">{todayFocus.targetName}</h1>
-          {brand && <p className="focus-subtitle">{brand.icon} براند</p>}
-          {project && project.progress > 0 && (
-            <div className="focus-progress-wrap">
-              <div className="focus-progress-bar">
-                <div className="focus-progress-fill" style={{ width: `${project.progress}%`, background: color }} />
-              </div>
-              <span className="focus-progress-label">{project.progress}%</span>
+    <section className="focus-hero">
+      {/* ── LEFT COLUMN: Main info ───────────────────────────────────────── */}
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 20, position: 'relative', zIndex: 2 }}>
+        {/* Badge */}
+        <div className="focus-label">
+          <span className="focus-label-dot" />
+          <span>الشيء الواحد الآن · Today&apos;s ONE Thing</span>
+        </div>
+        {/* Icon + Title row */}
+        <div style={{ display: 'flex', alignItems: 'flex-start', gap: 20 }}>
+          <div className="focus-icon-big">🎯</div>
+          <div style={{ flex: 1 }}>
+            <h1 className="focus-title">{todayFocus.targetName}</h1>
+            {/* Tags row */}
+            <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, marginTop: 10 }}>
+              {brand && (
+                <span style={{
+                  display: 'inline-flex', alignItems: 'center', gap: 6,
+                  padding: '4px 12px', borderRadius: 20,
+                  background: 'rgba(249,115,22,0.08)', border: '1px solid rgba(249,115,22,0.2)',
+                  fontSize: 12, fontWeight: 600, color: '#EA580C',
+                }}>
+                  {brand.icon} {brand.name}
+                </span>
+              )}
+              <span style={{
+                display: 'inline-flex', alignItems: 'center', gap: 6,
+                padding: '4px 12px', borderRadius: 20,
+                background: 'rgba(67,20,7,0.06)', border: '1px solid rgba(67,20,7,0.1)',
+                fontSize: 12, fontWeight: 600, color: '#7C3D1A',
+              }}>
+                {FOCUS_TYPE_ICONS[todayFocus.targetType]} {FOCUS_TYPE_LABELS[todayFocus.targetType]}
+              </span>
+              {sorted.length > 0 && (
+                <span style={{
+                  display: 'inline-flex', alignItems: 'center', gap: 6,
+                  padding: '4px 12px', borderRadius: 20,
+                  background: 'rgba(234,88,12,0.06)', border: '1px solid rgba(234,88,12,0.15)',
+                  fontSize: 12, fontWeight: 600, color: '#9A6B4B',
+                }}>
+                  ✅ {sorted.length} مهمة
+                </span>
+              )}
             </div>
-          )}
-          <div className="focus-meta">
-            <div className="focus-meta-item">
-              <span>{FOCUS_TYPE_ICONS[todayFocus.targetType]}</span>
-              <span>{FOCUS_TYPE_LABELS[todayFocus.targetType]}</span>
-            </div>
-          </div>
-          <div className="focus-cta">
-            <button className="focus-btn ghost" onClick={onOpenEditor}>تغيير الفوكس</button>
           </div>
         </div>
-        <div className="focus-icon-big">🎯</div>
+        {/* Progress bar if available */}
+        {project && project.progress > 0 && (
+          <div className="focus-progress-wrap">
+            <div className="focus-progress-bar">
+              <div className="focus-progress-fill" style={{ width: `${project.progress}%`, background: '#EA580C' }} />
+            </div>
+            <span className="focus-progress-label">{project.progress}%</span>
+          </div>
+        )}
+        {/* Action buttons */}
+        <div className="focus-cta">
+          <button className="focus-btn" onClick={onOpenEditor} style={{ fontSize: 14 }}>
+            🚀 ابدأ الآن
+          </button>
+          <button className="focus-btn ghost" onClick={onOpenEditor}>
+            🔄 تغيير المهمة
+          </button>
+        </div>
       </div>
-      {/* Tasks list */}
-      {sorted.length > 0 && (
-        <div className="focus-tasks">
-          <div className="focus-tasks-label">المهام المرتبطة ({sorted.length})</div>
-          {sorted.slice(0, 5).map(t => {
-            const pColor = PRIORITY_COLORS[t.priority] ?? '#8B8F9F';
-            return (
-              <button key={t.id} onClick={() => setSelectedTaskId(t.id)} className="focus-task-item"
-                style={{ borderRight: `3px solid ${pColor}` }}>
-                <span className="priority-dot" style={{ background: pColor }} />
-                <span className="flex-1">{t.title}</span>
-                <span className="priority-badge" style={{ background: `${pColor}18`, color: pColor }}>{PRIORITY_LABELS[t.priority]}</span>
-              </button>
-            );
-          })}
-          {sorted.length > 5 && <div className="focus-tasks-more">+ {sorted.length - 5} مهمة أخرى</div>}
-        </div>
-      )}
+      {/* ── RIGHT COLUMN: Premium subtask checklist ──────────────────────── */}
+      <div className="focus-hero-right-col" style={{ position: 'relative', zIndex: 2 }}>
+        {sorted.length > 0 ? (
+          <>
+            <div className="focus-hero-right-col-label">
+              المهام المرتبطة ({sorted.length})
+            </div>
+            {sorted.slice(0, 5).map(t => {
+              const pColor = PRIORITY_COLORS[t.priority] ?? '#8B8F9F';
+              const pLabel = PRIORITY_LABELS[t.priority];
+              return (
+                <div key={t.id} className="premium-subtask" onClick={() => setSelectedTaskId(t.id)}>
+                  <input type="checkbox" readOnly checked={false} onClick={e => e.stopPropagation()} />
+                  <span>{t.title}</span>
+                  <span className="premium-subtask-priority" style={{ background: `${pColor}18`, color: pColor }}>
+                    {pLabel}
+                  </span>
+                </div>
+              );
+            })}
+            {sorted.length > 5 && (
+              <div className="premium-subtask-more">+ {sorted.length - 5} مهمة أخرى</div>
+            )}
+          </>
+        ) : (
+          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', height: '100%', gap: 12, opacity: 0.6 }}>
+            <span style={{ fontSize: 40 }}>✨</span>
+            <span style={{ fontSize: 13, fontWeight: 600, color: '#9A6B4B', textAlign: 'center' }}>لا توجد مهام مرتبطة بعد</span>
+          </div>
+        )}
+      </div>
     </section>
   );
 }
