@@ -10,8 +10,10 @@ import { useState, useTransition, useMemo } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import {
-  addDecision, deleteDecision,
+  deleteDecision,
 } from '@/lib/leadership-actions';
+import { addDecision as addDecisionAction } from '@/lib/decisions-actions';
+import type { Decision as DecisionFull } from '@/app/decisions/page';
 import { addTask, updateTask } from '@/lib/tasks-actions';
 import { addPersonalTask } from '@/lib/personal-actions';
 import {
@@ -1369,24 +1371,39 @@ export default function LeadershipClient({
     setBlockedReason('');
     setTaskToBlock(null);
     try {
-      // 1. Update task status to on_hold in Supabase
+      // 1. Update task status to on_hold (valid value per tasks-actions.ts TaskStatus)
       const taskResult = await updateTask({ id: task.id, status: 'on_hold' as const });
-      if (taskResult.error) throw new Error(taskResult.error);
-      // 2. Create a decision in Supabase decisions table
-      await addDecision({
+      if (taskResult.error) {
+        alert(`خطأ في تحديث المهمة: ${taskResult.error}`);
+        return;
+      }
+      // 2. Create a decision using decisions-actions (correct schema: status='pending', no updated_at)
+      const newDecision: DecisionFull = {
+        id: `d${Date.now()}`,
+        brand_id: task.brandId ?? null,
+        project_id: task.projectId ?? null,
         title: decisionTitle,
-        brandId: task.brandId ?? '',
-        impact: 'high',
-        status: 'open',
         context: reason,
-        deadline: '',
+        options: [],
+        chosen_option_id: null,
+        status: 'pending',
+        impact: 'high',
+        deadline: null,
+        decided_at: null,
+        decided_by: null,
         notes: `تم إنشاؤه تلقائياً من مهمة عالقة: ${task.title}`,
-      });
+      };
+      const decResult = await addDecisionAction(newDecision);
+      if (!decResult.ok) {
+        alert(`خطأ في إنشاء القرار: ${decResult.error}`);
+        return;
+      }
       // 3. Refresh the page to reflect updated data from Supabase
       router.refresh();
-    } catch (e) {
-      console.error('Failed to block task:', e);
-      alert('حدث خطأ أثناء تحويل المهمة لقرار. يرجى المحاولة مرة أخرى.');
+    } catch (e: unknown) {
+      const msg = e instanceof Error ? e.message : String(e);
+      console.error('Failed to block task:', msg);
+      alert(`حدث خطأ غير متوقع: ${msg}`);
     }
   };
   const d = new Date();
