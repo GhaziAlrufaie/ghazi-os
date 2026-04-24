@@ -638,7 +638,7 @@ function FocusEditorModal({
 
 // ─── Focus Hero ───────────────────────────────────────────────────────────────
 function FocusHero({
-  todayFocus, activeTasks, personalTasks, brands, projects, onOpenEditor,
+  todayFocus, activeTasks, personalTasks, brands, projects, onOpenEditor, onBlockTask,
 }: {
   todayFocus: WeeklyFocusEntry | null;
   activeTasks: ActiveTask[];
@@ -646,6 +646,7 @@ function FocusHero({
   brands: Brand[];
   projects: Project[];
   onOpenEditor: () => void;
+  onBlockTask: (task: ActiveTask) => void;
 }) {
   const [selectedTaskId, setSelectedTaskId] = useState<string | null>(null);
   const [localStatuses, setLocalStatuses] = useState<Record<string, string>>({});
@@ -802,7 +803,7 @@ function FocusHero({
           {/* 2x2 Action buttons */}
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12, marginTop: 'auto' }}>
             <button style={{ background: '#DCFCE7', color: '#166534', padding: '14px 16px', borderRadius: 14, fontWeight: 800, border: 'none', cursor: 'pointer', fontSize: 14, display: 'flex', justifyContent: 'center', alignItems: 'center', gap: 8, fontFamily: 'inherit' }}>✓ خلصت</button>
-            <button style={{ background: '#FEE2E2', color: '#991B1B', padding: '14px 16px', borderRadius: 14, fontWeight: 800, border: 'none', cursor: 'pointer', fontSize: 14, display: 'flex', justifyContent: 'center', alignItems: 'center', gap: 8, fontFamily: 'inherit' }}>✋ عالق</button>
+            <button onClick={() => selectedTask && onBlockTask(selectedTask)} style={{ background: '#FEE2E2', color: '#991B1B', padding: '14px 16px', borderRadius: 14, fontWeight: 800, border: 'none', cursor: 'pointer', fontSize: 14, display: 'flex', justifyContent: 'center', alignItems: 'center', gap: 8, fontFamily: 'inherit' }}>✋ عالق</button>
             <button style={{ background: '#FFEDD5', color: '#9A3412', padding: '14px 16px', borderRadius: 14, fontWeight: 800, border: 'none', cursor: 'pointer', fontSize: 14, display: 'flex', justifyContent: 'center', alignItems: 'center', gap: 8, fontFamily: 'inherit' }}>⏰ بعدين</button>
             <button onClick={() => setSelectedTaskId(null)} style={{ background: '#F1F5F9', color: '#334155', padding: '14px 16px', borderRadius: 14, fontWeight: 800, border: 'none', cursor: 'pointer', fontSize: 14, display: 'flex', justifyContent: 'center', alignItems: 'center', gap: 8, fontFamily: 'inherit' }}>🔄 تغيير</button>
           </div>
@@ -1339,6 +1340,10 @@ export default function LeadershipClient({
   dailyRoutines: initialDailyRoutines,
 }: Props) {
   const [editorDate, setEditorDate] = useState<string | null>(null);
+  const [isBlockedModalOpen, setIsBlockedModalOpen] = useState(false);
+  const [blockedReason, setBlockedReason] = useState('');
+  const [taskToBlock, setTaskToBlock] = useState<ActiveTask | null>(null);
+  const [, startBlockTransition] = useTransition();
   const [dailyRoutines] = useState<DailyRoutine[]>(initialDailyRoutines);
   const router = useRouter();
 
@@ -1348,9 +1353,35 @@ export default function LeadershipClient({
 
   function handleEditorSaved() {
     setEditorDate(null);
-    router.refresh();
   }
-
+  const handleOpenBlockedModal = (task: ActiveTask) => {
+    setTaskToBlock(task);
+    setBlockedReason('');
+    setIsBlockedModalOpen(true);
+  };
+  const handleConfirmBlock = () => {
+    if (!taskToBlock || !blockedReason.trim()) return;
+    const decisionTitle = `${taskToBlock.title} — أكمل أم ألغي؟`;
+    startBlockTransition(async () => {
+      try {
+        await updateTask({ id: taskToBlock.id, status: 'on_hold' });
+        await addDecision({
+          title: decisionTitle,
+          brandId: taskToBlock.brandId ?? '',
+          impact: 'high',
+          status: 'open',
+          context: blockedReason,
+          deadline: '',
+          notes: `تم إنشاؤه تلقائياً من مهمة عالقة: ${taskToBlock.title}`,
+        });
+        router.refresh();
+      } catch (e) {
+        console.error('Failed to block task:', e);
+      }
+    });
+    setIsBlockedModalOpen(false);
+    setTaskToBlock(null);
+  };
   const d = new Date();
   const hour = d.getHours();
   const greeting = hour < 12 ? 'صباح الخير' : hour < 17 ? 'مساء الخير' : 'مساء النور';
@@ -1408,6 +1439,7 @@ export default function LeadershipClient({
             brands={brands}
             projects={projects}
             onOpenEditor={() => setEditorDate(todayISO())}
+            onBlockTask={handleOpenBlockedModal}
           />
 
           {/* باقي المحتوى بـ padding جانبي */}
@@ -1475,6 +1507,43 @@ export default function LeadershipClient({
       </main>
 
       {/* Focus Editor Modal */}
+      {/* Blocked Task Modal */}
+      {isBlockedModalOpen && taskToBlock && (
+        <div style={{ position: 'fixed', inset: 0, zIndex: 9999, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(15, 23, 42, 0.4)', backdropFilter: 'blur(8px)' }}>
+          <div style={{ background: '#FFFFFF', width: '100%', maxWidth: '440px', borderRadius: '24px', padding: '32px', boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.25)', border: '1px solid rgba(0,0,0,0.06)', direction: 'rtl' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '8px' }}>
+              <div style={{ background: '#FEE2E2', color: '#DC2626', width: '40px', height: '40px', borderRadius: '12px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '20px', flexShrink: 0 }}>✋</div>
+              <h3 style={{ margin: 0, fontSize: '20px', fontWeight: 800, color: '#0F172A' }}>إيقاف المهمة</h3>
+            </div>
+            <p style={{ margin: '0 0 20px 0', fontSize: '15px', color: '#64748B', lineHeight: 1.6 }}>
+              المهمة: <strong style={{ color: '#0F172A' }}>{taskToBlock.title}</strong><br />
+              وش اللي وقفك؟ (سيتم تحويلها لقرار لاتخاذ إجراء)
+            </p>
+            <textarea
+              autoFocus
+              value={blockedReason}
+              onChange={(e) => setBlockedReason(e.target.value)}
+              placeholder="مثال: العميل متردد بخصوص السعر..."
+              style={{ width: '100%', minHeight: '120px', padding: '16px', background: '#F8FAFC', border: '1px solid #E2E8F0', borderRadius: '16px', fontSize: '15px', color: '#0F172A', outline: 'none', resize: 'none', marginBottom: '24px', boxSizing: 'border-box', fontFamily: 'inherit', direction: 'rtl' }}
+            />
+            <div style={{ display: 'flex', gap: '12px' }}>
+              <button
+                onClick={() => setIsBlockedModalOpen(false)}
+                style={{ flex: 1, padding: '14px', background: '#F1F5F9', color: '#475569', border: 'none', borderRadius: '14px', fontSize: '15px', fontWeight: 700, cursor: 'pointer', fontFamily: 'inherit' }}
+              >
+                إلغاء
+              </button>
+              <button
+                onClick={handleConfirmBlock}
+                disabled={!blockedReason.trim()}
+                style={{ flex: 1, padding: '14px', background: blockedReason.trim() ? '#EA580C' : '#FDBA74', color: '#FFFFFF', border: 'none', borderRadius: '14px', fontSize: '15px', fontWeight: 700, cursor: blockedReason.trim() ? 'pointer' : 'not-allowed', transition: 'all 0.2s', fontFamily: 'inherit' }}
+              >
+                تأكيد وتحويل لقرار
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
       {editorDate && (
         <FocusEditorModal
           dateStr={editorDate}
