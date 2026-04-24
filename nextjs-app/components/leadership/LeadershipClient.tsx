@@ -1297,7 +1297,7 @@ export default function LeadershipClient({
 
   return (
     <div className="app" style={{ direction: 'rtl' }}>
-      <main className="main">
+      <main style={{ display: "contents" }}>
 
         {/* ── Greeting ────────────────────────────────────────────────────── */}
         {/* ── الغلاف الرئيسي — fluid، padding موحد 40px ─────────────────── */}
