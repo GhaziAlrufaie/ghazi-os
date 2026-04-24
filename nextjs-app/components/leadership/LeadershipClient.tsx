@@ -1033,185 +1033,123 @@ function CalendarMini({ upcomingEvents, brands, activeTasks }: { upcomingEvents:
     return d.getFullYear() === tomorrowYear && d.getMonth() === tomorrowMonth && d.getDate() === tomorrowDay;
   });
 
-  const cells: React.ReactNode[] = [];
-  // Header row
-  ['أح','اث','ث','أر','خ','ج','س'].forEach((d, i) => (
-    cells.push(<div key={`h-${i}`} className="cal-cell header">{d}</div>)
-  ));
-  // Empty cells before first day
+  // Build calendar days array for compact grid
+  const calendarDays: { num: number; isToday: boolean; isMuted: boolean; hasDot: boolean; }[] = [];
   for (let i = 0; i < firstDay; i++) {
-    cells.push(<div key={`e-${i}`} className="cal-cell" />);
+    calendarDays.push({ num: 0, isToday: false, isMuted: true, hasDot: false });
   }
-  // Day cells
   for (let d = 1; d <= daysInMonth; d++) {
-    const isToday = d === today;
-    const hasEvent = eventDays.has(d);
-    const hasTask = taskDays.has(d);
-    const isSelected = d === selectedDate;
-    let cls = 'cal-cell';
-    if (isToday) cls += ' today';
-    if (isSelected) cls += ' selected';
-    cells.push(
-      <div key={d} className={cls} onClick={() => setSelectedDate(d === selectedDate ? null : d)}
-        style={{ cursor: 'pointer', position: 'relative' }}>
-        {d}
-        {(hasEvent || hasTask) && (
-          <div style={{
-            position: 'absolute', bottom: 2, left: '50%', transform: 'translateX(-50%)',
-            display: 'flex', gap: 2,
-          }}>
-            {hasEvent && <span style={{ width: 4, height: 4, borderRadius: '50%', background: 'var(--coral, #ff6b6b)', display: 'block' }} />}
-            {hasTask && <span style={{ width: 4, height: 4, borderRadius: '50%', background: 'var(--gold, #f0a500)', display: 'block' }} />}
-          </div>
-        )}
-      </div>
-    );
+    calendarDays.push({
+      num: d,
+      isToday: d === today,
+      isMuted: false,
+      hasDot: eventDays.has(d) || taskDays.has(d),
+    });
   }
-
   const ARABIC_MONTHS = ['يناير','فبراير','مارس','أبريل','مايو','يونيو','يوليو','أغسطس','سبتمبر','أكتوبر','نوفمبر','ديسمبر'];
-
+  // Upcoming events sorted by date
+  const upcomingSorted = [...upcomingEvents]
+    .filter(e => {
+      const d = new Date(e.year, e.month - 1, e.day);
+      const todayDate = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+      return d >= todayDate;
+    })
+    .sort((a, b) => {
+      const da = new Date(a.year, a.month - 1, a.day).getTime();
+      const db = new Date(b.year, b.month - 1, b.day).getTime();
+      return da - db;
+    })
+    .slice(0, 8);
   return (
-    <div>
-      {/* Calendar grid */}
-      <div className="cal-mini">{cells}</div>
-
+    <div className="compact-calendar-wrapper">
+      {/* Header */}
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
+        <div>
+          <h3 style={{ fontSize: 18, fontWeight: 900, color: '#1E293B', margin: 0 }}>
+            {ARABIC_MONTHS[month]} {year}
+          </h3>
+          <span style={{ fontSize: 12, color: '#64748B' }}>{upcomingEvents.length} أحداث قادمة</span>
+        </div>
+        <div style={{ background: '#FFF7ED', padding: 8, borderRadius: 10, color: '#EA580C', fontSize: 18 }}>📅</div>
+      </div>
+      {/* Compact calendar grid */}
+      <div className="compact-calendar-grid">
+        {['أح','اث','ث','أر','خ','ج','س'].map((d, i) => (
+          <div key={`h-${i}`} className="compact-calendar-day-header">{d}</div>
+        ))}
+        {calendarDays.map((day, idx) => {
+          if (day.num === 0) return <div key={`e-${idx}`} />;
+          const isSelected = day.num === selectedDate;
+          let cls = 'compact-calendar-cell';
+          if (day.isToday) cls += ' is-today';
+          else if (isSelected) cls += ' is-selected';
+          if (day.hasDot && !day.isToday) cls += ' has-dot';
+          return (
+            <div key={day.num} className={cls} onClick={() => setSelectedDate(day.num === selectedDate ? null : day.num)}>
+              {day.num}
+            </div>
+          );
+        })}
+      </div>
       {/* Day Details Modal */}
       {selectedDate && (selectedEvents.length > 0 || selectedTasks.length > 0) && (
-        <div
-          onClick={() => setSelectedDate(null)}
-          style={{
-            position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.4)',
-            zIndex: 9999, display: 'flex', alignItems: 'center', justifyContent: 'center',
-          }}
-        >
-          <div
-            onClick={e => e.stopPropagation()}
-            style={{
-              background: 'var(--bg-card, #fff)', borderRadius: 16, padding: '20px 24px',
-              minWidth: 300, maxWidth: 420, width: '90vw', direction: 'rtl',
-              boxShadow: '0 20px 60px rgba(0,0,0,0.2)',
-            }}
-          >
-            {/* Modal header */}
+        <div onClick={() => setSelectedDate(null)} style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.4)', zIndex: 9999, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+          <div onClick={e => e.stopPropagation()} style={{ background: '#fff', borderRadius: 16, padding: '20px 24px', minWidth: 300, maxWidth: 420, width: '90vw', direction: 'rtl', boxShadow: '0 20px 60px rgba(0,0,0,0.2)' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
-              <button
-                onClick={() => setSelectedDate(null)}
-                style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: 18, color: 'var(--ink-faded, #aaa)' }}
-              >✕</button>
-              <div style={{ fontWeight: 700, fontSize: 16, color: 'var(--ink)' }}>
-                {selectedDate} {ARABIC_MONTHS[month]}
-              </div>
+              <button onClick={() => setSelectedDate(null)} style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: 18, color: '#94A3B8' }}>✕</button>
+              <div style={{ fontWeight: 700, fontSize: 16, color: '#1E293B' }}>{selectedDate} {ARABIC_MONTHS[month]}</div>
             </div>
-
-            {/* Events */}
-            {selectedEvents.length > 0 && (
-              <div style={{ marginBottom: 12 }}>
-                <div style={{ fontSize: 11, color: 'var(--txt3, #aaa)', marginBottom: 6, fontWeight: 600 }}>📅 أحداث</div>
-                {selectedEvents.map(e => {
-                  const brand = brands.find(b => b.id === e.brandId);
-                  return (
-                    <div key={e.id} style={{
-                      display: 'flex', alignItems: 'center', gap: 8, padding: '8px 10px',
-                      background: 'var(--bg-soft, #f8f8f8)', borderRadius: 10, marginBottom: 6,
-                    }}>
-                      <span style={{ flex: 1, fontSize: 13, color: 'var(--ink)' }}>{e.title}</span>
-                      {brand && (
-                        <span style={{
-                          fontSize: 11, padding: '2px 8px', borderRadius: 20,
-                          background: `${brand.color}22`, color: brand.color, fontWeight: 600,
-                        }}>{brand.icon} {brand.name}</span>
-                      )}
-                    </div>
-                  );
-                })}
-              </div>
-            )}
-
-            {/* Tasks */}
-            {selectedTasks.length > 0 && (
-              <div>
-                <div style={{ fontSize: 11, color: 'var(--txt3, #aaa)', marginBottom: 6, fontWeight: 600 }}>✅ مهام</div>
-                {selectedTasks.map(t => {
-                  const brand = brands.find(b => b.id === t.brandId);
-                  const isDone = t.status === 'done';
-                  return (
-                    <div key={t.id} style={{
-                      display: 'flex', alignItems: 'center', gap: 8, padding: '8px 10px',
-                      background: 'var(--bg-soft, #f8f8f8)', borderRadius: 10, marginBottom: 6,
-                    }}>
-                      <span style={{ fontSize: 14 }}>{isDone ? '☑️' : '⬜'}</span>
-                      <span style={{ flex: 1, fontSize: 13, color: 'var(--ink)', textDecoration: isDone ? 'line-through' : 'none' }}>{t.title}</span>
-                      {brand && (
-                        <span style={{
-                          fontSize: 11, padding: '2px 8px', borderRadius: 20,
-                          background: `${brand.color}22`, color: brand.color, fontWeight: 600,
-                        }}>{brand.icon} {brand.name}</span>
-                      )}
-                    </div>
-                  );
-                })}
-              </div>
-            )}
+            {selectedEvents.map(e => {
+              const brand = brands.find(b => b.id === e.brandId);
+              return (
+                <div key={e.id} style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '8px 10px', background: '#F8FAFC', borderRadius: 10, marginBottom: 6 }}>
+                  <span style={{ flex: 1, fontSize: 13, color: '#1E293B' }}>{e.title}</span>
+                  {brand && <span style={{ fontSize: 11, padding: '2px 8px', borderRadius: 20, background: `${brand.color}22`, color: brand.color, fontWeight: 600 }}>{brand.icon} {brand.name}</span>}
+                </div>
+              );
+            })}
+            {selectedTasks.map(t => {
+              const brand = brands.find(b => b.id === t.brandId);
+              const isDone = t.status === 'done';
+              return (
+                <div key={t.id} style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '8px 10px', background: '#F8FAFC', borderRadius: 10, marginBottom: 6 }}>
+                  <span style={{ fontSize: 14 }}>{isDone ? '☑️' : '⬜'}</span>
+                  <span style={{ flex: 1, fontSize: 13, color: '#1E293B', textDecoration: isDone ? 'line-through' : 'none' }}>{t.title}</span>
+                  {brand && <span style={{ fontSize: 11, padding: '2px 8px', borderRadius: 20, background: `${brand.color}22`, color: brand.color, fontWeight: 600 }}>{brand.icon}</span>}
+                </div>
+              );
+            })}
           </div>
         </div>
       )}
-
-      {/* Tomorrow section */}
-      <div style={{ marginTop: 12 }}>
-        <div style={{ fontSize: 11, color: 'var(--gold, #f0a500)', fontWeight: 700, textAlign: 'right', marginBottom: 6 }}>📌 قادم</div>
-        {tomorrowEvents.length === 0 && tomorrowTasks.length === 0 ? (
-          <div style={{
-            textAlign: 'center', color: 'var(--txt3, #aaa)', fontSize: 12,
-            padding: '24px 0', border: '1px solid var(--border-soft, #eee)',
-            borderRadius: 12, marginTop: 8,
-          }}>لا توجد أحداث قادمة</div>
+      {/* Upcoming section */}
+      <div className="upcoming-section">
+        <h4 style={{ fontSize: 13, fontWeight: 800, color: '#431407', marginBottom: 10, marginTop: 0 }}>قادم</h4>
+        {upcomingSorted.length === 0 ? (
+          <div style={{ fontSize: 12, color: '#94A3B8', textAlign: 'center', padding: '16px 0' }}>لا توجد أحداث قادمة قريباً.</div>
         ) : (
-          <div>
-            {tomorrowEvents.map(e => {
-              const brand = brands.find(b => b.id === e.brandId);
-              return (
-                <div key={e.id} style={{
-                  display: 'flex', alignItems: 'center', gap: 8, padding: '7px 10px',
-                  background: 'var(--bg-soft, #f8f8f8)', borderRadius: 10, marginBottom: 5,
-                  direction: 'rtl',
-                }}>
-                  <span style={{ fontSize: 12 }}>📅</span>
-                  <span style={{ flex: 1, fontSize: 12, color: 'var(--ink)' }}>{e.title}</span>
-                  {brand && (
-                    <span style={{
-                      fontSize: 10, padding: '2px 6px', borderRadius: 20,
-                      background: `${brand.color}22`, color: brand.color, fontWeight: 600,
-                    }}>{brand.icon}</span>
-                  )}
+          upcomingSorted.map(e => {
+            const brand = brands.find(b => b.id === e.brandId);
+            return (
+              <div key={e.id} className="upcoming-item">
+                <div className="upcoming-item-date">
+                  <div className="upcoming-item-date-day">{e.day}</div>
+                  <div className="upcoming-item-date-month">{ARABIC_MONTHS[e.month - 1]?.slice(0, 3)}</div>
                 </div>
-              );
-            })}
-            {tomorrowTasks.map(t => {
-              const brand = brands.find(b => b.id === t.brandId);
-              return (
-                <div key={t.id} style={{
-                  display: 'flex', alignItems: 'center', gap: 8, padding: '7px 10px',
-                  background: 'var(--bg-soft, #f8f8f8)', borderRadius: 10, marginBottom: 5,
-                  direction: 'rtl',
-                }}>
-                  <span style={{ fontSize: 12 }}>⬜</span>
-                  <span style={{ flex: 1, fontSize: 12, color: 'var(--ink)' }}>{t.title}</span>
-                  {brand && (
-                    <span style={{
-                      fontSize: 10, padding: '2px 6px', borderRadius: 20,
-                      background: `${brand.color}22`, color: brand.color, fontWeight: 600,
-                    }}>{brand.icon}</span>
-                  )}
-                </div>
-              );
-            })}
-          </div>
+                <span className="upcoming-item-title">{e.title}</span>
+                {brand && (
+                  <span style={{ fontSize: 11, padding: '3px 8px', borderRadius: 8, background: `${brand.color}18`, color: brand.color, fontWeight: 700, whiteSpace: 'nowrap' }}>
+                    {brand.icon}
+                  </span>
+                )}
+              </div>
+            );
+          })
         )}
       </div>
     </div>
   );
 }
-
 // ─── Inbox Panel ──────────────────────────────────────────────────────────────
 function formatInboxDate(dateStr: string): string {
   const d = new Date(dateStr);
