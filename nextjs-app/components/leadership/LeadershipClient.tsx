@@ -1488,7 +1488,7 @@ export default function LeadershipClient({
         <div style={{
           flex: 1,
           width: '100%',
-          padding: '24px 40px 40px',
+          padding: '40px 40px 40px',
           boxSizing: 'border-box',
           overflowX: 'hidden',
           display: 'flex',

@@ -67,8 +67,8 @@ export default function LayoutShell({ children, sidebar }: LayoutShellProps) {
 
       {/* Main Content */}
       <div className="main">
-        {/* Topbar — ثابت في أعلى كل صفحة */}
-        <Topbar title={pageTitle} />
+        {/* Topbar — مخفي في /leadership لأن الترويسة المخصصة تكفي */}
+        {currentPath !== '/leadership' && <Topbar title={pageTitle} />}
 
         {/* Month Navigation Bar — مخفي في /leadership */}
         {currentPath !== '/leadership' && <MonthNav />}
