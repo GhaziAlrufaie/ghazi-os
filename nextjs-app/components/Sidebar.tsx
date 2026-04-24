@@ -7,6 +7,7 @@
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { useState, useEffect } from 'react';
+import { useSidebar } from '@/components/SidebarContext';
 
 interface Brand {
   id: string;
@@ -67,6 +68,7 @@ export default function Sidebar({ brands = [] }: SidebarProps) {
   const pathname = usePathname();
   const router = useRouter();
   const [brandsOpen, setBrandsOpen] = useState(false);
+  const { collapsed, setCollapsed } = useSidebar();
   const [dateStr, setDateStr] = useState('');
 
   useEffect(() => {
@@ -83,9 +85,23 @@ export default function Sidebar({ brands = [] }: SidebarProps) {
   return (
     <aside className="side" style={{
       background: '#FFFBF5',
-      borderLeft: '1px solid #F0E6D6',
+      borderLeft: collapsed ? 'none' : '1px solid #F0E6D6',
       boxShadow: '2px 0 12px rgba(255,107,107,0.06)',
+      width: collapsed ? '0px' : '220px',
+      minWidth: collapsed ? '0px' : '220px',
+      overflow: 'hidden',
+      transition: 'width 0.3s cubic-bezier(0.4,0,0.2,1), min-width 0.3s cubic-bezier(0.4,0,0.2,1), border 0.3s ease',
     }}>
+      {/* Inner wrapper keeps content at 220px so it slides out cleanly */}
+      <div style={{ width: '220px', height: '100%', display: 'flex', flexDirection: 'column', position: 'relative' }}>
+      {/* Close Button */}
+      <button
+        onClick={() => setCollapsed(true)}
+        style={{ position: 'absolute', top: '16px', left: '12px', background: '#FFF7ED', color: '#EA580C', border: '1px solid #FED7AA', borderRadius: '8px', width: '28px', height: '28px', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', zIndex: 50, fontSize: '12px', fontWeight: 'bold', transition: 'all 0.2s', flexShrink: 0 }}
+        title="طي القائمة"
+      >
+        ❯
+      </button>
       {/* Logo */}
       <div style={{
         margin: '16px 12px 12px',
@@ -306,6 +322,7 @@ export default function Sidebar({ brands = [] }: SidebarProps) {
           <span>🚪</span>
           <span>تسجيل الخروج</span>
         </button>
+      </div>
       </div>
     </aside>
   );

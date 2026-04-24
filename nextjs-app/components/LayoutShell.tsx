@@ -8,6 +8,7 @@
  * الـ Sidebar يظهر دائماً عند تحميل الصفحة
  */
 import { usePathname } from 'next/navigation';
+import { useSidebar } from '@/components/SidebarContext';
 import Topbar from '@/components/Topbar';
 import MonthNav from '@/components/MonthNav';
 
@@ -37,6 +38,7 @@ const PAGE_TITLES: Record<string, string> = {
 
 export default function LayoutShell({ children, sidebar }: LayoutShellProps) {
   const pathname = usePathname();
+  const { collapsed, setCollapsed } = useSidebar();
 
   // تحديد عنوان الصفحة — يبحث عن أقرب مطابقة
   const currentPath = pathname ?? '/';
@@ -66,7 +68,17 @@ export default function LayoutShell({ children, sidebar }: LayoutShellProps) {
       {sidebar}
 
       {/* Main Content */}
-      <div className="main">
+      {/* Floating Expand Button — appears only when sidebar is collapsed */}
+      {collapsed && (
+        <button
+          onClick={() => setCollapsed(false)}
+          style={{ position: 'fixed', top: '24px', right: '24px', zIndex: 9999, background: '#EA580C', color: '#FFFFFF', border: 'none', width: '44px', height: '44px', borderRadius: '12px', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', boxShadow: '0 4px 12px rgba(234,88,12,0.3)', fontSize: '20px', transition: 'all 0.2s' }}
+          title="إظهار القائمة"
+        >
+          ☰
+        </button>
+      )}
+      <div className="main" style={{ marginRight: collapsed ? 0 : undefined, transition: 'margin-right 0.3s cubic-bezier(0.4,0,0.2,1)' }}>
         {/* Topbar — مخفي في /leadership لأن الترويسة المخصصة تكفي */}
         {currentPath !== '/leadership' && !currentPath.startsWith('/brands/') && <Topbar title={pageTitle} />}
 
