@@ -451,13 +451,13 @@ export default function BrandDetailClient({ brand: initialBrand, initialTasks, i
     if (!destination) return;
     if (source.droppableId === destination.droppableId && source.index === destination.index) return;
 
-    const newStatus = destination.droppableId as TaskStatus;
+    const newStatus = destination.droppableId as TaskStatus; // TaskStatus now includes HQ custom statuses
     const taskId = draggableId;
     const prevTasks = tasks;
 
     // 2. OPTIMISTIC UI UPDATE — instant, no blurry state
     setTasks((prev) =>
-      prev.map((t) => (t.id === taskId ? { ...t, status: newStatus } : t))
+      prev.map((t) => (t.id === taskId ? { ...t, status: newStatus as TaskStatus } : t))
     );
 
     // 3. DIRECT SUPABASE SYNC (browser client — no revalidatePath, no page reload)
@@ -468,9 +468,12 @@ export default function BrandDetailClient({ brand: initialBrand, initialTasks, i
         .eq('id', taskId);
       if (error) throw error;
     } catch (err: unknown) {
-      console.error('DnD DB Update Failed:', err);
+      const errMsg = err instanceof Error ? err.message : String(err);
+      console.error('DnD DB Update Failed:', errMsg);
       // Rollback optimistic update on failure
       setTasks(prevTasks);
+      // Alert user so they know the save failed (helps diagnose DB constraint issues)
+      alert(`❌ فشل الحفظ في السيرفر: ${errMsg}\n(قد يكون هناك قيد CHECK على عمود status في قاعدة البيانات)`);
     }
   }, [tasks, supabaseBrowser]);
 
