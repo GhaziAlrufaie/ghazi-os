@@ -727,55 +727,95 @@ function FocusHero({
       ...clItems.filter(c => !c.done).map(c => ({ id: c.id, title: c.text, type: 'قائمة' })),
     ].slice(0, 3);
 
+    const progressPct = totalItems > 0 ? Math.round((doneItems / totalItems) * 100) : 0;
     return (
-      <section className="focus-hero" style={{ borderTop: `4px solid ${taskColor}` }}>
-        <div className="focus-content">
-          <div style={{ flex: 1 }}>
-            <div className="focus-label">
-              <span className="focus-label-dot" style={{ background: taskColor }} />
-              <span>مهمة الفوكس</span>
-              {isOverdue && <span className="focus-overdue-badge">متأخرة</span>}
-            </div>
-            {/* badges: نوع + أولوية + متأخرة */}
-            <div style={{ display: 'flex', gap: 4, marginBottom: 6, flexWrap: 'wrap' }}>
-              <span style={{ fontSize: 9, background: 'rgba(255,255,255,0.25)', color: 'white', padding: '1px 8px', borderRadius: 8, border: '1px solid rgba(255,255,255,0.3)' }}>مهمة</span>
-              <span style={{ fontSize: 9, background: `${PRIORITY_COLORS[selectedTask.priority]}44`, color: 'white', padding: '1px 8px', borderRadius: 8, border: '1px solid rgba(255,255,255,0.3)' }}>{PRIORITY_LABELS[selectedTask.priority]}</span>
-              {isOverdue && <span style={{ fontSize: 9, background: 'rgba(231,76,60,0.4)', color: 'white', padding: '1px 8px', borderRadius: 8 }}>متأخرة</span>}
-            </div>
-            <h1 className="focus-title">{selectedTask.title}</h1>
-            {taskBrand && <p className="focus-subtitle" style={{ color: 'rgba(255,255,255,0.85)' }}>{taskBrand.name}</p>}
-            {totalItems > 0 && (
-              <div className="focus-progress-wrap">
-                <div className="focus-progress-bar">
-                  <div className="focus-progress-fill" style={{ width: `${totalItems > 0 ? Math.round(doneItems/totalItems*100) : 0}%` }} />
-                </div>
-                <span className="focus-progress-label">{doneItems}/{totalItems}</span>
-              </div>
-            )}
-            {nextSteps.length > 0 && (
-              <div className="focus-next-steps">
-                {nextSteps.map(step => (
-                  <div key={step.id} className="focus-step">
-                    <input type="checkbox" style={{ accentColor: 'white' }} />
-                    <span className="flex-1">{step.title}</span>
-                    <span className="focus-step-type">{step.type}</span>
-                  </div>
-                ))}
-                {totalItems - doneItems > nextSteps.length && (
-                  <div style={{ fontSize: 10, opacity: 0.75, marginTop: 4 }}>+ {totalItems - doneItems - nextSteps.length} أخرى...</div>
-                )}
-              </div>
-            )}
-            {/* أزرار الأربعة */}
-            <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', marginTop: 10, marginBottom: 8 }}>
-              <button style={{ flex: 1, padding: '6px 8px', background: 'rgba(46,204,113,0.25)', color: 'white', border: '1px solid rgba(46,204,113,0.4)', borderRadius: 7, fontSize: 11, cursor: 'pointer', fontFamily: 'inherit' }}>✓ خلصت</button>
-              <button style={{ flex: 1, padding: '6px 8px', background: 'rgba(231,76,60,0.25)', color: 'white', border: '1px solid rgba(231,76,60,0.4)', borderRadius: 7, fontSize: 11, cursor: 'pointer', fontFamily: 'inherit' }}>⚡ عالق</button>
-              <button style={{ flex: 1, padding: '6px 8px', background: 'rgba(255,217,61,0.25)', color: 'white', border: '1px solid rgba(255,217,61,0.4)', borderRadius: 7, fontSize: 11, cursor: 'pointer', fontFamily: 'inherit' }}>⏰ بعدين</button>
-              <button onClick={() => setSelectedTaskId(null)} style={{ flex: 1, padding: '6px 8px', background: 'rgba(255,255,255,0.2)', color: 'white', border: '1px solid rgba(255,255,255,0.3)', borderRadius: 7, fontSize: 11, cursor: 'pointer', fontFamily: 'inherit' }}>🔄 تغيير</button>
-            </div>
-            <Link href={`/tasks/${selectedTask.id}`} style={{ fontSize: 11, color: 'rgba(255,255,255,0.85)', display: 'block', textAlign: 'center' }}>فتح التفاصيل ←</Link>
+      <section className="focus-hero">
+        {/* ── LEFT COLUMN: Task info + action buttons ─────────────────────── */}
+        <div style={{
+          display: 'flex', flexDirection: 'column',
+          background: 'rgba(255,255,255,0.65)',
+          border: '1px solid rgba(255,255,255,0.9)',
+          padding: 32, borderRadius: 24, flex: 1,
+          boxShadow: '0 8px 32px rgba(0,0,0,0.03)',
+          minHeight: '100%', position: 'relative', zIndex: 2,
+        }}>
+          {/* Badge + Title */}
+          <div className="focus-label" style={{ marginBottom: 16 }}>
+            <span className="focus-label-dot" style={{ background: taskColor }} />
+            <span>مهمة الفوكس</span>
           </div>
-          <div className="focus-icon-big">✅</div>
+          <h1 className="focus-title" style={{ marginBottom: 10 }}>{selectedTask.title}</h1>
+          {/* Tags row */}
+          <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', marginBottom: 20 }}>
+            <span style={{ background: '#FFF7ED', color: '#C2410C', padding: '6px 12px', borderRadius: 8, fontSize: 12, fontWeight: 700, whiteSpace: 'nowrap' }}>
+              مهمة
+            </span>
+            <span style={{ background: `${PRIORITY_COLORS[selectedTask.priority]}18`, color: PRIORITY_COLORS[selectedTask.priority], padding: '6px 12px', borderRadius: 8, fontSize: 12, fontWeight: 700, whiteSpace: 'nowrap' }}>
+              {PRIORITY_LABELS[selectedTask.priority]}
+            </span>
+            {taskBrand && (
+              <span style={{ background: '#FFF7ED', color: '#C2410C', padding: '6px 12px', borderRadius: 8, fontSize: 12, fontWeight: 700, whiteSpace: 'nowrap' }}>
+                {taskBrand.icon} {taskBrand.name}
+              </span>
+            )}
+            {isOverdue && (
+              <span style={{ background: '#FEE2E2', color: '#991B1B', padding: '6px 12px', borderRadius: 8, fontSize: 12, fontWeight: 700, whiteSpace: 'nowrap' }}>
+                ⚠️ متأخرة
+              </span>
+            )}
+          </div>
+          {/* Progress section */}
+          {totalItems > 0 && (
+            <div style={{ marginBottom: 20 }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 10 }}>
+                <span style={{ fontSize: 14, fontWeight: 800, color: '#431407' }}>إنجاز المهام الفرعية</span>
+                <span style={{ fontSize: 14, fontWeight: 900, color: '#EA580C' }}>{doneItems}/{totalItems}</span>
+              </div>
+              <div style={{ height: 10, background: 'rgba(0,0,0,0.06)', borderRadius: 100, overflow: 'hidden' }}>
+                <div style={{ height: '100%', background: '#EA580C', borderRadius: 100, width: `${progressPct}%`, transition: 'width 0.4s ease' }} />
+              </div>
+            </div>
+          )}
+          {/* Next steps */}
+          {nextSteps.length > 0 && (
+            <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 10, marginBottom: 20 }}>
+              {nextSteps.map(step => (
+                <div key={step.id} style={{
+                  display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+                  background: '#FFFFFF', padding: '14px 18px', borderRadius: 14,
+                  border: '1px solid rgba(0,0,0,0.04)', boxShadow: '0 4px 12px rgba(0,0,0,0.02)', gap: 14,
+                }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 14, flex: 1 }}>
+                    <input type="checkbox" onClick={(e) => e.stopPropagation()} style={{ width: 20, height: 20, accentColor: '#EA580C', cursor: 'pointer', flexShrink: 0, margin: 0 }} />
+                    <span style={{ fontSize: 14, fontWeight: 700, color: '#1E293B' }}>{step.title}</span>
+                  </div>
+                  <span style={{ background: '#FFF7ED', color: '#C2410C', padding: '4px 10px', borderRadius: 8, fontSize: 11, fontWeight: 700, whiteSpace: 'nowrap' }}>{step.type}</span>
+                </div>
+              ))}
+              {totalItems - doneItems > nextSteps.length && (
+                <div style={{ fontSize: 12, color: '#9A6B4B', textAlign: 'center', padding: 8, fontWeight: 500 }}>
+                  + {totalItems - doneItems - nextSteps.length} أخرى...
+                </div>
+              )}
+            </div>
+          )}
+          {/* 2x2 Action buttons */}
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12, marginTop: 'auto' }}>
+            <button style={{ background: '#DCFCE7', color: '#166534', padding: '14px 16px', borderRadius: 14, fontWeight: 800, border: 'none', cursor: 'pointer', fontSize: 14, display: 'flex', justifyContent: 'center', alignItems: 'center', gap: 8, fontFamily: 'inherit' }}>✓ خلصت</button>
+            <button style={{ background: '#FEE2E2', color: '#991B1B', padding: '14px 16px', borderRadius: 14, fontWeight: 800, border: 'none', cursor: 'pointer', fontSize: 14, display: 'flex', justifyContent: 'center', alignItems: 'center', gap: 8, fontFamily: 'inherit' }}>✋ عالق</button>
+            <button style={{ background: '#FFEDD5', color: '#9A3412', padding: '14px 16px', borderRadius: 14, fontWeight: 800, border: 'none', cursor: 'pointer', fontSize: 14, display: 'flex', justifyContent: 'center', alignItems: 'center', gap: 8, fontFamily: 'inherit' }}>⏰ بعدين</button>
+            <button onClick={() => setSelectedTaskId(null)} style={{ background: '#F1F5F9', color: '#334155', padding: '14px 16px', borderRadius: 14, fontWeight: 800, border: 'none', cursor: 'pointer', fontSize: 14, display: 'flex', justifyContent: 'center', alignItems: 'center', gap: 8, fontFamily: 'inherit' }}>🔄 تغيير</button>
+          </div>
+          {/* Open details link */}
+          <Link href={`/tasks/${selectedTask.id}`} style={{ fontSize: 12, color: '#EA580C', display: 'block', textAlign: 'center', marginTop: 14, fontWeight: 600 }}>فتح التفاصيل الكاملة ←</Link>
+        </div>
+        {/* ── RIGHT COLUMN: Big icon + task count ─────────────────────────── */}
+        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 20, position: 'relative', zIndex: 2 }}>
+          <div className="focus-icon-big" style={{ width: 100, height: 100, fontSize: 56 }}>✅</div>
+          <div style={{ textAlign: 'center' }}>
+            <div style={{ fontSize: 28, fontWeight: 900, color: '#EA580C' }}>{progressPct}%</div>
+            <div style={{ fontSize: 13, color: '#9A6B4B', fontWeight: 600 }}>مكتمل</div>
+          </div>
         </div>
       </section>
     );
