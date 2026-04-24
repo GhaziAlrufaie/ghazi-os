@@ -21,12 +21,15 @@ const PRIORITY_OPTIONS: { v: TaskPriority; lbl: string; bg: string; color: strin
   { v: 'low',      lbl: '⬇️ منخفض', bg: '#F0FDF4', color: '#16A34A' },
 ];
 
+interface HQCol { id: string; name: string; color: string; }
 interface TaskPanelProps {
   task: Task | null;
   onClose: () => void;
   onUpdate: (patch: Partial<Task>) => void;
   onDelete: (id: string) => void;
   onArchive: (task: Task) => void;
+  isHQ?: boolean;
+  hqCols?: HQCol[];
 }
 
 function parseGroups(raw: unknown): ChecklistGroup[] {
@@ -42,7 +45,7 @@ function parseGroups(raw: unknown): ChecklistGroup[] {
   }];
 }
 
-export default function TaskPanel({ task, onClose, onUpdate, onDelete, onArchive }: TaskPanelProps) {
+export default function TaskPanel({ task, onClose, onUpdate, onDelete, onArchive, isHQ = false, hqCols }: TaskPanelProps) {
   const [title, setTitle]       = useState('');
   const [desc, setDesc]         = useState('');
   const [status, setStatus]     = useState<TaskStatus>('todo');
@@ -117,7 +120,9 @@ export default function TaskPanel({ task, onClose, onUpdate, onDelete, onArchive
   }
   function handleArchive() { onArchive(task!); onClose(); }
 
-  const activeStatus   = STATUS_OPTIONS.find(s => s.v === status)    ?? STATUS_OPTIONS[0];
+  const activeStatus = isHQ && hqCols
+    ? (hqCols.find(c => c.id === status) ? { bg: '#F5F3FF', color: '#6D28D9' } : { bg: '#F5F3FF', color: '#6D28D9' })
+    : (STATUS_OPTIONS.find(s => s.v === status) ?? STATUS_OPTIONS[0]);
   const activePriority = PRIORITY_OPTIONS.find(p => p.v === priority) ?? PRIORITY_OPTIONS[2];
   const totalItems = groups.reduce((s, g) => s + g.items.length, 0);
   const doneItems  = groups.reduce((s, g) => s + g.items.filter(i => i.isCompleted).length, 0);
@@ -137,7 +142,10 @@ export default function TaskPanel({ task, onClose, onUpdate, onDelete, onArchive
             <select className="vip-meta-badge" value={status}
               onChange={e => { const v = e.target.value as TaskStatus; setStatus(v); saveField({ id: task!.id, status: v }); }}
               style={{ background: activeStatus.bg, color: activeStatus.color, borderColor: activeStatus.color + '40' }}>
-              {STATUS_OPTIONS.map(s => <option key={s.v} value={s.v}>{s.lbl}</option>)}
+              {isHQ && hqCols
+                ? hqCols.map(col => <option key={col.id} value={col.id}>{col.name}</option>)
+                : STATUS_OPTIONS.map(s => <option key={s.v} value={s.v}>{s.lbl}</option>)
+              }
             </select>
           </div>
 

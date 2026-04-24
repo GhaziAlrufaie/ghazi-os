@@ -230,7 +230,7 @@ export default function Sidebar({ brands = [] }: SidebarProps) {
                               }}
                             >
                               <span style={{ width: 6, height: 6, borderRadius: '50%', background: brand.color, flexShrink: 0, display: 'inline-block' }} />
-                              <span>{brand.icon} {brand.name}</span>
+                              <span>{brand.id === 'x17747068433191tevy' ? '💡 مختبر الأفكار (HQ)' : `${brand.icon} ${brand.name}`}</span>
                             </Link>
                           );
                         })

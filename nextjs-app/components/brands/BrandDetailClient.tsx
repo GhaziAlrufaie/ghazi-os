@@ -28,6 +28,19 @@ const KANBAN_COLS: { id: TaskStatus; name: string; color: string }[] = [
   { id: 'done',        name: 'منجز',         color: '#10B981' },
 ];
 
+// ─── HQ Lab (مختبر الأفكار) — Custom categorical columns ─────────────────────
+const HQ_BRAND_ID = 'x17747068433191tevy';
+const HQ_BRAND_DISPLAY_NAME = '💡 مختبر الأفكار (HQ)';
+// HQ uses free-text statuses (not TaskStatus enum) stored as plain strings in DB
+const HQ_COLS: { id: string; name: string; color: string }[] = [
+  { id: 'hq_projects',  name: '🚀 مشاريع وبراندات مستقبلية', color: '#8B5CF6' },
+  { id: 'hq_marketing', name: '📢 أفكار تسويقية عامة',       color: '#3B82F6' },
+  { id: 'hq_ops',       name: '🏢 مهام إدارية وتشغيلية',     color: '#C9A84C' },
+  { id: 'hq_archive',   name: '📦 أرشيف / تم الترحيل',       color: '#94A3B8' },
+];
+// Standard statuses that get self-healed into hq_marketing when in HQ
+const HQ_LEGACY_STATUSES = ['ideas', 'todo', 'in_progress', 'on_hold', 'done', 'projects'];
+
 const PRIORITY_COLORS: Record<TaskPriority, string> = {
   critical: '#EF4444',
   high:     '#F97316',
@@ -420,6 +433,9 @@ export default function BrandDetailClient({ brand: initialBrand, initialTasks, i
   const [brand, setBrand]     = useState<BrandRow>(initialBrand);
   const [tasks, setTasks]     = useState<Task[]>(initialTasks);
   const [projects]            = useState<ProjectRow[]>(initialProjects);
+  // HQ Lab detection — custom categorical board for مختبر الأفكار
+  const isHQ = brand.id === HQ_BRAND_ID;
+  const activeCols = isHQ ? HQ_COLS : KANBAN_COLS;
   const [activeProjectId, setActiveProjectId] = useState<string | null>(null);
   const [menuOpen, setMenuOpen]               = useState(false);
   const [panelTask, setPanelTask]             = useState<Task | null>(null);
@@ -577,15 +593,21 @@ export default function BrandDetailClient({ brand: initialBrand, initialTasks, i
       <div style={{ flex: 1, overflow: 'hidden' }}>
         <DragDropContext onDragEnd={onDragEnd}>
           <div className="vip-kanban-board">
-            {/* All columns rendered uniformly — tasks with legacy status='projects' are shown in أفكار */}
-            {KANBAN_COLS.map((col) => (
+            {/* Dynamic columns: HQ Lab uses categorical, regular brands use temporal */}
+            {activeCols.map((col) => (
               <KanbanCol
                 key={col.id}
-                col={col}
-                tasks={visibleTasks.filter((t) =>
-                  t.status === col.id ||
-                  (col.id === 'ideas' && (t.status as string) === 'projects')
-                )}
+                col={col as typeof KANBAN_COLS[0]}
+                tasks={visibleTasks.filter((t) => {
+                  const s = t.status as string;
+                  if (isHQ) {
+                    // Self-healing: map legacy statuses to hq_marketing so tasks don't disappear
+                    if (col.id === 'hq_marketing' && HQ_LEGACY_STATUSES.includes(s)) return true;
+                    return s === col.id;
+                  }
+                  // Regular brand: self-heal legacy 'projects' status into أفكار
+                  return s === col.id || (col.id === 'ideas' && s === 'projects');
+                })}
                 projects={projects}
                 brandId={brand.id}
                 activeProjectId={activeProjectId}
@@ -606,6 +628,8 @@ export default function BrandDetailClient({ brand: initialBrand, initialTasks, i
         onUpdate={handleUpdate}
         onDelete={(id) => { handleDelete(id); setPanelTask(null); }}
         onArchive={(task) => { setTasks((prev) => prev.filter((t) => t.id !== task.id)); setPanelTask(null); }}
+        isHQ={isHQ}
+        hqCols={isHQ ? HQ_COLS : undefined}
       />
 
       {/* Add Task Modal */}
