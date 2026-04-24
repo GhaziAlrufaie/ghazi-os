@@ -82,9 +82,7 @@ export default function Sidebar({ brands = [] }: SidebarProps) {
 
   return (
     <aside className="side" style={{
-      background: '#FFFBF5',
-      borderLeft: '1px solid #F0E6D6',
-      boxShadow: '2px 0 12px rgba(255,107,107,0.06)',
+      background: '#FFFFFF',
     }}>
       {/* Logo */}
       <div style={{
