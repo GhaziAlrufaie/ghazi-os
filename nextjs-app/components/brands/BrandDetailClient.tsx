@@ -488,7 +488,7 @@ export default function BrandDetailClient({ brand: initialBrand, initialTasks, i
   const statusIsActive = brand.status === 'active';
 
   return (
-    <div className="scr on" style={{ padding: '16px 20px', height: '100%', overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
+    <div className="scr on" style={{ padding: '28px 20px 16px', height: '100%', overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
 
       {/* VIP Horizontal Brand Header */}
       <div className="vip-brand-header">

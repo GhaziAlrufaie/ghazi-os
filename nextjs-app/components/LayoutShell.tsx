@@ -68,10 +68,10 @@ export default function LayoutShell({ children, sidebar }: LayoutShellProps) {
       {/* Main Content */}
       <div className="main">
         {/* Topbar — مخفي في /leadership لأن الترويسة المخصصة تكفي */}
-        {currentPath !== '/leadership' && <Topbar title={pageTitle} />}
+        {currentPath !== '/leadership' && !currentPath.startsWith('/brands/') && <Topbar title={pageTitle} />}
 
         {/* Month Navigation Bar — مخفي في /leadership */}
-        {currentPath !== '/leadership' && <MonthNav />}
+        {currentPath !== '/leadership' && !currentPath.startsWith('/brands/') && <MonthNav />}
 
         {/* محتوى الصفحة */}
         {children}
