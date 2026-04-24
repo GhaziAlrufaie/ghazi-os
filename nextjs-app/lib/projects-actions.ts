@@ -100,6 +100,18 @@ export async function updateProject(
   return { project: mapRow(data) };
 }
 
+
+export async function updateProjectStatus(
+  id: string,
+  status: ProjectRow['status']
+): Promise<{ error?: string }> {
+  const supabase = createServerClient();
+  const { error } = await supabase.from('projects').update({ status }).eq('id', id);
+  if (error) return { error: error.message };
+  revalidatePath('/projects');
+  return {};
+}
+
 export async function deleteProject(id: string): Promise<{ error?: string }> {
   const supabase = createServerClient();
   const { error } = await supabase.from('projects').delete().eq('id', id);

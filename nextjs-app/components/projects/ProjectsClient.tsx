@@ -3,10 +3,11 @@
 // Layout: VIP header + brand filter + view toggle + VIP Kanban 4 cols
 // Modal: Premium 2-column modal with grouped checklists saved to description as JSON
 import React, { useState, useTransition, useEffect, useRef } from 'react';
+import { DragDropContext, Droppable, Draggable, type DropResult } from '@hello-pangea/dnd';
 import { useRouter } from 'next/navigation';
 import type { BrandRow } from '@/lib/brands-types';
 import type { ProjectRow } from '@/lib/projects-types';
-import { addProject, updateProject, deleteProject } from '@/lib/projects-actions';
+import { addProject, updateProject, deleteProject, updateProjectStatus } from '@/lib/projects-actions';
 
 // ─── Constants ────────────────────────────────────────────────────────────────
 const KANBAN_COLS: { id: ProjectRow['status']; label: string; emoji: string }[] = [
@@ -415,6 +416,25 @@ export default function ProjectsClient({ initialProjects, brands, taskStats = {}
     setProjects((prev) => prev.filter((x) => x.id !== id));
     startTransition(async () => { await deleteProject(id); });
   }
+  function onDragEnd(result: DropResult) {
+    const { source, destination } = result;
+    if (!destination) return;
+    if (source.droppableId === destination.droppableId && source.index === destination.index) return;
+    const newStatus = destination.droppableId as ProjectRow['status'];
+    const draggedId = result.draggableId;
+    // Optimistic UI
+    setProjects((prev) => {
+      const updated = [...prev];
+      const idx = updated.findIndex((p) => p.id === draggedId);
+      if (idx === -1) return prev;
+      updated[idx] = { ...updated[idx], status: newStatus };
+      return updated;
+    });
+    // Supabase sync
+    startTransition(async () => {
+      await updateProjectStatus(draggedId, newStatus);
+    });
+  }
 
   return (
     <div style={{ padding: '28px 24px', minHeight: '100vh', background: '#F8FAFC' }}>
@@ -446,34 +466,60 @@ export default function ProjectsClient({ initialProjects, brands, taskStats = {}
 
       {/* Kanban View */}
       {view === 'kanban' && (
-        <div className="vip-kanban-board">
-          {KANBAN_COLS.map((col) => {
-            const colProjs = filtered.filter((p) => p.status === col.id);
-            return (
-              <div key={col.id} className="vip-kanban-column">
-                <div className="vip-column-header">
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                    <span style={{ fontSize: '18px' }}>{col.emoji}</span>
-                    <span style={{ fontWeight: '800', color: '#1E293B', fontSize: '14px' }}>{col.label}</span>
+        <DragDropContext onDragEnd={onDragEnd}>
+          <div className="vip-kanban-board">
+            {KANBAN_COLS.map((col) => {
+              const colProjs = filtered.filter((p) => p.status === col.id);
+              return (
+                <div key={col.id} className="vip-kanban-column">
+                  <div className="vip-column-header">
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                      <span style={{ fontSize: '18px' }}>{col.emoji}</span>
+                      <span style={{ fontWeight: '800', color: '#1E293B', fontSize: '14px' }}>{col.label}</span>
+                    </div>
+                    <span style={{ background: '#FFF7ED', color: '#EA580C', border: '1px solid rgba(234,88,12,0.2)', borderRadius: '20px', padding: '2px 10px', fontSize: '12px', fontWeight: '800' }}>{colProjs.length}</span>
                   </div>
-                  <span style={{ background: '#FFF7ED', color: '#EA580C', border: '1px solid rgba(234,88,12,0.2)', borderRadius: '20px', padding: '2px 10px', fontSize: '12px', fontWeight: '800' }}>{colProjs.length}</span>
+                  <Droppable droppableId={col.id}>
+                    {(provided, snapshot) => (
+                      <div
+                        ref={provided.innerRef}
+                        {...provided.droppableProps}
+                        className={`vip-tasks-container${snapshot.isDraggingOver ? ' vip-kanban-drag-over' : ''}`}
+                        style={{ background: snapshot.isDraggingOver ? 'rgba(234,88,12,0.04)' : undefined }}
+                      >
+                        {colProjs.map((p, index) => {
+                          const stats = taskStats[p.id] ?? { total: 0, done: 0 };
+                          return (
+                            <Draggable key={p.id} draggableId={p.id} index={index}>
+                              {(prov, snap) => (
+                                <div
+                                  ref={prov.innerRef}
+                                  {...prov.draggableProps}
+                                  {...prov.dragHandleProps}
+                                  style={{ ...prov.draggableProps.style }}
+                                >
+                                  <ProjectCard project={p}
+                                    brand={p.brandId ? brandMap[p.brandId] : undefined}
+                                    taskCount={stats.total} doneCount={stats.done}
+                                    onClick={() => setSelectedProject(p)} />
+                                </div>
+                              )}
+                            </Draggable>
+                          );
+                        })}
+                        {provided.placeholder}
+                        {colProjs.length === 0 && !snapshot.isDraggingOver && (
+                          <div style={{ textAlign: 'center', color: '#CBD5E1', fontSize: 13, padding: '24px 0', border: '1px dashed #E2E8F0', borderRadius: 12 }}>لا توجد مشاريع</div>
+                        )}
+                      </div>
+                    )}
+                  </Droppable>
+                  <QuickAdd colId={col.id} brandId={filterBrand !== 'all' ? filterBrand : null} onAdd={handleAdd} />
                 </div>
-                <div className="vip-tasks-container">
-                  {colProjs.map((p) => {
-                    const stats = taskStats[p.id] ?? { total: 0, done: 0 };
-                    return (
-                      <ProjectCard key={p.id} project={p}
-                        brand={p.brandId ? brandMap[p.brandId] : undefined}
-                        taskCount={stats.total} doneCount={stats.done}
-                        onClick={() => setSelectedProject(p)} />
-                    );
-                  })}
-                </div>
-                <QuickAdd colId={col.id} brandId={filterBrand !== 'all' ? filterBrand : null} onAdd={handleAdd} />
-              </div>
-            );
-          })}
-        </div>
+              );
+            })}
+          </div>
+        </DragDropContext>
       )}
 
       {/* List View */}
