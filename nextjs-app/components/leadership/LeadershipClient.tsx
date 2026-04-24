@@ -861,7 +861,7 @@ function FocusHero({
               const effectiveStatus = localStatuses[t.id] ?? t.status;
               const isDone = effectiveStatus === 'done';
               return (
-                <label key={t.id} className="premium-subtask" style={{
+                <div key={t.id} className="premium-subtask" onClick={() => setSelectedTaskId(t.id)} style={{
                   cursor: 'pointer',
                   opacity: isDone ? 0.6 : 1,
                   display: 'flex',
@@ -872,6 +872,7 @@ function FocusHero({
                   <input
                     type="checkbox"
                     checked={isDone}
+                    onClick={(e) => e.stopPropagation()}
                     onChange={(e) => {
                       const newStatus = e.target.checked ? 'done' : 'todo';
                       // Optimistic UI update
@@ -896,7 +897,7 @@ function FocusHero({
                   <span className="premium-subtask-priority" style={{ background: `${pColor}18`, color: pColor }}>
                     {pLabel}
                   </span>
-                </label>
+                </div>
               );
             })}
             {sorted.length > 5 && (
