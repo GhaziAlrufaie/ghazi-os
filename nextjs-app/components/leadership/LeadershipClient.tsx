@@ -640,7 +640,7 @@ function FocusEditorModal({
 
 // ─── Focus Hero ───────────────────────────────────────────────────────────────
 function FocusHero({
-  todayFocus, activeTasks, personalTasks, brands, projects, onOpenEditor, onBlockTask,
+  todayFocus, activeTasks, personalTasks, brands, projects, onOpenEditor, onBlockTask, onSetFocusTask,
 }: {
   todayFocus: WeeklyFocusEntry | null;
   activeTasks: ActiveTask[];
@@ -649,10 +649,12 @@ function FocusHero({
   projects: Project[];
   onOpenEditor: () => void;
   onBlockTask: (task: ActiveTask) => void;
+  onSetFocusTask: (task: ActiveTask) => void;
 }) {
   const [selectedTaskId, setSelectedTaskId] = useState<string | null>(null);
   const [localStatuses, setLocalStatuses] = useState<Record<string, string>>({});
   const [, startTransition] = useTransition();
+  const [isAllTasksModalOpen, setIsAllTasksModalOpen] = useState(false);
   const tip = DAILY_TIPS[new Date().getDay() % DAILY_TIPS.length];
 
   const sorted = useMemo(() => todayFocus ? activeTasks.filter(t => {
@@ -944,7 +946,55 @@ function FocusHero({
               );
             })}
             {sorted.length > 5 && (
-              <div className="premium-subtask-more">+ {sorted.length - 5} مهمة أخرى</div>
+              <button
+                onClick={() => setIsAllTasksModalOpen(true)}
+                style={{ width: '100%', padding: '14px', marginTop: '12px', background: 'rgba(234, 88, 12, 0.05)', color: '#EA580C', border: '1px dashed rgba(234, 88, 12, 0.3)', borderRadius: '16px', fontSize: '14px', fontWeight: 800, cursor: 'pointer', transition: 'all 0.2s', textAlign: 'center', fontFamily: 'inherit' }}
+              >
+                👀 استعراض {sorted.length - 5} مهمة مخفية وتصفح القائمة
+              </button>
+            )}
+            {/* ── Task Vault Modal ─────────────────────────────────────────── */}
+            {isAllTasksModalOpen && (
+              <div style={{ position: 'fixed', inset: 0, zIndex: 9998, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(15, 23, 42, 0.4)', backdropFilter: 'blur(8px)' }} onClick={() => setIsAllTasksModalOpen(false)}>
+                <div style={{ background: '#FFFFFF', width: '100%', maxWidth: '650px', maxHeight: '85vh', borderRadius: '24px', display: 'flex', flexDirection: 'column', boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.25)', border: '1px solid rgba(0,0,0,0.06)', overflow: 'hidden' }} onClick={(e) => e.stopPropagation()}>
+                  {/* Modal Header */}
+                  <div style={{ padding: '24px 32px', borderBottom: '1px solid #F1F5F9', display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: '#F8FAFC' }}>
+                    <div>
+                      <h3 style={{ margin: 0, fontSize: '20px', fontWeight: 900, color: '#0F172A' }}>سجل المهام المرتبطة</h3>
+                      <span style={{ fontSize: '14px', color: '#64748B' }}>تصفح جميع المهام ({sorted.length}) واختر مهمة للبدء فيها الآن</span>
+                    </div>
+                    <button onClick={() => setIsAllTasksModalOpen(false)} style={{ background: '#E2E8F0', color: '#475569', border: 'none', width: '36px', height: '36px', borderRadius: '50%', cursor: 'pointer', fontWeight: 'bold', fontSize: '16px', fontFamily: 'inherit' }}>✕</button>
+                  </div>
+                  {/* Scrollable Tasks List */}
+                  <div style={{ padding: '24px 32px', overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: '12px', flex: 1 }}>
+                    {sorted.map((task) => {
+                      const pColor = PRIORITY_COLORS[task.priority] ?? '#8B8F9F';
+                      const pLabel = PRIORITY_LABELS[task.priority];
+                      const isCurrentFocus = selectedTaskId === task.id;
+                      return (
+                        <div key={task.id} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', background: isCurrentFocus ? '#FFF7ED' : '#FFFFFF', padding: '16px 20px', borderRadius: '16px', border: isCurrentFocus ? '1px solid #FED7AA' : '1px solid #E2E8F0', boxShadow: '0 2px 4px rgba(0,0,0,0.02)', gap: 12 }}>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '12px', flex: 1, minWidth: 0 }}>
+                            <span style={{ width: 10, height: 10, borderRadius: '50%', background: pColor, flexShrink: 0, display: 'inline-block' }} />
+                            <span style={{ fontSize: '15px', fontWeight: 700, color: '#1E293B', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{task.title}</span>
+                          </div>
+                          <div style={{ display: 'flex', gap: '8px', flexShrink: 0 }}>
+                            <span style={{ background: `${pColor}18`, color: pColor, padding: '4px 10px', borderRadius: 8, fontSize: 12, fontWeight: 700 }}>{pLabel}</span>
+                            <button
+                              onClick={() => {
+                                onSetFocusTask(task);
+                                setIsAllTasksModalOpen(false);
+                              }}
+                              style={{ background: '#FFF7ED', color: '#EA580C', border: '1px solid #FED7AA', padding: '10px 16px', borderRadius: '10px', fontSize: '13px', fontWeight: 800, cursor: 'pointer', fontFamily: 'inherit' }}
+                            >
+                              🎯 تعيين كفوكس
+                            </button>
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+              </div>
             )}
           </>
         ) : (
@@ -1420,6 +1470,22 @@ export default function LeadershipClient({
       alert(`حدث خطأ غير متوقع: ${msg}`);
     }
   };
+  const handleSetFocusTask = async (task: ActiveTask) => {
+    const today = todayISO();
+    const result = await setDayFocus({
+      focusDate: today,
+      targetType: 'task',
+      targetId: task.id,
+      targetName: task.title,
+      targetColor: task.brandColor ?? '#EA580C',
+      notes: '',
+    });
+    if (result.error) {
+      alert(`خطأ في تعيين المهمة كفوكس: ${result.error}`);
+      return;
+    }
+    router.refresh();
+  };
   const d = new Date();
   const hour = d.getHours();
   const greeting = hour < 12 ? 'صباح الخير' : hour < 17 ? 'مساء الخير' : 'مساء النور';
@@ -1478,6 +1544,7 @@ export default function LeadershipClient({
             projects={projects}
             onOpenEditor={() => setEditorDate(todayISO())}
             onBlockTask={handleOpenBlockedModal}
+            onSetFocusTask={handleSetFocusTask}
           />
 
           {/* باقي المحتوى بـ padding جانبي */}
