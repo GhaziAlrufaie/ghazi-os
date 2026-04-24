@@ -1,23 +1,23 @@
 {
-  "backup_date": "2026-04-23",
-  "backup_time": "2026-04-23T23:31:18.365Z",
+  "backup_date": "2026-04-24",
+  "backup_time": "2026-04-24T23:08:31.037Z",
   "tables_discovered": 13,
   "tables": {
-    "tasks": 123,
+    "tasks": 121,
     "brands": 8,
-    "projects": 15,
-    "personal_tasks": 18,
+    "projects": 7,
+    "personal_tasks": 15,
     "expenses": 6,
     "biz_expenses": 3,
     "employees": 10,
-    "decisions": 14,
+    "decisions": 28,
     "events": 7,
     "archive": 26,
-    "weekly_focus": 19,
-    "salla_orders": 62,
+    "weekly_focus": 20,
+    "salla_orders": 64,
     "metrics": 8
   },
-  "total_records": 319,
+  "total_records": 323,
   "status": "success",
-  "backup_folder": "backups/2026-04-23"
+  "backup_folder": "backups/2026-04-24"
 }
