@@ -20,12 +20,10 @@ import { useGlobal } from '@/components/GlobalProviders';
 
 // ─── Constants ────────────────────────────────────────────────────────────────
 const KANBAN_COLS: { id: TaskStatus; name: string; color: string }[] = [
-  { id: 'todo',        name: 'قيد الانتظار', color: '#3B82F6' },
-  { id: 'in_progress', name: 'جاري التنفيذ', color: '#C9A84C' },
-  { id: 'on_hold',     name: 'معلق',         color: '#F97316' },
-  { id: 'done',        name: 'منجز',         color: '#10B981' },
-  { id: 'ideas',       name: '💡 أفكار',     color: '#8B5CF6' },
-  { id: 'projects',    name: '🚀 مشاريع',    color: '#0EA5E9' },
+  { id: 'ideas',       name: '💡 أفكار',      color: '#8B5CF6' },
+  { id: 'todo',        name: '📝 قيد الانتظار', color: '#3B82F6' },
+  { id: 'in_progress', name: '🚀 جاري التنفيذ', color: '#C9A84C' },
+  { id: 'done',        name: '✅ مكتمل',       color: '#10B981' },
 ];
 
 const PRIORITY_COLORS: Record<TaskPriority, string> = {
@@ -273,6 +271,8 @@ function TaskCard({ task, project, index, onArchive, onDelete, onClick }: TaskCa
           </div>
           <h4 className="vip-task-title">{task.title}</h4>
           <div className="vip-card-tags">
+            {(task as any).type === 'project' && <span className="vip-tag" style={{ background: '#F3E8FF', color: '#7E22CE', border: '1px solid #E9D5FF', fontWeight: 900 }}>🚀 مشروع</span>}
+            {(task as any).type === 'idea' && <span className="vip-tag" style={{ background: '#FFFBEB', color: '#D97706', border: '1px solid #FEF3C7', fontWeight: 900 }}>💡 فكرة</span>}
             {task.priority === 'critical' && <span className="vip-tag" style={{ background: '#FEF2F2', color: '#DC2626' }}>🔴 حرج</span>}
             {task.priority === 'high' && <span className="vip-tag" style={{ background: '#FFF7ED', color: '#EA580C' }}>🟠 عالي</span>}
             {task.priority === 'medium' && <span className="vip-tag" style={{ background: '#EFF6FF', color: '#2563EB' }}>🟡 متوسط</span>}
@@ -314,7 +314,6 @@ function KanbanCol({ col, tasks, projects, brandId, activeProjectId, onArchive, 
     <div className="vip-kanban-column">
       <div className="vip-column-header">
         <h3 className="vip-column-title">
-          <span>{getColEmoji(col.id)}</span>
           <span>{col.name}</span>
         </h3>
         <div className="vip-column-count">{tasks.length}</div>
@@ -643,8 +642,8 @@ export default function BrandDetailClient({ brand: initialBrand, initialTasks, i
       <div style={{ flex: 1, overflow: 'hidden' }}>
         <DragDropContext onDragEnd={onDragEnd}>
           <div className="vip-kanban-board">
-            {/* Normal columns — exclude ideas and projects (stacked together) */}
-            {KANBAN_COLS.filter(col => col.id !== 'ideas' && col.id !== 'projects').map((col) => (
+            {/* Pure status columns — ideas → todo → in_progress → done */}
+            {KANBAN_COLS.map((col) => (
               <KanbanCol
                 key={col.id}
                 col={col}
@@ -658,18 +657,6 @@ export default function BrandDetailClient({ brand: initialBrand, initialTasks, i
                 onCardClick={(task) => setPanelTask(task)}
               />
             ))}
-            {/* Stacked Column: أفكار + مشاريع in one visual column */}
-            <StackedIdeasProjects
-              ideasTasks={visibleTasks.filter(t => t.status === 'ideas')}
-              projectsTasks={visibleTasks.filter(t => t.status === 'projects')}
-              projects={projects}
-              brandId={brand.id}
-              activeProjectId={activeProjectId}
-              onArchive={handleArchive}
-              onDelete={handleDelete}
-              onAdd={handleAdd}
-              onCardClick={(task) => setPanelTask(task)}
-            />
           </div>
         </DragDropContext>
       </div>
