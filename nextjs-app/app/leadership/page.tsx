@@ -81,18 +81,28 @@ export default async function LeadershipPage() {
   const rawTasks = tasksRes.status === 'fulfilled' && !tasksRes.value.error ? (tasksRes.value.data ?? []) : [];
   const activeTasks = rawTasks.map((t: Record<string, unknown>) => {
     const brand = brands.find(b => b.id === t.brand_id);
-    type SubtaskItem = { id: string; title: string; status?: string; completed?: boolean };
-    type SubtaskGroupItem = { subtasks?: SubtaskItem[] };
-    const rawSubtasks: SubtaskItem[] = Array.isArray(t.subtasks) ? (t.subtasks as SubtaskItem[]) : [];
-    const rawGroups: SubtaskGroupItem[] = Array.isArray(t.subtask_groups) ? (t.subtask_groups as SubtaskGroupItem[]) : [];
-    const allSubtasks: { id: string; title: string; completed: boolean }[] = [];
-    if (rawGroups.length > 0) {
-      rawGroups.forEach(g => { (g.subtasks ?? []).forEach(st => { allSubtasks.push({ id: st.id, title: st.title, completed: st.status === 'done' }); }); });
-    } else {
-      rawSubtasks.forEach(st => { allSubtasks.push({ id: st.id, title: st.title, completed: st.status === 'done' || st.completed === true }); });
+    // Parse grouped checklists (new TaskPanel format: [{id, title, items:[{id, text, isCompleted}]}])
+    type GroupedItem = { id: string; text: string; isCompleted: boolean };
+    type GroupedChecklist = { id: string; title: string; items: GroupedItem[] };
+    // Legacy flat subtask format: [{id, title, done}]
+    type LegacySubtask = { id: string; title: string; done?: boolean; completed?: boolean };
+    const rawSubtasks = Array.isArray(t.subtasks) ? (t.subtasks as Record<string, unknown>[]) : [];
+    let groups: GroupedChecklist[] = [];
+    if (rawSubtasks.length > 0) {
+      const first = rawSubtasks[0];
+      if ('items' in first && Array.isArray(first.items)) {
+        // New grouped format
+        groups = rawSubtasks as unknown as GroupedChecklist[];
+      } else {
+        // Legacy flat format — wrap in default group
+        const legacyItems = rawSubtasks as unknown as LegacySubtask[];
+        groups = [{
+          id: 'default_group',
+          title: 'الخطوات العامة',
+          items: legacyItems.map(s => ({ id: s.id, text: s.title, isCompleted: s.done === true || s.completed === true })),
+        }];
+      }
     }
-    type ChecklistItem = { id: string; text: string; done: boolean };
-    const checklist: ChecklistItem[] = Array.isArray(t.checklist) ? (t.checklist as ChecklistItem[]) : [];
     return {
       id: t.id as string,
       title: t.title as string,
@@ -104,8 +114,7 @@ export default async function LeadershipPage() {
       brandColor: brand?.color ?? null,
       projectId: (t.project_id as string | null) ?? null,
       hasDescription: !!t.description,
-      subtasks: allSubtasks,
-      checklist,
+      groups,
     };
   });
 

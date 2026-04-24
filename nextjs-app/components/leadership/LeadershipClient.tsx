@@ -31,13 +31,13 @@ import {
 } from '@/lib/daily-routines-actions';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
-interface ChecklistItem { id: string; text: string; done: boolean; }
-interface Subtask { id: string; title: string; completed: boolean; }
+interface ChecklistGroupItem { id: string; text: string; isCompleted: boolean; }
+interface ChecklistGroup { id: string; title: string; items: ChecklistGroupItem[]; }
 interface ActiveTask {
   id: string; title: string; status: string; priority: string;
   brandId: string | null; brandName: string | null; brandColor: string | null;
   dueDate: string | null; projectId: string | null; hasDescription: boolean;
-  subtasks: Subtask[]; checklist?: ChecklistItem[];
+  groups: ChecklistGroup[];
 }
 interface UpcomingEvent {
   id: string; title: string; day: number; month: number; year: number;
@@ -724,16 +724,13 @@ function FocusHero({
   if (selectedTask) {
     const taskBrand = brands.find(b => b.id === selectedTask.brandId);
     const taskColor = taskBrand?.color || color;
-    const stTotal = selectedTask.subtasks.length;
-    const stDone = selectedTask.subtasks.filter(s => s.completed).length;
-    const clItems = selectedTask.checklist ?? [];
-    const totalItems = stTotal + clItems.length;
-    const doneItems = stDone + clItems.filter(c => c.done).length;
+    const groups = selectedTask.groups ?? [];
+    const totalItems = groups.reduce((s, g) => s + g.items.length, 0);
+    const doneItems = groups.reduce((s, g) => s + g.items.filter(i => i.isCompleted).length, 0);
     const isOverdue = selectedTask.dueDate && daysLeft(selectedTask.dueDate) < 0;
-    const nextSteps = [
-      ...selectedTask.subtasks.filter(s => !s.completed).map(s => ({ id: s.id, title: s.title, type: 'مهمة فرعية' })),
-      ...clItems.filter(c => !c.done).map(c => ({ id: c.id, title: c.text, type: 'قائمة' })),
-    ].slice(0, 3);
+    const nextSteps = groups.flatMap(g =>
+      g.items.filter(i => !i.isCompleted).map(i => ({ id: i.id, title: i.text || 'خطوة', groupTitle: g.title }))
+    ).slice(0, 3);
 
     const progressPct = totalItems > 0 ? Math.round((doneItems / totalItems) * 100) : 0;
     return (
@@ -794,10 +791,10 @@ function FocusHero({
                   border: '1px solid rgba(0,0,0,0.04)', boxShadow: '0 4px 12px rgba(0,0,0,0.02)', gap: 14,
                 }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: 14, flex: 1 }}>
-                    <input type="checkbox" onClick={(e) => e.stopPropagation()} style={{ width: 20, height: 20, accentColor: '#EA580C', cursor: 'pointer', flexShrink: 0, margin: 0 }} />
+                    <input type="checkbox" checked={false} onChange={() => {}} onClick={(e) => e.stopPropagation()} style={{ width: 20, height: 20, accentColor: '#EA580C', cursor: 'pointer', flexShrink: 0, margin: 0 }} />
                     <span style={{ fontSize: 14, fontWeight: 700, color: '#1E293B' }}>{step.title}</span>
                   </div>
-                  <span style={{ background: '#FFF7ED', color: '#C2410C', padding: '4px 10px', borderRadius: 8, fontSize: 11, fontWeight: 700, whiteSpace: 'nowrap' }}>{step.type}</span>
+                  {step.groupTitle && <span style={{ background: '#FFF7ED', color: '#C2410C', padding: '4px 10px', borderRadius: 8, fontSize: 11, fontWeight: 700, whiteSpace: 'nowrap' }}>{step.groupTitle}</span>}
                 </div>
               ))}
               {totalItems - doneItems > nextSteps.length && (
