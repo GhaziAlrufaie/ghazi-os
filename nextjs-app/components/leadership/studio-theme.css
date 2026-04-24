@@ -506,13 +506,11 @@ body::before {
   box-shadow: var(--shadow-sm);
 }
 
-/* WeeklyCompass — edge-to-edge مثل FocusHero */
+/* WeeklyCompass — fluid width, rounded corners */
 .section.weekly-compass-section,
 .section.daily-tasks-section {
   border-radius: 20px;
   overflow: hidden;
-  border-left: none;
-  border-right: none;
 }
 
 .section-head {
@@ -1670,14 +1668,15 @@ body::before {
   gap: 20px;
   align-items: start;
 }
-/* Desktop: edge-to-edge stretch */
+/* Desktop: fluid width — no negative margins */
 .triple-panel,
 .focus-hero,
 .weekly-compass-section,
 .daily-tasks-section {
-  margin-left: -24px;
-  margin-right: calc(-24px - 220px);
-  width: calc(100% + 24px + 220px + 24px);
+  width: 100%;
+  margin-left: 0;
+  margin-right: 0;
+  box-sizing: border-box;
 }
 /* Fixed height for perfect visual symmetry */
 .triple-panel .section {
@@ -1749,9 +1748,10 @@ body::before {
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 20px;
   align-items: start;
-  margin-left: -24px;
-  margin-right: calc(-24px - 220px);
-  width: calc(100% + 24px + 220px + 24px);
+  margin-left: 0;
+  margin-right: 0;
+  width: 100%;
+  box-sizing: border-box;
 }
 
 /* Inbox spans full width (both columns) */

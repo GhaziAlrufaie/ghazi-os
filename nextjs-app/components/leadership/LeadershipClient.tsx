@@ -1300,7 +1300,7 @@ export default function LeadershipClient({
       <main className="main">
 
         {/* ── Greeting ────────────────────────────────────────────────────── */}
-        <div className="greeting" style={{ padding: '8px 24px 0' }}>
+        <div className="greeting" style={{ padding: '8px 40px 0' }}>
           <div className="greeting-title">
             <span className="greeting-emoji">👋</span>
             <div className="greeting-text">
@@ -1336,7 +1336,7 @@ export default function LeadershipClient({
           />
 
           {/* باقي المحتوى بـ padding جانبي */}
-          <div style={{ padding: '20px 24px 24px', display: 'flex', flexDirection: 'column', gap: 20 }}>
+          <div style={{ padding: '20px 40px 40px', display: 'flex', flexDirection: 'column', gap: 20, width: '100%', boxSizing: 'border-box' }}>
 
           {/* WeeklyCompass — كامل العرض */}
           <WeeklyCompass
