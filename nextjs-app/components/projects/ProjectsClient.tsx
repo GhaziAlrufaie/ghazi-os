@@ -3,7 +3,8 @@
 // Shows ONLY tasks with status='ideas' from all brands
 // Drop zones for other columns allow dispatching ideas to workflow
 // DnD updates the shared tasks table → instantly reflected in Brand boards
-import React, { useState, useCallback, useTransition } from 'react';
+import React, { useState, useCallback, useTransition, useMemo } from 'react';
+import { createBrowserClient } from '@/lib/supabase';
 import {
   DragDropContext,
   Droppable,
@@ -72,33 +73,35 @@ export default function ProjectsClient({ initialTasks, brands }: Props) {
   ).length;
 
   // ── DnD — updates same tasks table as Brands ────────────────────────────────────────────────────────────────────────────────────
+  // Browser-side Supabase client for DnD (avoids Server Action revalidation delay)
+  const supabaseBrowser = useMemo(() => createBrowserClient(), []);
+
   const onDragEnd = useCallback(async (result: DropResult) => {
     const { draggableId, source, destination } = result;
     if (!destination) return;
     if (source.droppableId === destination.droppableId && source.index === destination.index) return;
+
     const newStatus = destination.droppableId as TaskStatus;
-    const task = tasks.find(t => t.id === draggableId);
-    if (!task) return;
-    // Optimistic update
-    setTasks(prev => {
-      const without = prev.filter(t => t.id !== draggableId);
-      const updated = { ...task, status: newStatus };
-      const destColTasks = without.filter(t => t.status === newStatus);
-      const insertAt = without.findIndex(
-        t => t.status === newStatus && destColTasks.indexOf(t) === destination.index
-      );
-      if (insertAt === -1) return [...without, updated];
-      const arr = [...without];
-      arr.splice(insertAt, 0, updated);
-      return arr;
-    });
-    // Persist to Supabase
-    if (task.status !== newStatus) {
-      startTransition(async () => {
-        await updateTask({ id: draggableId, status: newStatus });
-      });
+    const taskId = draggableId;
+    const prevTasks = tasks;
+
+    // OPTIMISTIC UI UPDATE — instant, no blurry state
+    setTasks(prev =>
+      prev.map(t => (t.id === taskId ? { ...t, status: newStatus } : t))
+    );
+
+    // DIRECT SUPABASE SYNC (browser client — no revalidatePath, no page reload)
+    try {
+      const { error } = await supabaseBrowser
+        .from('tasks')
+        .update({ status: newStatus })
+        .eq('id', taskId);
+      if (error) throw error;
+    } catch (err: unknown) {
+      console.error('DnD DB Update Failed:', err);
+      setTasks(prevTasks);
     }
-  }, [tasks]);
+  }, [tasks, supabaseBrowser]);
 
   // ── Task Panel handlers ───────────────────────────────────────────────────
   function handleUpdate(patch: Partial<Task>) {

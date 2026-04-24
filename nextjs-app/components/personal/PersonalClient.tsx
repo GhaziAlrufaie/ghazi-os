@@ -1,6 +1,7 @@
 'use client';
 // PersonalClient — VIP Kanban (mirrors Brands page design)
-import React, { useState, useRef, useEffect, useTransition, useMemo } from 'react';
+import React, { useState, useRef, useEffect, useTransition, useMemo, useCallback } from 'react';
+import { createBrowserClient } from '@/lib/supabase';
 import { DragDropContext, Droppable, Draggable, type DropResult } from '@hello-pangea/dnd';
 import type { PersonalTask, TaskStatus, TaskPriority, TaskCategory } from '@/lib/personal-actions';
 import {
@@ -372,14 +373,31 @@ export default function PersonalClient({ initialTasks }: Props) {
     setSelectedTask(prev => prev ? { ...prev, ...patch } : prev);
   }
 
-  function onDragEnd(result: DropResult) {
+  // Browser-side Supabase client for DnD (avoids Server Action revalidation delay)
+  const supabaseBrowser = useMemo(() => createBrowserClient(), []);
+
+  const onDragEnd = useCallback(async (result: DropResult) => {
     if (!result.destination) return;
     const { draggableId, source, destination } = result;
     if (source.droppableId === destination.droppableId && source.index === destination.index) return;
     const newStatus = destination.droppableId as TaskStatus;
+    const prevTasks = tasks;
+
+    // OPTIMISTIC UI UPDATE — instant, no blurry state
     setTasks(prev => prev.map(t => t.id === draggableId ? { ...t, status: newStatus } : t));
-    startTransition(async () => { await updatePersonalTask({ id: draggableId, status: newStatus }); });
-  }
+
+    // DIRECT SUPABASE SYNC (browser client — no revalidatePath, no page reload)
+    try {
+      const { error } = await supabaseBrowser
+        .from('personal_tasks')
+        .update({ status: newStatus })
+        .eq('id', draggableId);
+      if (error) throw error;
+    } catch (err: unknown) {
+      console.error('DnD DB Update Failed:', err);
+      setTasks(prevTasks);
+    }
+  }, [tasks, supabaseBrowser]);
 
   const tasksByStatus = (status: TaskStatus) =>
     filteredTasks.filter(t => t.status === status).sort((a, b) => a.sortOrder - b.sortOrder);

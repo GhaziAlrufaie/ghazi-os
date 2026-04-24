@@ -1,7 +1,8 @@
 'use client';
 // BrandDetailClient — تفاصيل البراند
 // @hello-pangea/dnd للـ Drag & Drop + TaskPanel + AddTaskModal
-import React, { useState, useCallback, useEffect } from 'react';
+import React, { useState, useCallback, useEffect, useMemo } from 'react';
+import { createBrowserClient } from '@/lib/supabase';
 import { useRouter } from 'next/navigation';
 import {
   DragDropContext,
@@ -425,30 +426,37 @@ export default function BrandDetailClient({ brand: initialBrand, initialTasks, i
   const [showAddModal, setShowAddModal]       = useState(false);
 
   // ── Drag & Drop ──
+  // Browser-side Supabase client for DnD (avoids Server Action revalidation delay)
+  const supabaseBrowser = useMemo(() => createBrowserClient(), []);
+
   const onDragEnd = useCallback(async (result: DropResult) => {
     const { draggableId, source, destination } = result;
+    // 1. Invalid drop
     if (!destination) return;
-    // Same position — no-op
     if (source.droppableId === destination.droppableId && source.index === destination.index) return;
+
     const newStatus = destination.droppableId as TaskStatus;
-    const task = tasks.find((t) => t.id === draggableId);
-    if (!task) return;
-    // Optimistic update: move card to new column or reorder within same column
-    setTasks((prev) => {
-      const without = prev.filter((t) => t.id !== draggableId);
-      const updated = { ...task, status: newStatus };
-      const destColTasks = without.filter((t) => t.status === newStatus);
-      const insertAt = without.findIndex((t) => t.status === newStatus && destColTasks.indexOf(t) === destination.index);
-      if (insertAt === -1) return [...without, updated];
-      const arr = [...without];
-      arr.splice(insertAt, 0, updated);
-      return arr;
-    });
-    // Persist status change to Supabase only if column changed
-    if (task.status !== newStatus) {
-      await updateTask({ id: draggableId, status: newStatus });
+    const taskId = draggableId;
+    const prevTasks = tasks;
+
+    // 2. OPTIMISTIC UI UPDATE — instant, no blurry state
+    setTasks((prev) =>
+      prev.map((t) => (t.id === taskId ? { ...t, status: newStatus } : t))
+    );
+
+    // 3. DIRECT SUPABASE SYNC (browser client — no revalidatePath, no page reload)
+    try {
+      const { error } = await supabaseBrowser
+        .from('tasks')
+        .update({ status: newStatus })
+        .eq('id', taskId);
+      if (error) throw error;
+    } catch (err: unknown) {
+      console.error('DnD DB Update Failed:', err);
+      // Rollback optimistic update on failure
+      setTasks(prevTasks);
     }
-  }, [tasks]);
+  }, [tasks, supabaseBrowser]);
 
   // ── Task actions ──
   async function handleArchive(id: string) {
