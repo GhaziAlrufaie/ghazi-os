@@ -460,58 +460,97 @@ export default function BrandDetailClient({ brand: initialBrand, initialTasks, i
     return <DhikrniMissionControl brand={brand} tasks={tasks} projects={projects} />;
   }
 
-  return (
-    <div className="scr on" style={{ padding: 0, height: '100%', overflow: 'hidden' }}>
-      <div className="brand-detail-wrap">
-        <StatsCol brand={brand} tasks={tasks} onBrandUpdate={setBrand} />
-        <div className="brand-boards-outer">
-          <div className="brand-board-wrap">
-            {/* Nav Tabs */}
-            <div className="brand-boards-nav">
-              <button className="btn btn-sm" onClick={() => setShowAddModal(true)}>+ مهمة جديدة</button>
-              <div className="bbn-tabs">
-                <div className={`bbn-tab-wrap${activeProjectId === null ? ' on' : ''}`}>
-                  <button className={`bbn-tab${activeProjectId === null ? ' on' : ''}`} onClick={() => setActiveProjectId(null)}>{brand.name}</button>
-                  <button className="bbn-tab-opts" onClick={(e) => { e.stopPropagation(); setMenuOpen(!menuOpen); }}>⋯</button>
-                  {menuOpen && (
-                    <>
-                      <div style={{ position: 'fixed', inset: 0, zIndex: 9997 }} onClick={() => setMenuOpen(false)} />
-                      <div className="proj-opts-menu on" style={{ top: '100%', right: 0, left: 'auto' }}>
-                        <div className="proj-opts-item" onClick={() => { setMenuOpen(false); router.push('/brands'); }}>🗄️ أرشفة البراند</div>
-                        <div className="proj-opts-item danger" onClick={() => { setMenuOpen(false); handleDeleteBrand(); }}>🗑 حذف البراند</div>
-                      </div>
-                    </>
-                  )}
-                </div>
-                {projects.map((proj) => (
-                  <div key={proj.id} className={`bbn-tab-wrap${activeProjectId === proj.id ? ' on' : ''}`}>
-                    <button className={`bbn-tab${activeProjectId === proj.id ? ' on' : ''}`} onClick={() => setActiveProjectId(proj.id)}>{proj.title}</button>
-                  </div>
-                ))}
-              </div>
-            </div>
+  // -- Computed stats for header
+  const doneTasks    = tasks.filter((t) => t.status === 'done').length;
+  const openTasks    = tasks.filter((t) => t.status !== 'done').length;
+  const overdueTasks = tasks.filter(isOverdue).length;
+  const healthPct    = tasks.length > 0 ? Math.round((doneTasks / tasks.length) * 100) : 0;
+  const statusLabel  = STATUS_LABEL[brand.status] ?? brand.status;
+  const statusIsActive = brand.status === 'active';
 
-            {/* Kanban Board with DnD */}
-            <DragDropContext onDragEnd={onDragEnd}>
-              <div className="vip-kanban-board">
-                {KANBAN_COLS.map((col) => (
-                  <KanbanCol
-                    key={col.id}
-                    col={col}
-                    tasks={visibleTasks.filter((t) => t.status === col.id)}
-                    projects={projects}
-                    brandId={brand.id}
-                    activeProjectId={activeProjectId}
-                    onArchive={handleArchive}
-                    onDelete={handleDelete}
-                    onAdd={handleAdd}
-                    onCardClick={(task) => setPanelTask(task)}
-                  />
-                ))}
-              </div>
-            </DragDropContext>
+  return (
+    <div className="scr on" style={{ padding: '16px 20px', height: '100%', overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
+
+      {/* VIP Horizontal Brand Header */}
+      <div className="vip-brand-header">
+        <div className="vip-header-brand-info">
+          <div className="vip-header-brand-icon">{brand.icon || '🏷️'}</div>
+          <div>
+            <h2 className="vip-header-brand-name">{brand.name}</h2>
+            <span className="vip-header-brand-status" style={statusIsActive ? {} : { background: '#FEF9C3', color: '#854D0E' }}>
+              {statusLabel}
+            </span>
           </div>
         </div>
+        <div className="vip-header-stats">
+          <div className="vip-stat-box">
+            <span className="vip-stat-box-num" style={{ color: '#22C55E' }}>{doneTasks}</span>
+            <span className="vip-stat-box-lbl">مهام منجزة ✅</span>
+          </div>
+          <div className="vip-stat-box">
+            <span className="vip-stat-box-num" style={{ color: '#F59E0B' }}>{openTasks}</span>
+            <span className="vip-stat-box-lbl">مهام مفتوحة 📂</span>
+          </div>
+          <div className="vip-stat-box" style={{ background: '#FFF7ED', borderColor: '#FED7AA' }}>
+            <span className="vip-stat-box-lbl" style={{ color: '#C2410C' }}>صحة البراند:</span>
+            <span className="vip-stat-box-num" style={{ color: '#EA580C' }}>{healthPct}%</span>
+          </div>
+          {overdueTasks > 0 && (
+            <div className="vip-stat-box" style={{ background: '#FEF2F2', borderColor: '#FECACA' }}>
+              <span className="vip-stat-box-lbl" style={{ color: '#991B1B' }}>متأخرة ⚠️</span>
+              <span className="vip-stat-box-num" style={{ color: '#DC2626' }}>{overdueTasks}</span>
+            </div>
+          )}
+        </div>
+        <div className="vip-header-actions">
+          <button className="btn btn-sm" onClick={() => setShowAddModal(true)}>+ مهمة جديدة</button>
+        </div>
+      </div>
+
+      {/* Nav Tabs */}
+      <div className="brand-boards-nav" style={{ flexShrink: 0 }}>
+        <div className="bbn-tabs">
+          <div className={`bbn-tab-wrap${activeProjectId === null ? ' on' : ''}`}>
+            <button className={`bbn-tab${activeProjectId === null ? ' on' : ''}`} onClick={() => setActiveProjectId(null)}>{brand.name}</button>
+            <button className="bbn-tab-opts" onClick={(e) => { e.stopPropagation(); setMenuOpen(!menuOpen); }}>⋯</button>
+            {menuOpen && (
+              <>
+                <div style={{ position: 'fixed', inset: 0, zIndex: 9997 }} onClick={() => setMenuOpen(false)} />
+                <div className="proj-opts-menu on" style={{ top: '100%', right: 0, left: 'auto' }}>
+                  <div className="proj-opts-item" onClick={() => { setMenuOpen(false); router.push('/brands'); }}>🗄️ أرشفة البراند</div>
+                  <div className="proj-opts-item danger" onClick={() => { setMenuOpen(false); handleDeleteBrand(); }}>🗑 حذف البراند</div>
+                </div>
+              </>
+            )}
+          </div>
+          {projects.map((proj) => (
+            <div key={proj.id} className={`bbn-tab-wrap${activeProjectId === proj.id ? ' on' : ''}`}>
+              <button className={`bbn-tab${activeProjectId === proj.id ? ' on' : ''}`} onClick={() => setActiveProjectId(proj.id)}>{proj.title}</button>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* Full-Width Kanban Board */}
+      <div style={{ flex: 1, overflow: 'hidden' }}>
+        <DragDropContext onDragEnd={onDragEnd}>
+          <div className="vip-kanban-board">
+            {KANBAN_COLS.map((col) => (
+              <KanbanCol
+                key={col.id}
+                col={col}
+                tasks={visibleTasks.filter((t) => t.status === col.id)}
+                projects={projects}
+                brandId={brand.id}
+                activeProjectId={activeProjectId}
+                onArchive={handleArchive}
+                onDelete={handleDelete}
+                onAdd={handleAdd}
+                onCardClick={(task) => setPanelTask(task)}
+              />
+            ))}
+          </div>
+        </DragDropContext>
       </div>
 
       {/* Task Panel */}
