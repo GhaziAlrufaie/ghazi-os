@@ -472,7 +472,6 @@ export default function ProjectDetailClient({ project, initialTasks, brands }: P
       {selectedTask && (
         <TaskPanel
           task={selectedTask}
-          brands={brands}
           onClose={() => setSelectedTask(null)}
           onUpdate={handleTaskUpdate}
           onDelete={handleDelete}
@@ -483,7 +482,6 @@ export default function ProjectDetailClient({ project, initialTasks, brands }: P
       {/* Add Task Modal */}
       {showAddModal && (
         <AddTaskModal
-          brands={brands}
           defaultBrandId={project.brandId}
           defaultProjectId={project.id}
           onClose={() => setShowAddModal(false)}

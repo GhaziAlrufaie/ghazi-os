@@ -420,6 +420,122 @@ textarea { resize: vertical; min-height: 80px; }
 .tp-desc-area { width: 100%; background: transparent; border: none; font-size: 13px; color: var(--txt); font-family: inherit; resize: none; min-height: 80px; outline: none; line-height: 1.7; padding: 4px 0; border-bottom: 1px solid transparent; transition: border-color .2s; }
 .tp-desc-area:focus { border-bottom-color: var(--brd); }
 
+/* VIP TASK MODAL - Premium 2-Column Notion/Linear Style */
+.vip-modal-overlay {
+  position: fixed; inset: 0; background: rgba(15, 23, 42, 0.6);
+  backdrop-filter: blur(8px); z-index: 99999;
+  display: flex; justify-content: center; align-items: center; padding: 24px;
+}
+.vip-modal-container {
+  background: #FFFFFF; width: 100%; max-width: 1100px; height: 90vh;
+  border-radius: 24px; display: flex; overflow: hidden;
+  box-shadow: 0 25px 50px -12px rgba(0,0,0,0.3);
+  border: 1px solid rgba(255,255,255,0.4);
+}
+.vip-modal-sidebar {
+  width: 300px; background: #F8FAFC; border-left: 1px solid #E2E8F0;
+  padding: 28px 20px; display: flex; flex-direction: column; gap: 20px;
+  overflow-y: auto; flex-shrink: 0;
+}
+.vip-modal-main {
+  flex: 1; padding: 40px 48px; overflow-y: auto;
+  display: flex; flex-direction: column; gap: 28px; background: #FFFFFF;
+}
+.vip-task-title-input {
+  font-size: 28px; font-weight: 900; color: #0F172A; border: none; outline: none;
+  width: 100%; background: transparent; resize: none; line-height: 1.4; padding: 0; margin: 0;
+  font-family: inherit;
+}
+.vip-task-title-input::placeholder { color: #CBD5E1; }
+.vip-task-desc-input {
+  width: 100%; min-height: 100px; padding: 16px 20px;
+  background: #F8FAFC; border: 1px solid transparent; border-radius: 14px;
+  font-size: 14px; color: #334155; line-height: 1.7; outline: none;
+  resize: vertical; transition: all 0.2s; font-family: inherit;
+}
+.vip-task-desc-input:focus { background: #FFFFFF; border-color: #CBD5E1; box-shadow: 0 4px 12px rgba(0,0,0,0.03); }
+/* Grouped Checklists */
+.vip-checklist-group {
+  border: 1px solid #E2E8F0; border-radius: 16px; background: #FFFFFF;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.02); overflow: hidden; transition: all 0.2s;
+}
+.vip-checklist-group:focus-within { border-color: #CBD5E1; box-shadow: 0 4px 12px rgba(0,0,0,0.04); }
+.vip-checklist-header {
+  display: flex; justify-content: space-between; align-items: center;
+  background: #F8FAFC; padding: 14px 18px; border-bottom: 1px solid #E2E8F0;
+}
+.vip-checklist-title {
+  font-size: 15px; font-weight: 900; color: #1E293B; border: none; outline: none;
+  flex: 1; background: transparent; font-family: inherit;
+}
+.vip-checklist-title::placeholder { color: #94A3B8; font-weight: 700; }
+.vip-checklist-progress {
+  font-size: 12px; color: #64748B; font-weight: 700; margin-left: 12px; white-space: nowrap;
+}
+.vip-checklist-item {
+  display: flex; align-items: center; gap: 12px; padding: 11px 18px;
+  border-bottom: 1px solid #F1F5F9; transition: background 0.15s;
+}
+.vip-checklist-item:last-child { border-bottom: none; }
+.vip-checklist-item:hover { background: #F8FAFC; }
+.vip-checkbox {
+  appearance: none; -webkit-appearance: none; width: 20px; height: 20px;
+  border: 2px solid #CBD5E1; border-radius: 6px; cursor: pointer;
+  position: relative; background: #FFFFFF; flex-shrink: 0; transition: all 0.2s;
+}
+.vip-checkbox:checked { background: #10B981; border-color: #10B981; }
+.vip-checkbox:checked::after {
+  content: '✔'; position: absolute; color: white; font-size: 12px;
+  top: 50%; left: 50%; transform: translate(-50%, -50%);
+}
+.vip-checklist-input {
+  flex: 1; border: none; outline: none; font-size: 14px; color: #334155;
+  font-weight: 600; background: transparent; font-family: inherit;
+}
+.vip-checklist-input.completed { text-decoration: line-through; color: #94A3B8; }
+.vip-checklist-input::placeholder { color: #CBD5E1; }
+/* Sidebar Meta */
+.vip-meta-label {
+  font-size: 11px; font-weight: 800; color: #64748B; text-transform: uppercase;
+  margin-bottom: 8px; display: block; letter-spacing: 0.5px;
+}
+.vip-meta-badge {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 12px 14px; background: #FFFFFF; border: 1px solid #E2E8F0;
+  border-radius: 12px; font-size: 13px; font-weight: 800; color: #1E293B;
+  cursor: pointer; outline: none; width: 100%; appearance: none;
+  font-family: inherit; transition: all 0.15s;
+}
+.vip-meta-badge:hover { border-color: #CBD5E1; box-shadow: 0 2px 8px rgba(0,0,0,0.04); }
+.vip-meta-section { display: flex; flex-direction: column; }
+.vip-modal-add-group-btn {
+  margin-top: 20px; width: 100%; padding: 14px;
+  background: #F0FDF4; border: 2px dashed #86EFAC; border-radius: 14px;
+  color: #166534; font-weight: 900; font-size: 14px; cursor: pointer;
+  transition: all 0.2s; font-family: inherit;
+}
+.vip-modal-add-group-btn:hover { background: #DCFCE7; border-color: #4ADE80; }
+.vip-modal-add-item-btn {
+  background: #F1F5F9; border: none; color: #64748B; font-weight: 800;
+  font-size: 12px; cursor: pointer; padding: 7px 12px; border-radius: 8px;
+  transition: all 0.2s; font-family: inherit;
+}
+.vip-modal-add-item-btn:hover { background: #E2E8F0; color: #334155; }
+.vip-modal-del-group-btn {
+  background: transparent; border: none; color: #CBD5E1; cursor: pointer;
+  font-size: 14px; padding: 4px; border-radius: 6px; transition: all 0.15s;
+}
+.vip-modal-del-group-btn:hover { color: #EF4444; background: #FEF2F2; }
+.vip-modal-del-item-btn {
+  background: transparent; border: none; color: #CBD5E1; cursor: pointer;
+  font-size: 12px; padding: 2px 4px; border-radius: 4px; transition: all 0.15s;
+  flex-shrink: 0;
+}
+.vip-modal-del-item-btn:hover { color: #EF4444; }
+.vip-modal-section-title {
+  font-size: 14px; color: #475569; font-weight: 900; margin-bottom: 12px;
+  display: flex; align-items: center; gap: 8px;
+}
 /* LOGIN SCREEN */
 .login-screen { position: fixed; inset: 0; background: #FFFFFF; z-index: 9999; display: flex; align-items: center; justify-content: center; direction: rtl; }
 .login-screen.hidden { display: none; }

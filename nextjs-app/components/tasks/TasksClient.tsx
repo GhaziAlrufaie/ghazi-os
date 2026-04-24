@@ -486,7 +486,6 @@ export default function TasksClient({ initialTasks, brands, projects }: Props) {
       {selectedTask && (
         <TaskPanel
           task={selectedTask}
-          brands={brands}
           onClose={() => setSelectedTask(null)}
           onUpdate={handleTaskUpdate}
           onDelete={handleDelete}
@@ -497,7 +496,6 @@ export default function TasksClient({ initialTasks, brands, projects }: Props) {
       {/* Add Task Modal */}
       {showAddModal && (
         <AddTaskModal
-          brands={brands}
           onClose={() => setShowAddModal(false)}
           onAdd={handleAddTask}
         />
