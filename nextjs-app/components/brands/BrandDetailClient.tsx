@@ -270,6 +270,27 @@ interface TaskCardProps {
 function TaskCard({ task, project, index, onArchive, onDelete, onClick }: TaskCardProps) {
   const overdue  = isOverdue(task);
   const dueLabel = daysLeftLabel(task.dueDate);
+  // ── Card Badges Calculation ──
+  let totalChecklistItems = 0;
+  let completedChecklistItems = 0;
+  if (task.subtasks && Array.isArray(task.subtasks)) {
+    const raw = task.subtasks as any[];
+    if (raw.length > 0 && 'items' in (raw[0] as any)) {
+      // ChecklistGroup format
+      raw.forEach((group: any) => {
+        if (group.items && Array.isArray(group.items)) {
+          totalChecklistItems += group.items.length;
+          completedChecklistItems += group.items.filter((item: any) => item.isCompleted || item.completed || item.is_completed).length;
+        }
+      });
+    } else {
+      // SubtaskItem format (flat array)
+      totalChecklistItems = raw.length;
+      completedChecklistItems = raw.filter((item: any) => item.done || item.isCompleted || item.completed).length;
+    }
+  }
+  const hasChecklists = totalChecklistItems > 0;
+  const hasImages = !!(task.description && task.description.includes('!['));
   return (
     <Draggable draggableId={task.id} index={index}>
       {(provided, snapshot) => (
@@ -293,10 +314,25 @@ function TaskCard({ task, project, index, onArchive, onDelete, onClick }: TaskCa
             {project && <span className="vip-tag">📁 {project.title}</span>}
             {overdue && <span className="vip-tag-overdue">⚠️ متأخر {Math.abs(daysLeft(task.dueDate))} يوم</span>}
             {!overdue && task.dueDate && <span className="vip-tag-due">🗓 {dueLabel}</span>}
-            {task.hasDescription && <span className="vip-tag">📝</span>}
           </div>
+          {/* CARD BADGES ROW */}
+          {(task.hasDescription || hasChecklists || hasImages) && (
+            <div style={{ display: 'flex', gap: '10px', marginTop: '8px', alignItems: 'center', flexWrap: 'wrap', color: '#94A3B8', fontSize: '12px', fontWeight: '600' }}>
+              {task.hasDescription && (
+                <span title="تحتوي على تفاصيل" style={{ display: 'flex', alignItems: 'center', opacity: 0.8 }}>📝</span>
+              )}
+              {hasImages && (
+                <span title="تحتوي على صور" style={{ display: 'flex', alignItems: 'center', opacity: 0.8 }}>🖼️</span>
+              )}
+              {hasChecklists && (
+                <span title="مجموعات العمل والخطوات" style={{ display: 'flex', alignItems: 'center', gap: '4px', color: completedChecklistItems === totalChecklistItems && totalChecklistItems > 0 ? '#10B981' : '#64748B' }}>
+                  ☑️ <span style={{ fontSize: '11px', marginTop: '2px' }}>{completedChecklistItems}/{totalChecklistItems}</span>
+                </span>
+              )}
+            </div>
+          )}
           {task.status === 'on_hold' && task.blockerReason && (
-            <div style={{ padding: '6px 8px', background: '#FEF2F2', border: '1px solid #FECACA', borderRadius: '8px', display: 'flex', alignItems: 'flex-start', gap: '6px' }}>
+            <div style={{ padding: '6px 8px', marginTop: '8px', background: '#FEF2F2', border: '1px solid #FECACA', borderRadius: '8px', display: 'flex', alignItems: 'flex-start', gap: '6px' }}>
               <span style={{ fontSize: '13px', flexShrink: 0 }}>🛑</span>
               <span style={{ fontSize: '11px', fontWeight: '900', color: '#991B1B', lineHeight: '1.4' }}>{task.blockerReason}</span>
             </div>

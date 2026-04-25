@@ -254,8 +254,34 @@ export default function ProjectsClient({ initialTasks, brands }: Props) {
                                     {task.priority === 'low'      && <span className="vip-tag" style={{ background: '#F0FDF4', color: '#16A34A' }}>⬇️ منخفض</span>}
                                     {overdue  && <span className="vip-tag-overdue">⚠️ متأخر {Math.abs(daysLeft(task.dueDate))} يوم</span>}
                                     {!overdue && task.dueDate && <span className="vip-tag-due">🗓 {daysLeftLabel(task.dueDate)}</span>}
-                                    {task.hasDescription && <span className="vip-tag">📝</span>}
                                   </div>
+                                  {/* CARD BADGES ROW */}
+                                  {(() => {
+                                    let total = 0, done = 0;
+                                    if (task.subtasks && Array.isArray(task.subtasks)) {
+                                      const raw = task.subtasks as any[];
+                                      if (raw.length > 0 && 'items' in (raw[0] as any)) {
+                                        raw.forEach((g: any) => { if (g.items) { total += g.items.length; done += g.items.filter((i: any) => i.isCompleted || i.completed).length; } });
+                                      } else {
+                                        total = raw.length;
+                                        done = raw.filter((i: any) => i.done || i.isCompleted || i.completed).length;
+                                      }
+                                    }
+                                    const hasChecklists = total > 0;
+                                    const hasImages = !!(task.description && task.description.includes('!['));
+                                    if (!task.hasDescription && !hasChecklists && !hasImages) return null;
+                                    return (
+                                      <div style={{ display: 'flex', gap: '10px', marginTop: '8px', alignItems: 'center', flexWrap: 'wrap', color: '#94A3B8', fontSize: '12px', fontWeight: '600' }}>
+                                        {task.hasDescription && <span title="تحتوي على تفاصيل" style={{ display: 'flex', alignItems: 'center', opacity: 0.8 }}>📝</span>}
+                                        {hasImages && <span title="تحتوي على صور" style={{ display: 'flex', alignItems: 'center', opacity: 0.8 }}>🖼️</span>}
+                                        {hasChecklists && (
+                                          <span title="مجموعات العمل والخطوات" style={{ display: 'flex', alignItems: 'center', gap: '4px', color: done === total && total > 0 ? '#10B981' : '#64748B' }}>
+                                            ☑️ <span style={{ fontSize: '11px', marginTop: '2px' }}>{done}/{total}</span>
+                                          </span>
+                                        )}
+                                      </div>
+                                    );
+                                  })()}
                                 </div>
                               )}
                             </Draggable>

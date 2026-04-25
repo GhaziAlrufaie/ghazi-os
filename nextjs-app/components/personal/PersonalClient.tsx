@@ -81,13 +81,18 @@ function VIPTaskCard({ task, index, categories, onClick }: {
           <div style={{ display: 'flex', alignItems: 'center', gap: 6, flexWrap: 'wrap', marginTop: 8 }}>
             <span style={{ fontSize: 11, padding: '3px 9px', borderRadius: 20, background: pm.bg, color: pm.color, fontWeight: 700 }}>{pm.label}</span>
             {cat && <span style={{ fontSize: 11, color: '#64748B', fontWeight: 600 }}>{cat.emoji} {cat.label}</span>}
-            {task.hasDescription && <span style={{ fontSize: 11, color: '#94A3B8' }}>📝</span>}
             {task.dueDate && (
               <span style={{ fontSize: 11, padding: '3px 9px', borderRadius: 20, background: isOverdue ? '#FEF2F2' : '#F0FDF4', color: isOverdue ? '#DC2626' : '#16A34A', fontWeight: 700 }}>
                 {isOverdue ? `⚠️ متأخر` : `🗓 ${task.dueDate}`}
               </span>
             )}
           </div>
+          {/* CARD BADGES ROW */}
+          {task.hasDescription && (
+            <div style={{ display: 'flex', gap: '10px', marginTop: '6px', alignItems: 'center', flexWrap: 'wrap', color: '#94A3B8', fontSize: '12px', fontWeight: '600' }}>
+              <span title="تحتوي على تفاصيل" style={{ display: 'flex', alignItems: 'center', opacity: 0.8 }}>📝</span>
+            </div>
+          )}
         </div>
       )}
     </Draggable>
