@@ -1,8 +1,10 @@
 'use client';
 // TaskPanel — VIP Premium 2-Column Modal (Notion/Linear Style)
-import React, { useState, useEffect } from 'react';
+// PERFORMANCE: All state is strictly local. saveField uses createBrowserClient (NOT Server Action).
+// Close is instant — DB save happens in the background after modal unmounts.
+import React, { useState, useEffect, useRef, useMemo } from 'react';
 import type { Task, TaskStatus, TaskPriority } from '@/lib/tasks-actions';
-import { updateTask } from '@/lib/tasks-actions';
+import { createBrowserClient } from '@/lib/supabase';
 
 interface ChecklistItem { id: string; text: string; isCompleted: boolean; }
 interface ChecklistGroup { id: string; title: string; items: ChecklistItem[]; }
@@ -46,14 +48,25 @@ function parseGroups(raw: unknown): ChecklistGroup[] {
 }
 
 export default function TaskPanel({ task, onClose, onUpdate, onDelete, onArchive, isHQ = false, hqCols }: TaskPanelProps) {
+  // ── Strictly local state — parent board does NOT re-render on keystrokes ──
   const [title, setTitle]       = useState('');
   const [desc, setDesc]         = useState('');
   const [status, setStatus]     = useState<TaskStatus>('todo');
   const [priority, setPriority] = useState<TaskPriority>('medium');
   const [dueDate, setDueDate]   = useState('');
   const [groups, setGroups]     = useState<ChecklistGroup[]>([]);
-  const [saving, setSaving]     = useState(false);
+  const [bgSaving, setBgSaving] = useState(false); // background save indicator only
 
+  // Stable browser supabase client — never recreated
+  const supabase = useMemo(() => createBrowserClient(), []);
+
+  // Ref to always have latest values for background save on close
+  const latestRef = useRef({ title, desc, status, priority, dueDate, groups, taskId: task?.id });
+  useEffect(() => {
+    latestRef.current = { title, desc, status, priority, dueDate, groups, taskId: task?.id };
+  });
+
+  // Reset local state when a new task is opened
   useEffect(() => {
     if (!task) return;
     setTitle(task.title);
@@ -64,27 +77,65 @@ export default function TaskPanel({ task, onClose, onUpdate, onDelete, onArchive
     setGroups(parseGroups(task.subtasks));
   }, [task?.id]);
 
+  // Escape key closes modal
   useEffect(() => {
-    function handler(e: KeyboardEvent) { if (e.key === 'Escape') onClose(); }
+    function handler(e: KeyboardEvent) { if (e.key === 'Escape') handleClose(); }
     document.addEventListener('keydown', handler);
     return () => document.removeEventListener('keydown', handler);
-  }, [onClose]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   if (!task) return null;
 
-  async function saveField(patch: Parameters<typeof updateTask>[0]) {
-    setSaving(true);
-    const res = await updateTask(patch);
-    setSaving(false);
-    if (res.task) onUpdate(res.task);
+  // ── INSTANT CLOSE + BACKGROUND SAVE ──────────────────────────────────────
+  function handleClose() {
+    // 1. Close modal IMMEDIATELY — zero lag, zero UI freeze
+    onClose();
+
+    // 2. Notify parent of latest state for optimistic UI update
+    const { title: t, desc: d, status: s, priority: p, dueDate: dd, groups: g } = latestRef.current;
+    onUpdate({
+      id: task!.id,
+      title: t,
+      description: d,
+      status: s,
+      priority: p,
+      dueDate: dd || null,
+      subtasks: g as unknown as Task['subtasks'],
+    });
+
+    // 3. Save to Supabase in the background (fire-and-forget)
+    supabase.from('tasks').update({
+      title: t,
+      description: d,
+      status: s,
+      priority: p,
+      due_date: dd || null,
+      subtasks: g,
+    }).eq('id', task!.id).then(({ error }) => {
+      if (error) console.error('Background save failed:', error.message);
+    });
   }
 
-  async function saveGroups(updated: ChecklistGroup[]) {
+  // ── IMMEDIATE FIELD SAVES (status, priority, dueDate — user expects instant feedback) ──
+  function saveFieldImmediate(patch: Record<string, unknown>) {
+    setBgSaving(true);
+    supabase.from('tasks').update(patch).eq('id', task!.id).then(({ error }) => {
+      setBgSaving(false);
+      if (error) console.error('Field save failed:', error.message);
+    });
+  }
+
+  // ── CHECKLIST HELPERS ────────────────────────────────────────────────────
+  function saveGroupsToDb(updated: ChecklistGroup[]) {
+    supabase.from('tasks').update({ subtasks: updated }).eq('id', task!.id).then(({ error }) => {
+      if (error) console.error('Checklist save failed:', error.message);
+    });
+  }
+  function saveGroups(updated: ChecklistGroup[]) {
     setGroups(updated);
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    await saveField({ id: task!.id, subtasks: updated as any });
+    saveGroupsToDb(updated);
   }
-
   function addGroup() {
     const g: ChecklistGroup = { id: `g_${Date.now()}`, title: '', items: [] };
     saveGroups([...groups, g]);
@@ -101,6 +152,7 @@ export default function TaskPanel({ task, onClose, onUpdate, onDelete, onArchive
     saveGroups(groups.map(g => g.id === gid ? { ...g, items: [...g.items, item] } : g));
   }
   function updateItemText(gid: string, iid: string, val: string) {
+    // Local only — save on blur
     setGroups(groups.map(g => g.id === gid ? { ...g, items: g.items.map(i => i.id === iid ? { ...i, text: val } : i) } : g));
   }
   function saveItemText(gid: string, iid: string, val: string) {
@@ -128,19 +180,24 @@ export default function TaskPanel({ task, onClose, onUpdate, onDelete, onArchive
   const doneItems  = groups.reduce((s, g) => s + g.items.filter(i => i.isCompleted).length, 0);
 
   return (
-    <div className="vip-modal-overlay" onClick={onClose}>
+    <div className="vip-modal-overlay" onClick={handleClose}>
       <div className="vip-modal-container" dir="rtl" onClick={e => e.stopPropagation()}>
 
         {/* SIDEBAR */}
         <div className="vip-modal-sidebar">
           <div style={{ display: 'flex', justifyContent: 'flex-start' }}>
-            <button onClick={onClose} style={{ background: '#E2E8F0', color: '#475569', border: 'none', borderRadius: '50%', width: '36px', height: '36px', cursor: 'pointer', fontWeight: 'bold', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '16px' }}>✕</button>
+            <button onClick={handleClose} style={{ background: '#E2E8F0', color: '#475569', border: 'none', borderRadius: '50%', width: '36px', height: '36px', cursor: 'pointer', fontWeight: 'bold', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '16px' }}>✕</button>
           </div>
 
           <div className="vip-meta-section">
             <span className="vip-meta-label">🚀 الحالة</span>
             <select className="vip-meta-badge" value={status}
-              onChange={e => { const v = e.target.value as TaskStatus; setStatus(v); saveField({ id: task!.id, status: v }); }}
+              onChange={e => {
+                const v = e.target.value as TaskStatus;
+                setStatus(v);
+                saveFieldImmediate({ status: v });
+                onUpdate({ id: task!.id, status: v }); // optimistic parent update
+              }}
               style={{ background: activeStatus.bg, color: activeStatus.color, borderColor: activeStatus.color + '40' }}>
               {isHQ && hqCols
                 ? hqCols.map(col => <option key={col.id} value={col.id}>{col.name}</option>)
@@ -152,7 +209,12 @@ export default function TaskPanel({ task, onClose, onUpdate, onDelete, onArchive
           <div className="vip-meta-section">
             <span className="vip-meta-label">🔥 الأولوية</span>
             <select className="vip-meta-badge" value={priority}
-              onChange={e => { const v = e.target.value as TaskPriority; setPriority(v); saveField({ id: task!.id, priority: v }); }}
+              onChange={e => {
+                const v = e.target.value as TaskPriority;
+                setPriority(v);
+                saveFieldImmediate({ priority: v });
+                onUpdate({ id: task!.id, priority: v });
+              }}
               style={{ background: activePriority.bg, color: activePriority.color, borderColor: activePriority.color + '40' }}>
               {PRIORITY_OPTIONS.map(p => <option key={p.v} value={p.v}>{p.lbl}</option>)}
             </select>
@@ -161,7 +223,11 @@ export default function TaskPanel({ task, onClose, onUpdate, onDelete, onArchive
           <div className="vip-meta-section">
             <span className="vip-meta-label">📅 الموعد النهائي</span>
             <input type="date" className="vip-meta-badge" value={dueDate}
-              onChange={e => { setDueDate(e.target.value); saveField({ id: task!.id, dueDate: e.target.value || null }); }}
+              onChange={e => {
+                setDueDate(e.target.value);
+                saveFieldImmediate({ due_date: e.target.value || null });
+                onUpdate({ id: task!.id, dueDate: e.target.value || null });
+              }}
               style={{ fontFamily: 'inherit', cursor: 'pointer' }} />
           </div>
 
@@ -193,16 +259,21 @@ export default function TaskPanel({ task, onClose, onUpdate, onDelete, onArchive
 
         {/* MAIN CONTENT */}
         <div className="vip-modal-main">
+          {/* Title — local only, saved on blur */}
           <textarea className="vip-task-title-input" value={title}
             onChange={e => setTitle(e.target.value)}
-            onBlur={e => { if (e.target.value.trim() !== task.title) saveField({ id: task!.id, title: e.target.value.trim() || task.title }); }}
+            onBlur={e => {
+              const v = e.target.value.trim() || task.title;
+              if (v !== task.title) saveFieldImmediate({ title: v });
+            }}
             placeholder="عنوان المهمة..." rows={2} />
 
           <div>
             <div className="vip-modal-section-title">📝 الوصف والتفاصيل</div>
+            {/* Description — local only, saved on blur — NO onChange to parent */}
             <textarea className="vip-task-desc-input" value={desc}
               onChange={e => setDesc(e.target.value)}
-              onBlur={e => saveField({ id: task!.id, description: e.target.value })}
+              onBlur={e => saveFieldImmediate({ description: e.target.value })}
               placeholder="أضف تفاصيل المهمة والروابط هنا..." />
           </div>
 
@@ -243,9 +314,10 @@ export default function TaskPanel({ task, onClose, onUpdate, onDelete, onArchive
             <button className="vip-modal-add-group-btn" onClick={addGroup}>+ إضافة مجموعة جديدة</button>
           </div>
 
-          {saving && (
-            <div style={{ position: 'fixed', bottom: '24px', left: '24px', background: '#1E293B', color: '#94A3B8', fontSize: '12px', fontWeight: 700, padding: '8px 16px', borderRadius: '8px', zIndex: 100000 }}>
-              جارٍ الحفظ...
+          {/* Background save indicator — subtle, non-blocking */}
+          {bgSaving && (
+            <div style={{ position: 'fixed', bottom: '24px', left: '24px', background: '#1E293B', color: '#94A3B8', fontSize: '12px', fontWeight: 700, padding: '8px 16px', borderRadius: '8px', zIndex: 100000, opacity: 0.8 }}>
+              ✓ جارٍ الحفظ...
             </div>
           )}
         </div>
