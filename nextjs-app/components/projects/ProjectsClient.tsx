@@ -255,6 +255,23 @@ export default function ProjectsClient({ initialTasks, brands }: Props) {
                                     {overdue  && <span className="vip-tag-overdue">⚠️ متأخر {Math.abs(daysLeft(task.dueDate))} يوم</span>}
                                     {!overdue && task.dueDate && <span className="vip-tag-due">🗓 {daysLeftLabel(task.dueDate)}</span>}
                                   </div>
+                                  {/* LATEST UPDATE BUBBLE (STICKY NOTE) */}
+                                  {task.latestUpdate && task.latestUpdate.trim() !== '' && (
+                                    <div style={{
+                                      marginTop: '10px',
+                                      padding: '8px 10px',
+                                      background: '#FEF3C7',
+                                      borderLeft: '3px solid #F59E0B',
+                                      borderRadius: '4px',
+                                      fontSize: '11px',
+                                      fontWeight: '800',
+                                      color: '#92400E',
+                                      lineHeight: '1.5'
+                                    }}>
+                                      <span style={{ marginRight: '6px' }}>💬</span>
+                                      {task.latestUpdate}
+                                    </div>
+                                  )}
                                   {/* CARD BADGES ROW */}
                                   {(() => {
                                     let total = 0, done = 0;

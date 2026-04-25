@@ -55,6 +55,7 @@ export default function TaskPanel({ task, onClose, onUpdate, onDelete, onArchive
   const [priority, setPriority] = useState<TaskPriority>('medium');
   const [dueDate, setDueDate]   = useState('');
   const [blockerReason, setBlockerReason] = useState<string>('');
+  const [latestUpdate, setLatestUpdate]   = useState<string>('');
   const [groups, setGroups]     = useState<ChecklistGroup[]>([]);
   const [bgSaving, setBgSaving] = useState(false); // background save indicator only
 
@@ -62,9 +63,9 @@ export default function TaskPanel({ task, onClose, onUpdate, onDelete, onArchive
   const supabase = useMemo(() => createBrowserClient(), []);
 
   // Ref to always have latest values for background save on close
-  const latestRef = useRef({ title, desc, status, priority, dueDate, groups, blockerReason, taskId: task?.id });
+  const latestRef = useRef({ title, desc, status, priority, dueDate, groups, blockerReason, latestUpdate, taskId: task?.id });
   useEffect(() => {
-    latestRef.current = { title, desc, status, priority, dueDate, groups, blockerReason, taskId: task?.id };
+    latestRef.current = { title, desc, status, priority, dueDate, groups, blockerReason, latestUpdate, taskId: task?.id };
   });
 
   // Reset local state when a new task is opened
@@ -77,6 +78,7 @@ export default function TaskPanel({ task, onClose, onUpdate, onDelete, onArchive
     setDueDate(task.dueDate ?? '');
     setGroups(parseGroups(task.subtasks));
     setBlockerReason(task.blockerReason ?? '');
+    setLatestUpdate(task.latestUpdate ?? '');
   }, [task?.id]);
 
   // Escape key closes modal
@@ -96,6 +98,8 @@ export default function TaskPanel({ task, onClose, onUpdate, onDelete, onArchive
 
     // 2. Notify parent of latest state for optimistic UI update
     const { title: t, desc: d, status: s, priority: p, dueDate: dd, groups: g } = latestRef.current;
+    const br = latestRef.current.blockerReason;
+    const lu = latestRef.current.latestUpdate;
     onUpdate({
       id: task!.id,
       title: t,
@@ -104,10 +108,10 @@ export default function TaskPanel({ task, onClose, onUpdate, onDelete, onArchive
       priority: p,
       dueDate: dd || null,
       subtasks: g as unknown as Task['subtasks'],
+      latestUpdate: lu || null,
     });
 
     // 3. Save to Supabase in the background (fire-and-forget)
-    const br = latestRef.current.blockerReason;
     supabase.from('tasks').update({
       title: t,
       description: d,
@@ -116,6 +120,7 @@ export default function TaskPanel({ task, onClose, onUpdate, onDelete, onArchive
       due_date: dd || null,
       subtasks: g,
       blocker_reason: br || null,
+      latest_update: lu || null,
     }).eq('id', task!.id).then(({ error }) => {
       if (error) console.error('Background save failed:', error.message);
     });
@@ -253,6 +258,24 @@ export default function TaskPanel({ task, onClose, onUpdate, onDelete, onArchive
               />
             </div>
           )}
+          {/* ── LATEST UPDATE / QUICK NOTE ── */}
+          <div style={{ marginTop: '4px', padding: '12px', background: '#FFFBEB', borderRadius: '10px', border: '1px solid #FDE68A' }}>
+            <label style={{ display: 'block', fontSize: '11px', fontWeight: '900', color: '#D97706', marginBottom: '8px', letterSpacing: '0.5px' }}>
+              💬 آخر تطور / ملاحظة سريعة (يظهر خارج المهمة)
+            </label>
+            <input
+              type="text"
+              value={latestUpdate}
+              onChange={e => setLatestUpdate(e.target.value)}
+              onBlur={e => {
+                const v = e.target.value;
+                saveFieldImmediate({ latest_update: v || null });
+                onUpdate({ id: task!.id, latestUpdate: v || null });
+              }}
+              placeholder="مثال: تم عرض الفكرة على الجوزاء وبانتظار رأيها..."
+              style={{ width: '100%', padding: '10px', borderRadius: '8px', border: '1px dashed #FCD34D', fontSize: '12px', outline: 'none', background: '#FFFFFF', color: '#92400E', fontFamily: 'inherit', boxSizing: 'border-box' }}
+            />
+          </div>
 
           {totalItems > 0 && (
             <div className="vip-meta-section">

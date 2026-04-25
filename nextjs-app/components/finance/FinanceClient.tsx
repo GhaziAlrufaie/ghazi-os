@@ -176,7 +176,7 @@ export default function FinanceClient({ initialTasks, expenses }: Props) {
     const newTask: Task = {
       id: tempId, title, description: '', status: colId,
       priority: 'medium', dueDate: null, brandId: null,
-      projectId: null, sortOrder: 0, hasDescription: false, subtasks: [], blockerReason: null,
+      projectId: null, sortOrder: 0, hasDescription: false, subtasks: [], blockerReason: null, latestUpdate: null,
     };
     setTasks(prev => [...prev, newTask]);
     setQuickAdd(prev => ({ ...prev, [colId]: '' }));

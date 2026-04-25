@@ -331,6 +331,23 @@ function TaskCard({ task, project, index, onArchive, onDelete, onClick }: TaskCa
               )}
             </div>
           )}
+          {/* LATEST UPDATE BUBBLE (STICKY NOTE) */}
+          {task.latestUpdate && task.latestUpdate.trim() !== '' && (
+            <div style={{
+              marginTop: '10px',
+              padding: '8px 10px',
+              background: '#FEF3C7',
+              borderLeft: '3px solid #F59E0B',
+              borderRadius: '4px',
+              fontSize: '11px',
+              fontWeight: '800',
+              color: '#92400E',
+              lineHeight: '1.5'
+            }}>
+              <span style={{ marginRight: '6px' }}>💬</span>
+              {task.latestUpdate}
+            </div>
+          )}
           {task.status === 'on_hold' && task.blockerReason && (
             <div style={{ padding: '6px 8px', marginTop: '8px', background: '#FEF2F2', border: '1px solid #FECACA', borderRadius: '8px', display: 'flex', alignItems: 'flex-start', gap: '6px' }}>
               <span style={{ fontSize: '13px', flexShrink: 0 }}>🛑</span>

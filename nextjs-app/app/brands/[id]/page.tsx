@@ -55,6 +55,7 @@ async function getBrandTasks(brandId: string): Promise<Task[]> {
     subtasks: Array.isArray(r.subtasks) ? r.subtasks : [],
     subtask_groups: Array.isArray(r.subtask_groups) ? r.subtask_groups : undefined,
     blockerReason: (r.blocker_reason ?? null) as string | null,
+    latestUpdate: (r.latest_update ?? null) as string | null,
   }));
 }
 
