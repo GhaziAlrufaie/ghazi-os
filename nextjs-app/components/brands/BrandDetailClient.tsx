@@ -295,6 +295,12 @@ function TaskCard({ task, project, index, onArchive, onDelete, onClick }: TaskCa
             {!overdue && task.dueDate && <span className="vip-tag-due">🗓 {dueLabel}</span>}
             {task.hasDescription && <span className="vip-tag">📝</span>}
           </div>
+          {task.status === 'on_hold' && task.blockerReason && (
+            <div style={{ padding: '6px 8px', background: '#FEF2F2', border: '1px solid #FECACA', borderRadius: '8px', display: 'flex', alignItems: 'flex-start', gap: '6px' }}>
+              <span style={{ fontSize: '13px', flexShrink: 0 }}>🛑</span>
+              <span style={{ fontSize: '11px', fontWeight: '900', color: '#991B1B', lineHeight: '1.4' }}>{task.blockerReason}</span>
+            </div>
+          )}
         </div>
       )}
     </Draggable>

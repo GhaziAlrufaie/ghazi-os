@@ -54,6 +54,7 @@ export default function TaskPanel({ task, onClose, onUpdate, onDelete, onArchive
   const [status, setStatus]     = useState<TaskStatus>('todo');
   const [priority, setPriority] = useState<TaskPriority>('medium');
   const [dueDate, setDueDate]   = useState('');
+  const [blockerReason, setBlockerReason] = useState<string>('');
   const [groups, setGroups]     = useState<ChecklistGroup[]>([]);
   const [bgSaving, setBgSaving] = useState(false); // background save indicator only
 
@@ -61,9 +62,9 @@ export default function TaskPanel({ task, onClose, onUpdate, onDelete, onArchive
   const supabase = useMemo(() => createBrowserClient(), []);
 
   // Ref to always have latest values for background save on close
-  const latestRef = useRef({ title, desc, status, priority, dueDate, groups, taskId: task?.id });
+  const latestRef = useRef({ title, desc, status, priority, dueDate, groups, blockerReason, taskId: task?.id });
   useEffect(() => {
-    latestRef.current = { title, desc, status, priority, dueDate, groups, taskId: task?.id };
+    latestRef.current = { title, desc, status, priority, dueDate, groups, blockerReason, taskId: task?.id };
   });
 
   // Reset local state when a new task is opened
@@ -75,6 +76,7 @@ export default function TaskPanel({ task, onClose, onUpdate, onDelete, onArchive
     setPriority(task.priority);
     setDueDate(task.dueDate ?? '');
     setGroups(parseGroups(task.subtasks));
+    setBlockerReason(task.blockerReason ?? '');
   }, [task?.id]);
 
   // Escape key closes modal
@@ -105,6 +107,7 @@ export default function TaskPanel({ task, onClose, onUpdate, onDelete, onArchive
     });
 
     // 3. Save to Supabase in the background (fire-and-forget)
+    const br = latestRef.current.blockerReason;
     supabase.from('tasks').update({
       title: t,
       description: d,
@@ -112,6 +115,7 @@ export default function TaskPanel({ task, onClose, onUpdate, onDelete, onArchive
       priority: p,
       due_date: dd || null,
       subtasks: g,
+      blocker_reason: br || null,
     }).eq('id', task!.id).then(({ error }) => {
       if (error) console.error('Background save failed:', error.message);
     });
@@ -230,6 +234,25 @@ export default function TaskPanel({ task, onClose, onUpdate, onDelete, onArchive
               }}
               style={{ fontFamily: 'inherit', cursor: 'pointer' }} />
           </div>
+          {status === 'on_hold' && (
+            <div style={{ marginTop: '4px', padding: '12px', background: '#FEF2F2', borderRadius: '10px', border: '1px dashed #FCA5A5' }}>
+              <label style={{ display: 'block', fontSize: '11px', fontWeight: '900', color: '#991B1B', marginBottom: '8px', letterSpacing: '0.5px' }}>
+                🛑 سبب التعليق (لماذا توقف العمل؟)
+              </label>
+              <input
+                type="text"
+                value={blockerReason}
+                onChange={e => setBlockerReason(e.target.value)}
+                onBlur={e => {
+                  const v = e.target.value;
+                  saveFieldImmediate({ blocker_reason: v || null });
+                  onUpdate({ id: task!.id, blockerReason: v || null });
+                }}
+                placeholder="مثال: بانتظار وصول شحنة الزيت من الخارج..."
+                style={{ width: '100%', padding: '10px', borderRadius: '8px', border: '1px solid #F87171', fontSize: '12px', outline: 'none', background: '#FFFFFF', color: '#7F1D1D', fontFamily: 'inherit', boxSizing: 'border-box' }}
+              />
+            </div>
+          )}
 
           {totalItems > 0 && (
             <div className="vip-meta-section">

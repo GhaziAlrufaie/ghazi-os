@@ -23,6 +23,7 @@ export interface Task {
   sortOrder: number;
   hasDescription: boolean;
   subtasks: SubtaskItem[];
+  blockerReason: string | null;
 }
 
 interface AddTaskInput {
@@ -48,13 +49,14 @@ interface UpdateTaskInput {
   dueDate?: string | null;
   sortOrder?: number;
   subtasks?: SubtaskItem[];
+  blockerReason?: string | null;
 }
 
 export async function getTasks(): Promise<Task[]> {
   const supabase = createServerClient();
   const { data } = await supabase
     .from('tasks')
-    .select('id,title,description,status,priority,due_date,brand_id,project_id,sort_order,subtasks')
+    .select('id,title,description,status,priority,due_date,brand_id,project_id,sort_order,subtasks,blocker_reason')
     .order('sort_order');
   return (data ?? []).map(r => ({
     id: r.id as string,
@@ -68,6 +70,7 @@ export async function getTasks(): Promise<Task[]> {
     sortOrder: (r.sort_order as number) ?? 0,
     hasDescription: !!((r.description as string)?.trim()),
     subtasks: Array.isArray(r.subtasks) ? (r.subtasks as SubtaskItem[]) : [],
+    blockerReason: (r.blocker_reason as string | null) ?? null,
   }));
 }
 
@@ -76,7 +79,7 @@ export async function getIdeasTasks(): Promise<Task[]> {
   const supabase = createServerClient();
   const { data } = await supabase
     .from('tasks')
-    .select('id,title,description,status,priority,due_date,brand_id,project_id,sort_order,subtasks')
+    .select('id,title,description,status,priority,due_date,brand_id,project_id,sort_order,subtasks,blocker_reason')
     .in('status', ['ideas', 'projects'])
     .order('sort_order');
   return (data ?? []).map(r => ({
@@ -91,6 +94,7 @@ export async function getIdeasTasks(): Promise<Task[]> {
     sortOrder: (r.sort_order as number) ?? 0,
     hasDescription: !!((r.description as string)?.trim()),
     subtasks: Array.isArray(r.subtasks) ? (r.subtasks as SubtaskItem[]) : [],
+    blockerReason: (r.blocker_reason as string | null) ?? null,
   }));
 }
 
@@ -116,7 +120,7 @@ export async function addTask(
       project_id: input.projectId ?? null,
       sort_order: 0,
     })
-    .select('id,title,description,status,priority,due_date,brand_id,project_id,sort_order,subtasks')
+    .select('id,title,description,status,priority,due_date,brand_id,project_id,sort_order,subtasks,blocker_reason')
     .single();
 
   if (error) return { error: error.message };
@@ -135,6 +139,7 @@ export async function addTask(
       sortOrder: data.sort_order ?? 0,
       hasDescription: !!(data.description?.trim()),
       subtasks: Array.isArray(data.subtasks) ? (data.subtasks as SubtaskItem[]) : [],
+      blockerReason: (data.blocker_reason as string | null) ?? null,
     },
   };
 }
@@ -152,12 +157,13 @@ export async function updateTask(
   if (input.dueDate !== undefined)     patch.due_date = input.dueDate;
   if (input.sortOrder !== undefined)   patch.sort_order = input.sortOrder;
   if (input.subtasks !== undefined)    patch.subtasks = input.subtasks;
+  if (input.blockerReason !== undefined) patch.blocker_reason = input.blockerReason;
 
   const { data, error } = await supabase
     .from('tasks')
     .update(patch)
     .eq('id', input.id)
-    .select('id,title,description,status,priority,due_date,brand_id,project_id,sort_order,subtasks')
+    .select('id,title,description,status,priority,due_date,brand_id,project_id,sort_order,subtasks,blocker_reason')
     .single();
 
   if (error) return { error: error.message };
@@ -176,6 +182,7 @@ export async function updateTask(
       sortOrder: data.sort_order ?? 0,
       hasDescription: !!(data.description?.trim()),
       subtasks: Array.isArray(data.subtasks) ? (data.subtasks as SubtaskItem[]) : [],
+      blockerReason: (data.blocker_reason as string | null) ?? null,
     },
   };
 }
@@ -211,7 +218,7 @@ export async function getFinanceTasks(): Promise<Task[]> {
   const supabase = createServerClient();
   const { data } = await supabase
     .from('tasks')
-    .select('id,title,description,status,priority,due_date,brand_id,project_id,sort_order,category,subtasks')
+    .select('id,title,description,status,priority,due_date,brand_id,project_id,sort_order,category,subtasks,blocker_reason')
     .eq('category', 'financial')
     .order('sort_order');
   return (data ?? []).map(r => ({
@@ -226,6 +233,7 @@ export async function getFinanceTasks(): Promise<Task[]> {
     sortOrder: (r.sort_order as number) ?? 0,
     hasDescription: !!((r.description as string)?.trim()),
     subtasks: Array.isArray(r.subtasks) ? (r.subtasks as SubtaskItem[]) : [],
+    blockerReason: (r.blocker_reason as string | null) ?? null,
   }));
 }
 
@@ -247,7 +255,7 @@ export async function addFinanceTask(
       sort_order: 0,
       category: 'financial',
     })
-    .select('id,title,description,status,priority,due_date,brand_id,project_id,sort_order,subtasks')
+    .select('id,title,description,status,priority,due_date,brand_id,project_id,sort_order,subtasks,blocker_reason')
     .single();
   if (error) return { error: error.message };
   revalidatePath('/', 'layout');
@@ -264,6 +272,7 @@ export async function addFinanceTask(
       sortOrder: data.sort_order ?? 0,
       hasDescription: !!(data.description?.trim()),
       subtasks: [],
+      blockerReason: null,
     },
   };
 }
