@@ -279,7 +279,7 @@ function TaskCard({ task, project, index, onArchive, onDelete, onClick }: TaskCa
           {...provided.dragHandleProps}
           className={`vip-task-card${snapshot.isDragging ? ' dragging' : ''}`}
           onClick={() => onClick(task)}
-          style={{ ...provided.draggableProps.style, cursor: 'pointer' }}>
+          style={{ marginBottom: '12px', ...provided.draggableProps.style, cursor: 'pointer' }}>
           <div className="ptc-actions" onClick={(e) => e.stopPropagation()}>
             <button className="ptc-btn arch" title="أرشفة" onClick={() => onArchive(task.id)}>🗄️</button>
             <button className="ptc-btn del"  title="حذف"   onClick={() => onDelete(task.id)}>🗑️</button>
@@ -347,7 +347,7 @@ function KanbanCol({ col, tasks, projects, brandId, activeProjectId, onArchive, 
             ref={provided.innerRef}
             {...provided.droppableProps}
             className={`vip-tasks-container${snapshot.isDraggingOver ? ' vip-kanban-drag-over' : ''}`}
-            style={{ display: 'flex', flexDirection: 'column', gap: '12px', minHeight: 150, padding: '10px 12px' }}>
+            style={{ display: 'flex', flexDirection: 'column', minHeight: 150, padding: '10px 12px' }}>
             {tasks.map((task, index) => (
               <TaskCard
                 key={task.id}
@@ -454,61 +454,49 @@ export default function BrandDetailClient({ brand: initialBrand, initialTasks, i
   // Browser-side Supabase client for DnD (avoids Server Action revalidation delay)
   const supabaseBrowser = useMemo(() => createBrowserClient(), []);
 
-  const onDragEnd = useCallback(async (result: DropResult) => {
-    const { draggableId, source, destination } = result;
+  const onDragEnd = useCallback(async (result: any) => {
+    const { source, destination } = result;
     if (!destination) return;
-    if (source.droppableId === destination.droppableId && source.index === destination.index) return;
-
-    const newStatus = destination.droppableId as TaskStatus;
-    const prevTasks = [...tasks];
-
-    // Deep clone and locate dragged task
-    const newTasks: Task[] = JSON.parse(JSON.stringify(tasks));
-    const draggedTask = newTasks.find((t) => t.id === draggableId);
-    if (!draggedTask) return;
-
-    // Update status to destination column
-    draggedTask.status = newStatus;
-
-    // Get destination column tasks sorted by sortOrder (excluding dragged)
-    const destTasks = newTasks
-      .filter((t) => t.status === newStatus && t.id !== draggableId)
-      .sort((a, b) => (a.sortOrder ?? 0) - (b.sortOrder ?? 0));
-
-    // Insert dragged task at exact destination index
-    destTasks.splice(destination.index, 0, draggedTask);
-
-    // Reassign sortOrder sequentially for destination column
-    const updatesToSync: { id: string; status: TaskStatus; sortOrder: number }[] = [];
-    destTasks.forEach((task, index) => {
-      task.sortOrder = index;
-      updatesToSync.push({ id: task.id, status: task.status, sortOrder: index });
-    });
-
-    // Merge back into main tasks array
-    const merged = newTasks.map((t) => {
-      const updated = destTasks.find((dt) => dt.id === t.id);
-      return updated ?? t;
-    });
-
-    // OPTIMISTIC UI UPDATE — instant
-    setTasks(merged);
-
-    // SUPABASE SYNC — update all affected tasks in destination column
-    try {
-      for (const upd of updatesToSync) {
-        const { error } = await supabaseBrowser
-          .from('tasks')
-          .update({ status: upd.status, sort_order: upd.sortOrder })
-          .eq('id', upd.id);
-        if (error) throw error;
-      }
-    } catch (err: unknown) {
-      const errMsg = err instanceof Error ? err.message : String(err);
-      console.error('DnD Position Sync Failed:', errMsg);
-      setTasks(prevTasks);
-      alert(`❌ فشل حفظ الترتيب في السيرفر: ${errMsg}`);
+    if (destination.droppableId === source.droppableId && destination.index === source.index) return;
+    // 1. Clone flat array safely
+    const currentTasks = Array.from(tasks);
+    // === CASE A: MOVING WITHIN THE SAME COLUMN ===
+    if (source.droppableId === destination.droppableId) {
+      // Isolate tasks for this column and sort them to match UI
+      const colTasks = currentTasks.filter((t: any) => t.status === source.droppableId);
+      colTasks.sort((a: any, b: any) => (a.sortOrder || 0) - (b.sortOrder || 0));
+      // Move the item locally
+      const [movedTask] = colTasks.splice(source.index, 1);
+      colTasks.splice(destination.index, 0, movedTask);
+      // Update positions
+      colTasks.forEach((t: any, idx: number) => { t.sortOrder = idx; });
+      // Merge and update UI instantly (PREVENTS SNAPBACK)
+      const otherTasks = currentTasks.filter((t: any) => t.status !== source.droppableId);
+      setTasks([...otherTasks, ...colTasks]);
+      // Sync to DB
+      try {
+        for (const t of colTasks) {
+          await supabaseBrowser.from('tasks').update({ sort_order: t.sortOrder }).eq('id', t.id);
+        }
+      } catch (err) { console.error('DnD sync error:', err); }
+      return;
     }
+    // === CASE B: MOVING TO A DIFFERENT COLUMN ===
+    const sourceCol = currentTasks.filter((t: any) => t.status === source.droppableId).sort((a: any, b: any) => (a.sortOrder || 0) - (b.sortOrder || 0));
+    const destCol = currentTasks.filter((t: any) => t.status === destination.droppableId).sort((a: any, b: any) => (a.sortOrder || 0) - (b.sortOrder || 0));
+    const [movedTask] = sourceCol.splice(source.index, 1);
+    movedTask.status = destination.droppableId; // update status
+    destCol.splice(destination.index, 0, movedTask);
+    destCol.forEach((t: any, idx: number) => { t.sortOrder = idx; });
+    sourceCol.forEach((t: any, idx: number) => { t.sortOrder = idx; });
+    const otherTasks = currentTasks.filter((t: any) => t.status !== source.droppableId && t.status !== destination.droppableId);
+    setTasks([...otherTasks, ...sourceCol, ...destCol]); // Instant UI Update
+    try {
+      const updates = [...destCol, ...sourceCol];
+      for (const t of updates) {
+        await supabaseBrowser.from('tasks').update({ status: t.status, sort_order: t.sortOrder }).eq('id', t.id);
+      }
+    } catch (err) { console.error('DnD sync error:', err); }
   }, [tasks, supabaseBrowser]);
 
   // ── Task actions ──
