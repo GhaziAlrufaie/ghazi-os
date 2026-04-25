@@ -338,7 +338,7 @@ function KanbanCol({ col, tasks, projects, brandId, activeProjectId, onArchive, 
             ref={provided.innerRef}
             {...provided.droppableProps}
             className={`vip-tasks-container${snapshot.isDraggingOver ? ' vip-kanban-drag-over' : ''}`}
-            style={{ minHeight: 80 }}>
+            style={{ display: 'flex', flexDirection: 'column', gap: '12px', minHeight: 150, padding: '10px 12px' }}>
             {tasks.map((task, index) => (
               <TaskCard
                 key={task.id}
@@ -501,10 +501,11 @@ export default function BrandDetailClient({ brand: initialBrand, initialTasks, i
   }
   function handleAdd(task: Task) { setTasks((prev) => [...prev, task]); }
   function handleUpdate(patch: Partial<Task>) {
-    if (!panelTask) return;
-    const updated = { ...panelTask, ...patch };
-    setTasks((prev) => prev.map((t) => t.id === updated.id ? updated : t));
-    setPanelTask(updated);
+    // Update tasks array for optimistic UI — do NOT call setPanelTask here
+    // because calling setPanelTask after onClose() would re-open the modal!
+    const id = patch.id ?? panelTask?.id;
+    if (!id) return;
+    setTasks((prev) => prev.map((t) => t.id === id ? { ...t, ...patch } : t));
   }
 
   // ── Brand actions ──
