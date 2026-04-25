@@ -82,24 +82,45 @@ export default function ProjectsClient({ initialTasks, brands }: Props) {
     if (source.droppableId === destination.droppableId && source.index === destination.index) return;
 
     const newStatus = destination.droppableId as TaskStatus;
-    const taskId = draggableId;
-    const prevTasks = tasks;
+    const prevTasks = [...tasks];
 
-    // OPTIMISTIC UI UPDATE — instant, no blurry state
-    setTasks(prev =>
-      prev.map(t => (t.id === taskId ? { ...t, status: newStatus } : t))
-    );
+    const newTasks: Task[] = JSON.parse(JSON.stringify(tasks));
+    const draggedTask = newTasks.find((t) => t.id === draggableId);
+    if (!draggedTask) return;
 
-    // DIRECT SUPABASE SYNC (browser client — no revalidatePath, no page reload)
+    draggedTask.status = newStatus;
+
+    const destTasks = newTasks
+      .filter((t) => t.status === newStatus && t.id !== draggableId)
+      .sort((a, b) => (a.sortOrder ?? 0) - (b.sortOrder ?? 0));
+
+    destTasks.splice(destination.index, 0, draggedTask);
+
+    const updatesToSync: { id: string; status: TaskStatus; sortOrder: number }[] = [];
+    destTasks.forEach((task, index) => {
+      task.sortOrder = index;
+      updatesToSync.push({ id: task.id, status: task.status, sortOrder: index });
+    });
+
+    const merged = newTasks.map((t) => {
+      const updated = destTasks.find((dt) => dt.id === t.id);
+      return updated ?? t;
+    });
+
+    setTasks(merged);
+
     try {
-      const { error } = await supabaseBrowser
-        .from('tasks')
-        .update({ status: newStatus })
-        .eq('id', taskId);
-      if (error) throw error;
+      for (const upd of updatesToSync) {
+        const { error } = await supabaseBrowser
+          .from('tasks')
+          .update({ status: upd.status, sort_order: upd.sortOrder })
+          .eq('id', upd.id);
+        if (error) throw error;
+      }
     } catch (err: unknown) {
-      console.error('DnD DB Update Failed:', err);
+      console.error('DnD Position Sync Failed:', err);
       setTasks(prevTasks);
+      alert('❌ فشل حفظ الترتيب في السيرفر.');
     }
   }, [tasks, supabaseBrowser]);
 

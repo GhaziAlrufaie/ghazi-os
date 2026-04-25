@@ -456,33 +456,58 @@ export default function BrandDetailClient({ brand: initialBrand, initialTasks, i
 
   const onDragEnd = useCallback(async (result: DropResult) => {
     const { draggableId, source, destination } = result;
-    // 1. Invalid drop
     if (!destination) return;
     if (source.droppableId === destination.droppableId && source.index === destination.index) return;
 
-    const newStatus = destination.droppableId as TaskStatus; // TaskStatus now includes HQ custom statuses
-    const taskId = draggableId;
-    const prevTasks = tasks;
+    const newStatus = destination.droppableId as TaskStatus;
+    const prevTasks = [...tasks];
 
-    // 2. OPTIMISTIC UI UPDATE — instant, no blurry state
-    setTasks((prev) =>
-      prev.map((t) => (t.id === taskId ? { ...t, status: newStatus as TaskStatus } : t))
-    );
+    // Deep clone and locate dragged task
+    const newTasks: Task[] = JSON.parse(JSON.stringify(tasks));
+    const draggedTask = newTasks.find((t) => t.id === draggableId);
+    if (!draggedTask) return;
 
-    // 3. DIRECT SUPABASE SYNC (browser client — no revalidatePath, no page reload)
+    // Update status to destination column
+    draggedTask.status = newStatus;
+
+    // Get destination column tasks sorted by sortOrder (excluding dragged)
+    const destTasks = newTasks
+      .filter((t) => t.status === newStatus && t.id !== draggableId)
+      .sort((a, b) => (a.sortOrder ?? 0) - (b.sortOrder ?? 0));
+
+    // Insert dragged task at exact destination index
+    destTasks.splice(destination.index, 0, draggedTask);
+
+    // Reassign sortOrder sequentially for destination column
+    const updatesToSync: { id: string; status: TaskStatus; sortOrder: number }[] = [];
+    destTasks.forEach((task, index) => {
+      task.sortOrder = index;
+      updatesToSync.push({ id: task.id, status: task.status, sortOrder: index });
+    });
+
+    // Merge back into main tasks array
+    const merged = newTasks.map((t) => {
+      const updated = destTasks.find((dt) => dt.id === t.id);
+      return updated ?? t;
+    });
+
+    // OPTIMISTIC UI UPDATE — instant
+    setTasks(merged);
+
+    // SUPABASE SYNC — update all affected tasks in destination column
     try {
-      const { error } = await supabaseBrowser
-        .from('tasks')
-        .update({ status: newStatus })
-        .eq('id', taskId);
-      if (error) throw error;
+      for (const upd of updatesToSync) {
+        const { error } = await supabaseBrowser
+          .from('tasks')
+          .update({ status: upd.status, sort_order: upd.sortOrder })
+          .eq('id', upd.id);
+        if (error) throw error;
+      }
     } catch (err: unknown) {
       const errMsg = err instanceof Error ? err.message : String(err);
-      console.error('DnD DB Update Failed:', errMsg);
-      // Rollback optimistic update on failure
+      console.error('DnD Position Sync Failed:', errMsg);
       setTasks(prevTasks);
-      // Alert user so they know the save failed (helps diagnose DB constraint issues)
-      alert(`❌ فشل الحفظ في السيرفر: ${errMsg}\n(قد يكون هناك قيد CHECK على عمود status في قاعدة البيانات)`);
+      alert(`❌ فشل حفظ الترتيب في السيرفر: ${errMsg}`);
     }
   }, [tasks, supabaseBrowser]);
 
