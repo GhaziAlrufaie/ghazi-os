@@ -20,12 +20,12 @@ import AddTaskModal from './AddTaskModal';
 import { useGlobal } from '@/components/GlobalProviders';
 
 // ─── Constants ────────────────────────────────────────────────────────────────
-const KANBAN_COLS: { id: TaskStatus; name: string; color: string }[] = [
-  { id: 'ideas',       name: '💡 أفكار',     color: '#8B5CF6' },
-  { id: 'todo',        name: 'قيد الانتظار', color: '#3B82F6' },
-  { id: 'in_progress', name: 'جاري التنفيذ', color: '#C9A84C' },
-  { id: 'on_hold',     name: 'معلق',         color: '#F97316' },
-  { id: 'done',        name: 'منجز',         color: '#10B981' },
+const KANBAN_COLS: { id: TaskStatus; name: string; color: string; subtitle: string }[] = [
+  { id: 'ideas',       name: '💡 أفكار',        color: '#8B5CF6', subtitle: 'مسودات ومقترحات للمستقبل' },
+  { id: 'todo',        name: '📋 طابور المهام', color: '#3B82F6', subtitle: 'مهام معتمدة تنتظر التنفيذ' },
+  { id: 'in_progress', name: '🚀 جاري التنفيذ', color: '#C9A84C', subtitle: 'العمل جارٍ عليها هذه اللحظة' },
+  { id: 'on_hold',     name: '✋ معلق',          color: '#F97316', subtitle: 'متوقفة بسبب عائق خارجي' },
+  { id: 'done',        name: '✅ منجز',          color: '#10B981', subtitle: 'مهام منتهية ومغلقة' },
 ];
 
 // ─── HQ Lab (مختبر الأفكار) — Custom categorical columns ─────────────────────
@@ -39,7 +39,7 @@ const HQ_COLS: { id: string; name: string; color: string }[] = [
   { id: 'hq_archive',   name: '📦 أرشيف / تم الترحيل',       color: '#94A3B8' },
 ];
 // Standard statuses that get self-healed into hq_marketing when in HQ
-const HQ_LEGACY_STATUSES = ['ideas', 'todo', 'in_progress', 'on_hold', 'done', 'projects'];
+const HQ_LEGACY_STATUSES = ['ideas', 'todo', 'in_progress', 'on_hold', 'done', 'projects', 'قيد الانتظار', 'جاري التنفيذ', 'معلق', 'منجز', 'مكتمل'];
 
 const PRIORITY_COLORS: Record<TaskPriority, string> = {
   critical: '#EF4444',
@@ -336,6 +336,9 @@ function KanbanCol({ col, tasks, projects, brandId, activeProjectId, onArchive, 
           <span>{getColEmoji(col.id)}</span>
           <span>{col.name}</span>
         </h3>
+        {col.subtitle && (
+          <span style={{ display: 'block', fontSize: '11px', color: '#94A3B8', fontWeight: '600', marginTop: '4px', letterSpacing: '0.02em' }}>{col.subtitle}</span>
+        )}
         <div className="vip-column-count">{tasks.length}</div>
       </div>
       <Droppable droppableId={col.id}>
@@ -610,13 +613,12 @@ export default function BrandDetailClient({ brand: initialBrand, initialTasks, i
                 col={col as typeof KANBAN_COLS[0]}
                 tasks={visibleTasks.filter((t) => {
                   const s = t.status as string;
-                  if (isHQ) {
-                    // Self-healing: map legacy statuses to hq_marketing so tasks don't disappear
-                    if (col.id === 'hq_marketing' && HQ_LEGACY_STATUSES.includes(s)) return true;
-                    return s === col.id;
-                  }
-                  // Regular brand: self-heal legacy 'projects' status into أفكار
-                  return s === col.id || (col.id === 'ideas' && s === 'projects');
+                  if (col.id === 'todo') return s === 'todo' || s === 'قيد الانتظار';
+                  if (col.id === 'ideas') return s === 'ideas' || s === 'projects';
+                  if (col.id === 'in_progress') return s === 'in_progress' || s === 'جاري التنفيذ';
+                  if (col.id === 'on_hold') return s === 'on_hold' || s === 'معلق';
+                  if (col.id === 'done') return s === 'done' || s === 'منجز' || s === 'مكتمل';
+                  return s === col.id;
                 })}
                 projects={projects}
                 brandId={brand.id}

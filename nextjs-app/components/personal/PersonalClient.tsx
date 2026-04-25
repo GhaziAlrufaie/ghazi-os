@@ -14,8 +14,8 @@ import {
 import { useGlobal } from '@/components/GlobalProviders';
 
 // ─── Constants ────────────────────────────────────────────────────────────────
-const COLUMNS: { id: TaskStatus; name: string; emoji: string; color: string }[] = [
-  { id: 'todo',        name: 'قيد الانتظار', emoji: '📥', color: '#3B82F6' },
+const COLUMNS: { id: TaskStatus; name: string; emoji: string; color: string; subtitle?: string }[] = [
+  { id: 'todo',        name: '📋 طابور المهام', emoji: '📋', color: '#3B82F6', subtitle: 'مهام معتمدة تنتظر التنفيذ' },
   { id: 'in_progress', name: 'جاري التنفيذ', emoji: '🚀', color: '#F97316' },
   { id: 'on_hold',     name: 'معلق',          emoji: '✋', color: '#8B5CF6' },
   { id: 'done',        name: 'منجز',          emoji: '✅', color: '#10B981' },

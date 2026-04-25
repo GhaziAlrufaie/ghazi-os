@@ -17,9 +17,9 @@ import { updateTask, archiveTask, deleteTask } from '@/lib/tasks-actions';
 import TaskPanel from '@/components/brands/TaskPanel';
 
 // ─── Constants — MUST match BrandDetailClient exactly ─────────────────────────
-const KANBAN_COLS: { id: TaskStatus; name: string; color: string }[] = [
+const KANBAN_COLS: { id: TaskStatus; name: string; color: string; subtitle?: string }[] = [
   { id: 'ideas',       name: '💡 أفكار',     color: '#8B5CF6' },
-  { id: 'todo',        name: 'قيد الانتظار', color: '#3B82F6' },
+  { id: 'todo',        name: '📋 طابور المهام', color: '#3B82F6', subtitle: 'مهام معتمدة تنتظر التنفيذ' },
   { id: 'in_progress', name: 'جاري التنفيذ', color: '#C9A84C' },
   { id: 'on_hold',     name: 'معلق',         color: '#F97316' },
   { id: 'done',        name: 'منجز',         color: '#10B981' },
