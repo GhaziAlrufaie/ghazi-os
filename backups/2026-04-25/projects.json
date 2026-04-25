@@ -1,0 +1,108 @@
+[
+  {
+    "id": "x177475740557992wam",
+    "brand_id": "b1",
+    "title": "بكج العناية زي حق ام يزن",
+    "description": "",
+    "status": "planning",
+    "priority": "medium",
+    "start_date": "2026-03-29",
+    "target_date": null,
+    "progress": 0,
+    "tags": [],
+    "sort_order": 0,
+    "updated_at": "2026-04-06T01:04:56.122476+00:00"
+  },
+  {
+    "id": "x1774757445059ycf6m",
+    "brand_id": "b1",
+    "title": "مشروع المنظفات",
+    "description": "",
+    "status": "planning",
+    "priority": "medium",
+    "start_date": "2026-03-29",
+    "target_date": null,
+    "progress": 0,
+    "tags": [],
+    "sort_order": 0,
+    "updated_at": "2026-04-06T01:04:56.122476+00:00"
+  },
+  {
+    "id": "x177484615826932yb5",
+    "brand_id": "x17747068433191tevy",
+    "title": "مشاريع صفحات الهبوط",
+    "description": "",
+    "status": "planning",
+    "priority": "medium",
+    "start_date": "2026-03-30",
+    "target_date": null,
+    "progress": 0,
+    "tags": [],
+    "sort_order": 2,
+    "updated_at": "2026-04-06T01:04:56.122476+00:00"
+  },
+  {
+    "id": "x17747035979406xcj6",
+    "brand_id": "b3",
+    "title": "مشروع بيع براند غازي بوتيك",
+    "description": "",
+    "status": "planning",
+    "priority": "medium",
+    "start_date": "2026-03-28",
+    "target_date": null,
+    "progress": 0,
+    "tags": [],
+    "sort_order": 0,
+    "updated_at": "2026-04-06T01:04:56.122476+00:00"
+  },
+  {
+    "id": "p3",
+    "brand_id": "b1",
+    "title": "بكج سدرة الفاخر",
+    "description": "",
+    "status": "planning",
+    "priority": "medium",
+    "start_date": "2026-04-01",
+    "target_date": "2026-05-15",
+    "progress": 0,
+    "tags": [
+      "هدايا",
+      "موسمي"
+    ],
+    "sort_order": 0,
+    "updated_at": "2026-04-06T01:04:56.122476+00:00"
+  },
+  {
+    "id": "p1",
+    "brand_id": "b1",
+    "title": "إطلاق خط العناية الجديد",
+    "description": "",
+    "status": "planning",
+    "priority": "critical",
+    "start_date": "2026-03-01",
+    "target_date": "2026-04-30",
+    "progress": 0,
+    "tags": [
+      "عناية",
+      "منتج جديد"
+    ],
+    "sort_order": 0,
+    "updated_at": "2026-04-06T01:04:56.122476+00:00"
+  },
+  {
+    "id": "p6",
+    "brand_id": "b3",
+    "title": "حصريات النبش",
+    "description": "",
+    "status": "planning",
+    "priority": "high",
+    "start_date": "2026-03-05",
+    "target_date": "2026-03-25",
+    "progress": 0,
+    "tags": [
+      "حصريات"
+    ],
+    "sort_order": 0,
+    "updated_at": "2026-04-14T02:30:34.085078+00:00"
+  }
+]
