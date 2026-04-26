@@ -53,7 +53,7 @@ export default async function LeadershipPage() {
     supabase.from('inbox_tasks').select('id, text, created_at').order('created_at', { ascending: false }),
     supabase.from('events').select('id, title, day, month, year, brand_id').gte('day', new Date().getDate()).eq('month', new Date().getMonth() + 1).eq('year', new Date().getFullYear()).order('day'),
     supabase.from('salla_orders').select('total_amount').gte('created_at', `${todayStr}T00:00:00`).lte('created_at', `${todayStr}T23:59:59`),
-    supabase.from('daily_routines').select('id, title, meta, time_str, is_done, sort_order').order('sort_order'),
+    supabase.from('daily_routines').select('id, title, meta, time_str, is_done, sort_order, type').order('sort_order'),
   ]);
 
   // ── معالجة البيانات ──
@@ -204,6 +204,7 @@ export default async function LeadershipPage() {
     timeStr: (r.time_str as string) ?? '',
     isDone: (r.is_done as boolean) ?? false,
     sortOrder: (r.sort_order as number) ?? 0,
+    type: ((r.type as string) === 'weekly' ? 'weekly' : 'daily') as 'daily' | 'weekly',
   }));
 
   return (

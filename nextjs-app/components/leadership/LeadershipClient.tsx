@@ -26,7 +26,8 @@ import {
 } from '@/lib/weekly-focus-actions';
 import type { DecisionRow, EmployeeRow } from '@/lib/leadership-types';
 import {
-  addDailyRoutine, toggleDailyRoutine, updateDailyRoutineTime, deleteDailyRoutine,
+  addDailyRoutine, toggleDailyRoutine, deleteDailyRoutine,
+  resetRoutinesByType,
   type DailyRoutine,
 } from '@/lib/daily-routines-actions';
 
@@ -228,20 +229,165 @@ function WeeklyCompass({
   );
 }
 
-// ─── Daily Tasks ──────────────────────────────────────────────────────────────
-function DailyTasksSection({ routines: initialRoutines }: { routines: DailyRoutine[] }) {
-  const [routines, setRoutines] = useState<DailyRoutine[]>(initialRoutines);
-  const [showAddForm, setShowAddForm] = useState(false);
+// ─── CEO Cockpit — Routine Column ─────────────────────────────────────────────
+function RoutineColumn({
+  title, subtitle, icon, accentColor, checkColor, resetLabel,
+  routines, onToggle, onDelete, onAdd, onReset,
+}: {
+  title: string;
+  subtitle: string;
+  icon: string;
+  accentColor: string;
+  checkColor: string;
+  resetLabel: string;
+  routines: DailyRoutine[];
+  onToggle: (id: string, current: boolean) => void;
+  onDelete: (id: string) => void;
+  onAdd: (title: string) => void;
+  onReset: () => void;
+}) {
   const [newTitle, setNewTitle] = useState('');
-  const [newMeta, setNewMeta] = useState('');
-  const [newTime, setNewTime] = useState('');
-  const [editingTimeId, setEditingTimeId] = useState<string | null>(null);
-  const [editingTimeVal, setEditingTimeVal] = useState('');
-  const [, startTransition] = useTransition();
-
   const doneCount = routines.filter(r => r.isDone).length;
   const total = routines.length;
-  const pct = total > 0 ? Math.round((doneCount / total) * 100) : 0;
+
+  function handleKeyDown(e: React.KeyboardEvent<HTMLInputElement>) {
+    if (e.key === 'Enter') {
+      const t = newTitle.trim();
+      if (t) { onAdd(t); setNewTitle(''); }
+    }
+  }
+
+  function handleAddClick() {
+    const t = newTitle.trim();
+    if (t) { onAdd(t); setNewTitle(''); }
+  }
+
+  return (
+    <div style={{
+      background: '#FFFFFF',
+      padding: '24px',
+      borderRadius: '16px',
+      border: '1px solid #E2E8F0',
+      boxShadow: '0 4px 6px -1px rgba(0,0,0,0.03)',
+      display: 'flex',
+      flexDirection: 'column',
+      gap: 0,
+    }}>
+      {/* Header */}
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '16px' }}>
+        <div>
+          <h3 style={{ fontSize: '15px', fontWeight: 900, color: '#1E293B', margin: 0, marginBottom: 4 }}>
+            {icon} {title}
+          </h3>
+          <span style={{ fontSize: '11px', color: '#94A3B8' }}>{subtitle}</span>
+        </div>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+          <span style={{ fontSize: '11px', fontWeight: 700, color: accentColor }}>
+            {doneCount}/{total}
+          </span>
+          <button
+            onClick={onReset}
+            style={{
+              background: '#F8FAFC', border: '1px solid #E2E8F0', color: '#64748B',
+              fontSize: '11px', padding: '5px 10px', borderRadius: '6px',
+              cursor: 'pointer', fontWeight: 700, fontFamily: 'inherit',
+            }}
+          >🔄 {resetLabel}</button>
+        </div>
+      </div>
+
+      {/* Progress bar */}
+      {total > 0 && (
+        <div style={{ height: 4, background: '#F1F5F9', borderRadius: 4, marginBottom: 16, overflow: 'hidden' }}>
+          <div style={{
+            height: '100%',
+            width: `${Math.round((doneCount / total) * 100)}%`,
+            background: accentColor,
+            borderRadius: 4,
+            transition: 'width 0.3s ease',
+          }} />
+        </div>
+      )}
+
+      {/* Items — FLEX COLUMN to prevent horizontal wrapping */}
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', flex: 1 }}>
+        {routines.length === 0 && (
+          <div style={{ textAlign: 'center', color: '#CBD5E1', fontSize: 13, padding: '20px 0' }}>
+            لا توجد عناصر بعد
+          </div>
+        )}
+        {routines.map(r => (
+          <label
+            key={r.id}
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '12px',
+              cursor: 'pointer',
+              background: r.isDone ? '#F8FAFC' : '#F1F5F9',
+              padding: '11px 14px',
+              borderRadius: '10px',
+              transition: 'background 0.2s',
+              border: `1px solid ${r.isDone ? '#E2E8F0' : 'transparent'}`,
+              direction: 'rtl',
+            }}
+          >
+            <input
+              type="checkbox"
+              checked={r.isDone}
+              onChange={() => onToggle(r.id, r.isDone)}
+              style={{ width: 17, height: 17, accentColor: checkColor, cursor: 'pointer', flexShrink: 0 }}
+            />
+            <span style={{
+              fontSize: '13px',
+              fontWeight: 700,
+              color: r.isDone ? '#94A3B8' : '#334155',
+              textDecoration: r.isDone ? 'line-through' : 'none',
+              flex: 1,
+              lineHeight: 1.4,
+            }}>{r.title}</span>
+            <button
+              onClick={(e) => { e.preventDefault(); onDelete(r.id); }}
+              style={{ color: '#CBD5E1', background: 'none', border: 'none', opacity: 0.7, cursor: 'pointer', fontSize: 14, padding: '0 2px', flexShrink: 0 }}
+            >✕</button>
+          </label>
+        ))}
+      </div>
+
+      {/* Add input */}
+      <div style={{ display: 'flex', gap: '8px', marginTop: '16px' }}>
+        <input
+          type="text"
+          placeholder={`إضافة...`}
+          value={newTitle}
+          onChange={e => setNewTitle(e.target.value)}
+          onKeyDown={handleKeyDown}
+          style={{
+            flex: 1, padding: '9px 12px', borderRadius: '8px',
+            border: '1px solid #CBD5E1', fontSize: '12px',
+            outline: 'none', fontFamily: 'inherit', direction: 'rtl',
+          }}
+        />
+        <button
+          onClick={handleAddClick}
+          style={{
+            background: '#0F172A', color: 'white', border: 'none',
+            padding: '0 16px', borderRadius: '8px', cursor: 'pointer',
+            fontWeight: 'bold', fontSize: 18, lineHeight: 1,
+          }}
+        >+</button>
+      </div>
+    </div>
+  );
+}
+
+// ─── Daily Tasks (CEO Cockpit) ─────────────────────────────────────────────────
+function DailyTasksSection({ routines: initialRoutines }: { routines: DailyRoutine[] }) {
+  const [routines, setRoutines] = useState<DailyRoutine[]>(initialRoutines);
+  const [, startTransition] = useTransition();
+
+  const dailyRoutines = routines.filter(r => r.type === 'daily');
+  const weeklyRoutines = routines.filter(r => r.type === 'weekly');
 
   function handleToggle(id: string, current: boolean) {
     setRoutines(prev => prev.map(r => r.id === id ? { ...r, isDone: !current } : r));
@@ -253,135 +399,68 @@ function DailyTasksSection({ routines: initialRoutines }: { routines: DailyRouti
     startTransition(async () => { await deleteDailyRoutine(id); });
   }
 
-  function handleTimeClick(r: DailyRoutine) {
-    setEditingTimeId(r.id);
-    setEditingTimeVal(r.timeStr);
-  }
-
-  function handleTimeSave(id: string) {
-    setRoutines(prev => prev.map(r => r.id === id ? { ...r, timeStr: editingTimeVal } : r));
-    setEditingTimeId(null);
-    startTransition(async () => { await updateDailyRoutineTime(id, editingTimeVal); });
-  }
-
-  async function handleAdd() {
-    const title = newTitle.trim();
-    if (!title) return;
-    // Optimistic update — add immediately with temp id
+  async function handleAdd(title: string, type: 'daily' | 'weekly') {
     const tempId = `temp-${Date.now()}`;
     const optimistic: DailyRoutine = {
-      id: tempId,
-      title,
-      meta: newMeta.trim(),
-      timeStr: newTime.trim(),
-      isDone: false,
-      sortOrder: routines.length + 1,
+      id: tempId, title, meta: '', timeStr: '',
+      isDone: false, sortOrder: routines.length + 1, type,
     };
     setRoutines(prev => [...prev, optimistic]);
-    setNewTitle(''); setNewMeta(''); setNewTime('');
-    setShowAddForm(false);
-    // Persist to Supabase in background
     try {
-      const result = await addDailyRoutine({ title, meta: newMeta.trim(), timeStr: newTime.trim() });
+      const result = await addDailyRoutine({ title, meta: '', timeStr: '', type });
       if (result.routine) {
-        // Replace temp with real id from DB
         setRoutines(prev => prev.map(r => r.id === tempId ? result.routine! : r));
       }
-    } catch {
-      // Keep optimistic item even if server fails — will sync on next page load
-    }
+    } catch { /* keep optimistic */ }
+  }
+
+  function handleReset(type: 'daily' | 'weekly') {
+    setRoutines(prev => prev.map(r => r.type === type ? { ...r, isDone: false } : r));
+    startTransition(async () => { await resetRoutinesByType(type); });
   }
 
   return (
     <section className="section daily-tasks-section">
-      <div className="section-head">
+      <div className="section-head" style={{ marginBottom: 20 }}>
         <div className="section-title-wrap">
-          <div className="section-icon" style={{ background: 'var(--mint-light)', color: 'var(--mint-deep)' }}>☑️</div>
+          <div className="section-icon" style={{ background: 'var(--mint-light)', color: 'var(--mint-deep)' }}>🎯</div>
           <div className="section-title">
-            <div className="section-title-text">روتينك اليومي</div>
-            <div className="section-subtitle">مهام ثابتة كل يوم · <span>{doneCount}</span> من {total} منجزة</div>
+            <div className="section-title-text">CEO Cockpit</div>
+            <div className="section-subtitle">روتين القيادة اليومي والأسبوعي</div>
           </div>
         </div>
-        <button
-          className="section-link"
-          style={{ background: 'none', border: 'none', cursor: 'pointer', fontFamily: 'inherit' }}
-          onClick={() => setShowAddForm(v => !v)}
-        >+ إضافة</button>
       </div>
-      <div className="daily-progress">
-        <div className="daily-progress-bar" style={{ width: `${pct}%` }} />
-      </div>
-      {showAddForm && (
-        <div style={{ display: 'flex', gap: 8, marginBottom: 12, flexWrap: 'wrap', direction: 'rtl' }}>
-          <input
-            placeholder="اسم المهمة *"
-            value={newTitle}
-            onChange={e => setNewTitle(e.target.value)}
-            style={{ flex: '1 1 140px', padding: '6px 10px', borderRadius: 8, border: '1px solid #ddd', fontFamily: 'inherit', fontSize: 13 }}
-          />
-          <input
-            placeholder="التفاصيل (مثال: 📊 من سلة)"
-            value={newMeta}
-            onChange={e => setNewMeta(e.target.value)}
-            style={{ flex: '1 1 140px', padding: '6px 10px', borderRadius: 8, border: '1px solid #ddd', fontFamily: 'inherit', fontSize: 13 }}
-          />
-          <input
-            placeholder="الوقت (مثال: 8:00 ص)"
-            value={newTime}
-            onChange={e => setNewTime(e.target.value)}
-            style={{ flex: '0 1 110px', padding: '6px 10px', borderRadius: 8, border: '1px solid #ddd', fontFamily: 'inherit', fontSize: 13 }}
-          />
-          <button
-            onClick={handleAdd}
-            style={{ padding: '6px 16px', borderRadius: 8, background: 'var(--mint-deep)', color: 'white', border: 'none', cursor: 'pointer', fontFamily: 'inherit', fontSize: 13 }}
-          >حفظ</button>
-          <button
-            onClick={() => { setShowAddForm(false); setNewTitle(''); setNewMeta(''); setNewTime(''); }}
-            style={{ padding: '6px 12px', borderRadius: 8, background: '#f0f0f0', border: 'none', cursor: 'pointer', fontFamily: 'inherit', fontSize: 13 }}
-          >إلغاء</button>
-        </div>
-      )}
-      <div className="daily-grid">
-        {routines.map((r) => (
-          <div key={r.id} className={`daily-task${r.isDone ? ' done' : ''}`}>
-            <div
-              className={`daily-checkbox${r.isDone ? ' checked' : ''}`}
-              onClick={() => handleToggle(r.id, r.isDone)}
-            >
-              {r.isDone && (
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="3">
-                  <polyline points="20 6 9 17 4 12" />
-                </svg>
-              )}
-            </div>
-            <div className="daily-task-body">
-              <div className="daily-task-title">{r.title}</div>
-              {r.meta && <div className="daily-task-meta">{r.meta}</div>}
-            </div>
-            {editingTimeId === r.id ? (
-              <input
-                value={editingTimeVal}
-                onChange={e => setEditingTimeVal(e.target.value)}
-                onBlur={() => handleTimeSave(r.id)}
-                onKeyDown={e => e.key === 'Enter' && handleTimeSave(r.id)}
-                autoFocus
-                style={{ width: 80, padding: '2px 6px', borderRadius: 6, border: '1px solid #ccc', fontSize: 12, fontFamily: 'inherit', textAlign: 'center' }}
-              />
-            ) : (
-              <span
-                className="daily-time"
-                onClick={() => handleTimeClick(r)}
-                title="انقر لتعديل الوقت"
-                style={{ cursor: 'pointer' }}
-              >{r.timeStr || '—'}</span>
-            )}
-            <button
-              onClick={() => handleDelete(r.id)}
-              title="حذف"
-              style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#ccc', fontSize: 16, padding: '0 4px', lineHeight: 1 }}
-            >✕</button>
-          </div>
-        ))}
+      <div style={{
+        display: 'grid',
+        gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))',
+        gap: '24px',
+      }}>
+        <RoutineColumn
+          title="روتين القيادة اليومي"
+          subtitle="مهام ثابتة تنفذها كل يوم"
+          icon="☀️"
+          accentColor="#10B981"
+          checkColor="#10B981"
+          resetLabel="تصفير اليوم"
+          routines={dailyRoutines}
+          onToggle={handleToggle}
+          onDelete={handleDelete}
+          onAdd={(t) => handleAdd(t, 'daily')}
+          onReset={() => handleReset('daily')}
+        />
+        <RoutineColumn
+          title="متابعات القيادة الأسبوعية"
+          subtitle="تقارير ومراجعات تطلبها كل أسبوع"
+          icon="🗓️"
+          accentColor="#3B82F6"
+          checkColor="#3B82F6"
+          resetLabel="تصفير الأسبوع"
+          routines={weeklyRoutines}
+          onToggle={handleToggle}
+          onDelete={handleDelete}
+          onAdd={(t) => handleAdd(t, 'weekly')}
+          onReset={() => handleReset('weekly')}
+        />
       </div>
     </section>
   );
