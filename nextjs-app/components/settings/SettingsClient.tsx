@@ -2,7 +2,7 @@
 // SettingsClient — صفحة الإعدادات
 // Layout: .scr.on wrapper — نفس /brands و /calendar
 // 5 أقسام: واتساب | الفريق | البراندات | التفضيلات | البيانات
-import { useState, useTransition, useCallback } from 'react';
+import { useState, useTransition, useCallback, useEffect } from 'react';
 import { createBrowserClient } from '@/lib/supabase';
 import {
   updateWhatsappSettings, addTeamContact, deleteTeamContact,
@@ -306,8 +306,24 @@ function EmployeeProfileModal({ employee, onClose, onSave }: {
   const [localWarnings, setLocalWarnings] = useState(employee.warnings ?? 0);
   const [localPhone,    setLocalPhone]    = useState(employee.phone ?? '');
   const [localIban,     setLocalIban]     = useState(employee.iban ?? '');
-  const [localBrand,    setLocalBrand]    = useState(employee.brand ?? '');
+  const [localBrand,    setLocalBrand]    = useState(employee.brand || 'الإدارة العامة');
   const [isUploading,   setIsUploading]   = useState(false);
+  // Sync when employee changes
+  useEffect(() => {
+    setLocalName(employee.name);
+    setLocalRole(employee.role);
+    setLocalSalaryType(employee.salary_type);
+    setLocalSalaryAmount(String(employee.salary_amount));
+    setLocalStatus(employee.status);
+    setLocalSopUrl(employee.sop_url ?? '');
+    setLocalAccess(employee.access_rights ?? '');
+    setLocalNotes(employee.private_notes ?? '');
+    setLocalKudos(employee.kudos ?? 0);
+    setLocalWarnings(employee.warnings ?? 0);
+    setLocalPhone(employee.phone ?? '');
+    setLocalIban(employee.iban ?? '');
+    setLocalBrand(employee.brand || 'الإدارة العامة');
+  }, [employee.id]);
   const [saving, setSaving] = useState(false);
 
   async function handleFileUpload(e: React.ChangeEvent<HTMLInputElement>) {
@@ -509,15 +525,20 @@ function EmployeeProfileModal({ employee, onClose, onSave }: {
             </div>
 
             {/* Brand Assignment */}
-            <div style={{ background: 'white', padding: 16, borderRadius: 12, border: '1px solid #E2E8F0' }}>
-              <h3 style={{ fontSize: 14, fontWeight: 800, color: '#1E293B', margin: '0 0 12px' }}>🏢 البراند / القسم</h3>
-              <input
-                type="text"
-                placeholder="مثال: بشرى، الإدارة العامة..."
-                value={localBrand}
+            <div style={{ background: '#F8FAFC', padding: 16, borderRadius: 12, border: '1px solid #E2E8F0' }}>
+              <label style={{ fontSize: 13, fontWeight: 900, color: '#1E293B', display: 'block', marginBottom: 8 }}>🏢 تحديد البراند التابع له الموظف</label>
+              <select
+                value={localBrand || 'الإدارة العامة'}
                 onChange={e => setLocalBrand(e.target.value)}
-                style={fieldStyle}
-              />
+                style={{ width: '100%', padding: '10px', borderRadius: 8, border: '1px solid #CBD5E1', fontSize: 13, outline: 'none', background: '#FFFFFF', fontWeight: 'bold', cursor: 'pointer', color: '#1E293B' }}
+              >
+                <option value="الإدارة العامة">الإدارة العامة</option>
+                <option value="بيت الجوزاء">بيت الجوزاء</option>
+                <option value="غازي بوتيك">غازي بوتيك</option>
+                <option value="الجوزاء سويت">الجوزاء سويت</option>
+                <option value="أودريد">أودريد</option>
+                <option value="فريلانس">فريلانس</option>
+              </select>
             </div>
 
             {/* Access Rights */}
@@ -960,7 +981,7 @@ export default function SettingsClient({ whatsapp: initialWA, contacts: initialC
           }, {} as Record<string, Employee[]>);
 
           return (
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: 20, alignItems: 'start' }}>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(360px, 1fr))', gap: 24, width: '100%', alignItems: 'start' }}>
               {Object.entries(grouped).map(([brandName, emps]) => {
                 const brandTotal = emps
                   .filter(e => e.salary_type === 'fixed')
