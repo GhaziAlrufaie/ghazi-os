@@ -1493,6 +1493,10 @@ export default function LeadershipClient({
   const [snoozeTask, setSnoozeTask] = useState<ActiveTask | null>(null);
   // Task Vault modal state (lifted from FocusHero to root level)
   const [isVaultModalOpen, setIsVaultModalOpen] = useState(false);
+  // ── Client-side weeklyFocus state for instant optimistic updates ──────────
+  const [localWeeklyFocus, setLocalWeeklyFocus] = useState<WeeklyFocusEntry[]>(weeklyFocus);
+  // Sync with server prop when it changes (e.g., after router.refresh())
+  useEffect(() => { setLocalWeeklyFocus(weeklyFocus); }, [weeklyFocus]);
   // Sorted tasks for vault (derived from visibleActiveTasks + todayFocus)
   // Filter out optimistically-blocked tasks so they disappear instantly from FocusHero
   const visibleActiveTasks = useMemo(
@@ -1503,7 +1507,7 @@ export default function LeadershipClient({
   const router = useRouter();
 
   const focusMap: Record<string, WeeklyFocusEntry> = {};
-  weeklyFocus.forEach(f => { focusMap[f.focusDate] = f; });
+  localWeeklyFocus.forEach(f => { focusMap[f.focusDate] = f; });
   const todayFocus = focusMap[todayISO()] ?? null;
 
   function handleEditorSaved() {
@@ -1591,6 +1595,21 @@ export default function LeadershipClient({
   };
   const handleSetFocusTask = async (task: ActiveTask) => {
     const today = todayISO();
+    // 1. Optimistic update — instant UI response
+    const optimisticEntry: WeeklyFocusEntry = {
+      id: `optimistic_${Date.now()}`,
+      focusDate: today,
+      targetType: 'task',
+      targetId: task.id,
+      targetName: task.title,
+      targetColor: task.brandColor ?? '#EA580C',
+      notes: '',
+    };
+    setLocalWeeklyFocus(prev => {
+      const filtered = prev.filter(f => f.focusDate !== today);
+      return [...filtered, optimisticEntry];
+    });
+    // 2. Persist to DB
     const result = await setDayFocus({
       focusDate: today,
       targetType: 'task',
@@ -1601,7 +1620,16 @@ export default function LeadershipClient({
     });
     if (result.error) {
       alert(`خطأ في تعيين المهمة كفوكس: ${result.error}`);
+      // Rollback optimistic update
+      setLocalWeeklyFocus(weeklyFocus);
       return;
+    }
+    // 3. Replace optimistic with real entry from DB
+    if (result.entry) {
+      setLocalWeeklyFocus(prev => {
+        const filtered = prev.filter(f => f.focusDate !== today);
+        return [...filtered, result.entry!];
+      });
     }
     router.refresh();
   };
@@ -1674,7 +1702,7 @@ export default function LeadershipClient({
 
           {/* WeeklyCompass — كامل العرض */}
           <WeeklyCompass
-            weeklyFocus={weeklyFocus}
+            weeklyFocus={localWeeklyFocus}
             brands={brands}
             activeTasks={activeTasks}
             projects={projects}
@@ -1872,7 +1900,7 @@ export default function LeadershipClient({
       {editorDate && (
         <FocusEditorModal
           dateStr={editorDate}
-          weeklyFocus={weeklyFocus}
+          weeklyFocus={localWeeklyFocus}
           brands={brands}
           projects={projects}
           activeTasks={activeTasks}
