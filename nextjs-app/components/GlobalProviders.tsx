@@ -193,6 +193,8 @@ export function GlobalProviders({ children }: { children: ReactNode }) {
   const [showQuickAdd, setShowQuickAdd] = useState(false);
   const [showShortcuts, setShowShortcuts] = useState(false);
   const [undoItems, setUndoItems] = useState<UndoToastItem[]>([]);
+  const handleCloseQuickAdd = useCallback(() => setShowQuickAdd(false), []);
+  const handleCloseShortcuts = useCallback(() => setShowShortcuts(false), []);
   const { toast } = useToast();
   const searchInputRef = useRef<HTMLInputElement | null>(null);
 
@@ -291,8 +293,8 @@ export function GlobalProviders({ children }: { children: ReactNode }) {
   return (
     <GlobalContext.Provider value={{ openQuickAdd: () => setShowQuickAdd(true), pushUndo, focusSearch }}>
       {children}
-      {showQuickAdd && <QuickAddModal onClose={() => setShowQuickAdd(false)} />}
-      {showShortcuts && <ShortcutsModal onClose={() => setShowShortcuts(false)} />}
+      {showQuickAdd && <QuickAddModal onClose={handleCloseQuickAdd} />}
+      {showShortcuts && <ShortcutsModal onClose={handleCloseShortcuts} />}
       <UndoToastContainer items={undoItems} onUndo={handleUndo} onDismiss={handleDismiss} />
     </GlobalContext.Provider>
   );

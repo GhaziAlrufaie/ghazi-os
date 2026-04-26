@@ -119,6 +119,7 @@ function VIPQuickAdd({ colId, defaultCategory, onAdd }: {
     else if (e.key === 'Escape') { setIsOpen(false); setValue(''); setShowPicker(false); }
   }
 
+  function handleCancelPicker() { setIsOpen(false); setValue(''); setShowPicker(false); }
   function handleSelect(p: TaskPriority) {
     if (!value.trim()) return;
     onAdd(value.trim(), p);
@@ -142,7 +143,7 @@ function VIPQuickAdd({ colId, defaultCategory, onAdd }: {
         placeholder="اسم المهمة ثم Enter..."
         style={{ width: '100%', background: '#fff', border: '2px solid #EA580C', borderRadius: 12, padding: '10px 14px', fontSize: 14, color: '#1E293B', outline: 'none', fontFamily: 'inherit', boxSizing: 'border-box', boxShadow: '0 0 0 4px rgba(234,88,12,0.08)' }}
       />
-      {showPicker && <PriorityPicker onSelect={handleSelect} onCancel={() => { setIsOpen(false); setValue(''); setShowPicker(false); }} />}
+      {showPicker && <PriorityPicker onSelect={handleSelect} onCancel={handleCancelPicker} />}
     </div>
   );
 }

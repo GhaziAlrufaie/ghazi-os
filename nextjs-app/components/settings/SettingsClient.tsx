@@ -791,13 +791,14 @@ export default function SettingsClient({ whatsapp: initialWA, contacts: initialC
   }, [supabase]);
   // جلب عند mount لضمان أحدث البيانات من Supabase
   // جلب عند mount فقط — fetchEmployees مستقر بسبب useCallback
-  useEffect(() => { fetchEmployees(); }, [fetchEmployees]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  useEffect(() => { fetchEmployees(); }, []);
 
   const handleEmpAdd = async (e: Employee) => {
     // Optimistic update فوري + جلب في الخلفية للحصول على UUID الصحيح
     setEmployees(prev => [...prev, e]);
     setToast('تمت الإضافة');
-    setTimeout(() => fetchEmployees(), 500);
+    // removed: no need to re-fetch after optimistic update
   };
   const handleEmpProfileSave = async (e: Employee) => {
     // تحديث local state فوراً للاستجابة السريعة
