@@ -25,6 +25,7 @@ export interface Task {
   subtasks: SubtaskItem[];
   blockerReason: string | null;
   latestUpdate: string | null;
+  attachments?: {id: string; name: string; url: string; linkedStep: string}[] | null;
 }
 
 interface AddTaskInput {

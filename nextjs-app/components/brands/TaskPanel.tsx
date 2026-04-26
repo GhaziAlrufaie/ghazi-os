@@ -59,6 +59,11 @@ export default function TaskPanel({ task, onClose, onUpdate, onDelete, onArchive
   const [latestUpdate, setLatestUpdate]   = useState<string>('');
   const [groups, setGroups]     = useState<ChecklistGroup[]>([]);
   const [bgSaving, setBgSaving] = useState(false); // background save indicator only
+  // ── Task Attachments state ─────────────────────────────────────────────
+  const [localAttachments, setLocalAttachments] = useState<{id: string; name: string; url: string; linkedStep: string}[]>(() => {
+    try { return Array.isArray(task?.attachments) ? task.attachments : (typeof task?.attachments === 'string' ? JSON.parse(task.attachments) : []); } catch { return []; }
+  });
+  const [isUploadingTaskFile, setIsUploadingTaskFile] = useState(false);
   // ── Nested Logs state ──────────────────────────────────────────────────────
   const [expandedLogs, setExpandedLogs] = useState<Record<string, boolean>>({});
   const [newLogText, setNewLogText] = useState<Record<string, string>>({});
@@ -70,9 +75,9 @@ export default function TaskPanel({ task, onClose, onUpdate, onDelete, onArchive
   const saveDebounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   // Ref to always have latest values for background save on close
-  const latestRef = useRef({ title, desc, status, priority, dueDate, groups, blockerReason, latestUpdate, taskId: task?.id });
+  const latestRef = useRef({ title, desc, status, priority, dueDate, groups, blockerReason, latestUpdate, attachments: localAttachments, taskId: task?.id });
   // ── Sync latestRef on every render (no deps needed — ref update is free) ──
-  latestRef.current = { title, desc, status, priority, dueDate, groups, blockerReason, latestUpdate, taskId: task?.id };
+  latestRef.current = { title, desc, status, priority, dueDate, groups, blockerReason, latestUpdate, attachments: localAttachments, taskId: task?.id };
 
   // Reset local state when a new task is opened
   useEffect(() => {
@@ -85,6 +90,10 @@ export default function TaskPanel({ task, onClose, onUpdate, onDelete, onArchive
     setGroups(parseGroups(task.subtasks));
     setBlockerReason(task.blockerReason ?? '');
     setLatestUpdate(task.latestUpdate ?? '');
+    // Sync attachments
+    try {
+      setLocalAttachments(Array.isArray(task.attachments) ? task.attachments : (typeof task.attachments === 'string' ? JSON.parse(task.attachments) : []));
+    } catch { setLocalAttachments([]); }
   }, [task?.id]);
 
   // Escape key closes modal + cleanup debounce timer on unmount
@@ -138,6 +147,7 @@ export default function TaskPanel({ task, onClose, onUpdate, onDelete, onArchive
       subtasks: g,
       blocker_reason: br || null,
       latest_update: lu || null,
+      attachments: latestRef.current.attachments,
     }).eq('id', task!.id).then(({ error }) => {
       if (error) console.error('Background save failed:', error.message);
     });
@@ -152,6 +162,53 @@ export default function TaskPanel({ task, onClose, onUpdate, onDelete, onArchive
     });
   }
 
+  // ── TASK ATTACHMENTS HANDLERS ────────────────────────────────────────────
+  const handleTaskFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = Array.from(e.target.files || []);
+    if (!files.length) return;
+    setIsUploadingTaskFile(true);
+    const uploadedDocs: {id: string; name: string; url: string; linkedStep: string}[] = [];
+    for (const file of files) {
+      const fileExt = file.name.split('.').pop();
+      const safeName = file.name.replace(/[^a-zA-Z0-9.\-_]/g, '').substring(0, 15);
+      const fileName = `task-${task!.id}-${Date.now()}-${Math.random().toString(36).substring(7)}-${safeName}.${fileExt}`;
+      const { error } = await supabase.storage.from('task_docs').upload(fileName, file);
+      if (!error) {
+        const { data } = supabase.storage.from('task_docs').getPublicUrl(fileName);
+        uploadedDocs.push({ id: Date.now().toString() + Math.random(), name: file.name, url: data.publicUrl, linkedStep: 'عام (للمهمة بالكامل)' });
+      } else {
+        console.error('Upload error:', error.message);
+      }
+    }
+    setLocalAttachments(prev => {
+      const updated = [...prev, ...uploadedDocs];
+      // Save to DB immediately after upload
+      supabase.from('tasks').update({ attachments: updated }).eq('id', task!.id).then(({ error }) => {
+        if (error) console.error('Attachments save error:', error.message);
+      });
+      return updated;
+    });
+    setIsUploadingTaskFile(false);
+    e.target.value = '';
+  };
+  const updateAttachmentLink = (id: string, stepName: string) => {
+    setLocalAttachments(prev => {
+      const updated = prev.map(att => att.id === id ? { ...att, linkedStep: stepName } : att);
+      supabase.from('tasks').update({ attachments: updated }).eq('id', task!.id).then(({ error }) => {
+        if (error) console.error('Attachment link save error:', error.message);
+      });
+      return updated;
+    });
+  };
+  const removeTaskAttachment = (id: string) => {
+    setLocalAttachments(prev => {
+      const updated = prev.filter(att => att.id !== id);
+      supabase.from('tasks').update({ attachments: updated }).eq('id', task!.id).then(({ error }) => {
+        if (error) console.error('Attachment delete error:', error.message);
+      });
+      return updated;
+    });
+  };
   // ── CHECKLIST HELPERS ────────────────────────────────────────────────────
   function saveGroupsToDb(updated: ChecklistGroup[]) {
     // Debounce: cancel any pending save, wait 600ms before hitting DB
@@ -473,6 +530,52 @@ export default function TaskPanel({ task, onClose, onUpdate, onDelete, onArchive
             <button className="vip-modal-add-group-btn" onClick={addGroup}>+ إضافة مجموعة جديدة</button>
           </div>
 
+          {/* ── Task Attachments Section ─────────────────────────────────── */}
+          <div style={{ background: '#F8FAFC', padding: '20px', borderRadius: '16px', border: '1px solid #E2E8F0', marginTop: '24px', marginBottom: '24px' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
+              <h3 style={{ fontSize: '15px', fontWeight: '900', color: '#1E293B', margin: 0 }}>🗂️ ملفات ومرفقات المهمة</h3>
+              <label style={{ cursor: isUploadingTaskFile ? 'not-allowed' : 'pointer', background: '#0F172A', color: '#FFFFFF', padding: '8px 16px', borderRadius: '8px', fontSize: '12px', fontWeight: 'bold', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                {isUploadingTaskFile ? '⏳ جاري الرفع...' : '📎 إرفاق ملفات'}
+                <input type="file" multiple onChange={handleTaskFileUpload} disabled={isUploadingTaskFile} style={{ display: 'none' }} accept="*/*" />
+              </label>
+            </div>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+              {localAttachments.map((file) => (
+                <div key={file.id} style={{ display: 'flex', flexWrap: 'wrap', gap: '12px', justifyContent: 'space-between', alignItems: 'center', background: '#FFFFFF', padding: '12px 16px', borderRadius: '12px', border: '1px solid #E2E8F0' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '12px', flex: '1 1 200px' }}>
+                    <span style={{ fontSize: '20px' }}>📄</span>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                      <span style={{ fontSize: '13px', fontWeight: '800', color: '#334155', maxWidth: '200px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }} title={file.name}>{file.name}</span>
+                      <a href={file.url} target="_blank" rel="noopener noreferrer" style={{ fontSize: '11px', color: '#2563EB', fontWeight: 'bold', textDecoration: 'none' }}>🔗 عرض الملف</a>
+                    </div>
+                  </div>
+                  <div style={{ flex: '1 1 250px', display: 'flex', alignItems: 'center', gap: '8px', justifyContent: 'flex-end' }}>
+                    <span style={{ fontSize: '11px', color: '#64748B', fontWeight: 'bold', whiteSpace: 'nowrap' }}>يرتبط بـ:</span>
+                    <select
+                      value={file.linkedStep}
+                      onChange={(e) => updateAttachmentLink(file.id, e.target.value)}
+                      style={{ flex: 1, padding: '8px 10px', borderRadius: '6px', border: '1px solid #CBD5E1', fontSize: '11px', outline: 'none', background: '#F8FAFC', maxWidth: '200px', fontWeight: 'bold', color: file.linkedStep === 'عام (للمهمة بالكامل)' ? '#64748B' : '#1D4ED8' }}
+                    >
+                      <option value="عام (للمهمة بالكامل)">عام (للمهمة بالكامل)</option>
+                      {groups.map((group, gIdx) => (
+                        <optgroup key={gIdx} label={group.title || `مجموعة ${gIdx + 1}`}>
+                          {group.items.map((item, iIdx) => (
+                            <option key={iIdx} value={item.text}>{item.text.substring(0, 40)}</option>
+                          ))}
+                        </optgroup>
+                      ))}
+                    </select>
+                    <button onClick={() => removeTaskAttachment(file.id)} style={{ background: '#FEF2F2', color: '#EF4444', border: 'none', padding: '8px 12px', borderRadius: '6px', cursor: 'pointer', fontSize: '11px', fontWeight: 'bold' }}>حذف</button>
+                  </div>
+                </div>
+              ))}
+              {localAttachments.length === 0 && (
+                <div style={{ padding: '24px', textAlign: 'center', border: '1px dashed #CBD5E1', borderRadius: '12px', background: '#F8FAFC' }}>
+                  <span style={{ fontSize: '12px', color: '#64748B', fontWeight: 'bold' }}>لا توجد مرفقات لهذه المهمة. ارفع ملفات التسعير، الصور، أو العقود.</span>
+                </div>
+              )}
+            </div>
+          </div>
           {/* Background save indicator — subtle, non-blocking */}
           {bgSaving && (
             <div style={{ position: 'fixed', bottom: '24px', left: '24px', background: '#1E293B', color: '#94A3B8', fontSize: '12px', fontWeight: 700, padding: '8px 16px', borderRadius: '8px', zIndex: 100000, opacity: 0.8 }}>
