@@ -6,7 +6,7 @@
  */
 'use client';
 import './studio-theme.css';
-import { useState, useTransition, useMemo } from 'react';
+import { useState, useTransition, useMemo, useEffect } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import {
@@ -385,6 +385,37 @@ function RoutineColumn({
 function DailyTasksSection({ routines: initialRoutines }: { routines: DailyRoutine[] }) {
   const [routines, setRoutines] = useState<DailyRoutine[]>(initialRoutines);
   const [, startTransition] = useTransition();
+
+  // ── Fetch from Supabase on mount to guarantee persistence after refresh/deploy
+  useEffect(() => {
+    async function fetchFromDB() {
+      try {
+        const { createClient } = await import('@supabase/supabase-js');
+        const sb = createClient(
+          process.env.NEXT_PUBLIC_SUPABASE_URL!,
+          process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+        );
+        const { data, error } = await sb
+          .from('daily_routines')
+          .select('id, title, meta, time_str, is_done, sort_order, type')
+          .order('sort_order');
+        if (!error && data && data.length >= 0) {
+          setRoutines(data.map((r: Record<string, unknown>) => ({
+            id: r.id as string,
+            title: r.title as string,
+            meta: (r.meta as string) ?? '',
+            timeStr: (r.time_str as string) ?? '',
+            isDone: (r.is_done as boolean) ?? false,
+            sortOrder: (r.sort_order as number) ?? 0,
+            type: ((r.type as string) === 'weekly' ? 'weekly' : 'daily') as 'daily' | 'weekly',
+          })));
+        }
+      } catch (err) {
+        console.error('[DailyTasksSection] fetchFromDB error:', err);
+      }
+    }
+    fetchFromDB();
+  }, []); // runs once on mount — guarantees fresh data from Supabase
 
   const dailyRoutines = routines.filter(r => r.type === 'daily');
   const weeklyRoutines = routines.filter(r => r.type === 'weekly');
@@ -1468,7 +1499,7 @@ export default function LeadershipClient({
     () => activeTasks.filter(t => !blockedTaskIds.has(t.id)),
     [activeTasks, blockedTaskIds]
   );
-  const [dailyRoutines] = useState<DailyRoutine[]>(initialDailyRoutines);
+  // dailyRoutines passed as prop — DailyTasksSection fetches fresh from Supabase on mount
   const router = useRouter();
 
   const focusMap: Record<string, WeeklyFocusEntry> = {};
@@ -1651,7 +1682,7 @@ export default function LeadershipClient({
           />
 
           {/* DailyTasks — كامل العرض */}
-          <DailyTasksSection routines={dailyRoutines} />
+          <DailyTasksSection routines={initialDailyRoutines} />
           {/* Bento Grid: القرارات + التقويم (صف 1) | الوارد كامل العرض (صف 2) */}
           <div className="dashboard-bottom-grid">
             {/* القرارات */}
