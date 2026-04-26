@@ -64,6 +64,13 @@ export async function updateEmployee(
     salaryUnit?: string | null;
     reportsTo?: string | null;
     status?: 'active' | 'inactive' | 'freelance';
+    sopUrl?: string | null;
+    accessRights?: string | null;
+    privateNotes?: string | null;
+    kudos?: number;
+    warnings?: number;
+    phone?: string | null;
+    iban?: string | null;
   }
 ): Promise<void> {
   const sb = getSupabase();
@@ -76,6 +83,13 @@ export async function updateEmployee(
   if (updates.salaryUnit !== undefined) payload.salary_unit = updates.salaryUnit;
   if (updates.reportsTo !== undefined) payload.reports_to = updates.reportsTo;
   if (updates.status !== undefined) payload.status = updates.status;
+  if (updates.sopUrl !== undefined) payload.sop_url = updates.sopUrl;
+  if (updates.accessRights !== undefined) payload.access_rights = updates.accessRights;
+  if (updates.privateNotes !== undefined) payload.private_notes = updates.privateNotes;
+  if (updates.kudos !== undefined) payload.kudos = updates.kudos;
+  if (updates.warnings !== undefined) payload.warnings = updates.warnings;
+  if (updates.phone !== undefined) payload.phone = updates.phone;
+  if (updates.iban !== undefined) payload.iban = updates.iban;
   const { error } = await sb.from('employees').update(payload).eq('id', id);
   if (error) throw new Error(error.message);
 }

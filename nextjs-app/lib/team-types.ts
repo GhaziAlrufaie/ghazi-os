@@ -10,6 +10,14 @@ export interface Employee {
   status: 'active' | 'inactive' | 'freelance';
   created_at: string;
   updated_at: string;
+  // HR Dossier fields
+  sop_url?: string | null;
+  access_rights?: string | null;
+  private_notes?: string | null;
+  kudos?: number;
+  warnings?: number;
+  phone?: string | null;
+  iban?: string | null;
 }
 
 export const SALARY_TYPE_LABELS: Record<string, string> = {

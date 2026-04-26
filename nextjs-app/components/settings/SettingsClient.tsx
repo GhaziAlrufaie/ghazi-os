@@ -198,18 +198,16 @@ function BrandModal({ editBrand, onClose, onSave }: {
   );
 }
 
-// ─── Employee Modal ────────────────────────────────────────────────────────────
-function EmployeeModal({ editEmp, onClose, onSave }: {
-  editEmp?: Employee | null;
+// ─── Employee Add Modal (للإضافة فقط) ─────────────────────────────────────────
+function EmployeeAddModal({ onClose, onSave }: {
   onClose: () => void;
-  onSave: (e: Employee, isEdit: boolean) => void;
+  onSave: (e: Employee) => void;
 }) {
-  const isEdit = !!editEmp;
-  const [name,         setName]         = useState(editEmp?.name ?? '');
-  const [role,         setRole]         = useState(editEmp?.role ?? '');
-  const [salaryType,   setSalaryType]   = useState<Employee['salary_type']>(editEmp?.salary_type ?? 'fixed');
-  const [salaryAmount, setSalaryAmount] = useState(String(editEmp?.salary_amount ?? ''));
-  const [status,       setStatus]       = useState<Employee['status']>(editEmp?.status ?? 'active');
+  const [name,         setName]         = useState('');
+  const [role,         setRole]         = useState('');
+  const [salaryType,   setSalaryType]   = useState<Employee['salary_type']>('fixed');
+  const [salaryAmount, setSalaryAmount] = useState('');
+  const [status,       setStatus]       = useState<Employee['status']>('active');
   const [loading, setLoading] = useState(false);
   const [error,   setError]   = useState('');
 
@@ -218,17 +216,10 @@ function EmployeeModal({ editEmp, onClose, onSave }: {
     if (!name || !role) { setError('أدخل الاسم والوظيفة'); return; }
     setLoading(true); setError('');
     try {
-      if (isEdit && editEmp) {
-        await updateEmployee(editEmp.id, {
-          name, role, salaryType, salaryAmount: Number(salaryAmount) || 0, status,
-        });
-        onSave({ ...editEmp, name, role, salary_type: salaryType, salary_amount: Number(salaryAmount) || 0, status }, true);
-      } else {
-        const newEmp = await addEmployee({
-          name, role, brandIds: [], salaryType, salaryAmount: Number(salaryAmount) || 0, status,
-        });
-        onSave(newEmp, false);
-      }
+      const newEmp = await addEmployee({
+        name, role, brandIds: [], salaryType, salaryAmount: Number(salaryAmount) || 0, status,
+      });
+      onSave(newEmp);
       onClose();
     } catch (err: unknown) {
       setError(err instanceof Error ? err.message : 'حدث خطأ');
@@ -246,9 +237,7 @@ function EmployeeModal({ editEmp, onClose, onSave }: {
     <div className="modal-bg on" onClick={onClose}>
       <div className="modal-box" style={{ maxWidth: 440 }} onClick={e => e.stopPropagation()}>
         <button className="modal-close" onClick={onClose}>✕</button>
-        <h2 style={{ fontSize: 16, fontWeight: 800, color: 'var(--txt)', marginBottom: 20 }}>
-          {isEdit ? 'تعديل الموظف' : '+ موظف جديد'}
-        </h2>
+        <h2 style={{ fontSize: 16, fontWeight: 800, color: 'var(--txt)', marginBottom: 20 }}>+ موظف جديد</h2>
         <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
             <div>
@@ -289,10 +278,311 @@ function EmployeeModal({ editEmp, onClose, onSave }: {
               إلغاء
             </button>
             <button type="submit" className="btn" disabled={loading} style={{ opacity: loading ? 0.7 : 1 }}>
-              {loading ? '...' : isEdit ? 'حفظ' : 'إضافة'}
+              {loading ? '...' : 'إضافة'}
             </button>
           </div>
         </form>
+      </div>
+    </div>
+  );
+}
+
+// ─── Employee Profile Modal (الملف الشامل) ─────────────────────────────────────
+function EmployeeProfileModal({ employee, onClose, onSave }: {
+  employee: Employee;
+  onClose: () => void;
+  onSave: (e: Employee) => void;
+}) {
+  const [localName,     setLocalName]     = useState(employee.name);
+  const [localRole,     setLocalRole]     = useState(employee.role);
+  const [localSalaryType, setLocalSalaryType] = useState<Employee['salary_type']>(employee.salary_type);
+  const [localSalaryAmount, setLocalSalaryAmount] = useState(String(employee.salary_amount));
+  const [localStatus,   setLocalStatus]   = useState<Employee['status']>(employee.status);
+  const [localSopUrl,   setLocalSopUrl]   = useState(employee.sop_url ?? '');
+  const [localAccess,   setLocalAccess]   = useState(employee.access_rights ?? '');
+  const [localNotes,    setLocalNotes]    = useState(employee.private_notes ?? '');
+  const [localKudos,    setLocalKudos]    = useState(employee.kudos ?? 0);
+  const [localWarnings, setLocalWarnings] = useState(employee.warnings ?? 0);
+  const [localPhone,    setLocalPhone]    = useState(employee.phone ?? '');
+  const [localIban,     setLocalIban]     = useState(employee.iban ?? '');
+  const [saving, setSaving] = useState(false);
+  const [error,  setError]  = useState('');
+
+  const salaryLabel = localSalaryType === 'freelance'
+    ? 'فريلانسر'
+    : `${Number(localSalaryAmount).toLocaleString('ar-SA')} ر.س`;
+
+  async function handleSave() {
+    if (!localName || !localRole) { setError('الاسم والوظيفة مطلوبان'); return; }
+    setSaving(true); setError('');
+    try {
+      await updateEmployee(employee.id, {
+        name: localName,
+        role: localRole,
+        salaryType: localSalaryType,
+        salaryAmount: Number(localSalaryAmount) || 0,
+        status: localStatus,
+        sopUrl: localSopUrl || null,
+        accessRights: localAccess || null,
+        privateNotes: localNotes || null,
+        kudos: localKudos,
+        warnings: localWarnings,
+        phone: localPhone || null,
+        iban: localIban || null,
+      });
+      onSave({
+        ...employee,
+        name: localName,
+        role: localRole,
+        salary_type: localSalaryType,
+        salary_amount: Number(localSalaryAmount) || 0,
+        status: localStatus,
+        sop_url: localSopUrl || null,
+        access_rights: localAccess || null,
+        private_notes: localNotes || null,
+        kudos: localKudos,
+        warnings: localWarnings,
+        phone: localPhone || null,
+        iban: localIban || null,
+      });
+      onClose();
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : 'حدث خطأ في الحفظ');
+      setSaving(false);
+    }
+  }
+
+  const fieldStyle: React.CSSProperties = {
+    width: '100%', padding: '8px 10px', borderRadius: 6, border: '1px solid #CBD5E1',
+    fontSize: 12, outline: 'none', background: 'white', color: '#1E293B',
+  };
+
+  const STATUS_LABELS: Record<string, string> = { active: 'نشط', freelance: 'فريلانسر', inactive: 'غير نشط' };
+  const STATUS_COLORS: Record<string, { bg: string; color: string }> = {
+    active:    { bg: 'rgba(52,199,89,0.15)',  color: '#15803D' },
+    freelance: { bg: 'rgba(0,122,255,0.12)',  color: '#1D4ED8' },
+    inactive:  { bg: 'rgba(255,59,48,0.12)',  color: '#B91C1C' },
+  };
+
+  return (
+    <div className="modal-bg on" onClick={onClose}>
+      <div
+        onClick={e => e.stopPropagation()}
+        style={{
+          padding: '24px', background: '#F8FAFC', borderRadius: 16,
+          maxWidth: 860, width: '100%', maxHeight: '90vh', overflowY: 'auto',
+          border: '1px solid #E2E8F0', margin: 'auto', position: 'relative',
+        }}
+      >
+        {/* HEADER */}
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 24, borderBottom: '1px solid #E2E8F0', paddingBottom: 16 }}>
+          <div style={{ flex: 1 }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 8 }}>
+              <div style={{
+                width: 48, height: 48, borderRadius: '50%', background: 'linear-gradient(135deg, #C9A84C, #E8C96A)',
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                fontSize: 20, fontWeight: 900, color: '#fff', flexShrink: 0,
+              }}>
+                {localName[0]}
+              </div>
+              <div>
+                <input
+                  value={localName}
+                  onChange={e => setLocalName(e.target.value)}
+                  style={{ fontSize: 22, fontWeight: 900, color: '#0F172A', border: 'none', background: 'transparent', outline: 'none', width: '100%' }}
+                />
+                <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginTop: 2 }}>
+                  <input
+                    value={localRole}
+                    onChange={e => setLocalRole(e.target.value)}
+                    style={{ fontSize: 13, color: '#64748B', border: 'none', background: 'transparent', outline: 'none' }}
+                  />
+                  <span style={{ fontSize: 12, color: '#64748B' }}>| 💼 الراتب: {salaryLabel}</span>
+                  <span style={{
+                    fontSize: 10, padding: '2px 10px', borderRadius: 8, fontWeight: 700,
+                    background: STATUS_COLORS[localStatus]?.bg, color: STATUS_COLORS[localStatus]?.color,
+                  }}>
+                    {STATUS_LABELS[localStatus]}
+                  </span>
+                </div>
+              </div>
+            </div>
+            {/* Salary & Status quick edit */}
+            <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+              <select value={localSalaryType} onChange={e => setLocalSalaryType(e.target.value as Employee['salary_type'])}
+                style={{ ...fieldStyle, width: 'auto', fontSize: 11, padding: '4px 8px' }}>
+                <option value="fixed">راتب ثابت</option>
+                <option value="per_unit">بالقطعة</option>
+                <option value="freelance">فريلانسر</option>
+              </select>
+              {localSalaryType !== 'freelance' && (
+                <input type="number" min="0" value={localSalaryAmount} onChange={e => setLocalSalaryAmount(e.target.value)}
+                  style={{ ...fieldStyle, width: 120, fontSize: 11, padding: '4px 8px' }} placeholder="المبلغ" />
+              )}
+              <select value={localStatus} onChange={e => setLocalStatus(e.target.value as Employee['status'])}
+                style={{ ...fieldStyle, width: 'auto', fontSize: 11, padding: '4px 8px' }}>
+                <option value="active">نشط</option>
+                <option value="freelance">فريلانسر</option>
+                <option value="inactive">غير نشط</option>
+              </select>
+            </div>
+          </div>
+          <div style={{ display: 'flex', gap: 10, alignItems: 'center', flexShrink: 0, marginRight: 12 }}>
+            {localPhone && (
+              <a
+                href={`https://wa.me/${localPhone.replace(/\+/g, '')}`}
+                target="_blank"
+                rel="noreferrer"
+                style={{
+                  background: '#25D366', color: 'white', padding: '8px 12px',
+                  borderRadius: 8, fontSize: 12, fontWeight: 700, textDecoration: 'none',
+                  display: 'flex', alignItems: 'center', gap: 6,
+                }}
+              >
+                💬 واتساب
+              </a>
+            )}
+            <button onClick={onClose} style={{
+              border: 'none', background: '#F1F5F9', padding: '8px 12px',
+              borderRadius: 8, cursor: 'pointer', color: '#475569', fontWeight: 700, fontSize: 13,
+            }}>
+              إغلاق ✕
+            </button>
+          </div>
+        </div>
+
+        {/* BODY — 2 columns */}
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(340px, 1fr))', gap: 20 }}>
+
+          {/* COLUMN 1: Management & Docs */}
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
+
+            {/* SOP Vault */}
+            <div style={{ background: 'white', padding: 16, borderRadius: 12, border: '1px solid #E2E8F0' }}>
+              <h3 style={{ fontSize: 14, fontWeight: 800, color: '#1E293B', marginBottom: 12, margin: '0 0 12px' }}>📄 خزنة المستندات (SOP)</h3>
+              <input
+                type="text"
+                placeholder="رابط ملف دليل العمل (PDF/Drive)..."
+                value={localSopUrl}
+                onChange={e => setLocalSopUrl(e.target.value)}
+                style={fieldStyle}
+              />
+              {localSopUrl && (
+                <a href={localSopUrl} target="_blank" rel="noreferrer"
+                  style={{ fontSize: 12, color: '#2563EB', marginTop: 8, display: 'inline-block', fontWeight: 700 }}>
+                  🔗 فتح الملف
+                </a>
+              )}
+            </div>
+
+            {/* Access Rights */}
+            <div style={{ background: 'white', padding: 16, borderRadius: 12, border: '1px solid #E2E8F0' }}>
+              <h3 style={{ fontSize: 14, fontWeight: 800, color: '#1E293B', margin: '0 0 12px' }}>🔑 العهد والصلاحيات</h3>
+              <textarea
+                placeholder="حساب سلة، باسوورد سناب شات، لابتوب الشركة..."
+                value={localAccess}
+                onChange={e => setLocalAccess(e.target.value)}
+                style={{ ...fieldStyle, minHeight: 80, resize: 'vertical' }}
+              />
+            </div>
+
+            {/* HR Data: Phone + IBAN */}
+            <div style={{ background: 'white', padding: 16, borderRadius: 12, border: '1px solid #E2E8F0', display: 'flex', gap: 10 }}>
+              <div style={{ flex: 1 }}>
+                <label style={{ fontSize: 11, fontWeight: 700, color: '#64748B', display: 'block', marginBottom: 4 }}>رقم الجوال</label>
+                <input
+                  type="text"
+                  placeholder="+966..."
+                  value={localPhone}
+                  onChange={e => setLocalPhone(e.target.value)}
+                  style={fieldStyle}
+                  dir="ltr"
+                />
+              </div>
+              <div style={{ flex: 1 }}>
+                <label style={{ fontSize: 11, fontWeight: 700, color: '#64748B', display: 'block', marginBottom: 4 }}>الآيبان (IBAN)</label>
+                <input
+                  type="text"
+                  placeholder="SA00..."
+                  value={localIban}
+                  onChange={e => setLocalIban(e.target.value)}
+                  style={fieldStyle}
+                  dir="ltr"
+                />
+              </div>
+            </div>
+
+          </div>
+
+          {/* COLUMN 2: Performance */}
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
+
+            {/* Performance Trackers */}
+            <div style={{ background: 'white', padding: 16, borderRadius: 12, border: '1px solid #E2E8F0', display: 'flex', gap: 16 }}>
+              {/* Kudos */}
+              <div style={{ flex: 1, background: '#F0FDF4', border: '1px solid #BBF7D0', padding: 12, borderRadius: 8, textAlign: 'center' }}>
+                <span style={{ fontSize: 12, fontWeight: 700, color: '#15803D', display: 'block', marginBottom: 8 }}>🏆 إنجازات</span>
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 12 }}>
+                  <button
+                    onClick={() => setLocalKudos(Math.max(0, localKudos - 1))}
+                    style={{ background: 'white', border: '1px solid #86EFAC', borderRadius: 4, width: 28, height: 28, cursor: 'pointer', fontSize: 16, display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+                  >-</button>
+                  <span style={{ fontSize: 22, fontWeight: 900, color: '#166534', minWidth: 32, textAlign: 'center' }}>{localKudos}</span>
+                  <button
+                    onClick={() => setLocalKudos(localKudos + 1)}
+                    style={{ background: 'white', border: '1px solid #86EFAC', borderRadius: 4, width: 28, height: 28, cursor: 'pointer', fontSize: 16, display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+                  >+</button>
+                </div>
+              </div>
+              {/* Warnings */}
+              <div style={{ flex: 1, background: '#FEF2F2', border: '1px solid #FECACA', padding: 12, borderRadius: 8, textAlign: 'center' }}>
+                <span style={{ fontSize: 12, fontWeight: 700, color: '#B91C1C', display: 'block', marginBottom: 8 }}>🛑 لفت نظر</span>
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 12 }}>
+                  <button
+                    onClick={() => setLocalWarnings(Math.max(0, localWarnings - 1))}
+                    style={{ background: 'white', border: '1px solid #FCA5A5', borderRadius: 4, width: 28, height: 28, cursor: 'pointer', fontSize: 16, display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+                  >-</button>
+                  <span style={{ fontSize: 22, fontWeight: 900, color: '#991B1B', minWidth: 32, textAlign: 'center' }}>{localWarnings}</span>
+                  <button
+                    onClick={() => setLocalWarnings(localWarnings + 1)}
+                    style={{ background: 'white', border: '1px solid #FCA5A5', borderRadius: 4, width: 28, height: 28, cursor: 'pointer', fontSize: 16, display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+                  >+</button>
+                </div>
+              </div>
+            </div>
+
+            {/* Private CEO Notes */}
+            <div style={{ background: '#FFFBEB', padding: 16, borderRadius: 12, border: '1px solid #FDE68A', flex: 1, display: 'flex', flexDirection: 'column' }}>
+              <h3 style={{ fontSize: 14, fontWeight: 800, color: '#92400E', margin: '0 0 12px' }}>🕵️‍♂️ السجل السري (للإدارة فقط)</h3>
+              <textarea
+                placeholder="سجل هنا ملاحظاتك الخاصة كمدير عن أداء الموظف لتسهيل التقييم السنوي..."
+                value={localNotes}
+                onChange={e => setLocalNotes(e.target.value)}
+                style={{
+                  ...fieldStyle, flex: 1, minHeight: 150, resize: 'vertical',
+                  background: '#FEF3C7', border: '1px dashed #FCD34D', color: '#92400E', fontSize: 13,
+                }}
+              />
+            </div>
+
+          </div>
+        </div>
+
+        {/* SAVE BUTTON */}
+        {error && <p style={{ fontSize: 12, color: '#B91C1C', marginTop: 12, textAlign: 'center' }}>{error}</p>}
+        <div style={{ marginTop: 24, borderTop: '1px solid #E2E8F0', paddingTop: 16, display: 'flex', justifyContent: 'flex-end' }}>
+          <button
+            onClick={handleSave}
+            disabled={saving}
+            style={{
+              background: '#0F172A', color: 'white', padding: '12px 28px',
+              borderRadius: 8, fontWeight: 700, border: 'none', cursor: saving ? 'not-allowed' : 'pointer',
+              boxShadow: '0 4px 6px rgba(0,0,0,0.1)', fontSize: 14, opacity: saving ? 0.7 : 1,
+            }}
+          >
+            {saving ? '...' : '💾 حفظ بيانات الموظف'}
+          </button>
+        </div>
       </div>
     </div>
   );
@@ -389,13 +679,17 @@ export default function SettingsClient({ whatsapp: initialWA, contacts: initialC
   };
 
   // ── Employees ─────────────────────────────────────────────────────────────
-  const [showEmpModal, setShowEmpModal] = useState(false);
-  const [editEmp,      setEditEmp]      = useState<Employee | null>(null);
+  const [showAddEmpModal,    setShowAddEmpModal]    = useState(false);
+  const [selectedEmployee,   setSelectedEmployee]   = useState<Employee | null>(null);
 
-  const handleEmpSave = (e: Employee, isEdit: boolean) => {
-    if (isEdit) setEmployees(prev => prev.map(x => x.id === e.id ? e : x));
-    else        setEmployees(prev => [...prev, e]);
-    setToast(isEdit ? 'تم التعديل' : 'تمت الإضافة');
+  const handleEmpAdd = (e: Employee) => {
+    setEmployees(prev => [...prev, e]);
+    setToast('تمت الإضافة');
+  };
+
+  const handleEmpProfileSave = (e: Employee) => {
+    setEmployees(prev => prev.map(x => x.id === e.id ? e : x));
+    setToast('تم حفظ بيانات الموظف');
   };
 
   // ── Preferences ──────────────────────────────────────────────────────────
@@ -459,7 +753,6 @@ export default function SettingsClient({ whatsapp: initialWA, contacts: initialC
           <p style={{ fontSize: 13, color: 'var(--txt3)', textAlign: 'center', padding: '12px 0' }}>لم يتم تفعيل هذه الميزة بعد</p>
         ) : (
           <div style={{ display: 'flex', flexDirection: 'column', gap: 0 }}>
-            {/* Toggle تفعيل */}
             <RowItem>
               <div>
                 <div style={{ fontSize: 13, fontWeight: 600, color: 'var(--txt)' }}>تفعيل التنبيهات</div>
@@ -467,8 +760,6 @@ export default function SettingsClient({ whatsapp: initialWA, contacts: initialC
               </div>
               <Toggle checked={wa.enabled} onChange={v => handleToggleWA('enabled', v)} />
             </RowItem>
-
-            {/* Toggle التذكير الصباحي */}
             <RowItem>
               <div>
                 <div style={{ fontSize: 13, fontWeight: 600, color: 'var(--txt)' }}>التذكير الصباحي</div>
@@ -484,24 +775,18 @@ export default function SettingsClient({ whatsapp: initialWA, contacts: initialC
                 <Toggle checked={wa.morning_reminder_enabled} onChange={v => handleToggleWA('morning_reminder_enabled', v)} />
               </div>
             </RowItem>
-
-            {/* Toggle تنبيه المتأخرة */}
             <RowItem>
               <div>
                 <div style={{ fontSize: 13, fontWeight: 600, color: 'var(--txt)' }}>تنبيه المهام المتأخرة</div>
               </div>
               <Toggle checked={wa.overdue_alert_enabled} onChange={v => handleToggleWA('overdue_alert_enabled', v)} />
             </RowItem>
-
-            {/* Toggle تنبيه القرارات */}
             <RowItem>
               <div>
                 <div style={{ fontSize: 13, fontWeight: 600, color: 'var(--txt)' }}>تنبيه القرارات</div>
               </div>
               <Toggle checked={wa.decision_alert_enabled} onChange={v => handleToggleWA('decision_alert_enabled', v)} />
             </RowItem>
-
-            {/* رقم المالك */}
             <div style={{ paddingTop: 16 }}>
               <div style={{ fontSize: 13, fontWeight: 600, color: 'var(--txt)', marginBottom: 8 }}>رقمك الشخصي لاستقبال التنبيهات</div>
               <div style={{ display: 'flex', gap: 8 }}>
@@ -517,8 +802,6 @@ export default function SettingsClient({ whatsapp: initialWA, contacts: initialC
                 </button>
               </div>
             </div>
-
-            {/* جهات الفريق */}
             <div style={{ paddingTop: 20 }}>
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 12 }}>
                 <div style={{ fontSize: 13, fontWeight: 700, color: 'var(--txt)' }}>جهات الفريق</div>
@@ -560,8 +843,6 @@ export default function SettingsClient({ whatsapp: initialWA, contacts: initialC
                 </div>
               )}
             </div>
-
-            {/* الرسائل اليومية */}
             <div style={{ paddingTop: 20 }}>
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 12 }}>
                 <div style={{ fontSize: 13, fontWeight: 700, color: 'var(--txt)' }}>الرسائل اليومية الثابتة</div>
@@ -597,17 +878,6 @@ export default function SettingsClient({ whatsapp: initialWA, contacts: initialC
                 </div>
               )}
             </div>
-
-            {/* زر إرسال اختبار */}
-            <div style={{ paddingTop: 20 }}>
-              <button
-                className="btn"
-                style={{ width: '100%', padding: '12px', fontSize: 14, justifyContent: 'center' }}
-                onClick={() => setToast('تم إرسال رسالة الاختبار (يتطلب تفعيل Twilio)')}
-              >
-                📤 إرسال رسالة اختبار
-              </button>
-            </div>
           </div>
         )}
       </SectionCard>
@@ -615,16 +885,16 @@ export default function SettingsClient({ whatsapp: initialWA, contacts: initialC
       {/* ══════════════════════════════════════════════════════════════════════
           القسم 2: الفريق
       ══════════════════════════════════════════════════════════════════════ */}
-      <SectionCard title="الفريق" icon="👥">
-        {/* Stats Row */}
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 12, marginBottom: 20 }}>
+      <SectionCard title="إدارة الفريق" icon="👥">
+        {/* Stats */}
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 10, marginBottom: 20 }}>
           {[
-            { label: 'نشط', value: activeEmps.length,    color: 'var(--success)' },
-            { label: 'فريلانس', value: freelanceEmps.length, color: 'var(--accent)'  },
-            { label: 'إجمالي شهري', value: `${totalSalary.toLocaleString('ar-SA')} ر.س`, color: 'var(--gold)' },
+            { label: 'موظفون نشطون', value: activeEmps.length, color: 'var(--success)' },
+            { label: 'فريلانسر', value: freelanceEmps.length, color: 'var(--accent)' },
+            { label: 'إجمالي الرواتب', value: `${totalSalary.toLocaleString('ar-SA')} ر.س`, color: 'var(--gold)' },
           ].map(s => (
-            <div key={s.label} style={{ background: 'var(--bg2)', border: '1px solid var(--brd)', borderRadius: 10, padding: '12px 16px', textAlign: 'center' }}>
-              <div style={{ fontSize: 20, fontWeight: 800, color: s.color }}>{s.value}</div>
+            <div key={s.label} style={{ background: 'var(--bg2)', borderRadius: 10, padding: '12px 14px', border: '1px solid var(--brd)' }}>
+              <div style={{ fontSize: 18, fontWeight: 900, color: s.color }}>{s.value}</div>
               <div style={{ fontSize: 11, color: 'var(--txt3)', marginTop: 2 }}>{s.label}</div>
             </div>
           ))}
@@ -634,27 +904,65 @@ export default function SettingsClient({ whatsapp: initialWA, contacts: initialC
         <div style={{ marginBottom: 16 }}>
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 10 }}>
             <div style={{ fontSize: 13, fontWeight: 700, color: 'var(--txt)' }}>الموظفون النشطون</div>
-            <button className="btn btn-sm" onClick={() => { setEditEmp(null); setShowEmpModal(true); }}>+ موظف</button>
+            <button className="btn btn-sm" onClick={() => setShowAddEmpModal(true)}>+ موظف</button>
           </div>
           <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
             {employees.filter(e => e.status !== 'inactive').map(emp => (
-              <div key={emp.id} style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '10px 14px', background: 'var(--bg2)', borderRadius: 10, border: '1px solid var(--brd)', cursor: 'pointer' }}
-                onClick={() => { setEditEmp(emp); setShowEmpModal(true); }}>
-                <div style={{ width: 36, height: 36, borderRadius: '50%', background: 'var(--gold-dim)', border: '1px solid var(--gold-b)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 14, fontWeight: 800, color: 'var(--gold)', flexShrink: 0 }}>
+              <div
+                key={emp.id}
+                style={{
+                  display: 'flex', alignItems: 'center', gap: 12, padding: '10px 14px',
+                  background: 'var(--bg2)', borderRadius: 10, border: '1px solid var(--brd)',
+                  cursor: 'pointer', transition: 'border-color .15s, background .15s',
+                }}
+                onClick={() => setSelectedEmployee(emp)}
+                onMouseEnter={e => {
+                  (e.currentTarget as HTMLDivElement).style.borderColor = 'var(--gold-b)';
+                  (e.currentTarget as HTMLDivElement).style.background = 'var(--gold-dim)';
+                }}
+                onMouseLeave={e => {
+                  (e.currentTarget as HTMLDivElement).style.borderColor = 'var(--brd)';
+                  (e.currentTarget as HTMLDivElement).style.background = 'var(--bg2)';
+                }}
+              >
+                <div style={{
+                  width: 36, height: 36, borderRadius: '50%', background: 'var(--gold-dim)',
+                  border: '1px solid var(--gold-b)', display: 'flex', alignItems: 'center',
+                  justifyContent: 'center', fontSize: 14, fontWeight: 800, color: 'var(--gold)', flexShrink: 0,
+                }}>
                   {emp.name[0]}
                 </div>
                 <div style={{ flex: 1 }}>
                   <div style={{ fontSize: 13, fontWeight: 600, color: 'var(--txt)' }}>{emp.name}</div>
                   <div style={{ fontSize: 11, color: 'var(--txt3)', marginTop: 1 }}>{emp.role}</div>
                 </div>
+                {/* Kudos/Warnings badges */}
+                {((emp.kudos ?? 0) > 0 || (emp.warnings ?? 0) > 0) && (
+                  <div style={{ display: 'flex', gap: 6 }}>
+                    {(emp.kudos ?? 0) > 0 && (
+                      <span style={{ fontSize: 10, padding: '2px 7px', borderRadius: 6, background: 'rgba(52,199,89,0.12)', color: '#15803D', fontWeight: 700 }}>
+                        🏆 {emp.kudos}
+                      </span>
+                    )}
+                    {(emp.warnings ?? 0) > 0 && (
+                      <span style={{ fontSize: 10, padding: '2px 7px', borderRadius: 6, background: 'rgba(255,59,48,0.12)', color: '#B91C1C', fontWeight: 700 }}>
+                        🛑 {emp.warnings}
+                      </span>
+                    )}
+                  </div>
+                )}
                 <div style={{ textAlign: 'left' }}>
                   <div style={{ fontSize: 12, fontWeight: 700, color: 'var(--gold)' }}>
                     {emp.salary_type === 'freelance' ? 'فريلانسر' : `${emp.salary_amount.toLocaleString('ar-SA')} ر.س`}
                   </div>
                 </div>
-                <span style={{ fontSize: 10, padding: '3px 10px', borderRadius: 8, fontWeight: 600, background: STATUS_COLORS[emp.status]?.bg, color: STATUS_COLORS[emp.status]?.color }}>
+                <span style={{
+                  fontSize: 10, padding: '3px 10px', borderRadius: 8, fontWeight: 600,
+                  background: STATUS_COLORS[emp.status]?.bg, color: STATUS_COLORS[emp.status]?.color,
+                }}>
                   {STATUS_LABELS[emp.status]}
                 </span>
+                <span style={{ fontSize: 12, color: 'var(--txt3)', marginRight: 4 }}>←</span>
               </div>
             ))}
           </div>
@@ -666,8 +974,15 @@ export default function SettingsClient({ whatsapp: initialWA, contacts: initialC
             <div style={{ fontSize: 12, fontWeight: 700, color: 'var(--txt3)', marginBottom: 8 }}>غير نشط</div>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
               {employees.filter(e => e.status === 'inactive').map(emp => (
-                <div key={emp.id} style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '8px 12px', background: 'var(--bg2)', borderRadius: 8, border: '1px solid var(--brd)', opacity: 0.6, cursor: 'pointer' }}
-                  onClick={() => { setEditEmp(emp); setShowEmpModal(true); }}>
+                <div
+                  key={emp.id}
+                  style={{
+                    display: 'flex', alignItems: 'center', gap: 10, padding: '8px 12px',
+                    background: 'var(--bg2)', borderRadius: 8, border: '1px solid var(--brd)',
+                    opacity: 0.6, cursor: 'pointer',
+                  }}
+                  onClick={() => setSelectedEmployee(emp)}
+                >
                   <div style={{ width: 28, height: 28, borderRadius: '50%', background: 'var(--brd)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 12, fontWeight: 700, color: 'var(--txt3)', flexShrink: 0 }}>
                     {emp.name[0]}
                   </div>
@@ -690,17 +1005,21 @@ export default function SettingsClient({ whatsapp: initialWA, contacts: initialC
         </div>
         <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
           {brands.map(b => (
-            <div key={b.id} style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '10px 14px', background: 'var(--bg2)', borderRadius: 10, border: '1px solid var(--brd)' }}>
-              <span style={{ fontSize: 18 }}>{b.icon}</span>
-              <div style={{ width: 10, height: 10, borderRadius: '50%', background: b.color, flexShrink: 0 }} />
+            <div key={b.id} style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '10px 14px', background: 'var(--bg2)', borderRadius: 10, border: '1px solid var(--brd)', cursor: 'pointer' }}
+              onClick={() => { setEditBrand(b); setShowBrandModal(true); }}>
+              <div style={{ width: 34, height: 34, borderRadius: 8, background: `${b.color}22`, border: `1px solid ${b.color}44`, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 16, flexShrink: 0 }}>
+                {b.icon}
+              </div>
               <div style={{ flex: 1 }}>
                 <div style={{ fontSize: 13, fontWeight: 600, color: 'var(--txt)' }}>{b.name}</div>
-                {b.description && <div style={{ fontSize: 11, color: 'var(--txt3)', marginTop: 1 }}>{b.description}</div>}
+                {b.nameEn && <div style={{ fontSize: 11, color: 'var(--txt3)', direction: 'ltr' }}>{b.nameEn}</div>}
               </div>
-              <span style={{ fontSize: 10, padding: '3px 10px', borderRadius: 8, fontWeight: 600, background: BRAND_STATUS_COLORS[b.status]?.bg, color: BRAND_STATUS_COLORS[b.status]?.color }}>
+              <span style={{
+                fontSize: 10, padding: '3px 10px', borderRadius: 8, fontWeight: 600,
+                background: BRAND_STATUS_COLORS[b.status]?.bg, color: BRAND_STATUS_COLORS[b.status]?.color,
+              }}>
                 {BRAND_STATUS_LABELS[b.status]}
               </span>
-              <button className="btn btn-sm btn-plain" onClick={() => { setEditBrand(b); setShowBrandModal(true); }}>تعديل</button>
             </div>
           ))}
         </div>
@@ -712,8 +1031,8 @@ export default function SettingsClient({ whatsapp: initialWA, contacts: initialC
       <SectionCard title="التفضيلات" icon="⚙️">
         <RowItem>
           <div>
-            <div style={{ fontSize: 13, fontWeight: 600, color: 'var(--txt)' }}>الأرقام العربية (٠١٢٣)</div>
-            <div style={{ fontSize: 11, color: 'var(--txt3)', marginTop: 2 }}>عرض الأرقام بالشكل العربي في النظام</div>
+            <div style={{ fontSize: 13, fontWeight: 600, color: 'var(--txt)' }}>الأرقام العربية</div>
+            <div style={{ fontSize: 11, color: 'var(--txt3)', marginTop: 2 }}>عرض الأرقام بالشكل العربي (٠١٢٣...)</div>
           </div>
           <Toggle checked={useEastern} onChange={handleToggleEastern} />
         </RowItem>
@@ -722,37 +1041,11 @@ export default function SettingsClient({ whatsapp: initialWA, contacts: initialC
       {/* ══════════════════════════════════════════════════════════════════════
           القسم 5: البيانات
       ══════════════════════════════════════════════════════════════════════ */}
-      <SectionCard title="البيانات" icon="💾">
-        <p style={{ fontSize: 12, color: 'var(--txt3)', marginBottom: 16, lineHeight: 1.6 }}>
-          البيانات محفوظة في Supabase. استخدم التصدير للنسخ الاحتياطي.
-        </p>
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-          <button className="btn" style={{ width: '100%', padding: '10px', fontSize: 13, justifyContent: 'center' }} onClick={handleExport}>
-            📤 تصدير JSON
-          </button>
-          <label style={{ cursor: 'pointer' }}>
-            <div className="btn btn-plain" style={{ width: '100%', padding: '10px', fontSize: 13, textAlign: 'center', display: 'block' }}>
-              📥 استيراد JSON
-            </div>
-            <input type="file" accept=".json" style={{ display: 'none' }} onChange={e => {
-              const file = e.target.files?.[0];
-              if (!file) return;
-              const reader = new FileReader();
-              reader.onload = () => setToast('تم قراءة الملف — الاستيراد يتطلب تفعيلاً يدوياً');
-              reader.readAsText(file);
-            }} />
-          </label>
-          <button
-            style={{ width: '100%', padding: '10px', fontSize: 13, borderRadius: 8, border: '1px solid rgba(255,59,48,0.3)', background: 'rgba(255,59,48,0.05)', color: 'var(--danger)', cursor: 'pointer', fontFamily: 'inherit', fontWeight: 600 }}
-            onClick={() => {
-              if (confirm('هل أنت متأكد من إعادة الضبط؟')) {
-                if (confirm('هذا الإجراء لا يمكن التراجع عنه. هل تريد المتابعة؟')) {
-                  setToast('إعادة الضبط تتطلب تأكيداً إضافياً من المطور');
-                }
-              }
-            }}
-          >
-            🗑️ إعادة ضبط
+      <SectionCard title="البيانات والنسخ الاحتياطي" icon="💾">
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+          <div style={{ fontSize: 12, color: 'var(--txt3)' }}>تصدير جميع بيانات النظام كملف JSON</div>
+          <button className="btn" onClick={handleExport} style={{ width: 'fit-content' }}>
+            ⬇️ تصدير البيانات
           </button>
         </div>
       </SectionCard>
@@ -765,14 +1058,19 @@ export default function SettingsClient({ whatsapp: initialWA, contacts: initialC
           onSave={handleBrandSave}
         />
       )}
-      {showEmpModal && (
-        <EmployeeModal
-          editEmp={editEmp}
-          onClose={() => { setShowEmpModal(false); setEditEmp(null); }}
-          onSave={handleEmpSave}
+      {showAddEmpModal && (
+        <EmployeeAddModal
+          onClose={() => setShowAddEmpModal(false)}
+          onSave={handleEmpAdd}
         />
       )}
-
+      {selectedEmployee && (
+        <EmployeeProfileModal
+          employee={selectedEmployee}
+          onClose={() => setSelectedEmployee(null)}
+          onSave={handleEmpProfileSave}
+        />
+      )}
       {/* ── Toast ── */}
       {toast && <Toast msg={toast} onClose={() => setToast('')} />}
     </div>
