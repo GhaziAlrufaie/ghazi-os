@@ -971,8 +971,10 @@ export default function SettingsClient({ whatsapp: initialWA, contacts: initialC
           <button className="btn btn-sm" onClick={() => setShowAddEmpModal(true)}>+ موظف</button>
         </div>
 
-        {/* Grouped by Brand — CSS Grid */}
+        {/* Grouped by Brand — Compact Seamless List */}
         {(() => {
+          const parseSalary = (emp: Employee) =>
+            emp.salary_type === 'freelance' ? 0 : emp.salary_amount;
           const grouped = employees.reduce((acc, emp) => {
             const brandKey = emp.brand || 'الإدارة العامة';
             if (!acc[brandKey]) acc[brandKey] = [];
@@ -981,60 +983,64 @@ export default function SettingsClient({ whatsapp: initialWA, contacts: initialC
           }, {} as Record<string, Employee[]>);
 
           return (
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(360px, 1fr))', gap: 24, width: '100%', alignItems: 'start' }}>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '20px', width: '100%', marginTop: '8px', alignItems: 'start' }}>
               {Object.entries(grouped).map(([brandName, emps]) => {
-                const brandTotal = emps
-                  .filter(e => e.salary_type === 'fixed')
-                  .reduce((s, e) => s + e.salary_amount, 0);
+                const totalCost = emps.reduce((sum, emp) => sum + parseSalary(emp), 0);
                 return (
-                  <div key={brandName} style={{ background: '#F8FAFC', borderRadius: 16, border: '1px solid #E2E8F0', overflow: 'hidden', boxShadow: '0 4px 6px -1px rgba(0,0,0,0.02)' }}>
-                    {/* Brand Header */}
-                    <div style={{ background: '#FFFFFF', padding: '14px 18px', borderBottom: '1px solid #E2E8F0', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                      <h2 style={{ fontSize: 15, fontWeight: 900, color: '#0F172A', margin: 0 }}>🏢 {brandName}</h2>
-                      <div style={{ background: '#FEF2F2', padding: '5px 10px', borderRadius: 8, border: '1px solid #FECACA', textAlign: 'center' }}>
-                        <span style={{ fontSize: 10, color: '#991B1B', fontWeight: 700, display: 'block', marginBottom: 1 }}>إجمالي الرواتب</span>
-                        <span style={{ fontSize: 13, color: '#7F1D1D', fontWeight: 900 }}>{brandTotal.toLocaleString('ar-SA')} ر.س</span>
+                  <div key={brandName} style={{ background: '#FFFFFF', borderRadius: '16px', border: '1px solid #E2E8F0', boxShadow: '0 4px 6px -1px rgba(0,0,0,0.02)', overflow: 'hidden' }}>
+                    {/* Sleek Brand Header */}
+                    <div style={{ background: '#F8FAFC', padding: '14px 18px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid #E2E8F0' }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                        <span style={{ fontSize: '15px' }}>🏢</span>
+                        <h3 style={{ fontSize: '14px', fontWeight: '900', color: '#0F172A', margin: 0 }}>{brandName}</h3>
+                        <span style={{ background: '#E2E8F0', color: '#475569', fontSize: '11px', fontWeight: 'bold', padding: '2px 8px', borderRadius: '12px' }}>{emps.length}</span>
                       </div>
+                      <span style={{ fontSize: '12px', fontWeight: '800', color: '#475569', background: '#F1F5F9', padding: '4px 10px', borderRadius: '6px', border: '1px solid #E2E8F0' }}>
+                        {totalCost.toLocaleString('ar-SA')} ر.س
+                      </span>
                     </div>
-                    {/* Employees in this brand */}
-                    <div style={{ padding: 14, display: 'flex', flexDirection: 'column', gap: 10 }}>
-                      {emps.map(emp => (
+                    {/* Seamless Employee List — no nested cards */}
+                    <div style={{ display: 'flex', flexDirection: 'column' }}>
+                      {emps.map((emp, idx) => (
                         <div
                           key={emp.id}
                           onClick={() => setSelectedEmployee(emp)}
-                          style={{ background: '#FFFFFF', padding: '12px 14px', borderRadius: 10, border: '1px solid #E2E8F0', cursor: 'pointer', display: 'flex', justifyContent: 'space-between', alignItems: 'center', transition: 'border-color .15s, box-shadow .15s' }}
-                          onMouseEnter={e => {
-                            (e.currentTarget as HTMLDivElement).style.borderColor = 'var(--gold-b)';
-                            (e.currentTarget as HTMLDivElement).style.boxShadow = '0 2px 8px rgba(201,168,76,0.15)';
+                          style={{
+                            padding: '11px 18px',
+                            cursor: 'pointer',
+                            display: 'flex',
+                            justifyContent: 'space-between',
+                            alignItems: 'center',
+                            borderBottom: idx === emps.length - 1 ? 'none' : '1px dashed #E2E8F0',
+                            transition: 'background 0.15s',
                           }}
-                          onMouseLeave={e => {
-                            (e.currentTarget as HTMLDivElement).style.borderColor = '#E2E8F0';
-                            (e.currentTarget as HTMLDivElement).style.boxShadow = 'none';
-                          }}
+                          onMouseEnter={e => { (e.currentTarget as HTMLDivElement).style.background = '#F8FAFC'; }}
+                          onMouseLeave={e => { (e.currentTarget as HTMLDivElement).style.background = 'transparent'; }}
                         >
-                          <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-                            <div style={{ width: 38, height: 38, background: 'var(--gold-dim)', border: '1px solid var(--gold-b)', borderRadius: '50%', display: 'flex', justifyContent: 'center', alignItems: 'center', fontWeight: 800, color: 'var(--gold)', fontSize: 15, flexShrink: 0 }}>
-                              {emp.name[0]}
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                            <div style={{ width: '34px', height: '34px', background: '#F1F5F9', borderRadius: '50%', display: 'flex', justifyContent: 'center', alignItems: 'center', fontWeight: 'bold', color: '#475569', fontSize: '13px', border: '1px solid #E2E8F0', flexShrink: 0 }}>
+                              {emp.name.charAt(0)}
                             </div>
-                            <div>
-                              <div style={{ fontSize: 13, fontWeight: 800, color: '#1E293B', margin: 0 }}>{emp.name}</div>
-                              <div style={{ fontSize: 11, color: '#64748B', marginTop: 1 }}>{emp.role}</div>
+                            <div style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
+                              <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                                <span style={{ fontSize: '13px', fontWeight: '800', color: '#1E293B' }}>{emp.name}</span>
+                                <div
+                                  title={STATUS_LABELS[emp.status] || 'نشط'}
+                                  style={{ width: '7px', height: '7px', borderRadius: '50%', background: emp.status === 'active' ? '#10B981' : emp.status === 'inactive' ? '#EF4444' : '#10B981', flexShrink: 0 }}
+                                />
+                                {((emp.kudos ?? 0) > 0) && (
+                                  <span style={{ fontSize: '10px', color: '#15803D', fontWeight: 700 }}>🏆{emp.kudos}</span>
+                                )}
+                                {((emp.warnings ?? 0) > 0) && (
+                                  <span style={{ fontSize: '10px', color: '#B91C1C', fontWeight: 700 }}>🛑{emp.warnings}</span>
+                                )}
+                              </div>
+                              <span style={{ fontSize: '11px', color: '#64748B' }}>{emp.role}</span>
                             </div>
                           </div>
-                          <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                            {((emp.kudos ?? 0) > 0) && (
-                              <span style={{ fontSize: 10, padding: '2px 6px', borderRadius: 5, background: 'rgba(52,199,89,0.12)', color: '#15803D', fontWeight: 700 }}>🏆 {emp.kudos}</span>
-                            )}
-                            {((emp.warnings ?? 0) > 0) && (
-                              <span style={{ fontSize: 10, padding: '2px 6px', borderRadius: 5, background: 'rgba(255,59,48,0.12)', color: '#B91C1C', fontWeight: 700 }}>🛑 {emp.warnings}</span>
-                            )}
-                            <span style={{ fontSize: 12, fontWeight: 800, color: '#10B981', background: '#ECFDF5', padding: '4px 8px', borderRadius: 6 }}>
-                              {emp.salary_type === 'freelance' ? 'فريلانسر' : `${emp.salary_amount.toLocaleString('ar-SA')} ر.س`}
-                            </span>
-                            <span style={{ fontSize: 10, padding: '2px 8px', borderRadius: 6, fontWeight: 600, background: STATUS_COLORS[emp.status]?.bg, color: STATUS_COLORS[emp.status]?.color }}>
-                              {STATUS_LABELS[emp.status]}
-                            </span>
-                          </div>
+                          <span style={{ fontSize: '12px', fontWeight: '800', color: '#059669', whiteSpace: 'nowrap' }}>
+                            {emp.salary_type === 'freelance' ? 'فريلانسر' : `${emp.salary_amount.toLocaleString('ar-SA')} ر.س`}
+                          </span>
                         </div>
                       ))}
                     </div>
