@@ -19,6 +19,7 @@ export interface Employee {
   warnings?: number;
   phone?: string | null;
   iban?: string | null;
+  attachments?: { name: string; url: string }[] | null;
 }
 
 export const SALARY_TYPE_LABELS: Record<string, string> = {

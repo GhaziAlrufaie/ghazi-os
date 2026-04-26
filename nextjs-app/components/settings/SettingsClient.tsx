@@ -299,7 +299,17 @@ function EmployeeProfileModal({ employee, onClose, onSave }: {
   const [localSalaryType, setLocalSalaryType] = useState<Employee['salary_type']>(employee.salary_type);
   const [localSalaryAmount, setLocalSalaryAmount] = useState(String(employee.salary_amount));
   const [localStatus,   setLocalStatus]   = useState<Employee['status']>(employee.status);
-  const [localSopUrl,   setLocalSopUrl]   = useState(employee.sop_url ?? '');
+  const [localAttachments, setLocalAttachments] = useState<{ name: string; url: string }[]>(() => {
+    try {
+      let docs = (employee.attachments as { name: string; url: string }[] | null | undefined) || [];
+      if (!Array.isArray(docs)) docs = [];
+      // Migrate old sop_url if attachments is empty
+      if (docs.length === 0 && employee.sop_url) {
+        docs = [{ name: 'دليل العمل.pdf', url: employee.sop_url }];
+      }
+      return docs;
+    } catch { return []; }
+  });
   const [localAccess,   setLocalAccess]   = useState(employee.access_rights ?? '');
   const [localNotes,    setLocalNotes]    = useState(employee.private_notes ?? '');
   const [localKudos,    setLocalKudos]    = useState(employee.kudos ?? 0);
@@ -315,7 +325,16 @@ function EmployeeProfileModal({ employee, onClose, onSave }: {
     setLocalSalaryType(employee.salary_type);
     setLocalSalaryAmount(String(employee.salary_amount));
     setLocalStatus(employee.status);
-    setLocalSopUrl(employee.sop_url ?? '');
+    setLocalAttachments(() => {
+      try {
+        let docs = (employee.attachments as { name: string; url: string }[] | null | undefined) || [];
+        if (!Array.isArray(docs)) docs = [];
+        if (docs.length === 0 && employee.sop_url) {
+          docs = [{ name: 'دليل العمل.pdf', url: employee.sop_url }];
+        }
+        return docs;
+      } catch { return []; }
+    });
     setLocalAccess(employee.access_rights ?? '');
     setLocalNotes(employee.private_notes ?? '');
     setLocalKudos(employee.kudos ?? 0);
@@ -327,19 +346,29 @@ function EmployeeProfileModal({ employee, onClose, onSave }: {
   const [saving, setSaving] = useState(false);
 
   async function handleFileUpload(e: React.ChangeEvent<HTMLInputElement>) {
-    const file = e.target.files?.[0];
-    if (!file) return;
+    const files = Array.from(e.target.files || []);
+    if (!files.length) return;
     setIsUploading(true);
     const sb = createBrowserClient();
-    const fileName = `sop_${employee.id}_${Date.now()}_${file.name.replace(/[^a-zA-Z0-9._-]/g, '_')}`;
-    const { error: uploadError } = await sb.storage.from('hr_docs').upload(fileName, file, { upsert: true });
-    if (uploadError) {
-      alert('خطأ في الرفع: ' + uploadError.message);
-    } else {
-      const { data } = sb.storage.from('hr_docs').getPublicUrl(fileName);
-      setLocalSopUrl(data.publicUrl);
+    const uploadedDocs: { name: string; url: string }[] = [];
+    for (const file of files) {
+      const fileExt = file.name.split('.').pop() ?? 'bin';
+      const safeName = file.name.replace(/[^a-zA-Z0-9.\-_]/g, '').substring(0, 15);
+      const fileName = `emp-${employee.id}-${Date.now()}-${Math.random().toString(36).substring(7)}-${safeName}.${fileExt}`;
+      const { error: uploadError } = await sb.storage.from('hr_docs').upload(fileName, file);
+      if (!uploadError) {
+        const { data } = sb.storage.from('hr_docs').getPublicUrl(fileName);
+        uploadedDocs.push({ name: file.name, url: data.publicUrl });
+      } else {
+        console.error('Upload Error for', file.name, uploadError);
+      }
     }
+    setLocalAttachments(prev => [...prev, ...uploadedDocs]);
     setIsUploading(false);
+    e.target.value = '';
+  }
+  function removeAttachment(indexToRemove: number) {
+    setLocalAttachments(prev => prev.filter((_, i) => i !== indexToRemove));
   }
   const [error,  setError]  = useState('');
 
@@ -357,8 +386,9 @@ function EmployeeProfileModal({ employee, onClose, onSave }: {
         salaryType: localSalaryType,
         salaryAmount: Number(localSalaryAmount) || 0,
         status: localStatus,
-        sopUrl: localSopUrl || null,
+        sopUrl: localAttachments.length > 0 ? localAttachments[0].url : null,
         accessRights: localAccess || null,
+        attachments: localAttachments,
         privateNotes: localNotes || null,
         kudos: localKudos,
         warnings: localWarnings,
@@ -373,8 +403,9 @@ function EmployeeProfileModal({ employee, onClose, onSave }: {
         salary_type: localSalaryType,
         salary_amount: Number(localSalaryAmount) || 0,
         status: localStatus,
-        sop_url: localSopUrl || null,
+        sop_url: localAttachments.length > 0 ? localAttachments[0].url : null,
         access_rights: localAccess || null,
+        attachments: localAttachments,
         private_notes: localNotes || null,
         kudos: localKudos,
         warnings: localWarnings,
@@ -494,34 +525,34 @@ function EmployeeProfileModal({ employee, onClose, onSave }: {
           {/* COLUMN 1: Management & Docs */}
           <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
 
-            {/* SOP Vault — File Upload */}
-            <div style={{ background: 'white', padding: 16, borderRadius: 12, border: '1px solid #E2E8F0' }}>
-              <h3 style={{ fontSize: 14, fontWeight: 800, color: '#1E293B', margin: '0 0 12px' }}>📄 دليل العمل (SOP)</h3>
-              {localSopUrl ? (
-                <div style={{ display: 'flex', gap: 10, alignItems: 'center', flexWrap: 'wrap' }}>
-                  <a href={localSopUrl} target="_blank" rel="noreferrer"
-                    style={{ background: '#EFF6FF', color: '#2563EB', padding: '8px 12px', borderRadius: 6, fontSize: 12, fontWeight: 700, textDecoration: 'none' }}>
-                    🔗 عرض الملف المرفوع
-                  </a>
-                  <button onClick={() => setLocalSopUrl('')}
-                    style={{ color: '#EF4444', border: 'none', background: 'none', cursor: 'pointer', fontSize: 12, fontWeight: 700 }}>
-                    حذف ورفع جديد
-                  </button>
-                </div>
-              ) : (
-                <div>
-                  <input
-                    type="file"
-                    accept=".pdf,.doc,.docx,.png,.jpg"
-                    onChange={handleFileUpload}
-                    disabled={isUploading}
-                    style={{ width: '100%', fontSize: 12 }}
-                  />
-                  {isUploading && (
-                    <span style={{ fontSize: 11, color: '#F59E0B', display: 'block', marginTop: 8 }}>⏳ جاري الرفع...</span>
-                  )}
-                </div>
-              )}
+            {/* Multi-File Archive */}
+            <div style={{ background: '#FFFFFF', padding: 16, borderRadius: 12, border: '1px solid #E2E8F0' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
+                <h3 style={{ fontSize: 14, fontWeight: 900, color: '#1E293B', margin: 0 }}>🗂️ ملفات ومستندات الموظف</h3>
+                <label style={{ cursor: isUploading ? 'not-allowed' : 'pointer', background: '#0F172A', color: '#FFFFFF', padding: '8px 16px', borderRadius: 8, fontSize: 12, fontWeight: 'bold', transition: '0.2s', display: 'flex', alignItems: 'center', gap: 8 }}>
+                  {isUploading ? '⏳ جاري الرفع...' : '➕ إضافة ملفات'}
+                  <input type="file" multiple onChange={handleFileUpload} disabled={isUploading} style={{ display: 'none' }} accept="*/*" />
+                </label>
+              </div>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+                {localAttachments.map((file, idx) => (
+                  <div key={idx} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: '#F8FAFC', padding: '10px 16px', borderRadius: 8, border: '1px solid #E2E8F0' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 12, overflow: 'hidden' }}>
+                      <span style={{ fontSize: 16 }}>📄</span>
+                      <span style={{ fontSize: 13, fontWeight: 700, color: '#334155', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', maxWidth: 250 }} title={file.name}>{file.name}</span>
+                    </div>
+                    <div style={{ display: 'flex', gap: 8 }}>
+                      <a href={file.url} target="_blank" rel="noopener noreferrer" style={{ background: '#EFF6FF', color: '#2563EB', padding: '6px 12px', borderRadius: 6, fontSize: 11, fontWeight: 'bold', textDecoration: 'none' }}>عرض</a>
+                      <button onClick={() => removeAttachment(idx)} style={{ background: '#FEF2F2', color: '#EF4444', border: 'none', padding: '6px 12px', borderRadius: 6, fontSize: 11, fontWeight: 'bold', cursor: 'pointer' }}>حذف</button>
+                    </div>
+                  </div>
+                ))}
+                {localAttachments.length === 0 && (
+                  <div style={{ padding: 20, textAlign: 'center', background: '#F1F5F9', borderRadius: 8, border: '1px dashed #CBD5E1' }}>
+                    <span style={{ fontSize: 12, color: '#64748B', fontWeight: 'bold' }}>لا توجد ملفات مرفوعة حالياً. ارفع الهوية، العقود، أو دليل العمل...</span>
+                  </div>
+                )}
+              </div>
             </div>
 
             {/* Brand Assignment */}

@@ -72,6 +72,7 @@ export async function updateEmployee(
     phone?: string | null;
     iban?: string | null;
     brand?: string | null;
+    attachments?: { name: string; url: string }[] | null;
   }
 ): Promise<void> {
   const sb = getSupabase();
@@ -92,6 +93,7 @@ export async function updateEmployee(
   if (updates.phone !== undefined) payload.phone = updates.phone;
   if (updates.iban !== undefined) payload.iban = updates.iban;
   if (updates.brand !== undefined) payload.brand = updates.brand;
+  if (updates.attachments !== undefined) payload.attachments = updates.attachments;
   const { error } = await sb.from('employees').update(payload).eq('id', id);
   if (error) throw new Error(error.message);
 }
