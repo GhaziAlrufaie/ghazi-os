@@ -6,7 +6,8 @@ import React, { useState, useEffect, useRef, useMemo } from 'react';
 import type { Task, TaskStatus, TaskPriority } from '@/lib/tasks-actions';
 import { createBrowserClient } from '@/lib/supabase';
 
-interface ChecklistItem { id: string; text: string; isCompleted: boolean; }
+interface ChecklistLog { id: string; text: string; type: 'update' | 'info' | 'blocker'; date: string; }
+interface ChecklistItem { id: string; text: string; isCompleted: boolean; logs?: ChecklistLog[]; }
 interface ChecklistGroup { id: string; title: string; items: ChecklistItem[]; }
 
 const STATUS_OPTIONS: { v: TaskStatus; lbl: string; bg: string; color: string }[] = [
@@ -58,6 +59,10 @@ export default function TaskPanel({ task, onClose, onUpdate, onDelete, onArchive
   const [latestUpdate, setLatestUpdate]   = useState<string>('');
   const [groups, setGroups]     = useState<ChecklistGroup[]>([]);
   const [bgSaving, setBgSaving] = useState(false); // background save indicator only
+  // ── Nested Logs state ──────────────────────────────────────────────────────
+  const [expandedLogs, setExpandedLogs] = useState<Record<string, boolean>>({});
+  const [newLogText, setNewLogText] = useState<Record<string, string>>({});
+  const [newLogType, setNewLogType] = useState<Record<string, 'update' | 'info' | 'blocker'>>({});
 
   // Stable browser supabase client — never recreated
   const supabase = useMemo(() => createBrowserClient(), []);
@@ -172,6 +177,36 @@ export default function TaskPanel({ task, onClose, onUpdate, onDelete, onArchive
   }
   function deleteItem(gid: string, iid: string) {
     saveGroups(groups.map(g => g.id === gid ? { ...g, items: g.items.filter(i => i.id !== iid) } : g));
+  }
+  // ── Nested Logs functions ──────────────────────────────────────────────────
+  function toggleLogs(gid: string, iid: string) {
+    const key = `${gid}-${iid}`;
+    setExpandedLogs(prev => ({ ...prev, [key]: !prev[key] }));
+    if (!newLogType[key]) setNewLogType(prev => ({ ...prev, [key]: 'update' }));
+  }
+  function handleAddLog(gid: string, iid: string) {
+    const key = `${gid}-${iid}`;
+    const text = newLogText[key];
+    if (!text || !text.trim()) return;
+    const newLog: ChecklistLog = {
+      id: Date.now().toString(),
+      text: text.trim(),
+      type: newLogType[key] || 'update',
+      date: new Date().toLocaleString('ar-SA', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' }),
+    };
+    const updated = groups.map(g => g.id === gid ? {
+      ...g,
+      items: g.items.map(i => i.id === iid ? { ...i, logs: [...(i.logs || []), newLog] } : i),
+    } : g);
+    saveGroups(updated);
+    setNewLogText(prev => ({ ...prev, [key]: '' }));
+  }
+  function handleDeleteLog(gid: string, iid: string, logId: string) {
+    const updated = groups.map(g => g.id === gid ? {
+      ...g,
+      items: g.items.map(i => i.id === iid ? { ...i, logs: (i.logs || []).filter(l => l.id !== logId) } : i),
+    } : g);
+    saveGroups(updated);
   }
 
   function handleDelete() {
@@ -339,16 +374,78 @@ export default function TaskPanel({ task, onClose, onUpdate, onDelete, onArchive
                       <button className="vip-modal-del-group-btn" onClick={() => deleteGroup(group.id)} title="حذف المجموعة">🗑️</button>
                     </div>
                     <div style={{ display: 'flex', flexDirection: 'column' }}>
-                      {group.items.map(item => (
-                        <div key={item.id} className="vip-checklist-item">
-                          <input type="checkbox" className="vip-checkbox" checked={item.isCompleted} onChange={() => toggleItem(group.id, item.id)} />
-                          <input className={`vip-checklist-input${item.isCompleted ? ' completed' : ''}`} value={item.text}
-                            placeholder="اكتب خطوة التنفيذ..."
-                            onChange={e => updateItemText(group.id, item.id, e.target.value)}
-                            onBlur={e => saveItemText(group.id, item.id, e.target.value)} />
-                          <button className="vip-modal-del-item-btn" onClick={() => deleteItem(group.id, item.id)} title="حذف">✕</button>
-                        </div>
-                      ))}
+                      {group.items.map(item => {
+                        const logKey = `${group.id}-${item.id}`;
+                        const isExpanded = expandedLogs[logKey];
+                        const logType = newLogType[logKey] || 'update';
+                        return (
+                          <div key={item.id}>
+                            {/* Item Row */}
+                            <div className="vip-checklist-item" style={{ alignItems: 'center' }}>
+                              <input type="checkbox" className="vip-checkbox" checked={item.isCompleted} onChange={() => toggleItem(group.id, item.id)} />
+                              <input className={`vip-checklist-input${item.isCompleted ? ' completed' : ''}`} value={item.text}
+                                placeholder="اكتب خطوة التنفيذ..."
+                                onChange={e => updateItemText(group.id, item.id, e.target.value)}
+                                onBlur={e => saveItemText(group.id, item.id, e.target.value)} />
+                              <div style={{ display: 'flex', gap: 6, alignItems: 'center', flexShrink: 0 }}>
+                                <button
+                                  onClick={() => toggleLogs(group.id, item.id)}
+                                  style={{ background: isExpanded ? '#EFF6FF' : '#F8FAFC', border: `1px solid ${isExpanded ? '#BFDBFE' : '#E2E8F0'}`, color: isExpanded ? '#1D4ED8' : '#475569', fontSize: 11, fontWeight: 'bold', padding: '4px 10px', borderRadius: 6, cursor: 'pointer', display: 'flex', gap: 4, alignItems: 'center', transition: '0.2s', whiteSpace: 'nowrap' }}
+                                >
+                                  💬 {(item.logs?.length ?? 0) > 0 ? `${item.logs!.length} تحديثات` : 'سجل'}
+                                </button>
+                                <button className="vip-modal-del-item-btn" onClick={() => deleteItem(group.id, item.id)} title="حذف">✕</button>
+                              </div>
+                            </div>
+                            {/* Nested Logs Area */}
+                            {isExpanded && (
+                              <div style={{ marginRight: 28, paddingRight: 16, borderRight: '2px dashed #CBD5E1', display: 'flex', flexDirection: 'column', gap: 12, marginTop: 8, marginBottom: 16 }}>
+                                {/* Input Area */}
+                                <div style={{ background: '#F8FAFC', padding: 12, borderRadius: 8, border: '1px solid #E2E8F0' }}>
+                                  <div style={{ display: 'flex', gap: 6, marginBottom: 10 }}>
+                                    <button onClick={() => setNewLogType(p => ({ ...p, [logKey]: 'update' }))} style={{ flex: 1, padding: 6, borderRadius: 6, fontSize: 11, fontWeight: 'bold', cursor: 'pointer', border: logType === 'update' ? '1px solid #3B82F6' : '1px solid transparent', background: logType === 'update' ? '#EFF6FF' : '#F1F5F9', color: logType === 'update' ? '#1D4ED8' : '#64748B' }}>📞 تواصل</button>
+                                    <button onClick={() => setNewLogType(p => ({ ...p, [logKey]: 'info' }))} style={{ flex: 1, padding: 6, borderRadius: 6, fontSize: 11, fontWeight: 'bold', cursor: 'pointer', border: logType === 'info' ? '1px solid #F59E0B' : '1px solid transparent', background: logType === 'info' ? '#FFFBEB' : '#F1F5F9', color: logType === 'info' ? '#B45309' : '#64748B' }}>💡 معلومة</button>
+                                    <button onClick={() => setNewLogType(p => ({ ...p, [logKey]: 'blocker' }))} style={{ flex: 1, padding: 6, borderRadius: 6, fontSize: 11, fontWeight: 'bold', cursor: 'pointer', border: logType === 'blocker' ? '1px solid #EF4444' : '1px solid transparent', background: logType === 'blocker' ? '#FEF2F2' : '#F1F5F9', color: logType === 'blocker' ? '#B91C1C' : '#64748B' }}>🛑 عقبة</button>
+                                  </div>
+                                  <div style={{ display: 'flex', gap: 8 }}>
+                                    <input
+                                      type="text"
+                                      placeholder="سجل ما حدث في هذه الخطوة..."
+                                      value={newLogText[logKey] || ''}
+                                      onChange={e => setNewLogText(p => ({ ...p, [logKey]: e.target.value }))}
+                                      onKeyDown={e => e.key === 'Enter' && handleAddLog(group.id, item.id)}
+                                      style={{ flex: 1, padding: '8px 12px', borderRadius: 6, border: '1px solid #CBD5E1', fontSize: 12, outline: 'none', fontFamily: 'inherit' }}
+                                    />
+                                    <button onClick={() => handleAddLog(group.id, item.id)} style={{ background: '#0F172A', color: 'white', border: 'none', padding: '0 16px', borderRadius: 6, fontSize: 12, fontWeight: 'bold', cursor: 'pointer', fontFamily: 'inherit' }}>حفظ</button>
+                                  </div>
+                                </div>
+                                {/* Logs Timeline */}
+                                <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+                                  {(item.logs || []).slice().reverse().map(log => {
+                                    const isUpd = log.type === 'update';
+                                    const isInf = log.type === 'info';
+                                    const bg = isUpd ? '#EFF6FF' : isInf ? '#FFFBEB' : '#FEF2F2';
+                                    const border = isUpd ? '#BFDBFE' : isInf ? '#FDE68A' : '#FECACA';
+                                    const color = isUpd ? '#1D4ED8' : isInf ? '#B45309' : '#B91C1C';
+                                    const icon = isUpd ? '📞' : isInf ? '💡' : '🛑';
+                                    const label = isUpd ? 'تواصل وتحديث' : isInf ? 'معلومة / قرار' : 'عقبة وتأخير';
+                                    return (
+                                      <div key={log.id} style={{ background: bg, border: `1px solid ${border}`, padding: '10px 14px', borderRadius: 8, position: 'relative' }}>
+                                        <button onClick={() => handleDeleteLog(group.id, item.id, log.id)} style={{ position: 'absolute', top: 8, left: 8, background: 'none', border: 'none', color: border, cursor: 'pointer', fontSize: 14, fontWeight: 'bold' }}>✕</button>
+                                        <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 6 }}>
+                                          <span style={{ fontSize: 11, fontWeight: 900, color }}>{icon} {label}</span>
+                                          <span style={{ fontSize: 10, color: '#64748B', fontWeight: 'bold', marginRight: 20 }}>{log.date}</span>
+                                        </div>
+                                        <p style={{ margin: 0, fontSize: 13, color: '#1E293B', fontWeight: 700, lineHeight: 1.6 }}>{log.text}</p>
+                                      </div>
+                                    );
+                                  })}
+                                </div>
+                              </div>
+                            )}
+                          </div>
+                        );
+                      })}
                       <div style={{ padding: '10px 18px' }}>
                         <button className="vip-modal-add-item-btn" onClick={() => addItem(group.id)}>+ أضف خطوة</button>
                       </div>
