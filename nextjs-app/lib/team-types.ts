@@ -11,6 +11,7 @@ export interface Employee {
   created_at: string;
   updated_at: string;
   // HR Dossier fields
+  brand?: string | null;
   sop_url?: string | null;
   access_rights?: string | null;
   private_notes?: string | null;

@@ -3,6 +3,7 @@
 // Layout: .scr.on wrapper — نفس /brands و /calendar
 // 5 أقسام: واتساب | الفريق | البراندات | التفضيلات | البيانات
 import { useState, useTransition, useCallback } from 'react';
+import { createBrowserClient } from '@/lib/supabase';
 import {
   updateWhatsappSettings, addTeamContact, deleteTeamContact,
   addDailyMessage, toggleDailyMessage, deleteDailyMessage,
@@ -305,7 +306,25 @@ function EmployeeProfileModal({ employee, onClose, onSave }: {
   const [localWarnings, setLocalWarnings] = useState(employee.warnings ?? 0);
   const [localPhone,    setLocalPhone]    = useState(employee.phone ?? '');
   const [localIban,     setLocalIban]     = useState(employee.iban ?? '');
+  const [localBrand,    setLocalBrand]    = useState(employee.brand ?? '');
+  const [isUploading,   setIsUploading]   = useState(false);
   const [saving, setSaving] = useState(false);
+
+  async function handleFileUpload(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setIsUploading(true);
+    const sb = createBrowserClient();
+    const fileName = `sop_${employee.id}_${Date.now()}_${file.name.replace(/[^a-zA-Z0-9._-]/g, '_')}`;
+    const { error: uploadError } = await sb.storage.from('hr_docs').upload(fileName, file, { upsert: true });
+    if (uploadError) {
+      alert('خطأ في الرفع: ' + uploadError.message);
+    } else {
+      const { data } = sb.storage.from('hr_docs').getPublicUrl(fileName);
+      setLocalSopUrl(data.publicUrl);
+    }
+    setIsUploading(false);
+  }
   const [error,  setError]  = useState('');
 
   const salaryLabel = localSalaryType === 'freelance'
@@ -329,6 +348,7 @@ function EmployeeProfileModal({ employee, onClose, onSave }: {
         warnings: localWarnings,
         phone: localPhone || null,
         iban: localIban || null,
+        brand: localBrand || null,
       });
       onSave({
         ...employee,
@@ -344,6 +364,7 @@ function EmployeeProfileModal({ employee, onClose, onSave }: {
         warnings: localWarnings,
         phone: localPhone || null,
         iban: localIban || null,
+        brand: localBrand || null,
       });
       onClose();
     } catch (err: unknown) {
@@ -457,22 +478,46 @@ function EmployeeProfileModal({ employee, onClose, onSave }: {
           {/* COLUMN 1: Management & Docs */}
           <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
 
-            {/* SOP Vault */}
+            {/* SOP Vault — File Upload */}
             <div style={{ background: 'white', padding: 16, borderRadius: 12, border: '1px solid #E2E8F0' }}>
-              <h3 style={{ fontSize: 14, fontWeight: 800, color: '#1E293B', marginBottom: 12, margin: '0 0 12px' }}>📄 خزنة المستندات (SOP)</h3>
+              <h3 style={{ fontSize: 14, fontWeight: 800, color: '#1E293B', margin: '0 0 12px' }}>📄 دليل العمل (SOP)</h3>
+              {localSopUrl ? (
+                <div style={{ display: 'flex', gap: 10, alignItems: 'center', flexWrap: 'wrap' }}>
+                  <a href={localSopUrl} target="_blank" rel="noreferrer"
+                    style={{ background: '#EFF6FF', color: '#2563EB', padding: '8px 12px', borderRadius: 6, fontSize: 12, fontWeight: 700, textDecoration: 'none' }}>
+                    🔗 عرض الملف المرفوع
+                  </a>
+                  <button onClick={() => setLocalSopUrl('')}
+                    style={{ color: '#EF4444', border: 'none', background: 'none', cursor: 'pointer', fontSize: 12, fontWeight: 700 }}>
+                    حذف ورفع جديد
+                  </button>
+                </div>
+              ) : (
+                <div>
+                  <input
+                    type="file"
+                    accept=".pdf,.doc,.docx,.png,.jpg"
+                    onChange={handleFileUpload}
+                    disabled={isUploading}
+                    style={{ width: '100%', fontSize: 12 }}
+                  />
+                  {isUploading && (
+                    <span style={{ fontSize: 11, color: '#F59E0B', display: 'block', marginTop: 8 }}>⏳ جاري الرفع...</span>
+                  )}
+                </div>
+              )}
+            </div>
+
+            {/* Brand Assignment */}
+            <div style={{ background: 'white', padding: 16, borderRadius: 12, border: '1px solid #E2E8F0' }}>
+              <h3 style={{ fontSize: 14, fontWeight: 800, color: '#1E293B', margin: '0 0 12px' }}>🏢 البراند / القسم</h3>
               <input
                 type="text"
-                placeholder="رابط ملف دليل العمل (PDF/Drive)..."
-                value={localSopUrl}
-                onChange={e => setLocalSopUrl(e.target.value)}
+                placeholder="مثال: بشرى، الإدارة العامة..."
+                value={localBrand}
+                onChange={e => setLocalBrand(e.target.value)}
                 style={fieldStyle}
               />
-              {localSopUrl && (
-                <a href={localSopUrl} target="_blank" rel="noreferrer"
-                  style={{ fontSize: 12, color: '#2563EB', marginTop: 8, display: 'inline-block', fontWeight: 700 }}>
-                  🔗 فتح الملف
-                </a>
-              )}
             </div>
 
             {/* Access Rights */}
@@ -900,99 +945,84 @@ export default function SettingsClient({ whatsapp: initialWA, contacts: initialC
           ))}
         </div>
 
-        {/* Active + Freelance */}
-        <div style={{ marginBottom: 16 }}>
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 10 }}>
-            <div style={{ fontSize: 13, fontWeight: 700, color: 'var(--txt)' }}>الموظفون النشطون</div>
-            <button className="btn btn-sm" onClick={() => setShowAddEmpModal(true)}>+ موظف</button>
-          </div>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
-            {employees.filter(e => e.status !== 'inactive').map(emp => (
-              <div
-                key={emp.id}
-                style={{
-                  display: 'flex', alignItems: 'center', gap: 12, padding: '10px 14px',
-                  background: 'var(--bg2)', borderRadius: 10, border: '1px solid var(--brd)',
-                  cursor: 'pointer', transition: 'border-color .15s, background .15s',
-                }}
-                onClick={() => setSelectedEmployee(emp)}
-                onMouseEnter={e => {
-                  (e.currentTarget as HTMLDivElement).style.borderColor = 'var(--gold-b)';
-                  (e.currentTarget as HTMLDivElement).style.background = 'var(--gold-dim)';
-                }}
-                onMouseLeave={e => {
-                  (e.currentTarget as HTMLDivElement).style.borderColor = 'var(--brd)';
-                  (e.currentTarget as HTMLDivElement).style.background = 'var(--bg2)';
-                }}
-              >
-                <div style={{
-                  width: 36, height: 36, borderRadius: '50%', background: 'var(--gold-dim)',
-                  border: '1px solid var(--gold-b)', display: 'flex', alignItems: 'center',
-                  justifyContent: 'center', fontSize: 14, fontWeight: 800, color: 'var(--gold)', flexShrink: 0,
-                }}>
-                  {emp.name[0]}
-                </div>
-                <div style={{ flex: 1 }}>
-                  <div style={{ fontSize: 13, fontWeight: 600, color: 'var(--txt)' }}>{emp.name}</div>
-                  <div style={{ fontSize: 11, color: 'var(--txt3)', marginTop: 1 }}>{emp.role}</div>
-                </div>
-                {/* Kudos/Warnings badges */}
-                {((emp.kudos ?? 0) > 0 || (emp.warnings ?? 0) > 0) && (
-                  <div style={{ display: 'flex', gap: 6 }}>
-                    {(emp.kudos ?? 0) > 0 && (
-                      <span style={{ fontSize: 10, padding: '2px 7px', borderRadius: 6, background: 'rgba(52,199,89,0.12)', color: '#15803D', fontWeight: 700 }}>
-                        🏆 {emp.kudos}
-                      </span>
-                    )}
-                    {(emp.warnings ?? 0) > 0 && (
-                      <span style={{ fontSize: 10, padding: '2px 7px', borderRadius: 6, background: 'rgba(255,59,48,0.12)', color: '#B91C1C', fontWeight: 700 }}>
-                        🛑 {emp.warnings}
-                      </span>
-                    )}
-                  </div>
-                )}
-                <div style={{ textAlign: 'left' }}>
-                  <div style={{ fontSize: 12, fontWeight: 700, color: 'var(--gold)' }}>
-                    {emp.salary_type === 'freelance' ? 'فريلانسر' : `${emp.salary_amount.toLocaleString('ar-SA')} ر.س`}
-                  </div>
-                </div>
-                <span style={{
-                  fontSize: 10, padding: '3px 10px', borderRadius: 8, fontWeight: 600,
-                  background: STATUS_COLORS[emp.status]?.bg, color: STATUS_COLORS[emp.status]?.color,
-                }}>
-                  {STATUS_LABELS[emp.status]}
-                </span>
-                <span style={{ fontSize: 12, color: 'var(--txt3)', marginRight: 4 }}>←</span>
-              </div>
-            ))}
-          </div>
+        {/* Add Button */}
+        <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: 16 }}>
+          <button className="btn btn-sm" onClick={() => setShowAddEmpModal(true)}>+ موظف</button>
         </div>
 
-        {/* Inactive */}
-        {employees.filter(e => e.status === 'inactive').length > 0 && (
-          <div>
-            <div style={{ fontSize: 12, fontWeight: 700, color: 'var(--txt3)', marginBottom: 8 }}>غير نشط</div>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
-              {employees.filter(e => e.status === 'inactive').map(emp => (
-                <div
-                  key={emp.id}
-                  style={{
-                    display: 'flex', alignItems: 'center', gap: 10, padding: '8px 12px',
-                    background: 'var(--bg2)', borderRadius: 8, border: '1px solid var(--brd)',
-                    opacity: 0.6, cursor: 'pointer',
-                  }}
-                  onClick={() => setSelectedEmployee(emp)}
-                >
-                  <div style={{ width: 28, height: 28, borderRadius: '50%', background: 'var(--brd)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 12, fontWeight: 700, color: 'var(--txt3)', flexShrink: 0 }}>
-                    {emp.name[0]}
+        {/* Grouped by Brand — CSS Grid */}
+        {(() => {
+          const grouped = employees.reduce((acc, emp) => {
+            const brandKey = emp.brand || 'الإدارة العامة';
+            if (!acc[brandKey]) acc[brandKey] = [];
+            acc[brandKey].push(emp);
+            return acc;
+          }, {} as Record<string, Employee[]>);
+
+          return (
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: 20, alignItems: 'start' }}>
+              {Object.entries(grouped).map(([brandName, emps]) => {
+                const brandTotal = emps
+                  .filter(e => e.salary_type === 'fixed')
+                  .reduce((s, e) => s + e.salary_amount, 0);
+                return (
+                  <div key={brandName} style={{ background: '#F8FAFC', borderRadius: 16, border: '1px solid #E2E8F0', overflow: 'hidden', boxShadow: '0 4px 6px -1px rgba(0,0,0,0.02)' }}>
+                    {/* Brand Header */}
+                    <div style={{ background: '#FFFFFF', padding: '14px 18px', borderBottom: '1px solid #E2E8F0', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                      <h2 style={{ fontSize: 15, fontWeight: 900, color: '#0F172A', margin: 0 }}>🏢 {brandName}</h2>
+                      <div style={{ background: '#FEF2F2', padding: '5px 10px', borderRadius: 8, border: '1px solid #FECACA', textAlign: 'center' }}>
+                        <span style={{ fontSize: 10, color: '#991B1B', fontWeight: 700, display: 'block', marginBottom: 1 }}>إجمالي الرواتب</span>
+                        <span style={{ fontSize: 13, color: '#7F1D1D', fontWeight: 900 }}>{brandTotal.toLocaleString('ar-SA')} ر.س</span>
+                      </div>
+                    </div>
+                    {/* Employees in this brand */}
+                    <div style={{ padding: 14, display: 'flex', flexDirection: 'column', gap: 10 }}>
+                      {emps.map(emp => (
+                        <div
+                          key={emp.id}
+                          onClick={() => setSelectedEmployee(emp)}
+                          style={{ background: '#FFFFFF', padding: '12px 14px', borderRadius: 10, border: '1px solid #E2E8F0', cursor: 'pointer', display: 'flex', justifyContent: 'space-between', alignItems: 'center', transition: 'border-color .15s, box-shadow .15s' }}
+                          onMouseEnter={e => {
+                            (e.currentTarget as HTMLDivElement).style.borderColor = 'var(--gold-b)';
+                            (e.currentTarget as HTMLDivElement).style.boxShadow = '0 2px 8px rgba(201,168,76,0.15)';
+                          }}
+                          onMouseLeave={e => {
+                            (e.currentTarget as HTMLDivElement).style.borderColor = '#E2E8F0';
+                            (e.currentTarget as HTMLDivElement).style.boxShadow = 'none';
+                          }}
+                        >
+                          <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                            <div style={{ width: 38, height: 38, background: 'var(--gold-dim)', border: '1px solid var(--gold-b)', borderRadius: '50%', display: 'flex', justifyContent: 'center', alignItems: 'center', fontWeight: 800, color: 'var(--gold)', fontSize: 15, flexShrink: 0 }}>
+                              {emp.name[0]}
+                            </div>
+                            <div>
+                              <div style={{ fontSize: 13, fontWeight: 800, color: '#1E293B', margin: 0 }}>{emp.name}</div>
+                              <div style={{ fontSize: 11, color: '#64748B', marginTop: 1 }}>{emp.role}</div>
+                            </div>
+                          </div>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                            {((emp.kudos ?? 0) > 0) && (
+                              <span style={{ fontSize: 10, padding: '2px 6px', borderRadius: 5, background: 'rgba(52,199,89,0.12)', color: '#15803D', fontWeight: 700 }}>🏆 {emp.kudos}</span>
+                            )}
+                            {((emp.warnings ?? 0) > 0) && (
+                              <span style={{ fontSize: 10, padding: '2px 6px', borderRadius: 5, background: 'rgba(255,59,48,0.12)', color: '#B91C1C', fontWeight: 700 }}>🛑 {emp.warnings}</span>
+                            )}
+                            <span style={{ fontSize: 12, fontWeight: 800, color: '#10B981', background: '#ECFDF5', padding: '4px 8px', borderRadius: 6 }}>
+                              {emp.salary_type === 'freelance' ? 'فريلانسر' : `${emp.salary_amount.toLocaleString('ar-SA')} ر.س`}
+                            </span>
+                            <span style={{ fontSize: 10, padding: '2px 8px', borderRadius: 6, fontWeight: 600, background: STATUS_COLORS[emp.status]?.bg, color: STATUS_COLORS[emp.status]?.color }}>
+                              {STATUS_LABELS[emp.status]}
+                            </span>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
                   </div>
-                  <div style={{ flex: 1, fontSize: 12, color: 'var(--txt2)' }}>{emp.name} — {emp.role}</div>
-                  <span style={{ fontSize: 10, padding: '2px 8px', borderRadius: 6, background: 'rgba(255,59,48,0.1)', color: 'var(--danger)', fontWeight: 600 }}>غير نشط</span>
-                </div>
-              ))}
+                );
+              })}
             </div>
-          </div>
-        )}
+          );
+        })()}
       </SectionCard>
 
       {/* ══════════════════════════════════════════════════════════════════════
