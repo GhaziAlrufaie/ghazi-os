@@ -748,14 +748,29 @@ export default function SettingsClient({ whatsapp: initialWA, contacts: initialC
   const [showAddEmpModal,    setShowAddEmpModal]    = useState(false);
   const [selectedEmployee,   setSelectedEmployee]   = useState<Employee | null>(null);
 
-  const handleEmpAdd = (e: Employee) => {
-    setEmployees(prev => [...prev, e]);
+  // ── جلب الموظفين من Supabase client-side لضمان persistence ───────────────
+  const supabase = createBrowserClient();
+  const fetchEmployees = async () => {
+    const { data, error } = await supabase
+      .from('employees')
+      .select('*')
+      .order('created_at', { ascending: true });
+    if (!error && data) setEmployees(data as Employee[]);
+  };
+  // جلب عند mount لضمان أحدث البيانات من Supabase
+  useEffect(() => { fetchEmployees(); }, []);
+
+  const handleEmpAdd = async (e: Employee) => {
+    // إعادة جلب من Supabase بعد الإضافة لضمان persistence كاملة
+    await fetchEmployees();
     setToast('تمت الإضافة');
   };
-
-  const handleEmpProfileSave = (e: Employee) => {
+  const handleEmpProfileSave = async (e: Employee) => {
+    // تحديث local state فوراً للاستجابة السريعة
     setEmployees(prev => prev.map(x => x.id === e.id ? e : x));
     setToast('تم حفظ بيانات الموظف');
+    // إعادة جلب في الخلفية للتأكد من التزامن مع Supabase
+    setTimeout(() => fetchEmployees(), 300);
   };
 
   // ── Preferences ──────────────────────────────────────────────────────────
