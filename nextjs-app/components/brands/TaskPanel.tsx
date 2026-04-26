@@ -66,12 +66,13 @@ export default function TaskPanel({ task, onClose, onUpdate, onDelete, onArchive
 
   // Stable browser supabase client — never recreated
   const supabase = useMemo(() => createBrowserClient(), []);
+  // ── Debounce ref for saveGroupsToDb — prevents DB hammering ──────────────
+  const saveDebounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   // Ref to always have latest values for background save on close
   const latestRef = useRef({ title, desc, status, priority, dueDate, groups, blockerReason, latestUpdate, taskId: task?.id });
-  useEffect(() => {
-    latestRef.current = { title, desc, status, priority, dueDate, groups, blockerReason, latestUpdate, taskId: task?.id };
-  });
+  // ── Sync latestRef on every render (no deps needed — ref update is free) ──
+  latestRef.current = { title, desc, status, priority, dueDate, groups, blockerReason, latestUpdate, taskId: task?.id };
 
   // Reset local state when a new task is opened
   useEffect(() => {
@@ -86,11 +87,22 @@ export default function TaskPanel({ task, onClose, onUpdate, onDelete, onArchive
     setLatestUpdate(task.latestUpdate ?? '');
   }, [task?.id]);
 
-  // Escape key closes modal
+  // Escape key closes modal + cleanup debounce timer on unmount
   useEffect(() => {
     function handler(e: KeyboardEvent) { if (e.key === 'Escape') handleClose(); }
     document.addEventListener('keydown', handler);
-    return () => document.removeEventListener('keydown', handler);
+    return () => {
+      document.removeEventListener('keydown', handler);
+      // Flush any pending debounced save immediately on unmount
+      if (saveDebounceRef.current) {
+        clearTimeout(saveDebounceRef.current);
+        // Fire save immediately if there's pending data
+        const { groups: g, taskId } = latestRef.current;
+        if (taskId) {
+          supabase.from('tasks').update({ subtasks: g }).eq('id', taskId).then(() => {});
+        }
+      }
+    };
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -142,9 +154,13 @@ export default function TaskPanel({ task, onClose, onUpdate, onDelete, onArchive
 
   // ── CHECKLIST HELPERS ────────────────────────────────────────────────────
   function saveGroupsToDb(updated: ChecklistGroup[]) {
-    supabase.from('tasks').update({ subtasks: updated }).eq('id', task!.id).then(({ error }) => {
-      if (error) console.error('Checklist save failed:', error.message);
-    });
+    // Debounce: cancel any pending save, wait 600ms before hitting DB
+    if (saveDebounceRef.current) clearTimeout(saveDebounceRef.current);
+    saveDebounceRef.current = setTimeout(() => {
+      supabase.from('tasks').update({ subtasks: updated }).eq('id', task!.id).then(({ error }) => {
+        if (error) console.error('Checklist save failed:', error.message);
+      });
+    }, 600);
   }
   function saveGroups(updated: ChecklistGroup[]) {
     setGroups(updated);

@@ -1496,7 +1496,9 @@ export default function LeadershipClient({
   // ── Client-side weeklyFocus state for instant optimistic updates ──────────
   const [localWeeklyFocus, setLocalWeeklyFocus] = useState<WeeklyFocusEntry[]>(weeklyFocus);
   // Sync with server prop when it changes (e.g., after router.refresh())
-  useEffect(() => { setLocalWeeklyFocus(weeklyFocus); }, [weeklyFocus]);
+  // Sync localWeeklyFocus only when server data actually changes (not just new array reference)
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  useEffect(() => { setLocalWeeklyFocus(weeklyFocus); }, [JSON.stringify(weeklyFocus)]);
   // Sorted tasks for vault (derived from visibleActiveTasks + todayFocus)
   // Filter out optimistically-blocked tasks so they disappear instantly from FocusHero
   const visibleActiveTasks = useMemo(

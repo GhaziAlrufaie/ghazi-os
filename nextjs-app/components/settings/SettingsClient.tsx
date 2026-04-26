@@ -2,7 +2,7 @@
 // SettingsClient — صفحة الإعدادات
 // Layout: .scr.on wrapper — نفس /brands و /calendar
 // 5 أقسام: واتساب | الفريق | البراندات | التفضيلات | البيانات
-import { useState, useTransition, useCallback, useEffect } from 'react';
+import { useState, useTransition, useCallback, useEffect, useMemo } from 'react';
 import { createBrowserClient } from '@/lib/supabase';
 import {
   updateWhatsappSettings, addTeamContact, deleteTeamContact,
@@ -780,28 +780,29 @@ export default function SettingsClient({ whatsapp: initialWA, contacts: initialC
   const [selectedEmployee,   setSelectedEmployee]   = useState<Employee | null>(null);
 
   // ── جلب الموظفين من Supabase client-side لضمان persistence ───────────────
-  const supabase = createBrowserClient();
-  const fetchEmployees = async () => {
+  // useMemo: create client once, not on every render to prevent memory leaks
+  const supabase = useMemo(() => createBrowserClient(), []);
+  const fetchEmployees = useCallback(async () => {
     const { data, error } = await supabase
       .from('employees')
       .select('*')
       .order('created_at', { ascending: true });
     if (!error && data) setEmployees(data as Employee[]);
-  };
+  }, [supabase]);
   // جلب عند mount لضمان أحدث البيانات من Supabase
-  useEffect(() => { fetchEmployees(); }, []);
+  // جلب عند mount فقط — fetchEmployees مستقر بسبب useCallback
+  useEffect(() => { fetchEmployees(); }, [fetchEmployees]);
 
   const handleEmpAdd = async (e: Employee) => {
-    // إعادة جلب من Supabase بعد الإضافة لضمان persistence كاملة
-    await fetchEmployees();
+    // Optimistic update فوري + جلب في الخلفية للحصول على UUID الصحيح
+    setEmployees(prev => [...prev, e]);
     setToast('تمت الإضافة');
+    setTimeout(() => fetchEmployees(), 500);
   };
   const handleEmpProfileSave = async (e: Employee) => {
     // تحديث local state فوراً للاستجابة السريعة
     setEmployees(prev => prev.map(x => x.id === e.id ? e : x));
     setToast('تم حفظ بيانات الموظف');
-    // إعادة جلب في الخلفية للتأكد من التزامن مع Supabase
-    setTimeout(() => fetchEmployees(), 300);
   };
 
   // ── Preferences ──────────────────────────────────────────────────────────
