@@ -64,6 +64,8 @@ export default function TaskPanel({ task, onClose, onUpdate, onDelete, onArchive
     try { return Array.isArray(task?.attachments) ? task.attachments : (typeof task?.attachments === 'string' ? JSON.parse(task.attachments) : []); } catch { return []; }
   });
   const [isUploadingTaskFile, setIsUploadingTaskFile] = useState(false);
+  const [isSavingManual, setIsSavingManual] = useState(false);
+  const [saveSuccess, setSaveSuccess] = useState(false);
   // ── Nested Logs state ──────────────────────────────────────────────────────
   const [expandedLogs, setExpandedLogs] = useState<Record<string, boolean>>({});
   const [newLogText, setNewLogText] = useState<Record<string, string>>({});
@@ -162,6 +164,30 @@ export default function TaskPanel({ task, onClose, onUpdate, onDelete, onArchive
     });
   }
 
+  // ── EXPLICIT SAVE (all fields + attachments) ────────────────────────────
+  const handleExplicitSave = async () => {
+    setIsSavingManual(true);
+    const { title: t, desc: d, status: s, priority: p, dueDate: dd, groups: g, blockerReason: br, latestUpdate: lu, attachments: atts } = latestRef.current;
+    const { error } = await supabase.from('tasks').update({
+      title: t,
+      description: d,
+      status: s,
+      priority: p,
+      due_date: dd || null,
+      subtasks: g,
+      blocker_reason: br || null,
+      latest_update: lu || null,
+      attachments: atts,
+    }).eq('id', task!.id);
+    setIsSavingManual(false);
+    if (!error) {
+      setSaveSuccess(true);
+      setTimeout(() => setSaveSuccess(false), 2500);
+    } else {
+      console.error('Explicit save error:', error.message);
+      alert('❌ فشل الحفظ، يرجى المحاولة مرة أخرى.');
+    }
+  };
   // ── TASK ATTACHMENTS HANDLERS ────────────────────────────────────────────
   const handleTaskFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(e.target.files || []);
@@ -302,7 +328,31 @@ export default function TaskPanel({ task, onClose, onUpdate, onDelete, onArchive
 
         {/* SIDEBAR */}
         <div className="vip-modal-sidebar">
-          <div style={{ display: 'flex', justifyContent: 'flex-start' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', paddingBottom: '12px', borderBottom: '1px solid #E2E8F0', position: 'sticky', top: 0, background: '#FFFFFF', zIndex: 100, marginBottom: '4px' }}>
+            <div style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
+              <button
+                onClick={handleExplicitSave}
+                disabled={isSavingManual}
+                style={{
+                  background: saveSuccess ? '#10B981' : '#0F172A',
+                  color: '#FFFFFF',
+                  padding: '8px 16px',
+                  borderRadius: '8px',
+                  fontSize: '13px',
+                  fontWeight: 'bold',
+                  border: 'none',
+                  cursor: isSavingManual ? 'not-allowed' : 'pointer',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '6px',
+                  transition: 'background 0.3s',
+                  boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
+                  whiteSpace: 'nowrap',
+                }}
+              >
+                {isSavingManual ? '⏳ جاري الحفظ...' : saveSuccess ? '✅ تم الحفظ' : '💾 حفظ التعديلات'}
+              </button>
+            </div>
             <button onClick={handleClose} style={{ background: '#E2E8F0', color: '#475569', border: 'none', borderRadius: '50%', width: '36px', height: '36px', cursor: 'pointer', fontWeight: 'bold', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '16px' }}>✕</button>
           </div>
 
