@@ -82,9 +82,14 @@ export default function TaskPanel({ task, onClose, onUpdate, onDelete, onArchive
   // ── Sync latestRef on every render (no deps needed — ref update is free) ──
   latestRef.current = { title, desc, status, priority, dueDate, groups, blockerReason, latestUpdate, attachments: localAttachments, taskId: task?.id };
 
+  // isMounted guard — prevents debounced auto-save from firing on first render
+  const isMounted = useRef(false);
   // Reset local state when a new task is opened
   useEffect(() => {
     if (!task) return;
+    // 🚨 CRITICAL: Reset unsaved flag FIRST to prevent stale save on task switch
+    setHasUnsavedChanges(false);
+    isMounted.current = false; // Reset mount guard for new task
     setTitle(task.title);
     setDesc(task.description ?? '');
     setStatus(task.status);
@@ -97,10 +102,14 @@ export default function TaskPanel({ task, onClose, onUpdate, onDelete, onArchive
     try {
       setLocalAttachments(Array.isArray(task.attachments) ? task.attachments : (typeof task.attachments === 'string' ? JSON.parse(task.attachments) : []));
     } catch { setLocalAttachments([]); }
+    // Mark as mounted after state is initialized
+    requestAnimationFrame(() => { isMounted.current = true; });
   }, [task?.id]);
 
   // ── DEBOUNCED AUTO-SAVE: saves 2s after user stops interacting ──────────────
   useEffect(() => {
+    // 🚨 CRITICAL: isMounted guard prevents overwrite on initial render/task switch
+    if (!isMounted.current) return;
     if (!hasUnsavedChanges) return;
     const timer = setTimeout(() => {
       // Silent background save — does NOT trigger parent re-render
