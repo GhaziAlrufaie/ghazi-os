@@ -66,6 +66,7 @@ export default function TaskPanel({ task, onClose, onUpdate, onDelete, onArchive
   const [isUploadingTaskFile, setIsUploadingTaskFile] = useState(false);
   const [isSavingManual, setIsSavingManual] = useState(false);
   const [saveSuccess, setSaveSuccess] = useState(false);
+  const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
   // ── Nested Logs state ──────────────────────────────────────────────────────
   const [expandedLogs, setExpandedLogs] = useState<Record<string, boolean>>({});
   const [newLogText, setNewLogText] = useState<Record<string, string>>({});
@@ -98,6 +99,37 @@ export default function TaskPanel({ task, onClose, onUpdate, onDelete, onArchive
     } catch { setLocalAttachments([]); }
   }, [task?.id]);
 
+  // ── DEBOUNCED AUTO-SAVE: saves 2s after user stops interacting ──────────────
+  useEffect(() => {
+    if (!hasUnsavedChanges) return;
+    const timer = setTimeout(() => {
+      // Silent background save — does NOT trigger parent re-render
+      const { title: t, desc: d, status: s, priority: p, dueDate: dd, groups: g, blockerReason: br, latestUpdate: lu, attachments: atts, taskId } = latestRef.current;
+      if (!taskId) return;
+      supabase.from('tasks').update({
+        title: t, description: d, status: s, priority: p,
+        due_date: dd || null, subtasks: g,
+        blocker_reason: br || null, latest_update: lu || null, attachments: atts,
+      }).eq('id', taskId).then(({ error }) => {
+        if (!error) setHasUnsavedChanges(false);
+      });
+    }, 2000); // 2 seconds after last interaction
+    return () => clearTimeout(timer); // Clear if user types again
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [hasUnsavedChanges, title, desc, groups, blockerReason, latestUpdate]);
+
+  // ── BEFOREUNLOAD WARNING: warn if tab is closed with unsaved changes ──────
+  useEffect(() => {
+    const handleBeforeUnload = (e: BeforeUnloadEvent) => {
+      if (hasUnsavedChanges) {
+        e.preventDefault();
+        e.returnValue = ''; // Required for Chrome
+      }
+    };
+    window.addEventListener('beforeunload', handleBeforeUnload);
+    return () => window.removeEventListener('beforeunload', handleBeforeUnload);
+  }, [hasUnsavedChanges]);
+
   // Escape key closes modal + cleanup debounce timer on unmount
   useEffect(() => {
     function handler(e: KeyboardEvent) { if (e.key === 'Escape') handleClose(); }
@@ -121,6 +153,7 @@ export default function TaskPanel({ task, onClose, onUpdate, onDelete, onArchive
 
   // ── INSTANT CLOSE + BACKGROUND SAVE ──────────────────────────────────────
   function handleClose() {
+    setHasUnsavedChanges(false); // Clear unsaved flag
     // 1. Close modal IMMEDIATELY — zero lag, zero UI freeze
     onClose();
 
@@ -182,6 +215,7 @@ export default function TaskPanel({ task, onClose, onUpdate, onDelete, onArchive
     setIsSavingManual(false);
     if (!error) {
       setSaveSuccess(true);
+      setHasUnsavedChanges(false); // Clear unsaved flag after explicit save
       setTimeout(() => setSaveSuccess(false), 2500);
     } else {
       console.error('Explicit save error:', error.message);
@@ -255,6 +289,7 @@ export default function TaskPanel({ task, onClose, onUpdate, onDelete, onArchive
   }
   function updateGroupTitle(gid: string, val: string) {
     setGroups(groups.map(g => g.id === gid ? { ...g, title: val } : g));
+    setHasUnsavedChanges(true);
   }
   function saveGroupTitle(gid: string, val: string) {
     saveGroups(groups.map(g => g.id === gid ? { ...g, title: val } : g));
@@ -267,6 +302,7 @@ export default function TaskPanel({ task, onClose, onUpdate, onDelete, onArchive
   function updateItemText(gid: string, iid: string, val: string) {
     // Local only — save on blur
     setGroups(groups.map(g => g.id === gid ? { ...g, items: g.items.map(i => i.id === iid ? { ...i, text: val } : i) } : g));
+    setHasUnsavedChanges(true);
   }
   function saveItemText(gid: string, iid: string, val: string) {
     saveGroups(groups.map(g => g.id === gid ? { ...g, items: g.items.map(i => i.id === iid ? { ...i, text: val } : i) } : g));
@@ -350,7 +386,7 @@ export default function TaskPanel({ task, onClose, onUpdate, onDelete, onArchive
                   whiteSpace: 'nowrap',
                 }}
               >
-                {isSavingManual ? '⏳ جاري الحفظ...' : saveSuccess ? '✅ تم الحفظ' : '💾 حفظ التعديلات'}
+                {isSavingManual ? '⏳ جاري الحفظ...' : saveSuccess ? '✅ تم الحفظ' : hasUnsavedChanges ? '💾 حفظ ●' : '💾 حفظ التعديلات'}
               </button>
             </div>
             <button onClick={handleClose} style={{ background: '#E2E8F0', color: '#475569', border: 'none', borderRadius: '50%', width: '36px', height: '36px', cursor: 'pointer', fontWeight: 'bold', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '16px' }}>✕</button>
@@ -405,7 +441,7 @@ export default function TaskPanel({ task, onClose, onUpdate, onDelete, onArchive
               <input
                 type="text"
                 value={blockerReason}
-                onChange={e => setBlockerReason(e.target.value)}
+                onChange={e => { setBlockerReason(e.target.value); setHasUnsavedChanges(true); }}
                 onBlur={e => {
                   const v = e.target.value;
                   saveFieldImmediate({ blocker_reason: v || null });
@@ -424,7 +460,7 @@ export default function TaskPanel({ task, onClose, onUpdate, onDelete, onArchive
             <input
               type="text"
               value={latestUpdate}
-              onChange={e => setLatestUpdate(e.target.value)}
+              onChange={e => { setLatestUpdate(e.target.value); setHasUnsavedChanges(true); }}
               onBlur={e => {
                 const v = e.target.value;
                 saveFieldImmediate({ latest_update: v || null });
@@ -465,7 +501,7 @@ export default function TaskPanel({ task, onClose, onUpdate, onDelete, onArchive
         <div className="vip-modal-main">
           {/* Title — local only, saved on blur */}
           <textarea className="vip-task-title-input" value={title}
-            onChange={e => setTitle(e.target.value)}
+            onChange={e => { setTitle(e.target.value); setHasUnsavedChanges(true); }}
             onBlur={e => {
               const v = e.target.value.trim() || task.title;
               if (v !== task.title) saveFieldImmediate({ title: v });
@@ -476,7 +512,7 @@ export default function TaskPanel({ task, onClose, onUpdate, onDelete, onArchive
             <div className="vip-modal-section-title">📝 الوصف والتفاصيل</div>
             {/* Description — local only, saved on blur — NO onChange to parent */}
             <textarea className="vip-task-desc-input" value={desc}
-              onChange={e => setDesc(e.target.value)}
+              onChange={e => { setDesc(e.target.value); setHasUnsavedChanges(true); }}
               onBlur={e => saveFieldImmediate({ description: e.target.value })}
               placeholder="أضف تفاصيل المهمة والروابط هنا..." />
           </div>
