@@ -1314,8 +1314,8 @@ function InboxPanel({ inboxTasks, brands }: { inboxTasks: InboxTask[]; brands: B
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editText, setEditText] = useState('');
   const [, startTransition] = useTransition();
-  // Sync when prop changes (after server revalidation)
-  useMemo(() => { setTasks(inboxTasks); }, [inboxTasks]);
+  // Sync when prop changes (after server revalidation) — useEffect NOT useMemo to avoid render loop
+  useEffect(() => { setTasks(inboxTasks); }, [inboxTasks]);
   async function handleAdd() {
     if (!newText.trim()) return;
     const text = newText.trim();
