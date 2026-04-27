@@ -3,6 +3,7 @@
 // Layout: .scr.on wrapper — نفس /brands و /calendar
 // 5 أقسام: واتساب | الفريق | البراندات | التفضيلات | البيانات
 import { useState, useTransition, useCallback, useEffect, useMemo } from 'react';
+import { fetchCached, invalidateCache } from '@/lib/cache';
 import { createBrowserClient } from '@/lib/supabase';
 import {
   updateWhatsappSettings, addTeamContact, deleteTeamContact,
@@ -782,12 +783,16 @@ export default function SettingsClient({ whatsapp: initialWA, contacts: initialC
   // ── جلب الموظفين من Supabase client-side لضمان persistence ───────────────
   // useMemo: create client once, not on every render to prevent memory leaks
   const supabase = useMemo(() => createBrowserClient(), []);
-  const fetchEmployees = useCallback(async () => {
-    const { data, error } = await supabase
-      .from('employees')
-      .select('*')
-      .order('created_at', { ascending: true });
-    if (!error && data) setEmployees(data as Employee[]);
+  const fetchEmployees = useCallback(async (forceRefresh = false) => {
+    const data = await fetchCached('employees', async () => {
+      const { data: rows, error } = await supabase
+        .from('employees')
+        .select('*')
+        .order('created_at', { ascending: true });
+      if (error) throw error;
+      return rows ?? [];
+    }, forceRefresh);
+    setEmployees(data as Employee[]);
   }, [supabase]);
   // جلب عند mount لضمان أحدث البيانات من Supabase
   // جلب عند mount فقط — fetchEmployees مستقر بسبب useCallback
@@ -797,6 +802,7 @@ export default function SettingsClient({ whatsapp: initialWA, contacts: initialC
   const handleEmpAdd = async (e: Employee) => {
     // Optimistic update فوري + جلب في الخلفية للحصول على UUID الصحيح
     setEmployees(prev => [...prev, e]);
+    invalidateCache('employees'); // Force fresh fetch next time
     setToast('تمت الإضافة');
     // removed: no need to re-fetch after optimistic update
   };
