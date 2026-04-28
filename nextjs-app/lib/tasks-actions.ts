@@ -6,7 +6,7 @@ import { revalidatePath } from 'next/cache';
 
 export type TaskStatus = 
   // Standard workflow statuses
-  | 'todo' | 'in_progress' | 'on_hold' | 'waiting' | 'done' | 'ideas' | 'projects'
+  | 'todo' | 'in_progress' | 'on_hold' | 'done' | 'ideas' | 'projects'
   // HQ Lab (مختبر الأفكار) categorical statuses
   | 'hq_projects' | 'hq_marketing' | 'hq_ops' | 'hq_archive';
 export type TaskPriority = 'critical' | 'high' | 'medium' | 'low';
