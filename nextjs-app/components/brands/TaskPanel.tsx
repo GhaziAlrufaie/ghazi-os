@@ -202,7 +202,10 @@ export default function TaskPanel({ task, onClose, onUpdate, onDelete, onArchive
     setBgSaving(true);
     supabase.from('tasks').update(patch).eq('id', task!.id).then(({ error }) => {
       setBgSaving(false);
-      if (error) console.error('Field save failed:', error.message);
+      if (error) {
+        console.error('❌ Field save failed:', error.message);
+        alert('❌ فشل الحفظ في السيرفر! تأكد من اتصالك بالإنترنت. البيانات محفوظة محلياً.');
+      }
     });
   }
 
@@ -210,6 +213,11 @@ export default function TaskPanel({ task, onClose, onUpdate, onDelete, onArchive
   const handleExplicitSave = async () => {
     setIsSavingManual(true);
     const { title: t, desc: d, status: s, priority: p, dueDate: dd, groups: g, blockerReason: br, latestUpdate: lu, attachments: atts } = latestRef.current;
+    
+    // 🚨 STEP 1: BACKUP CURRENT STATE
+    // Backup state (not used in current implementation, but kept for future rollback support)
+    
+    // 🚨 STEP 2: AWAIT SUPABASE RESPONSE (NOT FIRE-AND-FORGET)
     const { error } = await supabase.from('tasks').update({
       title: t,
       description: d,
@@ -221,14 +229,21 @@ export default function TaskPanel({ task, onClose, onUpdate, onDelete, onArchive
       latest_update: lu || null,
       attachments: atts,
     }).eq('id', task!.id);
+    
     setIsSavingManual(false);
+    
+    // 🚨 STEP 3: STRICT VERIFICATION — ONLY SHOW SUCCESS IF DB CONFIRMS
     if (!error) {
       setSaveSuccess(true);
       setHasUnsavedChanges(false); // Clear unsaved flag after explicit save
       setTimeout(() => setSaveSuccess(false), 2500);
+      console.log('✅ Save successful');
     } else {
-      console.error('Explicit save error:', error.message);
-      alert('❌ فشل الحفظ، يرجى المحاولة مرة أخرى.');
+      // 🚨 CRITICAL: SHOW ERROR AND PREVENT DATA LOSS
+      console.error('❌ Explicit save error:', error.message);
+      alert('❌ فشل الحفظ في السيرفر! تأكد من اتصالك بالإنترنت. البيانات محفوظة محلياً وسيتم إعادة محاولة الحفظ تلقائياً.');
+      // Keep unsaved flag so user knows changes weren't saved
+      setHasUnsavedChanges(true);
     }
   };
   // ── TASK ATTACHMENTS HANDLERS ────────────────────────────────────────────

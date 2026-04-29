@@ -511,8 +511,13 @@ export default function BrandDetailClient({ brand: initialBrand, initialTasks, i
     const { source, destination } = result;
     if (!destination) return;
     if (destination.droppableId === source.droppableId && destination.index === source.index) return;
+
+    // 🚨 STEP 1: BACKUP ORIGINAL STATE
+    const originalTasks = Array.from(tasks);
+
     // 1. Clone flat array safely
     const currentTasks = Array.from(tasks);
+
     // === CASE A: MOVING WITHIN THE SAME COLUMN ===
     if (source.droppableId === destination.droppableId) {
       // Isolate tasks for this column and sort them to match UI
@@ -525,15 +530,25 @@ export default function BrandDetailClient({ brand: initialBrand, initialTasks, i
       colTasks.forEach((t: any, idx: number) => { t.sortOrder = idx; });
       // Merge and update UI instantly (PREVENTS SNAPBACK)
       const otherTasks = currentTasks.filter((t: any) => t.status !== source.droppableId);
+      
+      // 🚨 STEP 2: OPTIMISTIC UPDATE
       setTasks([...otherTasks, ...colTasks]);
-      // Sync to DB
+      
+      // 🚨 STEP 3: DATABASE SYNC WITH ROLLBACK ON FAILURE
       try {
         for (const t of colTasks) {
-          await supabaseBrowser.from('tasks').update({ sort_order: t.sortOrder }).eq('id', t.id);
+          const { error } = await supabaseBrowser.from('tasks').update({ sort_order: t.sortOrder }).eq('id', t.id);
+          if (error) throw error;
         }
-      } catch (err) { console.error('DnD sync error:', err); }
+      } catch (err) {
+        // 🚨 CRITICAL: ROLLBACK IF DB FAILS
+        console.error('❌ DnD sync error (CASE A):', err);
+        setTasks(originalTasks); // REVERT UI!
+        alert('❌ فشل الحفظ في السيرفر! تم التراجع عن الحركة للحفاظ على بياناتك. تأكد من اتصالك بالإنترنت.');
+      }
       return;
     }
+
     // === CASE B: MOVING TO A DIFFERENT COLUMN ===
     const sourceCol = currentTasks.filter((t: any) => t.status === source.droppableId).sort((a: any, b: any) => (a.sortOrder || 0) - (b.sortOrder || 0));
     const destCol = currentTasks.filter((t: any) => t.status === destination.droppableId).sort((a: any, b: any) => (a.sortOrder || 0) - (b.sortOrder || 0));
@@ -543,13 +558,23 @@ export default function BrandDetailClient({ brand: initialBrand, initialTasks, i
     destCol.forEach((t: any, idx: number) => { t.sortOrder = idx; });
     sourceCol.forEach((t: any, idx: number) => { t.sortOrder = idx; });
     const otherTasks = currentTasks.filter((t: any) => t.status !== source.droppableId && t.status !== destination.droppableId);
+    
+    // 🚨 STEP 2: OPTIMISTIC UPDATE
     setTasks([...otherTasks, ...sourceCol, ...destCol]); // Instant UI Update
+    
+    // 🚨 STEP 3: DATABASE SYNC WITH ROLLBACK ON FAILURE
     try {
       const updates = [...destCol, ...sourceCol];
       for (const t of updates) {
-        await supabaseBrowser.from('tasks').update({ status: t.status, sort_order: t.sortOrder }).eq('id', t.id);
+        const { error } = await supabaseBrowser.from('tasks').update({ status: t.status, sort_order: t.sortOrder }).eq('id', t.id);
+        if (error) throw error;
       }
-    } catch (err) { console.error('DnD sync error:', err); }
+    } catch (err) {
+      // 🚨 CRITICAL: ROLLBACK IF DB FAILS
+      console.error('❌ DnD sync error (CASE B):', err);
+      setTasks(originalTasks); // REVERT UI!
+      alert('❌ فشل الحفظ في السيرفر! تم التراجع عن الحركة للحفاظ على بياناتك. تأكد من اتصالك بالإنترنت.');
+    }
   }, [tasks, supabaseBrowser]);
 
   // ── Task actions ──
