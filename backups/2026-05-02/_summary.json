@@ -1,0 +1,22 @@
+{
+  "backup_date": "2026-05-02",
+  "backup_time": "2026-05-02T23:27:39.958Z",
+  "tables_discovered": 13,
+  "tables": {
+    "tasks": 115,
+    "brands": 8,
+    "projects": 15,
+    "personal_tasks": 15,
+    "expenses": 6,
+    "biz_expenses": 3,
+    "employees": 14,
+    "decisions": 30,
+    "events": 7,
+    "archive": 26,
+    "weekly_focus": 22,
+    "salla_orders": 64,
+    "metrics": 8
+  },
+  "total_records": 333,
+  "status": "success"
+}
