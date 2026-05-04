@@ -1,0 +1,1029 @@
+[
+  {
+    "id": "d5",
+    "brand_id": "b4",
+    "project_id": "p8",
+    "title": "ذكرني — نموذج الاشتراك",
+    "context": "هل الاشتراك الشهري أم السنوي أفضل للمستخدم؟",
+    "options": [
+      {
+        "id": "o12",
+        "cons": [
+          "churn أعلى"
+        ],
+        "pros": [
+          "سهل التجربة"
+        ],
+        "title": "شهري ٩.٩٩",
+        "estimatedCost": 0,
+        "estimatedRevenue": 120
+      },
+      {
+        "id": "o13",
+        "cons": [
+          "حاجز دخول"
+        ],
+        "pros": [
+          "LTV أعلى",
+          "تدفق نقدي"
+        ],
+        "title": "سنوي ٧٩",
+        "estimatedCost": 0,
+        "estimatedRevenue": 79
+      }
+    ],
+    "chosen_option_id": "o13",
+    "status": "decided",
+    "impact": "medium",
+    "deadline": "2026-03-10",
+    "decided_at": "2026-03-10",
+    "decided_by": "غازي",
+    "notes": "السنوي يعطي قيمة أفضل",
+    "updated_at": "2026-04-04T20:34:58.460084+00:00"
+  },
+  {
+    "id": "x1775078925966swrmx",
+    "brand_id": "b1",
+    "project_id": null,
+    "title": "موظفات جوزاء — وقف دانيا — انتظر حقين مستقل يردون",
+    "context": "انتظر حقين مستقل يردون",
+    "options": [
+      {
+        "id": "x17750789259666nolo",
+        "cons": [],
+        "pros": [],
+        "title": "ميزانية",
+        "estimatedCost": null,
+        "estimatedRevenue": null
+      },
+      {
+        "id": "x1775078925966gf5of",
+        "cons": [],
+        "pros": [],
+        "title": "شخص",
+        "estimatedCost": null,
+        "estimatedRevenue": null
+      },
+      {
+        "id": "x1775078925966om00m",
+        "cons": [],
+        "pros": [],
+        "title": "وقت",
+        "estimatedCost": null,
+        "estimatedRevenue": null
+      }
+    ],
+    "chosen_option_id": null,
+    "status": "pending",
+    "impact": "medium",
+    "deadline": null,
+    "decided_at": null,
+    "decided_by": "غازي",
+    "notes": "",
+    "updated_at": "2026-04-04T20:34:58.460084+00:00"
+  },
+  {
+    "id": "x1775079005584zfd6l",
+    "brand_id": null,
+    "project_id": null,
+    "title": "كلموني الزكاه يقولون فيه اقرارات زكويه متاخره ما رفعتها — انتظر ابو سامح يعطيني خبر",
+    "context": "انتظر ابو سامح يعطيني خبر",
+    "options": [
+      {
+        "id": "x1775079005584r5o8z",
+        "cons": [],
+        "pros": [],
+        "title": "ميزانية",
+        "estimatedCost": null,
+        "estimatedRevenue": null
+      },
+      {
+        "id": "x17750790055846j7sn",
+        "cons": [],
+        "pros": [],
+        "title": "شخص",
+        "estimatedCost": null,
+        "estimatedRevenue": null
+      },
+      {
+        "id": "x1775079005584fspgi",
+        "cons": [],
+        "pros": [],
+        "title": "وقت",
+        "estimatedCost": null,
+        "estimatedRevenue": null
+      }
+    ],
+    "chosen_option_id": null,
+    "status": "pending",
+    "impact": "medium",
+    "deadline": null,
+    "decided_at": null,
+    "decided_by": "غازي",
+    "notes": "",
+    "updated_at": "2026-04-04T20:34:58.460084+00:00"
+  },
+  {
+    "id": "x1777031943970vdssi",
+    "brand_id": "b3",
+    "project_id": null,
+    "title": "ا — لابلات",
+    "context": "لابلات",
+    "options": [
+      {
+        "id": "x1777031943970d0yby",
+        "cons": [],
+        "pros": [],
+        "title": "ميزانية",
+        "estimatedCost": null,
+        "estimatedRevenue": null
+      },
+      {
+        "id": "x1777031943970u5fqw",
+        "cons": [],
+        "pros": [],
+        "title": "شخص",
+        "estimatedCost": null,
+        "estimatedRevenue": null
+      },
+      {
+        "id": "x17770319439709ohkr",
+        "cons": [],
+        "pros": [],
+        "title": "وقت",
+        "estimatedCost": null,
+        "estimatedRevenue": null
+      }
+    ],
+    "chosen_option_id": null,
+    "status": "pending",
+    "impact": "medium",
+    "deadline": null,
+    "decided_at": null,
+    "decided_by": "غازي",
+    "notes": "",
+    "updated_at": "2026-04-27T07:16:35.08168+00:00"
+  },
+  {
+    "id": "x1777031952828hzh1t",
+    "brand_id": "b3",
+    "project_id": null,
+    "title": "ا — بيظلطاذتنزم",
+    "context": "بيظلطاذتنزم",
+    "options": [
+      {
+        "id": "x1777031952828qx98o",
+        "cons": [],
+        "pros": [],
+        "title": "ميزانية",
+        "estimatedCost": null,
+        "estimatedRevenue": null
+      },
+      {
+        "id": "x1777031952828ofu5s",
+        "cons": [],
+        "pros": [],
+        "title": "شخص",
+        "estimatedCost": null,
+        "estimatedRevenue": null
+      },
+      {
+        "id": "x17770319528281gf9u",
+        "cons": [],
+        "pros": [],
+        "title": "وقت",
+        "estimatedCost": null,
+        "estimatedRevenue": null
+      }
+    ],
+    "chosen_option_id": null,
+    "status": "pending",
+    "impact": "medium",
+    "deadline": null,
+    "decided_at": null,
+    "decided_by": "غازي",
+    "notes": "",
+    "updated_at": "2026-04-27T07:16:35.08168+00:00"
+  },
+  {
+    "id": "x1775134036981a6t78",
+    "brand_id": null,
+    "project_id": null,
+    "title": "انقل سيارة ابو اياد باسمه — انتظر ابو اياد",
+    "context": "انتظر ابو اياد",
+    "options": [
+      {
+        "id": "x1775134036981eyaxh",
+        "cons": [],
+        "pros": [],
+        "title": "ميزانية",
+        "estimatedCost": null,
+        "estimatedRevenue": null
+      },
+      {
+        "id": "x17751340369818g0pd",
+        "cons": [],
+        "pros": [],
+        "title": "شخص",
+        "estimatedCost": null,
+        "estimatedRevenue": null
+      },
+      {
+        "id": "x1775134036981ux85i",
+        "cons": [],
+        "pros": [],
+        "title": "وقت",
+        "estimatedCost": null,
+        "estimatedRevenue": null
+      }
+    ],
+    "chosen_option_id": null,
+    "status": "pending",
+    "impact": "medium",
+    "deadline": null,
+    "decided_at": null,
+    "decided_by": "غازي",
+    "notes": "",
+    "updated_at": "2026-04-04T20:34:58.460084+00:00"
+  },
+  {
+    "id": "x1775135129873c9jkv",
+    "brand_id": null,
+    "project_id": null,
+    "title": "عليا اسوي لها أبشر — براء توديها لأبشر",
+    "context": "براء توديها لأبشر",
+    "options": [
+      {
+        "id": "x1775135129873u7qxs",
+        "cons": [],
+        "pros": [],
+        "title": "ميزانية",
+        "estimatedCost": null,
+        "estimatedRevenue": null
+      },
+      {
+        "id": "x1775135129873vl31d",
+        "cons": [],
+        "pros": [],
+        "title": "شخص",
+        "estimatedCost": null,
+        "estimatedRevenue": null
+      },
+      {
+        "id": "x1775135129873n75ks",
+        "cons": [],
+        "pros": [],
+        "title": "وقت",
+        "estimatedCost": null,
+        "estimatedRevenue": null
+      }
+    ],
+    "chosen_option_id": null,
+    "status": "pending",
+    "impact": "medium",
+    "deadline": null,
+    "decided_at": null,
+    "decided_by": "غازي",
+    "notes": "",
+    "updated_at": "2026-04-04T20:34:58.460084+00:00"
+  },
+  {
+    "id": "x17751331662373sx9h",
+    "brand_id": null,
+    "project_id": null,
+    "title": "انقل سيارة ابو اياد باسمه — انتظر ابو اياد ينقلها",
+    "context": "انتظر ابو اياد ينقلها",
+    "options": [
+      {
+        "id": "x17751331662370egm2",
+        "cons": [],
+        "pros": [],
+        "title": "ميزانية",
+        "estimatedCost": null,
+        "estimatedRevenue": null
+      },
+      {
+        "id": "x177513316623744dzv",
+        "cons": [],
+        "pros": [],
+        "title": "شخص",
+        "estimatedCost": null,
+        "estimatedRevenue": null
+      },
+      {
+        "id": "x1775133166237urzvf",
+        "cons": [],
+        "pros": [],
+        "title": "وقت",
+        "estimatedCost": null,
+        "estimatedRevenue": null
+      }
+    ],
+    "chosen_option_id": null,
+    "status": "pending",
+    "impact": "medium",
+    "deadline": null,
+    "decided_at": null,
+    "decided_by": "غازي",
+    "notes": "",
+    "updated_at": "2026-04-04T20:34:58.460084+00:00"
+  },
+  {
+    "id": "x1775133178096c8egm",
+    "brand_id": null,
+    "project_id": null,
+    "title": "توظيف عهود — الموضوع عند راكان",
+    "context": "الموضوع عند راكان",
+    "options": [
+      {
+        "id": "x1775133178096rsh18",
+        "cons": [],
+        "pros": [],
+        "title": "ميزانية",
+        "estimatedCost": null,
+        "estimatedRevenue": null
+      },
+      {
+        "id": "x17751331780966f7i4",
+        "cons": [],
+        "pros": [],
+        "title": "شخص",
+        "estimatedCost": null,
+        "estimatedRevenue": null
+      },
+      {
+        "id": "x1775133178096othdo",
+        "cons": [],
+        "pros": [],
+        "title": "وقت",
+        "estimatedCost": null,
+        "estimatedRevenue": null
+      }
+    ],
+    "chosen_option_id": null,
+    "status": "pending",
+    "impact": "medium",
+    "deadline": null,
+    "decided_at": null,
+    "decided_by": "غازي",
+    "notes": "",
+    "updated_at": "2026-04-04T20:34:58.460084+00:00"
+  },
+  {
+    "id": "x1775133507601e0zvs",
+    "brand_id": null,
+    "project_id": null,
+    "title": "انقل سيارة ابو اياد باسمه — الموضوع عند ابو اياد",
+    "context": "الموضوع عند ابو اياد",
+    "options": [
+      {
+        "id": "x1775133507601v9a55",
+        "cons": [],
+        "pros": [],
+        "title": "ميزانية",
+        "estimatedCost": null,
+        "estimatedRevenue": null
+      },
+      {
+        "id": "x1775133507601jfbj7",
+        "cons": [],
+        "pros": [],
+        "title": "شخص",
+        "estimatedCost": null,
+        "estimatedRevenue": null
+      },
+      {
+        "id": "x1775133507601deqr2",
+        "cons": [],
+        "pros": [],
+        "title": "وقت",
+        "estimatedCost": null,
+        "estimatedRevenue": null
+      }
+    ],
+    "chosen_option_id": "x1775133507601v9a55",
+    "status": "decided",
+    "impact": "medium",
+    "deadline": null,
+    "decided_at": "2026-04-02T12:45:41.016Z",
+    "decided_by": "غازي",
+    "notes": "",
+    "updated_at": "2026-04-04T20:34:58.460084+00:00"
+  },
+  {
+    "id": "d1",
+    "brand_id": "b1",
+    "project_id": "p7",
+    "title": "توم فورد — خاص أم مستوحى؟",
+    "context": "العميل يطلب توم فورد، هل نوفره خاصاً أم نقدم مستوحى؟",
+    "options": [
+      {
+        "id": "o1",
+        "cons": [
+          "تكلفة أعلى",
+          "وقت أطول"
+        ],
+        "pros": [
+          "هامش أعلى",
+          "تميز"
+        ],
+        "title": "خاص",
+        "estimatedCost": 8000,
+        "estimatedRevenue": 15000
+      },
+      {
+        "id": "o2",
+        "cons": [
+          "هامش أقل"
+        ],
+        "pros": [
+          "سريع",
+          "تكلفة أقل"
+        ],
+        "title": "مستوحى",
+        "estimatedCost": 2000,
+        "estimatedRevenue": 6000
+      },
+      {
+        "id": "o3",
+        "cons": [
+          "خسارة فرصة"
+        ],
+        "pros": [
+          "لا مخاطرة"
+        ],
+        "title": "نتركه",
+        "estimatedCost": 0,
+        "estimatedRevenue": 0
+      }
+    ],
+    "chosen_option_id": null,
+    "status": "pending",
+    "impact": "high",
+    "deadline": "2026-03-26",
+    "decided_at": null,
+    "decided_by": "غازي",
+    "notes": "",
+    "updated_at": "2026-04-14T02:30:34.439209+00:00"
+  },
+  {
+    "id": "d2",
+    "brand_id": "b1",
+    "project_id": "p3",
+    "title": "بكج سدرة — أكمل أم ألغي؟",
+    "context": "بكج سدرة بقيمة ٧٠٠٠ ريال، العميل متردد",
+    "options": [
+      {
+        "id": "o4",
+        "cons": [
+          "وقت وجهد"
+        ],
+        "pros": [
+          "عائد جيد",
+          "علاقة عميل"
+        ],
+        "title": "أكمل",
+        "estimatedCost": 3000,
+        "estimatedRevenue": 7000
+      },
+      {
+        "id": "o5",
+        "cons": [
+          "خسارة العميل"
+        ],
+        "pros": [
+          "توفير وقت"
+        ],
+        "title": "ألغي",
+        "estimatedCost": 0,
+        "estimatedRevenue": 0
+      }
+    ],
+    "chosen_option_id": null,
+    "status": "pending",
+    "impact": "high",
+    "deadline": "2026-03-28",
+    "decided_at": null,
+    "decided_by": "غازي",
+    "notes": "",
+    "updated_at": "2026-04-14T02:30:34.439209+00:00"
+  },
+  {
+    "id": "d3",
+    "brand_id": "b1",
+    "project_id": "p1",
+    "title": "خط العناية — نبدأ بإيش؟",
+    "context": "لدينا ٣ منتجات: بودرة، معطر، زيت — أيهم نبدأ؟",
+    "options": [
+      {
+        "id": "o6",
+        "cons": [
+          "منافسة"
+        ],
+        "pros": [
+          "طلب عالي",
+          "سهل التسويق"
+        ],
+        "title": "بودرة",
+        "estimatedCost": 5000,
+        "estimatedRevenue": 12000
+      },
+      {
+        "id": "o7",
+        "cons": [
+          "تعقيد أكثر"
+        ],
+        "pros": [
+          "هامش أعلى"
+        ],
+        "title": "معطر",
+        "estimatedCost": 6000,
+        "estimatedRevenue": 14000
+      },
+      {
+        "id": "o8",
+        "cons": [
+          "سوق أصغر"
+        ],
+        "pros": [
+          "تميز"
+        ],
+        "title": "زيت",
+        "estimatedCost": 4000,
+        "estimatedRevenue": 10000
+      },
+      {
+        "id": "o9",
+        "cons": [
+          "تكلفة عالية",
+          "مخاطرة"
+        ],
+        "pros": [
+          "حضور كامل"
+        ],
+        "title": "الكل معاً",
+        "estimatedCost": 15000,
+        "estimatedRevenue": 36000
+      }
+    ],
+    "chosen_option_id": null,
+    "status": "pending",
+    "impact": "high",
+    "deadline": "2026-03-22",
+    "decided_at": null,
+    "decided_by": "غازي",
+    "notes": "",
+    "updated_at": "2026-04-14T02:30:34.439209+00:00"
+  },
+  {
+    "id": "x17753239020782z40c",
+    "brand_id": "b1",
+    "project_id": null,
+    "title": "منتج جديد هدايا عيد الاضحى — الموضوع انتقل لمجاهد لما يخلص الانتاج والكرتون",
+    "context": "الموضوع انتقل لمجاهد لما يخلص الانتاج والكرتون",
+    "options": [
+      {
+        "id": "x17753239020783hlkv",
+        "cons": [],
+        "pros": [],
+        "title": "ميزانية",
+        "estimatedCost": null,
+        "estimatedRevenue": null
+      },
+      {
+        "id": "x1775323902078m6uym",
+        "cons": [],
+        "pros": [],
+        "title": "شخص",
+        "estimatedCost": null,
+        "estimatedRevenue": null
+      },
+      {
+        "id": "x1775323902078m0y2o",
+        "cons": [],
+        "pros": [],
+        "title": "وقت",
+        "estimatedCost": null,
+        "estimatedRevenue": null
+      }
+    ],
+    "chosen_option_id": null,
+    "status": "pending",
+    "impact": "medium",
+    "deadline": null,
+    "decided_at": null,
+    "decided_by": "غازي",
+    "notes": "",
+    "updated_at": "2026-04-04T20:34:58.460084+00:00"
+  },
+  {
+    "id": "d4",
+    "brand_id": "b2",
+    "project_id": "p4",
+    "title": "أودريد — قناة التوزيع",
+    "context": "هل نركز على حراج أم نبني متجر مستقل؟",
+    "options": [
+      {
+        "id": "o10",
+        "cons": [
+          "عمولة",
+          "تبعية"
+        ],
+        "pros": [
+          "سريع",
+          "جمهور جاهز"
+        ],
+        "title": "حراج فقط",
+        "estimatedCost": 500,
+        "estimatedRevenue": 8000
+      },
+      {
+        "id": "o11",
+        "cons": [
+          "وقت أطول",
+          "تكلفة"
+        ],
+        "pros": [
+          "استقلالية",
+          "بناء براند"
+        ],
+        "title": "متجر مستقل",
+        "estimatedCost": 5000,
+        "estimatedRevenue": 15000
+      }
+    ],
+    "chosen_option_id": "o10",
+    "status": "decided",
+    "impact": "medium",
+    "deadline": "2026-03-15",
+    "decided_at": "2026-03-15",
+    "decided_by": "غازي",
+    "notes": "نبدأ بحراج ونبني المتجر بالتوازي",
+    "updated_at": "2026-04-14T02:30:34.439209+00:00"
+  },
+  {
+    "id": "d1776401702943",
+    "brand_id": null,
+    "project_id": null,
+    "title": "قرار اختبار من القيادة الجديدة",
+    "context": "",
+    "options": [],
+    "chosen_option_id": null,
+    "status": "open",
+    "impact": "medium",
+    "deadline": null,
+    "decided_at": null,
+    "decided_by": null,
+    "notes": "",
+    "updated_at": "2026-04-17T04:55:02.943+00:00"
+  },
+  {
+    "id": "x1777027556693bc4gu",
+    "brand_id": "x17747670469005rdjn",
+    "project_id": null,
+    "title": "طريقة تحويل حساباتي في السوشيال ميديا الى نشر ذكاء اصطناعي فيه تغريدة سويت لها قلب — وش وقفك؟",
+    "context": "",
+    "options": [
+      {
+        "id": "x17770275566934rfll",
+        "cons": [],
+        "pros": [],
+        "title": "ميزانية",
+        "estimatedCost": null,
+        "estimatedRevenue": null
+      },
+      {
+        "id": "x1777027556693i4lpc",
+        "cons": [],
+        "pros": [],
+        "title": "شخص",
+        "estimatedCost": null,
+        "estimatedRevenue": null
+      },
+      {
+        "id": "x1777027556693htnqw",
+        "cons": [],
+        "pros": [],
+        "title": "وقت",
+        "estimatedCost": null,
+        "estimatedRevenue": null
+      }
+    ],
+    "chosen_option_id": null,
+    "status": "pending",
+    "impact": "medium",
+    "deadline": null,
+    "decided_at": null,
+    "decided_by": "غازي",
+    "notes": "",
+    "updated_at": "2026-04-24T10:46:00.288477+00:00"
+  },
+  {
+    "id": "d1777030515398",
+    "brand_id": "b3",
+    "project_id": null,
+    "title": "حصريات النبش — الطلب — أكمل أم ألغي؟",
+    "context": "قسيبفلاتنمك؛\\كتالبيس",
+    "options": [],
+    "chosen_option_id": null,
+    "status": "open",
+    "impact": "high",
+    "deadline": null,
+    "decided_at": null,
+    "decided_by": null,
+    "notes": "تم إنشاؤه تلقائياً من مهمة عالقة: حصريات النبش — الطلب",
+    "updated_at": "2026-04-24T11:35:15.398+00:00"
+  },
+  {
+    "id": "d1777029155239",
+    "brand_id": "b1",
+    "project_id": null,
+    "title": "م — أكمل أم ألغي؟",
+    "context": "حبيبي",
+    "options": [],
+    "chosen_option_id": null,
+    "status": "open",
+    "impact": "high",
+    "deadline": null,
+    "decided_at": null,
+    "decided_by": null,
+    "notes": "تم إنشاؤه تلقائياً من مهمة عالقة: م",
+    "updated_at": "2026-04-24T11:12:35.239+00:00"
+  },
+  {
+    "id": "d1777029244263",
+    "brand_id": "b3",
+    "project_id": null,
+    "title": "h — أكمل أم ألغي؟",
+    "context": "غازي",
+    "options": [],
+    "chosen_option_id": null,
+    "status": "open",
+    "impact": "high",
+    "deadline": null,
+    "decided_at": null,
+    "decided_by": null,
+    "notes": "تم إنشاؤه تلقائياً من مهمة عالقة: h",
+    "updated_at": "2026-04-24T11:14:04.263+00:00"
+  },
+  {
+    "id": "d1777029293256",
+    "brand_id": "b3",
+    "project_id": null,
+    "title": "h — أكمل أم ألغي؟",
+    "context": "غازي",
+    "options": [],
+    "chosen_option_id": null,
+    "status": "open",
+    "impact": "high",
+    "deadline": null,
+    "decided_at": null,
+    "decided_by": null,
+    "notes": "تم إنشاؤه تلقائياً من مهمة عالقة: h",
+    "updated_at": "2026-04-24T11:14:53.256+00:00"
+  },
+  {
+    "id": "x1777026963880gb6wt",
+    "brand_id": "b2",
+    "project_id": null,
+    "title": "مشروع بيع براند اودريد — بسبب شي ثاني",
+    "context": "بسبب شي ثاني",
+    "options": [
+      {
+        "id": "x1777026963880r7qk9",
+        "cons": [],
+        "pros": [],
+        "title": "ميزانية",
+        "estimatedCost": null,
+        "estimatedRevenue": null
+      },
+      {
+        "id": "x1777026963880d220d",
+        "cons": [],
+        "pros": [],
+        "title": "شخص",
+        "estimatedCost": null,
+        "estimatedRevenue": null
+      },
+      {
+        "id": "x1777026963880ziqvk",
+        "cons": [],
+        "pros": [],
+        "title": "وقت",
+        "estimatedCost": null,
+        "estimatedRevenue": null
+      }
+    ],
+    "chosen_option_id": null,
+    "status": "pending",
+    "impact": "medium",
+    "deadline": null,
+    "decided_at": null,
+    "decided_by": "غازي",
+    "notes": "",
+    "updated_at": "2026-04-24T10:36:06.344702+00:00"
+  },
+  {
+    "id": "d1777029355270",
+    "brand_id": "b3",
+    "project_id": null,
+    "title": "h — أكمل أم ألغي؟",
+    "context": "لتاشسلنشتم",
+    "options": [],
+    "chosen_option_id": null,
+    "status": "open",
+    "impact": "high",
+    "deadline": null,
+    "decided_at": null,
+    "decided_by": null,
+    "notes": "تم إنشاؤه تلقائياً من مهمة عالقة: h",
+    "updated_at": "2026-04-24T11:15:55.27+00:00"
+  },
+  {
+    "id": "d1777030450952",
+    "brand_id": "x17747670469005rdjn",
+    "project_id": null,
+    "title": "طريقة تحويل حساباتي في السوشيال ميديا الى نشر ذكاء اصطناعي فيه تغريدة سويت لها قلب — أكمل أم ألغي؟",
+    "context": "طبلذادتزنرمك؛\\",
+    "options": [],
+    "chosen_option_id": null,
+    "status": "open",
+    "impact": "high",
+    "deadline": null,
+    "decided_at": null,
+    "decided_by": null,
+    "notes": "تم إنشاؤه تلقائياً من مهمة عالقة: طريقة تحويل حساباتي في السوشيال ميديا الى نشر ذكاء اصطناعي فيه تغريدة سويت لها قلب",
+    "updated_at": "2026-04-24T11:34:10.952+00:00"
+  },
+  {
+    "id": "x17770269845785qeoe",
+    "brand_id": "b2",
+    "project_id": null,
+    "title": "مشروع بيع براند اودريد — بسبب شي ثاني",
+    "context": "بسبب شي ثاني",
+    "options": [
+      {
+        "id": "x1777026984579smk37",
+        "cons": [],
+        "pros": [],
+        "title": "ميزانية",
+        "estimatedCost": null,
+        "estimatedRevenue": null
+      },
+      {
+        "id": "x1777026984579nu13t",
+        "cons": [],
+        "pros": [],
+        "title": "شخص",
+        "estimatedCost": null,
+        "estimatedRevenue": null
+      },
+      {
+        "id": "x1777026984579oh0v0",
+        "cons": [],
+        "pros": [],
+        "title": "وقت",
+        "estimatedCost": null,
+        "estimatedRevenue": null
+      }
+    ],
+    "chosen_option_id": null,
+    "status": "pending",
+    "impact": "medium",
+    "deadline": null,
+    "decided_at": null,
+    "decided_by": "غازي",
+    "notes": "",
+    "updated_at": "2026-04-24T10:36:26.218265+00:00"
+  },
+  {
+    "id": "x17770272538823doet",
+    "brand_id": "b1",
+    "project_id": "p1",
+    "title": "طلب عبوات بودرة الجسم — وش وقفك؟",
+    "context": "",
+    "options": [
+      {
+        "id": "x1777027253882res6n",
+        "cons": [],
+        "pros": [],
+        "title": "ميزانية",
+        "estimatedCost": null,
+        "estimatedRevenue": null
+      },
+      {
+        "id": "x1777027253882vk6vn",
+        "cons": [],
+        "pros": [],
+        "title": "شخص",
+        "estimatedCost": null,
+        "estimatedRevenue": null
+      },
+      {
+        "id": "x1777027253882gs303",
+        "cons": [],
+        "pros": [],
+        "title": "وقت",
+        "estimatedCost": null,
+        "estimatedRevenue": null
+      }
+    ],
+    "chosen_option_id": null,
+    "status": "pending",
+    "impact": "medium",
+    "deadline": null,
+    "decided_at": null,
+    "decided_by": "غازي",
+    "notes": "",
+    "updated_at": "2026-04-24T10:40:57.942558+00:00"
+  },
+  {
+    "id": "x1777027920651dqv2r",
+    "brand_id": "b1",
+    "project_id": "p3",
+    "title": "تصميم بكج سدرة — وش وقفك؟",
+    "context": "",
+    "options": [
+      {
+        "id": "x1777027920651gidtz",
+        "cons": [],
+        "pros": [],
+        "title": "ميزانية",
+        "estimatedCost": null,
+        "estimatedRevenue": null
+      },
+      {
+        "id": "x1777027920651sxxrv",
+        "cons": [],
+        "pros": [],
+        "title": "شخص",
+        "estimatedCost": null,
+        "estimatedRevenue": null
+      },
+      {
+        "id": "x1777027920651o2zvk",
+        "cons": [],
+        "pros": [],
+        "title": "وقت",
+        "estimatedCost": null,
+        "estimatedRevenue": null
+      }
+    ],
+    "chosen_option_id": null,
+    "status": "pending",
+    "impact": "medium",
+    "deadline": null,
+    "decided_at": null,
+    "decided_by": "غازي",
+    "notes": "",
+    "updated_at": "2026-04-24T10:52:02.822238+00:00"
+  },
+  {
+    "id": "d1777029366635",
+    "brand_id": "b3",
+    "project_id": null,
+    "title": "h — أكمل أم ألغي؟",
+    "context": "اليسشنتزشنتس",
+    "options": [],
+    "chosen_option_id": null,
+    "status": "open",
+    "impact": "high",
+    "deadline": null,
+    "decided_at": null,
+    "decided_by": null,
+    "notes": "تم إنشاؤه تلقائياً من مهمة عالقة: h",
+    "updated_at": "2026-04-24T11:16:06.635+00:00"
+  },
+  {
+    "id": "d1777030197085",
+    "brand_id": "b3",
+    "project_id": null,
+    "title": "h — أكمل أم ألغي؟",
+    "context": "غاززززي",
+    "options": [],
+    "chosen_option_id": null,
+    "status": "open",
+    "impact": "high",
+    "deadline": null,
+    "decided_at": null,
+    "decided_by": null,
+    "notes": "تم إنشاؤه تلقائياً من مهمة عالقة: h",
+    "updated_at": "2026-04-24T11:29:57.085+00:00"
+  },
+  {
+    "id": "d1777030311553",
+    "brand_id": "b3",
+    "project_id": null,
+    "title": "h — أكمل أم ألغي؟",
+    "context": "لااتلبتابتالبتلابالبتابانبنات",
+    "options": [],
+    "chosen_option_id": null,
+    "status": "open",
+    "impact": "high",
+    "deadline": null,
+    "decided_at": null,
+    "decided_by": null,
+    "notes": "تم إنشاؤه تلقائياً من مهمة عالقة: h",
+    "updated_at": "2026-04-24T11:31:51.553+00:00"
+  }
+]
