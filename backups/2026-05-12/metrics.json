@@ -1,0 +1,98 @@
+[
+  {
+    "id": "m3",
+    "brand_id": "b1",
+    "date": "2026-03-01",
+    "revenue": 38000,
+    "orders": 95,
+    "avg_order_value": 400,
+    "ad_spend": 4000,
+    "roas": 9.5,
+    "custom_metrics": {},
+    "updated_at": "2026-04-04T20:34:59.267581+00:00"
+  },
+  {
+    "id": "m6",
+    "brand_id": "b2",
+    "date": "2026-03-01",
+    "revenue": 15000,
+    "orders": 300,
+    "avg_order_value": 50,
+    "ad_spend": 2000,
+    "roas": 7.5,
+    "custom_metrics": {},
+    "updated_at": "2026-04-04T20:34:59.267581+00:00"
+  },
+  {
+    "id": "m8",
+    "brand_id": "b3",
+    "date": "2026-03-01",
+    "revenue": 9000,
+    "orders": 60,
+    "avg_order_value": 150,
+    "ad_spend": 600,
+    "roas": 15,
+    "custom_metrics": {},
+    "updated_at": "2026-04-04T20:34:59.267581+00:00"
+  },
+  {
+    "id": "m2",
+    "brand_id": "b1",
+    "date": "2026-02-01",
+    "revenue": 52000,
+    "orders": 140,
+    "avg_order_value": 371,
+    "ad_spend": 3500,
+    "roas": 14.9,
+    "custom_metrics": {},
+    "updated_at": "2026-04-04T20:34:59.267581+00:00"
+  },
+  {
+    "id": "m5",
+    "brand_id": "b2",
+    "date": "2026-02-01",
+    "revenue": 22000,
+    "orders": 440,
+    "avg_order_value": 50,
+    "ad_spend": 1800,
+    "roas": 12.2,
+    "custom_metrics": {},
+    "updated_at": "2026-04-04T20:34:59.267581+00:00"
+  },
+  {
+    "id": "m7",
+    "brand_id": "b3",
+    "date": "2026-02-01",
+    "revenue": 12000,
+    "orders": 80,
+    "avg_order_value": 150,
+    "ad_spend": 800,
+    "roas": 15,
+    "custom_metrics": {},
+    "updated_at": "2026-04-04T20:34:59.267581+00:00"
+  },
+  {
+    "id": "m1",
+    "brand_id": "b1",
+    "date": "2026-01-01",
+    "revenue": 45000,
+    "orders": 120,
+    "avg_order_value": 375,
+    "ad_spend": 3000,
+    "roas": 15,
+    "custom_metrics": {},
+    "updated_at": "2026-04-04T20:34:59.267581+00:00"
+  },
+  {
+    "id": "m4",
+    "brand_id": "b2",
+    "date": "2026-01-01",
+    "revenue": 18000,
+    "orders": 360,
+    "avg_order_value": 50,
+    "ad_spend": 1500,
+    "roas": 12,
+    "custom_metrics": {},
+    "updated_at": "2026-04-04T20:34:59.267581+00:00"
+  }
+]
