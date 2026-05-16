@@ -38,76 +38,6 @@
     "updated_at": "2026-04-12T02:09:35.103155+00:00"
   },
   {
-    "id": "pt3",
-    "title": "مراجعة البريد الإلكتروني",
-    "description": "",
-    "status": "done",
-    "priority": "medium",
-    "due_date": null,
-    "completed_at": null,
-    "tags": [],
-    "notes": "",
-    "sort_order": 0,
-    "checklist": [],
-    "subtasks": [],
-    "subtask_groups": [],
-    "links": [],
-    "category": "personal",
-    "created_at": null,
-    "updated_at": "2026-04-12T02:09:35.103155+00:00"
-  },
-  {
-    "id": "pt4",
-    "title": "إنهاء كتاب \"الفكر الاستراتيجي\"",
-    "description": "",
-    "status": "todo",
-    "priority": "high",
-    "due_date": "2026-06-30",
-    "completed_at": null,
-    "tags": [],
-    "notes": "وصلت للفصل الخامس",
-    "sort_order": 0,
-    "checklist": [
-      {
-        "done": true,
-        "text": "الفصل ١-٣"
-      },
-      {
-        "done": false,
-        "text": "الفصل ٤-٦"
-      },
-      {
-        "done": false,
-        "text": "الفصل ٧-٩"
-      }
-    ],
-    "subtasks": [],
-    "subtask_groups": [],
-    "links": [],
-    "category": "personal",
-    "created_at": null,
-    "updated_at": "2026-04-12T02:09:35.103155+00:00"
-  },
-  {
-    "id": "pt5",
-    "title": "تعلم لغة برمجية جديدة",
-    "description": "",
-    "status": "in_progress",
-    "priority": "medium",
-    "due_date": "2026-12-31",
-    "completed_at": null,
-    "tags": [],
-    "notes": "",
-    "sort_order": 0,
-    "checklist": [],
-    "subtasks": [],
-    "subtask_groups": [],
-    "links": [],
-    "category": "financial",
-    "created_at": null,
-    "updated_at": "2026-04-12T02:09:35.103155+00:00"
-  },
-  {
     "id": "pt6",
     "title": "رحلة عائلية",
     "description": "",
@@ -290,25 +220,6 @@
     "updated_at": "2026-04-12T02:13:58.522549+00:00"
   },
   {
-    "id": "pt1774853495254",
-    "title": "احول لراعي الي صدمته بجده",
-    "description": "",
-    "status": "todo",
-    "priority": "high",
-    "due_date": null,
-    "completed_at": null,
-    "tags": [],
-    "notes": "",
-    "sort_order": 0,
-    "checklist": [],
-    "subtasks": [],
-    "subtask_groups": [],
-    "links": [],
-    "category": "health",
-    "created_at": null,
-    "updated_at": "2026-04-12T02:13:58.522549+00:00"
-  },
-  {
     "id": "pt1774853539257",
     "title": "عليا اسوي لها أبشر",
     "description": "",
@@ -328,25 +239,6 @@
     "updated_at": "2026-04-12T02:13:58.522549+00:00"
   },
   {
-    "id": "pt1774987160192",
-    "title": "طلبت من نخبة الجوف 16 لتر",
-    "description": "",
-    "status": "todo",
-    "priority": "low",
-    "due_date": null,
-    "completed_at": null,
-    "tags": [],
-    "notes": "",
-    "sort_order": 0,
-    "checklist": [],
-    "subtasks": [],
-    "subtask_groups": [],
-    "links": [],
-    "category": "health",
-    "created_at": null,
-    "updated_at": "2026-04-12T02:13:58.522549+00:00"
-  },
-  {
     "id": "pt1775487953820",
     "title": "60400 فلوس امي الي تطلب جوزا",
     "description": "",
@@ -362,6 +254,44 @@
     "subtask_groups": [],
     "links": [],
     "category": "family",
+    "created_at": null,
+    "updated_at": "2026-04-12T02:13:58.522549+00:00"
+  },
+  {
+    "id": "pt1774853495254",
+    "title": "احول لراعي الي صدمته بجده",
+    "description": "",
+    "status": "todo",
+    "priority": "high",
+    "due_date": null,
+    "completed_at": null,
+    "tags": [],
+    "notes": "",
+    "sort_order": 0,
+    "checklist": [],
+    "subtasks": [],
+    "subtask_groups": [],
+    "links": [],
+    "category": "health",
+    "created_at": null,
+    "updated_at": "2026-04-12T02:13:58.522549+00:00"
+  },
+  {
+    "id": "pt1774987160192",
+    "title": "طلبت من نخبة الجوف 16 لتر",
+    "description": "",
+    "status": "done",
+    "priority": "low",
+    "due_date": null,
+    "completed_at": null,
+    "tags": [],
+    "notes": "",
+    "sort_order": 0,
+    "checklist": [],
+    "subtasks": [],
+    "subtask_groups": [],
+    "links": [],
+    "category": "health",
     "created_at": null,
     "updated_at": "2026-04-12T02:13:58.522549+00:00"
   }
