@@ -61,39 +61,6 @@
     "updated_at": "2026-04-04T20:35:00.561576+00:00"
   },
   {
-    "id": "exp-sec-2",
-    "title": "معيشة وأسرة",
-    "type": "living",
-    "color": "var(--accent)",
-    "items": [
-      {
-        "id": "exp-2-1",
-        "kind": "fixed",
-        "name": "مصروف الأهل",
-        "note": "",
-        "cycle": "monthly",
-        "amount": 1500
-      },
-      {
-        "id": "exp-2-2",
-        "kind": "fixed",
-        "name": "مصروف البيت",
-        "note": "",
-        "cycle": "monthly",
-        "amount": 1000
-      },
-      {
-        "id": "exp-2-3",
-        "kind": "fixed",
-        "name": "تعليم (دانه + حمودي)",
-        "note": "",
-        "cycle": "yearly",
-        "amount": 25000
-      }
-    ],
-    "updated_at": "2026-04-14T05:01:32.868+00:00"
-  },
-  {
     "id": "exp-sec-utilities",
     "title": "فواتير ومرافق",
     "type": "utilities",
@@ -132,6 +99,39 @@
       }
     ],
     "updated_at": "2026-04-04T20:35:00.561576+00:00"
+  },
+  {
+    "id": "exp-sec-2",
+    "title": "معيشة وأسرة",
+    "type": "living",
+    "color": "var(--accent)",
+    "items": [
+      {
+        "id": "exp-2-1",
+        "kind": "fixed",
+        "name": "مصروف الأهل",
+        "note": "",
+        "cycle": "monthly",
+        "amount": 1500
+      },
+      {
+        "id": "exp-2-2",
+        "kind": "fixed",
+        "name": "مصروف البيت",
+        "note": "",
+        "cycle": "monthly",
+        "amount": 1000
+      },
+      {
+        "id": "exp-2-3",
+        "kind": "fixed",
+        "name": "تعليم (دانه + حمودي)",
+        "note": "",
+        "cycle": "yearly",
+        "amount": 25000
+      }
+    ],
+    "updated_at": "2026-04-14T05:01:32.868+00:00"
   },
   {
     "id": "exp-sec-3",
