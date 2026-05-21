@@ -1,19 +1,5 @@
 [
   {
-    "id": "x17747104956216edgo",
-    "brand_id": "x17747068433191tevy",
-    "title": "أفكار تسويقية",
-    "description": "",
-    "status": "planning",
-    "priority": "medium",
-    "start_date": "2026-03-28",
-    "target_date": null,
-    "progress": 0,
-    "tags": [],
-    "sort_order": 1,
-    "updated_at": "2026-04-06T01:04:56.122476+00:00"
-  },
-  {
     "id": "x177475740557992wam",
     "brand_id": "b1",
     "title": "بكج العناية زي حق ام يزن",
@@ -70,40 +56,6 @@
     "updated_at": "2026-04-06T01:04:56.122476+00:00"
   },
   {
-    "id": "p1",
-    "brand_id": "b1",
-    "title": "إطلاق خط العناية الجديد",
-    "description": "",
-    "status": "active",
-    "priority": "critical",
-    "start_date": "2026-03-01",
-    "target_date": "2026-04-30",
-    "progress": 0,
-    "tags": [
-      "عناية",
-      "منتج جديد"
-    ],
-    "sort_order": 0,
-    "updated_at": "2026-04-06T01:04:56.122476+00:00"
-  },
-  {
-    "id": "p2",
-    "brand_id": "b1",
-    "title": "حل واتساب للعملاء",
-    "description": "",
-    "status": "active",
-    "priority": "high",
-    "start_date": "2026-02-15",
-    "target_date": "2026-03-31",
-    "progress": 0,
-    "tags": [
-      "تسويق",
-      "واتساب"
-    ],
-    "sort_order": 0,
-    "updated_at": "2026-04-06T01:04:56.122476+00:00"
-  },
-  {
     "id": "p3",
     "brand_id": "b1",
     "title": "بكج سدرة الفاخر",
@@ -121,6 +73,39 @@
     "updated_at": "2026-04-06T01:04:56.122476+00:00"
   },
   {
+    "id": "p1",
+    "brand_id": "b1",
+    "title": "إطلاق خط العناية الجديد",
+    "description": "",
+    "status": "planning",
+    "priority": "critical",
+    "start_date": "2026-03-01",
+    "target_date": "2026-04-30",
+    "progress": 0,
+    "tags": [
+      "عناية",
+      "منتج جديد"
+    ],
+    "sort_order": 0,
+    "updated_at": "2026-04-06T01:04:56.122476+00:00"
+  },
+  {
+    "id": "p6",
+    "brand_id": "b3",
+    "title": "حصريات النبش",
+    "description": "",
+    "status": "planning",
+    "priority": "high",
+    "start_date": "2026-03-05",
+    "target_date": "2026-03-25",
+    "progress": 0,
+    "tags": [
+      "حصريات"
+    ],
+    "sort_order": 0,
+    "updated_at": "2026-04-14T02:30:34.085078+00:00"
+  },
+  {
     "id": "p4",
     "brand_id": "b2",
     "title": "عرض تجار المصري",
@@ -135,7 +120,7 @@
       "تجار"
     ],
     "sort_order": 0,
-    "updated_at": "2026-04-06T01:04:56.122476+00:00"
+    "updated_at": "2026-04-27T07:16:34.744208+00:00"
   },
   {
     "id": "p5",
@@ -151,23 +136,7 @@
       "إعلانات"
     ],
     "sort_order": 0,
-    "updated_at": "2026-04-14T02:30:34.085078+00:00"
-  },
-  {
-    "id": "p6",
-    "brand_id": "b3",
-    "title": "حصريات النبش",
-    "description": "",
-    "status": "active",
-    "priority": "high",
-    "start_date": "2026-03-05",
-    "target_date": "2026-03-25",
-    "progress": 0,
-    "tags": [
-      "حصريات"
-    ],
-    "sort_order": 0,
-    "updated_at": "2026-04-14T02:30:34.085078+00:00"
+    "updated_at": "2026-04-27T07:16:34.744208+00:00"
   },
   {
     "id": "p7",
@@ -183,7 +152,7 @@
       "منتج جديد"
     ],
     "sort_order": 0,
-    "updated_at": "2026-04-14T02:30:34.085078+00:00"
+    "updated_at": "2026-04-27T07:16:34.744208+00:00"
   },
   {
     "id": "p8",
@@ -200,7 +169,7 @@
       "تسويق"
     ],
     "sort_order": 0,
-    "updated_at": "2026-04-06T01:04:56.122476+00:00"
+    "updated_at": "2026-04-27T07:16:34.744208+00:00"
   },
   {
     "id": "p9",
@@ -217,7 +186,7 @@
       "موسمي"
     ],
     "sort_order": 0,
-    "updated_at": "2026-04-14T02:30:34.085078+00:00"
+    "updated_at": "2026-04-27T07:16:34.744208+00:00"
   },
   {
     "id": "x1774707508320h6p0w",
@@ -231,6 +200,37 @@
     "progress": 0,
     "tags": [],
     "sort_order": 0,
-    "updated_at": "2026-04-06T01:04:56.122476+00:00"
+    "updated_at": "2026-04-27T07:16:34.744208+00:00"
+  },
+  {
+    "id": "x17747104956216edgo",
+    "brand_id": "x17747068433191tevy",
+    "title": "أفكار تسويقية",
+    "description": "",
+    "status": "planning",
+    "priority": "medium",
+    "start_date": "2026-03-28",
+    "target_date": null,
+    "progress": 0,
+    "tags": [],
+    "sort_order": 1,
+    "updated_at": "2026-04-27T07:16:34.744208+00:00"
+  },
+  {
+    "id": "p2",
+    "brand_id": "b1",
+    "title": "حل واتساب للعملاء",
+    "description": "",
+    "status": "active",
+    "priority": "high",
+    "start_date": "2026-02-15",
+    "target_date": "2026-03-31",
+    "progress": 0,
+    "tags": [
+      "تسويق",
+      "واتساب"
+    ],
+    "sort_order": 0,
+    "updated_at": "2026-04-27T07:16:34.744208+00:00"
   }
 ]

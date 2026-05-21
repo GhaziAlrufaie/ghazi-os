@@ -1,5 +1,87 @@
 [
   {
+    "id": "x1777031943970vdssi",
+    "brand_id": "b3",
+    "project_id": null,
+    "title": "ا — لابلات",
+    "context": "لابلات",
+    "options": [
+      {
+        "id": "x1777031943970d0yby",
+        "cons": [],
+        "pros": [],
+        "title": "ميزانية",
+        "estimatedCost": null,
+        "estimatedRevenue": null
+      },
+      {
+        "id": "x1777031943970u5fqw",
+        "cons": [],
+        "pros": [],
+        "title": "شخص",
+        "estimatedCost": null,
+        "estimatedRevenue": null
+      },
+      {
+        "id": "x17770319439709ohkr",
+        "cons": [],
+        "pros": [],
+        "title": "وقت",
+        "estimatedCost": null,
+        "estimatedRevenue": null
+      }
+    ],
+    "chosen_option_id": null,
+    "status": "pending",
+    "impact": "medium",
+    "deadline": null,
+    "decided_at": null,
+    "decided_by": "غازي",
+    "notes": "",
+    "updated_at": "2026-04-27T07:16:35.08168+00:00"
+  },
+  {
+    "id": "x1777031952828hzh1t",
+    "brand_id": "b3",
+    "project_id": null,
+    "title": "ا — بيظلطاذتنزم",
+    "context": "بيظلطاذتنزم",
+    "options": [
+      {
+        "id": "x1777031952828qx98o",
+        "cons": [],
+        "pros": [],
+        "title": "ميزانية",
+        "estimatedCost": null,
+        "estimatedRevenue": null
+      },
+      {
+        "id": "x1777031952828ofu5s",
+        "cons": [],
+        "pros": [],
+        "title": "شخص",
+        "estimatedCost": null,
+        "estimatedRevenue": null
+      },
+      {
+        "id": "x17770319528281gf9u",
+        "cons": [],
+        "pros": [],
+        "title": "وقت",
+        "estimatedCost": null,
+        "estimatedRevenue": null
+      }
+    ],
+    "chosen_option_id": null,
+    "status": "pending",
+    "impact": "medium",
+    "deadline": null,
+    "decided_at": null,
+    "decided_by": "غازي",
+    "notes": "",
+    "updated_at": "2026-04-27T07:16:35.08168+00:00"
+  },
+  {
     "id": "d5",
     "brand_id": "b4",
     "project_id": "p8",
@@ -329,6 +411,47 @@
     "updated_at": "2026-04-04T20:34:58.460084+00:00"
   },
   {
+    "id": "x17753239020782z40c",
+    "brand_id": "b1",
+    "project_id": null,
+    "title": "منتج جديد هدايا عيد الاضحى — الموضوع انتقل لمجاهد لما يخلص الانتاج والكرتون",
+    "context": "الموضوع انتقل لمجاهد لما يخلص الانتاج والكرتون",
+    "options": [
+      {
+        "id": "x17753239020783hlkv",
+        "cons": [],
+        "pros": [],
+        "title": "ميزانية",
+        "estimatedCost": null,
+        "estimatedRevenue": null
+      },
+      {
+        "id": "x1775323902078m6uym",
+        "cons": [],
+        "pros": [],
+        "title": "شخص",
+        "estimatedCost": null,
+        "estimatedRevenue": null
+      },
+      {
+        "id": "x1775323902078m0y2o",
+        "cons": [],
+        "pros": [],
+        "title": "وقت",
+        "estimatedCost": null,
+        "estimatedRevenue": null
+      }
+    ],
+    "chosen_option_id": null,
+    "status": "pending",
+    "impact": "medium",
+    "deadline": null,
+    "decided_at": null,
+    "decided_by": "غازي",
+    "notes": "",
+    "updated_at": "2026-04-04T20:34:58.460084+00:00"
+  },
+  {
     "id": "d1",
     "brand_id": "b1",
     "project_id": "p7",
@@ -383,47 +506,6 @@
     "decided_by": "غازي",
     "notes": "",
     "updated_at": "2026-04-14T02:30:34.439209+00:00"
-  },
-  {
-    "id": "x17753239020782z40c",
-    "brand_id": "b1",
-    "project_id": null,
-    "title": "منتج جديد هدايا عيد الاضحى — الموضوع انتقل لمجاهد لما يخلص الانتاج والكرتون",
-    "context": "الموضوع انتقل لمجاهد لما يخلص الانتاج والكرتون",
-    "options": [
-      {
-        "id": "x17753239020783hlkv",
-        "cons": [],
-        "pros": [],
-        "title": "ميزانية",
-        "estimatedCost": null,
-        "estimatedRevenue": null
-      },
-      {
-        "id": "x1775323902078m6uym",
-        "cons": [],
-        "pros": [],
-        "title": "شخص",
-        "estimatedCost": null,
-        "estimatedRevenue": null
-      },
-      {
-        "id": "x1775323902078m0y2o",
-        "cons": [],
-        "pros": [],
-        "title": "وقت",
-        "estimatedCost": null,
-        "estimatedRevenue": null
-      }
-    ],
-    "chosen_option_id": null,
-    "status": "pending",
-    "impact": "medium",
-    "deadline": null,
-    "decided_at": null,
-    "decided_by": "غازي",
-    "notes": "",
-    "updated_at": "2026-04-04T20:34:58.460084+00:00"
   },
   {
     "id": "d2",
@@ -594,5 +676,354 @@
     "decided_by": null,
     "notes": "",
     "updated_at": "2026-04-17T04:55:02.943+00:00"
+  },
+  {
+    "id": "d1777030515398",
+    "brand_id": "b3",
+    "project_id": null,
+    "title": "حصريات النبش — الطلب — أكمل أم ألغي؟",
+    "context": "قسيبفلاتنمك؛\\كتالبيس",
+    "options": [],
+    "chosen_option_id": null,
+    "status": "open",
+    "impact": "high",
+    "deadline": null,
+    "decided_at": null,
+    "decided_by": null,
+    "notes": "تم إنشاؤه تلقائياً من مهمة عالقة: حصريات النبش — الطلب",
+    "updated_at": "2026-04-24T11:35:15.398+00:00"
+  },
+  {
+    "id": "d1777029355270",
+    "brand_id": "b3",
+    "project_id": null,
+    "title": "h — أكمل أم ألغي؟",
+    "context": "لتاشسلنشتم",
+    "options": [],
+    "chosen_option_id": null,
+    "status": "open",
+    "impact": "high",
+    "deadline": null,
+    "decided_at": null,
+    "decided_by": null,
+    "notes": "تم إنشاؤه تلقائياً من مهمة عالقة: h",
+    "updated_at": "2026-04-24T11:15:55.27+00:00"
+  },
+  {
+    "id": "d1777030450952",
+    "brand_id": "x17747670469005rdjn",
+    "project_id": null,
+    "title": "طريقة تحويل حساباتي في السوشيال ميديا الى نشر ذكاء اصطناعي فيه تغريدة سويت لها قلب — أكمل أم ألغي؟",
+    "context": "طبلذادتزنرمك؛\\",
+    "options": [],
+    "chosen_option_id": null,
+    "status": "open",
+    "impact": "high",
+    "deadline": null,
+    "decided_at": null,
+    "decided_by": null,
+    "notes": "تم إنشاؤه تلقائياً من مهمة عالقة: طريقة تحويل حساباتي في السوشيال ميديا الى نشر ذكاء اصطناعي فيه تغريدة سويت لها قلب",
+    "updated_at": "2026-04-24T11:34:10.952+00:00"
+  },
+  {
+    "id": "x1777027556693bc4gu",
+    "brand_id": "x17747670469005rdjn",
+    "project_id": null,
+    "title": "طريقة تحويل حساباتي في السوشيال ميديا الى نشر ذكاء اصطناعي فيه تغريدة سويت لها قلب — وش وقفك؟",
+    "context": "",
+    "options": [
+      {
+        "id": "x17770275566934rfll",
+        "cons": [],
+        "pros": [],
+        "title": "ميزانية",
+        "estimatedCost": null,
+        "estimatedRevenue": null
+      },
+      {
+        "id": "x1777027556693i4lpc",
+        "cons": [],
+        "pros": [],
+        "title": "شخص",
+        "estimatedCost": null,
+        "estimatedRevenue": null
+      },
+      {
+        "id": "x1777027556693htnqw",
+        "cons": [],
+        "pros": [],
+        "title": "وقت",
+        "estimatedCost": null,
+        "estimatedRevenue": null
+      }
+    ],
+    "chosen_option_id": null,
+    "status": "pending",
+    "impact": "medium",
+    "deadline": null,
+    "decided_at": null,
+    "decided_by": "غازي",
+    "notes": "",
+    "updated_at": "2026-04-24T10:46:00.288477+00:00"
+  },
+  {
+    "id": "d1777029155239",
+    "brand_id": "b1",
+    "project_id": null,
+    "title": "م — أكمل أم ألغي؟",
+    "context": "حبيبي",
+    "options": [],
+    "chosen_option_id": null,
+    "status": "open",
+    "impact": "high",
+    "deadline": null,
+    "decided_at": null,
+    "decided_by": null,
+    "notes": "تم إنشاؤه تلقائياً من مهمة عالقة: م",
+    "updated_at": "2026-04-24T11:12:35.239+00:00"
+  },
+  {
+    "id": "d1777029244263",
+    "brand_id": "b3",
+    "project_id": null,
+    "title": "h — أكمل أم ألغي؟",
+    "context": "غازي",
+    "options": [],
+    "chosen_option_id": null,
+    "status": "open",
+    "impact": "high",
+    "deadline": null,
+    "decided_at": null,
+    "decided_by": null,
+    "notes": "تم إنشاؤه تلقائياً من مهمة عالقة: h",
+    "updated_at": "2026-04-24T11:14:04.263+00:00"
+  },
+  {
+    "id": "d1777029293256",
+    "brand_id": "b3",
+    "project_id": null,
+    "title": "h — أكمل أم ألغي؟",
+    "context": "غازي",
+    "options": [],
+    "chosen_option_id": null,
+    "status": "open",
+    "impact": "high",
+    "deadline": null,
+    "decided_at": null,
+    "decided_by": null,
+    "notes": "تم إنشاؤه تلقائياً من مهمة عالقة: h",
+    "updated_at": "2026-04-24T11:14:53.256+00:00"
+  },
+  {
+    "id": "x1777026963880gb6wt",
+    "brand_id": "b2",
+    "project_id": null,
+    "title": "مشروع بيع براند اودريد — بسبب شي ثاني",
+    "context": "بسبب شي ثاني",
+    "options": [
+      {
+        "id": "x1777026963880r7qk9",
+        "cons": [],
+        "pros": [],
+        "title": "ميزانية",
+        "estimatedCost": null,
+        "estimatedRevenue": null
+      },
+      {
+        "id": "x1777026963880d220d",
+        "cons": [],
+        "pros": [],
+        "title": "شخص",
+        "estimatedCost": null,
+        "estimatedRevenue": null
+      },
+      {
+        "id": "x1777026963880ziqvk",
+        "cons": [],
+        "pros": [],
+        "title": "وقت",
+        "estimatedCost": null,
+        "estimatedRevenue": null
+      }
+    ],
+    "chosen_option_id": null,
+    "status": "pending",
+    "impact": "medium",
+    "deadline": null,
+    "decided_at": null,
+    "decided_by": "غازي",
+    "notes": "",
+    "updated_at": "2026-04-24T10:36:06.344702+00:00"
+  },
+  {
+    "id": "x17770269845785qeoe",
+    "brand_id": "b2",
+    "project_id": null,
+    "title": "مشروع بيع براند اودريد — بسبب شي ثاني",
+    "context": "بسبب شي ثاني",
+    "options": [
+      {
+        "id": "x1777026984579smk37",
+        "cons": [],
+        "pros": [],
+        "title": "ميزانية",
+        "estimatedCost": null,
+        "estimatedRevenue": null
+      },
+      {
+        "id": "x1777026984579nu13t",
+        "cons": [],
+        "pros": [],
+        "title": "شخص",
+        "estimatedCost": null,
+        "estimatedRevenue": null
+      },
+      {
+        "id": "x1777026984579oh0v0",
+        "cons": [],
+        "pros": [],
+        "title": "وقت",
+        "estimatedCost": null,
+        "estimatedRevenue": null
+      }
+    ],
+    "chosen_option_id": null,
+    "status": "pending",
+    "impact": "medium",
+    "deadline": null,
+    "decided_at": null,
+    "decided_by": "غازي",
+    "notes": "",
+    "updated_at": "2026-04-24T10:36:26.218265+00:00"
+  },
+  {
+    "id": "x17770272538823doet",
+    "brand_id": "b1",
+    "project_id": "p1",
+    "title": "طلب عبوات بودرة الجسم — وش وقفك؟",
+    "context": "",
+    "options": [
+      {
+        "id": "x1777027253882res6n",
+        "cons": [],
+        "pros": [],
+        "title": "ميزانية",
+        "estimatedCost": null,
+        "estimatedRevenue": null
+      },
+      {
+        "id": "x1777027253882vk6vn",
+        "cons": [],
+        "pros": [],
+        "title": "شخص",
+        "estimatedCost": null,
+        "estimatedRevenue": null
+      },
+      {
+        "id": "x1777027253882gs303",
+        "cons": [],
+        "pros": [],
+        "title": "وقت",
+        "estimatedCost": null,
+        "estimatedRevenue": null
+      }
+    ],
+    "chosen_option_id": null,
+    "status": "pending",
+    "impact": "medium",
+    "deadline": null,
+    "decided_at": null,
+    "decided_by": "غازي",
+    "notes": "",
+    "updated_at": "2026-04-24T10:40:57.942558+00:00"
+  },
+  {
+    "id": "x1777027920651dqv2r",
+    "brand_id": "b1",
+    "project_id": "p3",
+    "title": "تصميم بكج سدرة — وش وقفك؟",
+    "context": "",
+    "options": [
+      {
+        "id": "x1777027920651gidtz",
+        "cons": [],
+        "pros": [],
+        "title": "ميزانية",
+        "estimatedCost": null,
+        "estimatedRevenue": null
+      },
+      {
+        "id": "x1777027920651sxxrv",
+        "cons": [],
+        "pros": [],
+        "title": "شخص",
+        "estimatedCost": null,
+        "estimatedRevenue": null
+      },
+      {
+        "id": "x1777027920651o2zvk",
+        "cons": [],
+        "pros": [],
+        "title": "وقت",
+        "estimatedCost": null,
+        "estimatedRevenue": null
+      }
+    ],
+    "chosen_option_id": null,
+    "status": "pending",
+    "impact": "medium",
+    "deadline": null,
+    "decided_at": null,
+    "decided_by": "غازي",
+    "notes": "",
+    "updated_at": "2026-04-24T10:52:02.822238+00:00"
+  },
+  {
+    "id": "d1777029366635",
+    "brand_id": "b3",
+    "project_id": null,
+    "title": "h — أكمل أم ألغي؟",
+    "context": "اليسشنتزشنتس",
+    "options": [],
+    "chosen_option_id": null,
+    "status": "open",
+    "impact": "high",
+    "deadline": null,
+    "decided_at": null,
+    "decided_by": null,
+    "notes": "تم إنشاؤه تلقائياً من مهمة عالقة: h",
+    "updated_at": "2026-04-24T11:16:06.635+00:00"
+  },
+  {
+    "id": "d1777030197085",
+    "brand_id": "b3",
+    "project_id": null,
+    "title": "h — أكمل أم ألغي؟",
+    "context": "غاززززي",
+    "options": [],
+    "chosen_option_id": null,
+    "status": "open",
+    "impact": "high",
+    "deadline": null,
+    "decided_at": null,
+    "decided_by": null,
+    "notes": "تم إنشاؤه تلقائياً من مهمة عالقة: h",
+    "updated_at": "2026-04-24T11:29:57.085+00:00"
+  },
+  {
+    "id": "d1777030311553",
+    "brand_id": "b3",
+    "project_id": null,
+    "title": "h — أكمل أم ألغي؟",
+    "context": "لااتلبتابتالبتلابالبتابانبنات",
+    "options": [],
+    "chosen_option_id": null,
+    "status": "open",
+    "impact": "high",
+    "deadline": null,
+    "decided_at": null,
+    "decided_by": null,
+    "notes": "تم إنشاؤه تلقائياً من مهمة عالقة: h",
+    "updated_at": "2026-04-24T11:31:51.553+00:00"
   }
 ]
