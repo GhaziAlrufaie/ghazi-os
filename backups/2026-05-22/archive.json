@@ -1,5 +1,31 @@
 [
   {
+    "id": "x1774703483818jk3tq",
+    "type": "task",
+    "reason": "manual",
+    "archived_at": "2026-03-28T13:11:23.818Z",
+    "archived_month": 2,
+    "archived_year": 2026,
+    "data": {
+      "id": "t14",
+      "desc": "",
+      "tags": [],
+      "links": [],
+      "notes": "",
+      "title": "تجهيز كتالوج المنتجات",
+      "status": "todo",
+      "brandId": "b2",
+      "dueDate": "2026-03-10",
+      "priority": "medium",
+      "subtasks": [],
+      "checklist": [],
+      "projectId": "p4",
+      "sortOrder": 13,
+      "completedAt": null
+    },
+    "updated_at": "2026-04-04T20:35:00.167253+00:00"
+  },
+  {
     "id": "x1774845510282jwats",
     "type": "subtask",
     "reason": "manual",
@@ -44,32 +70,6 @@
       "priority": "medium",
       "projectId": null,
       "sortOrder": 31,
-      "completedAt": null
-    },
-    "updated_at": "2026-04-04T20:35:00.167253+00:00"
-  },
-  {
-    "id": "x1774703483818jk3tq",
-    "type": "task",
-    "reason": "manual",
-    "archived_at": "2026-03-28T13:11:23.818Z",
-    "archived_month": 2,
-    "archived_year": 2026,
-    "data": {
-      "id": "t14",
-      "desc": "",
-      "tags": [],
-      "links": [],
-      "notes": "",
-      "title": "تجهيز كتالوج المنتجات",
-      "status": "todo",
-      "brandId": "b2",
-      "dueDate": "2026-03-10",
-      "priority": "medium",
-      "subtasks": [],
-      "checklist": [],
-      "projectId": "p4",
-      "sortOrder": 13,
       "completedAt": null
     },
     "updated_at": "2026-04-04T20:35:00.167253+00:00"
@@ -587,6 +587,55 @@
     "updated_at": "2026-04-04T20:35:00.167253+00:00"
   },
   {
+    "id": "x1774700728229652r2",
+    "type": "task",
+    "reason": "manual",
+    "archived_at": "2026-03-28T12:25:28.229Z",
+    "archived_month": 2,
+    "archived_year": 2026,
+    "data": {
+      "id": "task-1774700459136",
+      "links": [],
+      "notes": "",
+      "title": "رواتب",
+      "status": "todo",
+      "brandId": "b1",
+      "dueDate": null,
+      "priority": "medium",
+      "subtasks": [],
+      "checklist": [],
+      "createdAt": "2026-03-28",
+      "projectId": null,
+      "updatedAt": "2026-03-28"
+    },
+    "updated_at": "2026-04-04T20:35:00.167253+00:00"
+  },
+  {
+    "id": "x1774701642799dmaxd",
+    "type": "subtask",
+    "reason": "manual",
+    "archived_at": "2026-03-28T12:40:42.799Z",
+    "archived_month": 2,
+    "archived_year": 2026,
+    "data": {
+      "id": "task-1774701139616",
+      "links": [],
+      "notes": "",
+      "title": "غازي",
+      "status": "todo",
+      "brandId": "b1",
+      "dueDate": null,
+      "priority": "low",
+      "subtasks": [],
+      "checklist": [],
+      "createdAt": "2026-03-28",
+      "projectId": null,
+      "sortOrder": 32,
+      "updatedAt": "2026-03-28"
+    },
+    "updated_at": "2026-04-04T20:35:00.167253+00:00"
+  },
+  {
     "id": "x1774701667218qkwhs",
     "type": "subtask",
     "reason": "manual",
@@ -735,51 +784,51 @@
     "updated_at": "2026-04-04T20:35:00.167253+00:00"
   },
   {
-    "id": "x1774700728229652r2",
-    "type": "task",
+    "id": "x17750779979083j5h2",
+    "type": "decision",
     "reason": "manual",
-    "archived_at": "2026-03-28T12:25:28.229Z",
-    "archived_month": 2,
+    "archived_at": "2026-04-01T21:13:17.908Z",
+    "archived_month": 3,
     "archived_year": 2026,
     "data": {
-      "id": "task-1774700459136",
-      "links": [],
+      "id": "x17750649338395zg68",
       "notes": "",
-      "title": "رواتب",
-      "status": "todo",
+      "title": "موظفات جوزاء — وقف دانيا — وش وقفك؟",
+      "impact": "medium",
+      "status": "pending",
       "brandId": "b1",
-      "dueDate": null,
-      "priority": "medium",
-      "subtasks": [],
-      "checklist": [],
-      "createdAt": "2026-03-28",
+      "context": "",
+      "options": [
+        {
+          "id": "x1775064933839od0ln",
+          "cons": [],
+          "pros": [],
+          "title": "ميزانية",
+          "estimatedCost": null,
+          "estimatedRevenue": null
+        },
+        {
+          "id": "x17750649338396ey21",
+          "cons": [],
+          "pros": [],
+          "title": "شخص",
+          "estimatedCost": null,
+          "estimatedRevenue": null
+        },
+        {
+          "id": "x17750649338390txnn",
+          "cons": [],
+          "pros": [],
+          "title": "وقت",
+          "estimatedCost": null,
+          "estimatedRevenue": null
+        }
+      ],
+      "deadline": null,
+      "decidedAt": null,
+      "decidedBy": "غازي",
       "projectId": null,
-      "updatedAt": "2026-03-28"
-    },
-    "updated_at": "2026-04-04T20:35:00.167253+00:00"
-  },
-  {
-    "id": "x1774701642799dmaxd",
-    "type": "subtask",
-    "reason": "manual",
-    "archived_at": "2026-03-28T12:40:42.799Z",
-    "archived_month": 2,
-    "archived_year": 2026,
-    "data": {
-      "id": "task-1774701139616",
-      "links": [],
-      "notes": "",
-      "title": "غازي",
-      "status": "todo",
-      "brandId": "b1",
-      "dueDate": null,
-      "priority": "low",
-      "subtasks": [],
-      "checklist": [],
-      "createdAt": "2026-03-28",
-      "projectId": null,
-      "sortOrder": 32,
-      "updatedAt": "2026-03-28"
+      "chosenOptionId": null
     },
     "updated_at": "2026-04-04T20:35:00.167253+00:00"
   },
@@ -903,55 +952,6 @@
       "decidedAt": null,
       "decidedBy": "غازي",
       "projectId": "p1",
-      "chosenOptionId": null
-    },
-    "updated_at": "2026-04-04T20:35:00.167253+00:00"
-  },
-  {
-    "id": "x17750779979083j5h2",
-    "type": "decision",
-    "reason": "manual",
-    "archived_at": "2026-04-01T21:13:17.908Z",
-    "archived_month": 3,
-    "archived_year": 2026,
-    "data": {
-      "id": "x17750649338395zg68",
-      "notes": "",
-      "title": "موظفات جوزاء — وقف دانيا — وش وقفك؟",
-      "impact": "medium",
-      "status": "pending",
-      "brandId": "b1",
-      "context": "",
-      "options": [
-        {
-          "id": "x1775064933839od0ln",
-          "cons": [],
-          "pros": [],
-          "title": "ميزانية",
-          "estimatedCost": null,
-          "estimatedRevenue": null
-        },
-        {
-          "id": "x17750649338396ey21",
-          "cons": [],
-          "pros": [],
-          "title": "شخص",
-          "estimatedCost": null,
-          "estimatedRevenue": null
-        },
-        {
-          "id": "x17750649338390txnn",
-          "cons": [],
-          "pros": [],
-          "title": "وقت",
-          "estimatedCost": null,
-          "estimatedRevenue": null
-        }
-      ],
-      "deadline": null,
-      "decidedAt": null,
-      "decidedBy": "غازي",
-      "projectId": null,
       "chosenOptionId": null
     },
     "updated_at": "2026-04-04T20:35:00.167253+00:00"
