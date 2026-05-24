@@ -36,18 +36,6 @@
     "updated_at": "2026-04-05T22:47:54.27+00:00"
   },
   {
-    "id": "80ce0053-4ee5-4663-87ed-88f9ab2c5e87",
-    "focus_date": "2026-04-23",
-    "target_type": "recharge",
-    "target_id": null,
-    "target_name": "استراحة",
-    "target_color": "#4ECDC4",
-    "notes": "",
-    "metrics_cache": {},
-    "created_at": "2026-04-20T18:12:25.678655+00:00",
-    "updated_at": "2026-04-20T18:12:25.678655+00:00"
-  },
-  {
     "id": "37a73af4-fe19-4b3d-8f85-87b8ea14874d",
     "focus_date": "2026-04-17",
     "target_type": "brand",
@@ -106,6 +94,18 @@
     "metrics_cache": {},
     "created_at": "2026-04-05T22:47:03.845291+00:00",
     "updated_at": "2026-04-05T22:47:42.404+00:00"
+  },
+  {
+    "id": "7e392e92-56c6-4834-ab48-d6be1133e29b",
+    "focus_date": "2026-04-22",
+    "target_type": "brand",
+    "target_id": "b2",
+    "target_name": "أودريد",
+    "target_color": "#8B5CF6",
+    "notes": "",
+    "metrics_cache": {},
+    "created_at": "2026-04-22T07:39:13.464317+00:00",
+    "updated_at": "2026-04-22T07:39:12.529+00:00"
   },
   {
     "id": "3e82c2bb-c233-4fce-8352-ccc60a694644",
@@ -194,6 +194,18 @@
     "updated_at": "2026-04-12T00:43:10.833+00:00"
   },
   {
+    "id": "80ce0053-4ee5-4663-87ed-88f9ab2c5e87",
+    "focus_date": "2026-04-23",
+    "target_type": "brand",
+    "target_id": "b1",
+    "target_name": "بيت الجوزاء",
+    "target_color": "#C9A84C",
+    "notes": "",
+    "metrics_cache": {},
+    "created_at": "2026-04-20T18:12:25.678655+00:00",
+    "updated_at": "2026-04-20T18:12:25.678655+00:00"
+  },
+  {
     "id": "0274787e-178f-4a01-b0b4-fc9658471a09",
     "focus_date": "2026-04-18",
     "target_type": "brand",
@@ -218,5 +230,43 @@
     "metrics_cache": {},
     "created_at": "2026-04-18T02:55:09.276895+00:00",
     "updated_at": "2026-04-18T02:55:09.276895+00:00"
+  },
+  {
+    "id": "add63d4a-71de-4c69-963f-714247f1c181",
+    "focus_date": "2026-04-24",
+    "target_type": "brand",
+    "target_id": "b1",
+    "target_name": "بيت الجوزاء",
+    "target_color": "#C9A84C",
+    "notes": "",
+    "metrics_cache": {
+      "today_sales": 0
+    },
+    "created_at": "2026-04-24T00:15:25.862951+00:00",
+    "updated_at": "2026-04-24T11:33:45.181+00:00"
+  },
+  {
+    "id": "229aa47b-7514-4237-a266-25bcd37800a0",
+    "focus_date": "2026-04-25",
+    "target_type": "brand",
+    "target_id": "b1",
+    "target_name": "بيت الجوزاء",
+    "target_color": "#C9A84C",
+    "notes": "",
+    "metrics_cache": {},
+    "created_at": "2026-04-25T11:39:15.810814+00:00",
+    "updated_at": "2026-04-25T11:39:15.810814+00:00"
+  },
+  {
+    "id": "014becad-cf4c-4c9f-b920-4a9011381b6e",
+    "focus_date": "2026-04-26",
+    "target_type": "task",
+    "target_id": "task-1774757529755",
+    "target_name": "– نشتغل على منتج مونكسيديل يطلع الشعر",
+    "target_color": "#C9A84C",
+    "notes": "",
+    "metrics_cache": {},
+    "created_at": "2026-04-26T07:02:39.390799+00:00",
+    "updated_at": "2026-04-26T07:02:39.390799+00:00"
   }
 ]

@@ -1,5 +1,31 @@
 [
   {
+    "id": "x1774703483818jk3tq",
+    "type": "task",
+    "reason": "manual",
+    "archived_at": "2026-03-28T13:11:23.818Z",
+    "archived_month": 2,
+    "archived_year": 2026,
+    "data": {
+      "id": "t14",
+      "desc": "",
+      "tags": [],
+      "links": [],
+      "notes": "",
+      "title": "تجهيز كتالوج المنتجات",
+      "status": "todo",
+      "brandId": "b2",
+      "dueDate": "2026-03-10",
+      "priority": "medium",
+      "subtasks": [],
+      "checklist": [],
+      "projectId": "p4",
+      "sortOrder": 13,
+      "completedAt": null
+    },
+    "updated_at": "2026-04-04T20:35:00.167253+00:00"
+  },
+  {
     "id": "x1774845510282jwats",
     "type": "subtask",
     "reason": "manual",
@@ -44,32 +70,6 @@
       "priority": "medium",
       "projectId": null,
       "sortOrder": 31,
-      "completedAt": null
-    },
-    "updated_at": "2026-04-04T20:35:00.167253+00:00"
-  },
-  {
-    "id": "x1774703483818jk3tq",
-    "type": "task",
-    "reason": "manual",
-    "archived_at": "2026-03-28T13:11:23.818Z",
-    "archived_month": 2,
-    "archived_year": 2026,
-    "data": {
-      "id": "t14",
-      "desc": "",
-      "tags": [],
-      "links": [],
-      "notes": "",
-      "title": "تجهيز كتالوج المنتجات",
-      "status": "todo",
-      "brandId": "b2",
-      "dueDate": "2026-03-10",
-      "priority": "medium",
-      "subtasks": [],
-      "checklist": [],
-      "projectId": "p4",
-      "sortOrder": 13,
       "completedAt": null
     },
     "updated_at": "2026-04-04T20:35:00.167253+00:00"
@@ -784,81 +784,6 @@
     "updated_at": "2026-04-04T20:35:00.167253+00:00"
   },
   {
-    "id": "x1774762754959jfeah",
-    "type": "decision",
-    "reason": "manual",
-    "archived_at": "2026-03-29T05:39:14.959Z",
-    "archived_month": 2,
-    "archived_year": 2026,
-    "data": {
-      "id": "d3",
-      "notes": "",
-      "title": "خط العناية — نبدأ بإيش؟",
-      "impact": "high",
-      "status": "pending",
-      "brandId": "b1",
-      "context": "لدينا ٣ منتجات: بودرة، معطر، زيت — أيهم نبدأ؟",
-      "options": [
-        {
-          "id": "o6",
-          "cons": [
-            "منافسة"
-          ],
-          "pros": [
-            "طلب عالي",
-            "سهل التسويق"
-          ],
-          "title": "بودرة",
-          "estimatedCost": 5000,
-          "estimatedRevenue": 12000
-        },
-        {
-          "id": "o7",
-          "cons": [
-            "تعقيد أكثر"
-          ],
-          "pros": [
-            "هامش أعلى"
-          ],
-          "title": "معطر",
-          "estimatedCost": 6000,
-          "estimatedRevenue": 14000
-        },
-        {
-          "id": "o8",
-          "cons": [
-            "سوق أصغر"
-          ],
-          "pros": [
-            "تميز"
-          ],
-          "title": "زيت",
-          "estimatedCost": 4000,
-          "estimatedRevenue": 10000
-        },
-        {
-          "id": "o9",
-          "cons": [
-            "تك��فة عالية",
-            "مخاطرة"
-          ],
-          "pros": [
-            "حضور كامل"
-          ],
-          "title": "الكل معاً",
-          "estimatedCost": 15000,
-          "estimatedRevenue": 36000
-        }
-      ],
-      "deadline": "2026-03-22",
-      "decidedAt": null,
-      "decidedBy": "غازي",
-      "projectId": "p1",
-      "chosenOptionId": null
-    },
-    "updated_at": "2026-04-04T20:35:00.167253+00:00"
-  },
-  {
     "id": "x17750779979083j5h2",
     "type": "decision",
     "reason": "manual",
@@ -952,6 +877,81 @@
       "decidedAt": null,
       "decidedBy": "غازي",
       "projectId": null,
+      "chosenOptionId": null
+    },
+    "updated_at": "2026-04-04T20:35:00.167253+00:00"
+  },
+  {
+    "id": "x1774762754959jfeah",
+    "type": "decision",
+    "reason": "manual",
+    "archived_at": "2026-03-29T05:39:14.959Z",
+    "archived_month": 2,
+    "archived_year": 2026,
+    "data": {
+      "id": "d3",
+      "notes": "",
+      "title": "خط العناية — نبدأ بإيش؟",
+      "impact": "high",
+      "status": "pending",
+      "brandId": "b1",
+      "context": "لدينا ٣ منتجات: بودرة، معطر، زيت — أيهم نبدأ؟",
+      "options": [
+        {
+          "id": "o6",
+          "cons": [
+            "منافسة"
+          ],
+          "pros": [
+            "طلب عالي",
+            "سهل التسويق"
+          ],
+          "title": "بودرة",
+          "estimatedCost": 5000,
+          "estimatedRevenue": 12000
+        },
+        {
+          "id": "o7",
+          "cons": [
+            "تعقيد أكثر"
+          ],
+          "pros": [
+            "هامش أعلى"
+          ],
+          "title": "معطر",
+          "estimatedCost": 6000,
+          "estimatedRevenue": 14000
+        },
+        {
+          "id": "o8",
+          "cons": [
+            "سوق أصغر"
+          ],
+          "pros": [
+            "تميز"
+          ],
+          "title": "زيت",
+          "estimatedCost": 4000,
+          "estimatedRevenue": 10000
+        },
+        {
+          "id": "o9",
+          "cons": [
+            "تكلفة عالية",
+            "مخاطرة"
+          ],
+          "pros": [
+            "حضور كامل"
+          ],
+          "title": "الكل معاً",
+          "estimatedCost": 15000,
+          "estimatedRevenue": 36000
+        }
+      ],
+      "deadline": "2026-03-22",
+      "decidedAt": null,
+      "decidedBy": "غازي",
+      "projectId": "p1",
       "chosenOptionId": null
     },
     "updated_at": "2026-04-04T20:35:00.167253+00:00"
