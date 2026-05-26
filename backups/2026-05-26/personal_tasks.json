@@ -38,38 +38,6 @@
     "updated_at": "2026-04-12T02:09:35.103155+00:00"
   },
   {
-    "id": "pt4",
-    "title": "إنهاء كتاب \"الفكر الاستراتيجي\"",
-    "description": "",
-    "status": "todo",
-    "priority": "high",
-    "due_date": "2026-06-30",
-    "completed_at": null,
-    "tags": [],
-    "notes": "وصلت للفصل الخامس",
-    "sort_order": 0,
-    "checklist": [
-      {
-        "done": true,
-        "text": "الفصل ١-٣"
-      },
-      {
-        "done": false,
-        "text": "الفصل ٤-٦"
-      },
-      {
-        "done": false,
-        "text": "الفصل ٧-٩"
-      }
-    ],
-    "subtasks": [],
-    "subtask_groups": [],
-    "links": [],
-    "category": "personal",
-    "created_at": null,
-    "updated_at": "2026-04-12T02:09:35.103155+00:00"
-  },
-  {
     "id": "pt6",
     "title": "رحلة عائلية",
     "description": "",
@@ -252,25 +220,6 @@
     "updated_at": "2026-04-12T02:13:58.522549+00:00"
   },
   {
-    "id": "pt1774853495254",
-    "title": "احول لراعي الي صدمته بجده",
-    "description": "",
-    "status": "todo",
-    "priority": "high",
-    "due_date": null,
-    "completed_at": null,
-    "tags": [],
-    "notes": "",
-    "sort_order": 0,
-    "checklist": [],
-    "subtasks": [],
-    "subtask_groups": [],
-    "links": [],
-    "category": "health",
-    "created_at": null,
-    "updated_at": "2026-04-12T02:13:58.522549+00:00"
-  },
-  {
     "id": "pt1774853539257",
     "title": "عليا اسوي لها أبشر",
     "description": "",
@@ -286,25 +235,6 @@
     "subtask_groups": [],
     "links": [],
     "category": "family",
-    "created_at": null,
-    "updated_at": "2026-04-12T02:13:58.522549+00:00"
-  },
-  {
-    "id": "pt1774987160192",
-    "title": "طلبت من نخبة الجوف 16 لتر",
-    "description": "",
-    "status": "todo",
-    "priority": "low",
-    "due_date": null,
-    "completed_at": null,
-    "tags": [],
-    "notes": "",
-    "sort_order": 0,
-    "checklist": [],
-    "subtasks": [],
-    "subtask_groups": [],
-    "links": [],
-    "category": "health",
     "created_at": null,
     "updated_at": "2026-04-12T02:13:58.522549+00:00"
   },
@@ -328,11 +258,11 @@
     "updated_at": "2026-04-12T02:13:58.522549+00:00"
   },
   {
-    "id": "pt3",
-    "title": "مراجعة البريد الإلكتروني",
+    "id": "pt1774853495254",
+    "title": "احول لراعي الي صدمته بجده",
     "description": "",
-    "status": "in_progress",
-    "priority": "medium",
+    "status": "todo",
+    "priority": "high",
     "due_date": null,
     "completed_at": null,
     "tags": [],
@@ -342,17 +272,17 @@
     "subtasks": [],
     "subtask_groups": [],
     "links": [],
-    "category": "personal",
+    "category": "health",
     "created_at": null,
-    "updated_at": "2026-04-12T02:09:35.103155+00:00"
+    "updated_at": "2026-04-12T02:13:58.522549+00:00"
   },
   {
-    "id": "pt5",
-    "title": "تعلم لغة برمجية جديدة",
+    "id": "pt1774987160192",
+    "title": "طلبت من نخبة الجوف 16 لتر",
     "description": "",
-    "status": "in_progress",
-    "priority": "medium",
-    "due_date": "2026-12-31",
+    "status": "done",
+    "priority": "low",
+    "due_date": null,
     "completed_at": null,
     "tags": [],
     "notes": "",
@@ -361,8 +291,8 @@
     "subtasks": [],
     "subtask_groups": [],
     "links": [],
-    "category": "financial",
+    "category": "health",
     "created_at": null,
-    "updated_at": "2026-04-12T02:09:35.103155+00:00"
+    "updated_at": "2026-04-12T02:13:58.522549+00:00"
   }
 ]
