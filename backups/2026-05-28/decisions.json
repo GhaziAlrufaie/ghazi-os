@@ -1,5 +1,87 @@
 [
   {
+    "id": "x1777031943970vdssi",
+    "brand_id": "b3",
+    "project_id": null,
+    "title": "ا — لابلات",
+    "context": "لابلات",
+    "options": [
+      {
+        "id": "x1777031943970d0yby",
+        "cons": [],
+        "pros": [],
+        "title": "ميزانية",
+        "estimatedCost": null,
+        "estimatedRevenue": null
+      },
+      {
+        "id": "x1777031943970u5fqw",
+        "cons": [],
+        "pros": [],
+        "title": "شخص",
+        "estimatedCost": null,
+        "estimatedRevenue": null
+      },
+      {
+        "id": "x17770319439709ohkr",
+        "cons": [],
+        "pros": [],
+        "title": "وقت",
+        "estimatedCost": null,
+        "estimatedRevenue": null
+      }
+    ],
+    "chosen_option_id": null,
+    "status": "pending",
+    "impact": "medium",
+    "deadline": null,
+    "decided_at": null,
+    "decided_by": "غازي",
+    "notes": "",
+    "updated_at": "2026-04-27T07:16:35.08168+00:00"
+  },
+  {
+    "id": "x1777031952828hzh1t",
+    "brand_id": "b3",
+    "project_id": null,
+    "title": "ا — بيظلطاذتنزم",
+    "context": "بيظلطاذتنزم",
+    "options": [
+      {
+        "id": "x1777031952828qx98o",
+        "cons": [],
+        "pros": [],
+        "title": "ميزانية",
+        "estimatedCost": null,
+        "estimatedRevenue": null
+      },
+      {
+        "id": "x1777031952828ofu5s",
+        "cons": [],
+        "pros": [],
+        "title": "شخص",
+        "estimatedCost": null,
+        "estimatedRevenue": null
+      },
+      {
+        "id": "x17770319528281gf9u",
+        "cons": [],
+        "pros": [],
+        "title": "وقت",
+        "estimatedCost": null,
+        "estimatedRevenue": null
+      }
+    ],
+    "chosen_option_id": null,
+    "status": "pending",
+    "impact": "medium",
+    "deadline": null,
+    "decided_at": null,
+    "decided_by": "غازي",
+    "notes": "",
+    "updated_at": "2026-04-27T07:16:35.08168+00:00"
+  },
+  {
     "id": "d5",
     "brand_id": "b4",
     "project_id": "p8",
@@ -124,88 +206,6 @@
     "updated_at": "2026-04-04T20:34:58.460084+00:00"
   },
   {
-    "id": "x1775135129873c9jkv",
-    "brand_id": null,
-    "project_id": null,
-    "title": "عليا اسوي لها أبشر — براء توديها لأبشر",
-    "context": "براء توديها لأبشر",
-    "options": [
-      {
-        "id": "x1775135129873u7qxs",
-        "cons": [],
-        "pros": [],
-        "title": "ميزانية",
-        "estimatedCost": null,
-        "estimatedRevenue": null
-      },
-      {
-        "id": "x1775135129873vl31d",
-        "cons": [],
-        "pros": [],
-        "title": "شخص",
-        "estimatedCost": null,
-        "estimatedRevenue": null
-      },
-      {
-        "id": "x1775135129873n75ks",
-        "cons": [],
-        "pros": [],
-        "title": "وقت",
-        "estimatedCost": null,
-        "estimatedRevenue": null
-      }
-    ],
-    "chosen_option_id": null,
-    "status": "pending",
-    "impact": "medium",
-    "deadline": null,
-    "decided_at": null,
-    "decided_by": "غازي",
-    "notes": "",
-    "updated_at": "2026-04-04T20:34:58.460084+00:00"
-  },
-  {
-    "id": "x17751331662373sx9h",
-    "brand_id": null,
-    "project_id": null,
-    "title": "انقل سيارة ابو اياد باسمه — انتظر ابو اياد ينقلها",
-    "context": "انتظر ابو اياد ينقلها",
-    "options": [
-      {
-        "id": "x17751331662370egm2",
-        "cons": [],
-        "pros": [],
-        "title": "ميزانية",
-        "estimatedCost": null,
-        "estimatedRevenue": null
-      },
-      {
-        "id": "x177513316623744dzv",
-        "cons": [],
-        "pros": [],
-        "title": "شخص",
-        "estimatedCost": null,
-        "estimatedRevenue": null
-      },
-      {
-        "id": "x1775133166237urzvf",
-        "cons": [],
-        "pros": [],
-        "title": "وقت",
-        "estimatedCost": null,
-        "estimatedRevenue": null
-      }
-    ],
-    "chosen_option_id": null,
-    "status": "pending",
-    "impact": "medium",
-    "deadline": null,
-    "decided_at": null,
-    "decided_by": "غازي",
-    "notes": "",
-    "updated_at": "2026-04-04T20:34:58.460084+00:00"
-  },
-  {
     "id": "x1775133178096c8egm",
     "brand_id": null,
     "project_id": null,
@@ -312,6 +312,88 @@
       },
       {
         "id": "x1775134036981ux85i",
+        "cons": [],
+        "pros": [],
+        "title": "وقت",
+        "estimatedCost": null,
+        "estimatedRevenue": null
+      }
+    ],
+    "chosen_option_id": null,
+    "status": "pending",
+    "impact": "medium",
+    "deadline": null,
+    "decided_at": null,
+    "decided_by": "غازي",
+    "notes": "",
+    "updated_at": "2026-04-04T20:34:58.460084+00:00"
+  },
+  {
+    "id": "x1775135129873c9jkv",
+    "brand_id": null,
+    "project_id": null,
+    "title": "عليا اسوي لها أبشر — براء توديها لأبشر",
+    "context": "براء توديها لأبشر",
+    "options": [
+      {
+        "id": "x1775135129873u7qxs",
+        "cons": [],
+        "pros": [],
+        "title": "ميزانية",
+        "estimatedCost": null,
+        "estimatedRevenue": null
+      },
+      {
+        "id": "x1775135129873vl31d",
+        "cons": [],
+        "pros": [],
+        "title": "شخص",
+        "estimatedCost": null,
+        "estimatedRevenue": null
+      },
+      {
+        "id": "x1775135129873n75ks",
+        "cons": [],
+        "pros": [],
+        "title": "وقت",
+        "estimatedCost": null,
+        "estimatedRevenue": null
+      }
+    ],
+    "chosen_option_id": null,
+    "status": "pending",
+    "impact": "medium",
+    "deadline": null,
+    "decided_at": null,
+    "decided_by": "غازي",
+    "notes": "",
+    "updated_at": "2026-04-04T20:34:58.460084+00:00"
+  },
+  {
+    "id": "x17751331662373sx9h",
+    "brand_id": null,
+    "project_id": null,
+    "title": "انقل سيارة ابو اياد باسمه — انتظر ابو اياد ينقلها",
+    "context": "انتظر ابو اياد ينقلها",
+    "options": [
+      {
+        "id": "x17751331662370egm2",
+        "cons": [],
+        "pros": [],
+        "title": "ميزانية",
+        "estimatedCost": null,
+        "estimatedRevenue": null
+      },
+      {
+        "id": "x177513316623744dzv",
+        "cons": [],
+        "pros": [],
+        "title": "شخص",
+        "estimatedCost": null,
+        "estimatedRevenue": null
+      },
+      {
+        "id": "x1775133166237urzvf",
         "cons": [],
         "pros": [],
         "title": "وقت",

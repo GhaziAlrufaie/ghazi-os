@@ -256,5 +256,17 @@
     "metrics_cache": {},
     "created_at": "2026-04-25T11:39:15.810814+00:00",
     "updated_at": "2026-04-25T11:39:15.810814+00:00"
+  },
+  {
+    "id": "014becad-cf4c-4c9f-b920-4a9011381b6e",
+    "focus_date": "2026-04-26",
+    "target_type": "task",
+    "target_id": "task-1774757529755",
+    "target_name": "– نشتغل على منتج مونكسيديل يطلع الشعر",
+    "target_color": "#C9A84C",
+    "notes": "",
+    "metrics_cache": {},
+    "created_at": "2026-04-26T07:02:39.390799+00:00",
+    "updated_at": "2026-04-26T07:02:39.390799+00:00"
   }
 ]
