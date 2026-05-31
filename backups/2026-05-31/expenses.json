@@ -1,38 +1,5 @@
 [
   {
-    "id": "exp-sec-2",
-    "title": "معيشة وأسرة",
-    "type": "living",
-    "color": "var(--accent)",
-    "items": [
-      {
-        "id": "exp-2-1",
-        "kind": "fixed",
-        "name": "مصروف الأهل",
-        "note": "",
-        "cycle": "monthly",
-        "amount": 1500
-      },
-      {
-        "id": "exp-2-2",
-        "kind": "fixed",
-        "name": "مصروف البيت",
-        "note": "",
-        "cycle": "monthly",
-        "amount": 1000
-      },
-      {
-        "id": "exp-2-3",
-        "kind": "fixed",
-        "name": "تعليم (دانه + حمودي)",
-        "note": "",
-        "cycle": "yearly",
-        "amount": 25000
-      }
-    ],
-    "updated_at": "2026-04-14T05:01:32.868+00:00"
-  },
-  {
     "id": "exp-sec-salaries",
     "title": "رواتب وأجور",
     "type": "salaries",
@@ -134,45 +101,37 @@
     "updated_at": "2026-04-04T20:35:00.561576+00:00"
   },
   {
-    "id": "exp-sec-1",
-    "title": "رواتب وأجور",
-    "type": "salaries",
-    "color": "var(--gold)",
+    "id": "exp-sec-2",
+    "title": "معيشة وأسرة",
+    "type": "living",
+    "color": "var(--accent)",
     "items": [
       {
-        "id": "exp-1-1",
+        "id": "exp-2-1",
         "kind": "fixed",
-        "name": "خادمة شخصية",
-        "note": "",
-        "cycle": "monthly",
-        "amount": 2000
-      },
-      {
-        "id": "exp-1-2",
-        "kind": "fixed",
-        "name": "خادمة أمي",
-        "note": "",
-        "cycle": "monthly",
-        "amount": 2000
-      },
-      {
-        "id": "exp-1-3",
-        "kind": "fixed",
-        "name": "سائق",
-        "note": "",
-        "cycle": "monthly",
-        "amount": 1900
-      },
-      {
-        "id": "exp-1-4",
-        "kind": "fixed",
-        "name": "عامل المزرعة",
+        "name": "مصروف الأهل",
         "note": "",
         "cycle": "monthly",
         "amount": 1500
+      },
+      {
+        "id": "exp-2-2",
+        "kind": "fixed",
+        "name": "مصروف البيت",
+        "note": "",
+        "cycle": "monthly",
+        "amount": 1000
+      },
+      {
+        "id": "exp-2-3",
+        "kind": "fixed",
+        "name": "تعليم (دانه + حمودي)",
+        "note": "",
+        "cycle": "yearly",
+        "amount": 25000
       }
     ],
-    "updated_at": "2026-04-14T02:30:34.096731+00:00"
+    "updated_at": "2026-04-14T05:01:32.868+00:00"
   },
   {
     "id": "exp-sec-3",
@@ -219,6 +178,47 @@
         "note": "",
         "cycle": "monthly",
         "amount": 800
+      }
+    ],
+    "updated_at": "2026-04-14T02:30:34.096731+00:00"
+  },
+  {
+    "id": "exp-sec-1",
+    "title": "رواتب وأجور",
+    "type": "salaries",
+    "color": "var(--gold)",
+    "items": [
+      {
+        "id": "exp-1-1",
+        "kind": "fixed",
+        "name": "خادمة شخصية",
+        "note": "",
+        "cycle": "monthly",
+        "amount": 2000
+      },
+      {
+        "id": "exp-1-2",
+        "kind": "fixed",
+        "name": "خادمة أمي",
+        "note": "",
+        "cycle": "monthly",
+        "amount": 2000
+      },
+      {
+        "id": "exp-1-3",
+        "kind": "fixed",
+        "name": "سائق",
+        "note": "",
+        "cycle": "monthly",
+        "amount": 1900
+      },
+      {
+        "id": "exp-1-4",
+        "kind": "fixed",
+        "name": "عامل المزرعة",
+        "note": "",
+        "cycle": "monthly",
+        "amount": 1500
       }
     ],
     "updated_at": "2026-04-14T02:30:34.096731+00:00"
