@@ -1,6 +1,6 @@
 {
-  "backup_date": "2026-05-31",
-  "backup_time": "2026-05-31T21:51:02.611Z",
+  "backup_date": "2026-06-01",
+  "backup_time": "2026-06-01T22:56:14.600Z",
   "tables_discovered": 13,
   "tables": {
     "tasks": 116,
@@ -19,5 +19,5 @@
   },
   "total_records": 334,
   "status": "success",
-  "backup_folder": "backups/2026-05-31"
+  "backup_folder": "backups/2026-06-01"
 }

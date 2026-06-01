@@ -1821,7 +1821,7 @@
           "mobile": 558075500,
           "address": {
             "city": "عنيزة",
-            "country": "ا��سعودية",
+            "country": "السعودية",
             "district": "Al Muruj",
             "description": null,
             "postal_code": "56432",
@@ -8543,7 +8543,7 @@
       "merchant": 1020985111,
       "created_at": "Sat Apr 18 2026 16:55:42 GMT+0300"
     },
-    "brand": "غازي بوتيك",
+    "brand": "غازي ��وتيك",
     "created_at": "2026-04-18T13:55:44.372859+00:00",
     "updated_at": "2026-04-18T13:55:43.181+00:00"
   },
