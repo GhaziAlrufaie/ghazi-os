@@ -1821,7 +1821,7 @@
           "mobile": 558075500,
           "address": {
             "city": "عنيزة",
-            "country": "السعودية",
+            "country": "ا��سعودية",
             "district": "Al Muruj",
             "description": null,
             "postal_code": "56432",
@@ -8561,7 +8561,7 @@
       {
         "id": 812736542,
         "sku": "",
-        "name": "مجموعة ذكرني الكاملة",
+        "name": "��جموعة ذكرني الكاملة",
         "price": null,
         "quantity": 1
       }
