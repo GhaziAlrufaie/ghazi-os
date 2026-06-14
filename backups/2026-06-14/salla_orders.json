@@ -1821,7 +1821,7 @@
           "mobile": 558075500,
           "address": {
             "city": "عنيزة",
-            "country": "ا��سعودية",
+            "country": "السعودية",
             "district": "Al Muruj",
             "description": null,
             "postal_code": "56432",
@@ -7285,7 +7285,7 @@
       "merchant": 1020985111,
       "created_at": "Fri Apr 17 2026 14:22:09 GMT+0300"
     },
-    "brand": "غازي بوتيك",
+    "brand": "غازي ب��تيك",
     "created_at": "2026-04-17T11:22:11.895751+00:00",
     "updated_at": "2026-04-17T11:22:10.681+00:00"
   },
@@ -8543,7 +8543,7 @@
       "merchant": 1020985111,
       "created_at": "Sat Apr 18 2026 16:55:42 GMT+0300"
     },
-    "brand": "غازي ��وتيك",
+    "brand": "غازي بوتيك",
     "created_at": "2026-04-18T13:55:44.372859+00:00",
     "updated_at": "2026-04-18T13:55:43.181+00:00"
   },
@@ -8679,5 +8679,853 @@
     "brand": "غازي بوتيك",
     "created_at": "2026-04-24T11:24:09.020476+00:00",
     "updated_at": "2026-04-24T11:24:07.923+00:00"
+  },
+  {
+    "id": 68,
+    "salla_order_id": "752938788",
+    "order_number": "752938788",
+    "status": "pending",
+    "customer_name": "نوره خالد",
+    "customer_phone": "+966505848333",
+    "customer_email": "",
+    "total_amount": 176.01,
+    "currency": "SAR",
+    "items": [
+      {
+        "id": 1430566024,
+        "sku": "",
+        "name": "نفعة — إثمد حجازي",
+        "price": null,
+        "quantity": 1
+      },
+      {
+        "sku": "",
+        "name": "رسوم الشحن",
+        "price": null,
+        "quantity": 1
+      }
+    ],
+    "raw_payload": {
+      "data": {
+        "id": 752938788,
+        "tax": {
+          "amount": {
+            "amount": 22.96,
+            "currency": "SAR"
+          },
+          "percent": 15
+        },
+        "date": "2026-06-12 13:21:37",
+        "slug": 1,
+        "type": "Tax Invoice",
+        "uuid": "f5a1bfe8-f584-48ea-a2c5-be924e0ff502",
+        "items": [
+          {
+            "id": 1430566024,
+            "sku": "",
+            "tax": {
+              "amount": {
+                "amount": 19.44,
+                "currency": "SAR"
+              },
+              "percent": 15
+            },
+            "name": "نفعة — إثمد حجازي",
+            "type": "product",
+            "price": {
+              "amount": 129.57,
+              "currency": "SAR"
+            },
+            "total": {
+              "amount": 149.01,
+              "currency": "SAR"
+            },
+            "item_id": 1406971352,
+            "discount": {
+              "amount": 0,
+              "currency": "SAR"
+            },
+            "quantity": 1,
+            "product_id": 263325435,
+            "description": ""
+          },
+          {
+            "tax": {
+              "amount": {
+                "amount": 3.522,
+                "currency": "SAR"
+              },
+              "percent": 15
+            },
+            "name": "رسوم الشحن",
+            "type": "service",
+            "price": {
+              "amount": 23.48,
+              "currency": "SAR"
+            },
+            "total": {
+              "amount": 27.002,
+              "currency": "SAR"
+            },
+            "discount": {
+              "amount": 0,
+              "currency": "SAR"
+            },
+            "quantity": 1
+          }
+        ],
+        "total": {
+          "amount": 176.01,
+          "currency": "SAR"
+        },
+        "company": null,
+        "qr_code": null,
+        "cod_cost": {
+          "amount": 0,
+          "taxable": true,
+          "currency": "SAR"
+        },
+        "customer": {
+          "id": 309259062,
+          "email": "",
+          "avatar": "https://cdn.assets.salla.network/prod/admin/cp/assets/images/avatar_male.png",
+          "gender": "",
+          "mobile": 505848333,
+          "address": {
+            "city": "الخبر",
+            "country": "السعودية",
+            "district": "As Sadafah",
+            "description": "فيلا 8",
+            "postal_code": "34215",
+            "street_name": "عبدالباقي ابن قانع,5240",
+            "building_number": "5240",
+            "additional_number": "8948"
+          },
+          "birthday": null,
+          "currency": "SAR",
+          "last_name": "خالد",
+          "first_name": "نوره",
+          "updated_at": {
+            "date": "2026-06-12 13:21:07.000000",
+            "timezone": "Asia/Riyadh",
+            "timezone_type": 3
+          },
+          "mobile_code": "+966",
+          "country_code": "SA"
+        },
+        "discount": {
+          "amount": 0,
+          "currency": "SAR"
+        },
+        "order_id": 125057593,
+        "sub_total": {
+          "amount": 129.57,
+          "currency": "SAR"
+        },
+        "order_options": {
+          "amount": 0,
+          "currency": "SAR"
+        },
+        "shipping_cost": {
+          "amount": 23.48,
+          "taxable": true,
+          "currency": "SAR"
+        },
+        "invoice_number": 390,
+        "payment_method": "mada",
+        "order_reference_id": 265908126,
+        "invoice_reference_id": null,
+        "shipping_cost_discount": {
+          "amount": 0,
+          "currency": "SAR"
+        }
+      },
+      "event": "invoice.created",
+      "merchant": 1020985111,
+      "created_at": "Fri Jun 12 2026 13:21:37 GMT+0300"
+    },
+    "brand": "غازي بوتيك",
+    "created_at": "2026-06-12T10:21:40.042026+00:00",
+    "updated_at": "2026-06-12T10:21:38.783+00:00"
+  },
+  {
+    "id": 69,
+    "salla_order_id": "1144485702",
+    "order_number": "1144485702",
+    "status": "pending",
+    "customer_name": "ممدوح  التوم",
+    "customer_phone": "+966552587196",
+    "customer_email": "m_aaas_2009@hotmail.com",
+    "total_amount": 176.01,
+    "currency": "SAR",
+    "items": [
+      {
+        "id": 1273427548,
+        "sku": "",
+        "name": "نفعة — إثمد حجازي",
+        "price": null,
+        "quantity": 1
+      },
+      {
+        "sku": "",
+        "name": "رسوم الشحن",
+        "price": null,
+        "quantity": 1
+      }
+    ],
+    "raw_payload": {
+      "data": {
+        "id": 1144485702,
+        "tax": {
+          "amount": {
+            "amount": 22.96,
+            "currency": "SAR"
+          },
+          "percent": 15
+        },
+        "date": "2026-06-12 15:25:49",
+        "slug": 1,
+        "type": "Tax Invoice",
+        "uuid": "4b7e63ee-4581-46a0-9342-18ecce011cba",
+        "items": [
+          {
+            "id": 1273427548,
+            "sku": "",
+            "tax": {
+              "amount": {
+                "amount": 19.44,
+                "currency": "SAR"
+              },
+              "percent": 15
+            },
+            "name": "نفعة — إثمد حجازي",
+            "type": "product",
+            "price": {
+              "amount": 129.57,
+              "currency": "SAR"
+            },
+            "total": {
+              "amount": 149.01,
+              "currency": "SAR"
+            },
+            "item_id": 383609472,
+            "discount": {
+              "amount": 0,
+              "currency": "SAR"
+            },
+            "quantity": 1,
+            "product_id": 263325435,
+            "description": ""
+          },
+          {
+            "tax": {
+              "amount": {
+                "amount": 3.522,
+                "currency": "SAR"
+              },
+              "percent": 15
+            },
+            "name": "رسوم الشحن",
+            "type": "service",
+            "price": {
+              "amount": 23.48,
+              "currency": "SAR"
+            },
+            "total": {
+              "amount": 27.002,
+              "currency": "SAR"
+            },
+            "discount": {
+              "amount": 0,
+              "currency": "SAR"
+            },
+            "quantity": 1
+          }
+        ],
+        "total": {
+          "amount": 176.01,
+          "currency": "SAR"
+        },
+        "company": null,
+        "qr_code": null,
+        "cod_cost": {
+          "amount": 0,
+          "taxable": true,
+          "currency": "SAR"
+        },
+        "customer": {
+          "id": 1334131679,
+          "email": "m_aaas_2009@hotmail.com",
+          "avatar": "https://cdn.salla.sa/customer_profiles/vp4oVlp7eJa09ZQitIJdM2EMSEALPcIVTyubVfJE.jpg",
+          "gender": "female",
+          "mobile": 552587196,
+          "address": {
+            "city": "الخرج",
+            "country": "السعودية",
+            "district": "Al Burj",
+            "description": null,
+            "postal_code": "16278",
+            "street_name": "أبي الحسن الأهوازي,8197",
+            "building_number": "8197",
+            "additional_number": "2558"
+          },
+          "birthday": null,
+          "currency": "SAR",
+          "last_name": "التوم ",
+          "first_name": "ممدوح ",
+          "updated_at": {
+            "date": "2026-06-12 15:25:17.000000",
+            "timezone": "Asia/Riyadh",
+            "timezone_type": 3
+          },
+          "mobile_code": "+966",
+          "country_code": "SA"
+        },
+        "discount": {
+          "amount": 0,
+          "currency": "SAR"
+        },
+        "order_id": 1515219955,
+        "sub_total": {
+          "amount": 129.57,
+          "currency": "SAR"
+        },
+        "order_options": {
+          "amount": 0,
+          "currency": "SAR"
+        },
+        "shipping_cost": {
+          "amount": 23.48,
+          "taxable": true,
+          "currency": "SAR"
+        },
+        "invoice_number": 391,
+        "payment_method": "mada",
+        "order_reference_id": 265929816,
+        "invoice_reference_id": null,
+        "shipping_cost_discount": {
+          "amount": 0,
+          "currency": "SAR"
+        }
+      },
+      "event": "invoice.created",
+      "merchant": 1020985111,
+      "created_at": "Fri Jun 12 2026 15:25:49 GMT+0300"
+    },
+    "brand": "غازي بوتيك",
+    "created_at": "2026-06-12T12:25:50.924304+00:00",
+    "updated_at": "2026-06-12T12:25:49.492+00:00"
+  },
+  {
+    "id": 70,
+    "salla_order_id": "881901500",
+    "order_number": "881901500",
+    "status": "pending",
+    "customer_name": "بدر",
+    "customer_phone": "+966532100951",
+    "customer_email": "ba5979707@gmail.com",
+    "total_amount": 176.01,
+    "currency": "SAR",
+    "items": [
+      {
+        "id": 357983282,
+        "sku": "",
+        "name": "نفعة — إثمد حجازي",
+        "price": null,
+        "quantity": 1
+      },
+      {
+        "sku": "",
+        "name": "رسوم الشحن",
+        "price": null,
+        "quantity": 1
+      }
+    ],
+    "raw_payload": {
+      "data": {
+        "id": 881901500,
+        "tax": {
+          "amount": {
+            "amount": 22.96,
+            "currency": "SAR"
+          },
+          "percent": 15
+        },
+        "date": "2026-06-13 17:36:54",
+        "slug": 1,
+        "type": "Tax Invoice",
+        "uuid": "21f63137-d07b-4436-8d70-81df4360d899",
+        "items": [
+          {
+            "id": 357983282,
+            "sku": "",
+            "tax": {
+              "amount": {
+                "amount": 19.44,
+                "currency": "SAR"
+              },
+              "percent": 15
+            },
+            "name": "نفعة — إثمد حجازي",
+            "type": "product",
+            "price": {
+              "amount": 129.57,
+              "currency": "SAR"
+            },
+            "total": {
+              "amount": 149.01,
+              "currency": "SAR"
+            },
+            "item_id": 869610562,
+            "discount": {
+              "amount": 0,
+              "currency": "SAR"
+            },
+            "quantity": 1,
+            "product_id": 263325435,
+            "description": ""
+          },
+          {
+            "tax": {
+              "amount": {
+                "amount": 3.522,
+                "currency": "SAR"
+              },
+              "percent": 15
+            },
+            "name": "رسوم الشحن",
+            "type": "service",
+            "price": {
+              "amount": 23.48,
+              "currency": "SAR"
+            },
+            "total": {
+              "amount": 27.002,
+              "currency": "SAR"
+            },
+            "discount": {
+              "amount": 0,
+              "currency": "SAR"
+            },
+            "quantity": 1
+          }
+        ],
+        "total": {
+          "amount": 176.01,
+          "currency": "SAR"
+        },
+        "company": null,
+        "qr_code": null,
+        "cod_cost": {
+          "amount": 0,
+          "taxable": true,
+          "currency": "SAR"
+        },
+        "customer": {
+          "id": 706683104,
+          "email": "ba5979707@gmail.com",
+          "avatar": "https://cdn.assets.salla.network/prod/admin/cp/assets/images/avatar_male.png",
+          "gender": "",
+          "mobile": 532100951,
+          "address": {
+            "city": "الرياض",
+            "country": "السعودية",
+            "district": "Al Rimal",
+            "description": "ثاني فيلا",
+            "postal_code": "13263",
+            "street_name": "عبدالكريم بن يوسف الأنصاري,7263",
+            "building_number": "7263",
+            "additional_number": "2550"
+          },
+          "birthday": null,
+          "currency": "SAR",
+          "last_name": "",
+          "first_name": "بدر",
+          "updated_at": {
+            "date": "2026-06-13 17:36:22.000000",
+            "timezone": "Asia/Riyadh",
+            "timezone_type": 3
+          },
+          "mobile_code": "+966",
+          "country_code": "SA"
+        },
+        "discount": {
+          "amount": 0,
+          "currency": "SAR"
+        },
+        "order_id": 1588553840,
+        "sub_total": {
+          "amount": 129.57,
+          "currency": "SAR"
+        },
+        "order_options": {
+          "amount": 0,
+          "currency": "SAR"
+        },
+        "shipping_cost": {
+          "amount": 23.48,
+          "taxable": true,
+          "currency": "SAR"
+        },
+        "invoice_number": 392,
+        "payment_method": "mada",
+        "order_reference_id": 266136277,
+        "invoice_reference_id": null,
+        "shipping_cost_discount": {
+          "amount": 0,
+          "currency": "SAR"
+        }
+      },
+      "event": "invoice.created",
+      "merchant": 1020985111,
+      "created_at": "Sat Jun 13 2026 17:36:55 GMT+0300"
+    },
+    "brand": "غازي بوتيك",
+    "created_at": "2026-06-13T14:36:57.547187+00:00",
+    "updated_at": "2026-06-13T14:36:56.103+00:00"
+  },
+  {
+    "id": 71,
+    "salla_order_id": "1051800154",
+    "order_number": "1051800154",
+    "status": "pending",
+    "customer_name": "عميل زائر",
+    "customer_phone": "+966920031659",
+    "customer_email": "guest@salla.sa",
+    "total_amount": 165,
+    "currency": "SAR",
+    "items": [
+      {
+        "id": 1928223356,
+        "sku": "",
+        "name": "نفعة — إثمد حجازي",
+        "price": null,
+        "quantity": 1
+      },
+      {
+        "sku": "",
+        "name": "رسوم الشحن",
+        "price": null,
+        "quantity": 1
+      }
+    ],
+    "raw_payload": {
+      "data": {
+        "id": 1051800154,
+        "tax": {
+          "amount": {
+            "amount": 21.52,
+            "currency": "SAR"
+          },
+          "percent": 15
+        },
+        "date": "2026-06-14 02:54:37",
+        "slug": 1,
+        "type": "Tax Invoice",
+        "uuid": "35554902-3629-4209-a607-d4d3b7febe42",
+        "items": [
+          {
+            "id": 1928223356,
+            "sku": "",
+            "tax": {
+              "amount": {
+                "amount": 18,
+                "currency": "SAR"
+              },
+              "percent": 15
+            },
+            "name": "نفعة — إثمد حجازي",
+            "type": "product",
+            "price": {
+              "amount": 120,
+              "currency": "SAR"
+            },
+            "total": {
+              "amount": 138,
+              "currency": "SAR"
+            },
+            "item_id": 407969160,
+            "discount": {
+              "amount": 0,
+              "currency": "SAR"
+            },
+            "quantity": 1,
+            "product_id": 263325435,
+            "description": ""
+          },
+          {
+            "tax": {
+              "amount": {
+                "amount": 3.522,
+                "currency": "SAR"
+              },
+              "percent": 15
+            },
+            "name": "رسوم الشحن",
+            "type": "service",
+            "price": {
+              "amount": 23.48,
+              "currency": "SAR"
+            },
+            "total": {
+              "amount": 27.002,
+              "currency": "SAR"
+            },
+            "discount": {
+              "amount": 0,
+              "currency": "SAR"
+            },
+            "quantity": 1
+          }
+        ],
+        "total": {
+          "amount": 165,
+          "currency": "SAR"
+        },
+        "company": null,
+        "qr_code": null,
+        "cod_cost": {
+          "amount": 0,
+          "taxable": true,
+          "currency": "SAR"
+        },
+        "customer": {
+          "id": 187661634,
+          "email": "guest@salla.sa",
+          "avatar": "https://cdn.assets.salla.network/prod/admin/cp/assets/images/avatar_male.png",
+          "gender": "male",
+          "mobile": 920031659,
+          "address": {
+            "city": "Riyadh",
+            "country": "السعودية",
+            "district": null,
+            "description": "",
+            "postal_code": "٤٥٦٧",
+            "street_name": "",
+            "building_number": null,
+            "additional_number": null
+          },
+          "birthday": {
+            "date": "1998-02-06 00:00:00.000000",
+            "timezone": "Asia/Riyadh",
+            "timezone_type": 3
+          },
+          "currency": "SAR",
+          "last_name": "زائر",
+          "first_name": "عميل",
+          "updated_at": {
+            "date": "2025-12-07 10:06:32.000000",
+            "timezone": "Asia/Riyadh",
+            "timezone_type": 3
+          },
+          "mobile_code": "+966",
+          "country_code": "SA"
+        },
+        "discount": {
+          "amount": 0,
+          "currency": "SAR"
+        },
+        "order_id": 2110500644,
+        "sub_total": {
+          "amount": 120,
+          "currency": "SAR"
+        },
+        "order_options": {
+          "amount": 0,
+          "currency": "SAR"
+        },
+        "shipping_cost": {
+          "amount": 23.48,
+          "taxable": true,
+          "currency": "SAR"
+        },
+        "invoice_number": 393,
+        "payment_method": "mada",
+        "order_reference_id": 266237825,
+        "invoice_reference_id": null,
+        "shipping_cost_discount": {
+          "amount": 0,
+          "currency": "SAR"
+        }
+      },
+      "event": "invoice.created",
+      "merchant": 1020985111,
+      "created_at": "Sun Jun 14 2026 02:54:37 GMT+0300"
+    },
+    "brand": "غازي بوتيك",
+    "created_at": "2026-06-13T23:54:39.537748+00:00",
+    "updated_at": "2026-06-13T23:54:38.286+00:00"
+  },
+  {
+    "id": 72,
+    "salla_order_id": "442539723",
+    "order_number": "442539723",
+    "status": "pending",
+    "customer_name": "عميل زائر",
+    "customer_phone": "+966920031659",
+    "customer_email": "guest@salla.sa",
+    "total_amount": 165,
+    "currency": "SAR",
+    "items": [
+      {
+        "id": 706073822,
+        "sku": "",
+        "name": "نفعة — إثمد حجازي",
+        "price": null,
+        "quantity": 1
+      },
+      {
+        "sku": "",
+        "name": "رسوم الشحن",
+        "price": null,
+        "quantity": 1
+      }
+    ],
+    "raw_payload": {
+      "data": {
+        "id": 442539723,
+        "tax": {
+          "amount": {
+            "amount": 21.52,
+            "currency": "SAR"
+          },
+          "percent": 15
+        },
+        "date": "2026-06-14 21:13:01",
+        "slug": 1,
+        "type": "Tax Invoice",
+        "uuid": "a32554a0-bb3b-43e9-9131-f137c221a60f",
+        "items": [
+          {
+            "id": 706073822,
+            "sku": "",
+            "tax": {
+              "amount": {
+                "amount": 18,
+                "currency": "SAR"
+              },
+              "percent": 15
+            },
+            "name": "نفعة — إثمد حجازي",
+            "type": "product",
+            "price": {
+              "amount": 120,
+              "currency": "SAR"
+            },
+            "total": {
+              "amount": 138,
+              "currency": "SAR"
+            },
+            "item_id": 384822190,
+            "discount": {
+              "amount": 0,
+              "currency": "SAR"
+            },
+            "quantity": 1,
+            "product_id": 263325435,
+            "description": ""
+          },
+          {
+            "tax": {
+              "amount": {
+                "amount": 3.522,
+                "currency": "SAR"
+              },
+              "percent": 15
+            },
+            "name": "رسوم الشحن",
+            "type": "service",
+            "price": {
+              "amount": 23.48,
+              "currency": "SAR"
+            },
+            "total": {
+              "amount": 27.002,
+              "currency": "SAR"
+            },
+            "discount": {
+              "amount": 0,
+              "currency": "SAR"
+            },
+            "quantity": 1
+          }
+        ],
+        "total": {
+          "amount": 165,
+          "currency": "SAR"
+        },
+        "company": null,
+        "qr_code": null,
+        "cod_cost": {
+          "amount": 0,
+          "taxable": true,
+          "currency": "SAR"
+        },
+        "customer": {
+          "id": 187661634,
+          "email": "guest@salla.sa",
+          "avatar": "https://cdn.assets.salla.network/prod/admin/cp/assets/images/avatar_male.png",
+          "gender": "male",
+          "mobile": 920031659,
+          "address": {
+            "city": "Riyadh",
+            "country": "السعودية",
+            "district": null,
+            "description": "",
+            "postal_code": "",
+            "street_name": "",
+            "building_number": null,
+            "additional_number": null
+          },
+          "birthday": {
+            "date": "1998-02-06 00:00:00.000000",
+            "timezone": "Asia/Riyadh",
+            "timezone_type": 3
+          },
+          "currency": "SAR",
+          "last_name": "زائر",
+          "first_name": "عميل",
+          "updated_at": {
+            "date": "2025-12-07 10:06:32.000000",
+            "timezone": "Asia/Riyadh",
+            "timezone_type": 3
+          },
+          "mobile_code": "+966",
+          "country_code": "SA"
+        },
+        "discount": {
+          "amount": 0,
+          "currency": "SAR"
+        },
+        "order_id": 1693508307,
+        "sub_total": {
+          "amount": 120,
+          "currency": "SAR"
+        },
+        "order_options": {
+          "amount": 0,
+          "currency": "SAR"
+        },
+        "shipping_cost": {
+          "amount": 23.48,
+          "taxable": true,
+          "currency": "SAR"
+        },
+        "invoice_number": 394,
+        "payment_method": "mada",
+        "order_reference_id": 266673528,
+        "invoice_reference_id": null,
+        "shipping_cost_discount": {
+          "amount": 0,
+          "currency": "SAR"
+        }
+      },
+      "event": "invoice.created",
+      "merchant": 1020985111,
+      "created_at": "Sun Jun 14 2026 21:13:01 GMT+0300"
+    },
+    "brand": "غازي بوتيك",
+    "created_at": "2026-06-14T18:13:04.071097+00:00",
+    "updated_at": "2026-06-14T18:13:02.516+00:00"
   }
 ]
