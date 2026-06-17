@@ -1,87 +1,5 @@
 [
   {
-    "id": "x1777031943970vdssi",
-    "brand_id": "b3",
-    "project_id": null,
-    "title": "ا — لابلات",
-    "context": "لابلات",
-    "options": [
-      {
-        "id": "x1777031943970d0yby",
-        "cons": [],
-        "pros": [],
-        "title": "ميزانية",
-        "estimatedCost": null,
-        "estimatedRevenue": null
-      },
-      {
-        "id": "x1777031943970u5fqw",
-        "cons": [],
-        "pros": [],
-        "title": "شخص",
-        "estimatedCost": null,
-        "estimatedRevenue": null
-      },
-      {
-        "id": "x17770319439709ohkr",
-        "cons": [],
-        "pros": [],
-        "title": "وقت",
-        "estimatedCost": null,
-        "estimatedRevenue": null
-      }
-    ],
-    "chosen_option_id": null,
-    "status": "pending",
-    "impact": "medium",
-    "deadline": null,
-    "decided_at": null,
-    "decided_by": "غازي",
-    "notes": "",
-    "updated_at": "2026-04-27T07:16:35.08168+00:00"
-  },
-  {
-    "id": "x1777031952828hzh1t",
-    "brand_id": "b3",
-    "project_id": null,
-    "title": "ا — بيظلطاذتنزم",
-    "context": "بيظلطاذتنزم",
-    "options": [
-      {
-        "id": "x1777031952828qx98o",
-        "cons": [],
-        "pros": [],
-        "title": "ميزانية",
-        "estimatedCost": null,
-        "estimatedRevenue": null
-      },
-      {
-        "id": "x1777031952828ofu5s",
-        "cons": [],
-        "pros": [],
-        "title": "شخص",
-        "estimatedCost": null,
-        "estimatedRevenue": null
-      },
-      {
-        "id": "x17770319528281gf9u",
-        "cons": [],
-        "pros": [],
-        "title": "وقت",
-        "estimatedCost": null,
-        "estimatedRevenue": null
-      }
-    ],
-    "chosen_option_id": null,
-    "status": "pending",
-    "impact": "medium",
-    "deadline": null,
-    "decided_at": null,
-    "decided_by": "غازي",
-    "notes": "",
-    "updated_at": "2026-04-27T07:16:35.08168+00:00"
-  },
-  {
     "id": "d5",
     "brand_id": "b4",
     "project_id": "p8",
@@ -206,14 +124,14 @@
     "updated_at": "2026-04-04T20:34:58.460084+00:00"
   },
   {
-    "id": "x1775133178096c8egm",
-    "brand_id": null,
+    "id": "x1777031943970vdssi",
+    "brand_id": "b3",
     "project_id": null,
-    "title": "توظيف عهود — الموضوع عند راكان",
-    "context": "الموضوع عند راكان",
+    "title": "ا — لابلات",
+    "context": "لابلات",
     "options": [
       {
-        "id": "x1775133178096rsh18",
+        "id": "x1777031943970d0yby",
         "cons": [],
         "pros": [],
         "title": "ميزانية",
@@ -221,7 +139,7 @@
         "estimatedRevenue": null
       },
       {
-        "id": "x17751331780966f7i4",
+        "id": "x1777031943970u5fqw",
         "cons": [],
         "pros": [],
         "title": "شخص",
@@ -229,7 +147,7 @@
         "estimatedRevenue": null
       },
       {
-        "id": "x1775133178096othdo",
+        "id": "x17770319439709ohkr",
         "cons": [],
         "pros": [],
         "title": "وقت",
@@ -244,17 +162,17 @@
     "decided_at": null,
     "decided_by": "غازي",
     "notes": "",
-    "updated_at": "2026-04-04T20:34:58.460084+00:00"
+    "updated_at": "2026-04-27T07:16:35.08168+00:00"
   },
   {
-    "id": "x1775133507601e0zvs",
-    "brand_id": null,
+    "id": "x1777031952828hzh1t",
+    "brand_id": "b3",
     "project_id": null,
-    "title": "انقل سيارة ابو اياد باسمه — الموضوع عند ابو اياد",
-    "context": "الموضوع عند ابو اياد",
+    "title": "ا — بيظلطاذتنزم",
+    "context": "بيظلطاذتنزم",
     "options": [
       {
-        "id": "x1775133507601v9a55",
+        "id": "x1777031952828qx98o",
         "cons": [],
         "pros": [],
         "title": "ميزانية",
@@ -262,7 +180,7 @@
         "estimatedRevenue": null
       },
       {
-        "id": "x1775133507601jfbj7",
+        "id": "x1777031952828ofu5s",
         "cons": [],
         "pros": [],
         "title": "شخص",
@@ -270,7 +188,7 @@
         "estimatedRevenue": null
       },
       {
-        "id": "x1775133507601deqr2",
+        "id": "x17770319528281gf9u",
         "cons": [],
         "pros": [],
         "title": "وقت",
@@ -278,14 +196,14 @@
         "estimatedRevenue": null
       }
     ],
-    "chosen_option_id": "x1775133507601v9a55",
-    "status": "decided",
+    "chosen_option_id": null,
+    "status": "pending",
     "impact": "medium",
     "deadline": null,
-    "decided_at": "2026-04-02T12:45:41.016Z",
+    "decided_at": null,
     "decided_by": "غازي",
     "notes": "",
-    "updated_at": "2026-04-04T20:34:58.460084+00:00"
+    "updated_at": "2026-04-27T07:16:35.08168+00:00"
   },
   {
     "id": "x1775134036981a6t78",
@@ -406,6 +324,88 @@
     "impact": "medium",
     "deadline": null,
     "decided_at": null,
+    "decided_by": "غازي",
+    "notes": "",
+    "updated_at": "2026-04-04T20:34:58.460084+00:00"
+  },
+  {
+    "id": "x1775133178096c8egm",
+    "brand_id": null,
+    "project_id": null,
+    "title": "توظيف عهود — الموضوع عند راكان",
+    "context": "الموضوع عند راكان",
+    "options": [
+      {
+        "id": "x1775133178096rsh18",
+        "cons": [],
+        "pros": [],
+        "title": "ميزانية",
+        "estimatedCost": null,
+        "estimatedRevenue": null
+      },
+      {
+        "id": "x17751331780966f7i4",
+        "cons": [],
+        "pros": [],
+        "title": "شخص",
+        "estimatedCost": null,
+        "estimatedRevenue": null
+      },
+      {
+        "id": "x1775133178096othdo",
+        "cons": [],
+        "pros": [],
+        "title": "وقت",
+        "estimatedCost": null,
+        "estimatedRevenue": null
+      }
+    ],
+    "chosen_option_id": null,
+    "status": "pending",
+    "impact": "medium",
+    "deadline": null,
+    "decided_at": null,
+    "decided_by": "غازي",
+    "notes": "",
+    "updated_at": "2026-04-04T20:34:58.460084+00:00"
+  },
+  {
+    "id": "x1775133507601e0zvs",
+    "brand_id": null,
+    "project_id": null,
+    "title": "انقل سيارة ابو اياد باسمه — الموضوع عند ابو اياد",
+    "context": "الموضوع عند ابو اياد",
+    "options": [
+      {
+        "id": "x1775133507601v9a55",
+        "cons": [],
+        "pros": [],
+        "title": "ميزانية",
+        "estimatedCost": null,
+        "estimatedRevenue": null
+      },
+      {
+        "id": "x1775133507601jfbj7",
+        "cons": [],
+        "pros": [],
+        "title": "شخص",
+        "estimatedCost": null,
+        "estimatedRevenue": null
+      },
+      {
+        "id": "x1775133507601deqr2",
+        "cons": [],
+        "pros": [],
+        "title": "وقت",
+        "estimatedCost": null,
+        "estimatedRevenue": null
+      }
+    ],
+    "chosen_option_id": "x1775133507601v9a55",
+    "status": "decided",
+    "impact": "medium",
+    "deadline": null,
+    "decided_at": "2026-04-02T12:45:41.016Z",
     "decided_by": "غازي",
     "notes": "",
     "updated_at": "2026-04-04T20:34:58.460084+00:00"
@@ -678,95 +678,6 @@
     "updated_at": "2026-04-17T04:55:02.943+00:00"
   },
   {
-    "id": "d1777030515398",
-    "brand_id": "b3",
-    "project_id": null,
-    "title": "حصريات النبش — الطلب — أكمل أم ألغي؟",
-    "context": "قسيبفلاتنمك؛\\كتالبيس",
-    "options": [],
-    "chosen_option_id": null,
-    "status": "open",
-    "impact": "high",
-    "deadline": null,
-    "decided_at": null,
-    "decided_by": null,
-    "notes": "تم إنشاؤه تلقائياً من مهمة عالقة: حصريات النبش — الطلب",
-    "updated_at": "2026-04-24T11:35:15.398+00:00"
-  },
-  {
-    "id": "d1777029355270",
-    "brand_id": "b3",
-    "project_id": null,
-    "title": "h — أكمل أم ألغي؟",
-    "context": "لتاشسلنشتم",
-    "options": [],
-    "chosen_option_id": null,
-    "status": "open",
-    "impact": "high",
-    "deadline": null,
-    "decided_at": null,
-    "decided_by": null,
-    "notes": "تم إنشاؤه تلقائياً من مهمة عالقة: h",
-    "updated_at": "2026-04-24T11:15:55.27+00:00"
-  },
-  {
-    "id": "d1777030450952",
-    "brand_id": "x17747670469005rdjn",
-    "project_id": null,
-    "title": "طريقة تحويل حساباتي في السوشيال ميديا الى نشر ذكاء اصطناعي فيه تغريدة سويت لها قلب — أكمل أم ألغي؟",
-    "context": "طبلذادتزنرمك؛\\",
-    "options": [],
-    "chosen_option_id": null,
-    "status": "open",
-    "impact": "high",
-    "deadline": null,
-    "decided_at": null,
-    "decided_by": null,
-    "notes": "تم إنشاؤه تلقائياً من مهمة عالقة: طريقة تحويل حساباتي في السوشيال ميديا الى نشر ذكاء اصطناعي فيه تغريدة سويت لها قلب",
-    "updated_at": "2026-04-24T11:34:10.952+00:00"
-  },
-  {
-    "id": "x1777027556693bc4gu",
-    "brand_id": "x17747670469005rdjn",
-    "project_id": null,
-    "title": "طريقة تحويل حساباتي في السوشيال ميديا الى نشر ذكاء اصطناعي فيه تغريدة سويت لها قلب — وش وقفك؟",
-    "context": "",
-    "options": [
-      {
-        "id": "x17770275566934rfll",
-        "cons": [],
-        "pros": [],
-        "title": "ميزانية",
-        "estimatedCost": null,
-        "estimatedRevenue": null
-      },
-      {
-        "id": "x1777027556693i4lpc",
-        "cons": [],
-        "pros": [],
-        "title": "شخص",
-        "estimatedCost": null,
-        "estimatedRevenue": null
-      },
-      {
-        "id": "x1777027556693htnqw",
-        "cons": [],
-        "pros": [],
-        "title": "وقت",
-        "estimatedCost": null,
-        "estimatedRevenue": null
-      }
-    ],
-    "chosen_option_id": null,
-    "status": "pending",
-    "impact": "medium",
-    "deadline": null,
-    "decided_at": null,
-    "decided_by": "غازي",
-    "notes": "",
-    "updated_at": "2026-04-24T10:46:00.288477+00:00"
-  },
-  {
     "id": "d1777029155239",
     "brand_id": "b1",
     "project_id": null,
@@ -854,6 +765,95 @@
     "decided_by": "غازي",
     "notes": "",
     "updated_at": "2026-04-24T10:36:06.344702+00:00"
+  },
+  {
+    "id": "d1777030515398",
+    "brand_id": "b3",
+    "project_id": null,
+    "title": "حصريات النبش — الطلب — أكمل أم ألغي؟",
+    "context": "قسيبفلاتنمك؛\\كتالبيس",
+    "options": [],
+    "chosen_option_id": null,
+    "status": "open",
+    "impact": "high",
+    "deadline": null,
+    "decided_at": null,
+    "decided_by": null,
+    "notes": "تم إنشاؤه تلقائياً من مهمة عالقة: حصريات النبش — الطلب",
+    "updated_at": "2026-04-24T11:35:15.398+00:00"
+  },
+  {
+    "id": "d1777029355270",
+    "brand_id": "b3",
+    "project_id": null,
+    "title": "h — أكمل أم ألغي؟",
+    "context": "لتاشسلنشتم",
+    "options": [],
+    "chosen_option_id": null,
+    "status": "open",
+    "impact": "high",
+    "deadline": null,
+    "decided_at": null,
+    "decided_by": null,
+    "notes": "تم إنشاؤه تلقائياً من مهمة عالقة: h",
+    "updated_at": "2026-04-24T11:15:55.27+00:00"
+  },
+  {
+    "id": "d1777030450952",
+    "brand_id": "x17747670469005rdjn",
+    "project_id": null,
+    "title": "طريقة تحويل حساباتي في السوشيال ميديا الى نشر ذكاء اصطناعي فيه تغريدة سويت لها قلب — أكمل أم ألغي؟",
+    "context": "طبلذادتزنرمك؛\\",
+    "options": [],
+    "chosen_option_id": null,
+    "status": "open",
+    "impact": "high",
+    "deadline": null,
+    "decided_at": null,
+    "decided_by": null,
+    "notes": "تم إنشاؤه تلقائياً من مهمة عالقة: طريقة تحويل حساباتي في السوشيال ميديا الى نشر ذكاء اصطناعي فيه تغريدة سويت لها قلب",
+    "updated_at": "2026-04-24T11:34:10.952+00:00"
+  },
+  {
+    "id": "x1777027556693bc4gu",
+    "brand_id": "x17747670469005rdjn",
+    "project_id": null,
+    "title": "طريقة تحويل حساباتي في السوشيال ميديا الى نشر ذكاء اصطناعي فيه تغريدة سويت لها قلب — وش وقفك؟",
+    "context": "",
+    "options": [
+      {
+        "id": "x17770275566934rfll",
+        "cons": [],
+        "pros": [],
+        "title": "ميزانية",
+        "estimatedCost": null,
+        "estimatedRevenue": null
+      },
+      {
+        "id": "x1777027556693i4lpc",
+        "cons": [],
+        "pros": [],
+        "title": "شخص",
+        "estimatedCost": null,
+        "estimatedRevenue": null
+      },
+      {
+        "id": "x1777027556693htnqw",
+        "cons": [],
+        "pros": [],
+        "title": "وقت",
+        "estimatedCost": null,
+        "estimatedRevenue": null
+      }
+    ],
+    "chosen_option_id": null,
+    "status": "pending",
+    "impact": "medium",
+    "deadline": null,
+    "decided_at": null,
+    "decided_by": "غازي",
+    "notes": "",
+    "updated_at": "2026-04-24T10:46:00.288477+00:00"
   },
   {
     "id": "x17770269845785qeoe",

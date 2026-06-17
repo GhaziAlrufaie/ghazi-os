@@ -587,81 +587,6 @@
     "updated_at": "2026-04-04T20:35:00.167253+00:00"
   },
   {
-    "id": "x1774700728229652r2",
-    "type": "task",
-    "reason": "manual",
-    "archived_at": "2026-03-28T12:25:28.229Z",
-    "archived_month": 2,
-    "archived_year": 2026,
-    "data": {
-      "id": "task-1774700459136",
-      "links": [],
-      "notes": "",
-      "title": "رواتب",
-      "status": "todo",
-      "brandId": "b1",
-      "dueDate": null,
-      "priority": "medium",
-      "subtasks": [],
-      "checklist": [],
-      "createdAt": "2026-03-28",
-      "projectId": null,
-      "updatedAt": "2026-03-28"
-    },
-    "updated_at": "2026-04-04T20:35:00.167253+00:00"
-  },
-  {
-    "id": "x1774701642799dmaxd",
-    "type": "subtask",
-    "reason": "manual",
-    "archived_at": "2026-03-28T12:40:42.799Z",
-    "archived_month": 2,
-    "archived_year": 2026,
-    "data": {
-      "id": "task-1774701139616",
-      "links": [],
-      "notes": "",
-      "title": "غازي",
-      "status": "todo",
-      "brandId": "b1",
-      "dueDate": null,
-      "priority": "low",
-      "subtasks": [],
-      "checklist": [],
-      "createdAt": "2026-03-28",
-      "projectId": null,
-      "sortOrder": 32,
-      "updatedAt": "2026-03-28"
-    },
-    "updated_at": "2026-04-04T20:35:00.167253+00:00"
-  },
-  {
-    "id": "x1774701667218qkwhs",
-    "type": "subtask",
-    "reason": "manual",
-    "archived_at": "2026-03-28T12:41:07.218Z",
-    "archived_month": 2,
-    "archived_year": 2026,
-    "data": {
-      "id": "t32",
-      "desc": "",
-      "tags": [
-        "شخصي"
-      ],
-      "notes": "",
-      "title": "بطن حمودي",
-      "status": "todo",
-      "brandId": null,
-      "dueDate": "2026-03-22",
-      "category": "personal",
-      "priority": "high",
-      "projectId": null,
-      "sortOrder": 24,
-      "completedAt": null
-    },
-    "updated_at": "2026-04-04T20:35:00.167253+00:00"
-  },
-  {
     "id": "x1774696118371gqzoa",
     "type": "subtask",
     "reason": "manual",
@@ -784,6 +709,156 @@
     "updated_at": "2026-04-04T20:35:00.167253+00:00"
   },
   {
+    "id": "x1774700728229652r2",
+    "type": "task",
+    "reason": "manual",
+    "archived_at": "2026-03-28T12:25:28.229Z",
+    "archived_month": 2,
+    "archived_year": 2026,
+    "data": {
+      "id": "task-1774700459136",
+      "links": [],
+      "notes": "",
+      "title": "رواتب",
+      "status": "todo",
+      "brandId": "b1",
+      "dueDate": null,
+      "priority": "medium",
+      "subtasks": [],
+      "checklist": [],
+      "createdAt": "2026-03-28",
+      "projectId": null,
+      "updatedAt": "2026-03-28"
+    },
+    "updated_at": "2026-04-04T20:35:00.167253+00:00"
+  },
+  {
+    "id": "x1774701642799dmaxd",
+    "type": "subtask",
+    "reason": "manual",
+    "archived_at": "2026-03-28T12:40:42.799Z",
+    "archived_month": 2,
+    "archived_year": 2026,
+    "data": {
+      "id": "task-1774701139616",
+      "links": [],
+      "notes": "",
+      "title": "غازي",
+      "status": "todo",
+      "brandId": "b1",
+      "dueDate": null,
+      "priority": "low",
+      "subtasks": [],
+      "checklist": [],
+      "createdAt": "2026-03-28",
+      "projectId": null,
+      "sortOrder": 32,
+      "updatedAt": "2026-03-28"
+    },
+    "updated_at": "2026-04-04T20:35:00.167253+00:00"
+  },
+  {
+    "id": "x1774701667218qkwhs",
+    "type": "subtask",
+    "reason": "manual",
+    "archived_at": "2026-03-28T12:41:07.218Z",
+    "archived_month": 2,
+    "archived_year": 2026,
+    "data": {
+      "id": "t32",
+      "desc": "",
+      "tags": [
+        "شخصي"
+      ],
+      "notes": "",
+      "title": "بطن حمودي",
+      "status": "todo",
+      "brandId": null,
+      "dueDate": "2026-03-22",
+      "category": "personal",
+      "priority": "high",
+      "projectId": null,
+      "sortOrder": 24,
+      "completedAt": null
+    },
+    "updated_at": "2026-04-04T20:35:00.167253+00:00"
+  },
+  {
+    "id": "x1774762754959jfeah",
+    "type": "decision",
+    "reason": "manual",
+    "archived_at": "2026-03-29T05:39:14.959Z",
+    "archived_month": 2,
+    "archived_year": 2026,
+    "data": {
+      "id": "d3",
+      "notes": "",
+      "title": "خط العناية — نبدأ بإيش؟",
+      "impact": "high",
+      "status": "pending",
+      "brandId": "b1",
+      "context": "لدينا ٣ منتجات: بودرة، معطر، زيت — أيهم نبدأ؟",
+      "options": [
+        {
+          "id": "o6",
+          "cons": [
+            "منافسة"
+          ],
+          "pros": [
+            "طلب عالي",
+            "سهل التسويق"
+          ],
+          "title": "بودرة",
+          "estimatedCost": 5000,
+          "estimatedRevenue": 12000
+        },
+        {
+          "id": "o7",
+          "cons": [
+            "تعقيد أكثر"
+          ],
+          "pros": [
+            "هامش أعلى"
+          ],
+          "title": "معطر",
+          "estimatedCost": 6000,
+          "estimatedRevenue": 14000
+        },
+        {
+          "id": "o8",
+          "cons": [
+            "سوق أصغر"
+          ],
+          "pros": [
+            "تميز"
+          ],
+          "title": "زيت",
+          "estimatedCost": 4000,
+          "estimatedRevenue": 10000
+        },
+        {
+          "id": "o9",
+          "cons": [
+            "تكلفة عالية",
+            "مخاطرة"
+          ],
+          "pros": [
+            "حضور كامل"
+          ],
+          "title": "الكل معاً",
+          "estimatedCost": 15000,
+          "estimatedRevenue": 36000
+        }
+      ],
+      "deadline": "2026-03-22",
+      "decidedAt": null,
+      "decidedBy": "غازي",
+      "projectId": "p1",
+      "chosenOptionId": null
+    },
+    "updated_at": "2026-04-04T20:35:00.167253+00:00"
+  },
+  {
     "id": "x17750779979083j5h2",
     "type": "decision",
     "reason": "manual",
@@ -877,81 +952,6 @@
       "decidedAt": null,
       "decidedBy": "غازي",
       "projectId": null,
-      "chosenOptionId": null
-    },
-    "updated_at": "2026-04-04T20:35:00.167253+00:00"
-  },
-  {
-    "id": "x1774762754959jfeah",
-    "type": "decision",
-    "reason": "manual",
-    "archived_at": "2026-03-29T05:39:14.959Z",
-    "archived_month": 2,
-    "archived_year": 2026,
-    "data": {
-      "id": "d3",
-      "notes": "",
-      "title": "خط العناية — نبدأ بإيش؟",
-      "impact": "high",
-      "status": "pending",
-      "brandId": "b1",
-      "context": "لدينا ٣ منتجات: بودرة، معطر، زيت — أيهم نبدأ؟",
-      "options": [
-        {
-          "id": "o6",
-          "cons": [
-            "منافسة"
-          ],
-          "pros": [
-            "طلب عالي",
-            "سهل التسويق"
-          ],
-          "title": "بودرة",
-          "estimatedCost": 5000,
-          "estimatedRevenue": 12000
-        },
-        {
-          "id": "o7",
-          "cons": [
-            "تعقيد أكثر"
-          ],
-          "pros": [
-            "هامش أعلى"
-          ],
-          "title": "معطر",
-          "estimatedCost": 6000,
-          "estimatedRevenue": 14000
-        },
-        {
-          "id": "o8",
-          "cons": [
-            "سوق أصغر"
-          ],
-          "pros": [
-            "تميز"
-          ],
-          "title": "زيت",
-          "estimatedCost": 4000,
-          "estimatedRevenue": 10000
-        },
-        {
-          "id": "o9",
-          "cons": [
-            "تكلفة عالية",
-            "مخاطرة"
-          ],
-          "pros": [
-            "حضور كامل"
-          ],
-          "title": "الكل معاً",
-          "estimatedCost": 15000,
-          "estimatedRevenue": 36000
-        }
-      ],
-      "deadline": "2026-03-22",
-      "decidedAt": null,
-      "decidedBy": "غازي",
-      "projectId": "p1",
       "chosenOptionId": null
     },
     "updated_at": "2026-04-04T20:35:00.167253+00:00"
