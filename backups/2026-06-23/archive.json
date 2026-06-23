@@ -587,6 +587,30 @@
     "updated_at": "2026-04-04T20:35:00.167253+00:00"
   },
   {
+    "id": "x17746961191810osoq",
+    "type": "subtask",
+    "reason": "manual",
+    "archived_at": "2026-03-28T11:08:39.181Z",
+    "archived_month": 2,
+    "archived_year": 2026,
+    "data": {
+      "id": "task-1774530378428",
+      "links": [],
+      "notes": "",
+      "title": "مهمة جديدة",
+      "status": "todo",
+      "brandId": "b1",
+      "dueDate": null,
+      "priority": "medium",
+      "subtasks": [],
+      "checklist": [],
+      "createdAt": "2026-03-26",
+      "projectId": null,
+      "updatedAt": "2026-03-26"
+    },
+    "updated_at": "2026-04-04T20:35:00.167253+00:00"
+  },
+  {
     "id": "x1774700728229652r2",
     "type": "task",
     "reason": "manual",
@@ -760,79 +784,6 @@
     "updated_at": "2026-04-04T20:35:00.167253+00:00"
   },
   {
-    "id": "x17746961191810osoq",
-    "type": "subtask",
-    "reason": "manual",
-    "archived_at": "2026-03-28T11:08:39.181Z",
-    "archived_month": 2,
-    "archived_year": 2026,
-    "data": {
-      "id": "task-1774530378428",
-      "links": [],
-      "notes": "",
-      "title": "مهمة جديدة",
-      "status": "todo",
-      "brandId": "b1",
-      "dueDate": null,
-      "priority": "medium",
-      "subtasks": [],
-      "checklist": [],
-      "createdAt": "2026-03-26",
-      "projectId": null,
-      "updatedAt": "2026-03-26"
-    },
-    "updated_at": "2026-04-04T20:35:00.167253+00:00"
-  },
-  {
-    "id": "x17750779979083j5h2",
-    "type": "decision",
-    "reason": "manual",
-    "archived_at": "2026-04-01T21:13:17.908Z",
-    "archived_month": 3,
-    "archived_year": 2026,
-    "data": {
-      "id": "x17750649338395zg68",
-      "notes": "",
-      "title": "موظفات جوزاء — وقف دانيا — وش وقفك؟",
-      "impact": "medium",
-      "status": "pending",
-      "brandId": "b1",
-      "context": "",
-      "options": [
-        {
-          "id": "x1775064933839od0ln",
-          "cons": [],
-          "pros": [],
-          "title": "ميزانية",
-          "estimatedCost": null,
-          "estimatedRevenue": null
-        },
-        {
-          "id": "x17750649338396ey21",
-          "cons": [],
-          "pros": [],
-          "title": "شخص",
-          "estimatedCost": null,
-          "estimatedRevenue": null
-        },
-        {
-          "id": "x17750649338390txnn",
-          "cons": [],
-          "pros": [],
-          "title": "وقت",
-          "estimatedCost": null,
-          "estimatedRevenue": null
-        }
-      ],
-      "deadline": null,
-      "decidedAt": null,
-      "decidedBy": "غازي",
-      "projectId": null,
-      "chosenOptionId": null
-    },
-    "updated_at": "2026-04-04T20:35:00.167253+00:00"
-  },
-  {
     "id": "x17750779924840d9qj",
     "type": "decision",
     "reason": "manual",
@@ -952,6 +903,55 @@
       "decidedAt": null,
       "decidedBy": "غازي",
       "projectId": "p1",
+      "chosenOptionId": null
+    },
+    "updated_at": "2026-04-04T20:35:00.167253+00:00"
+  },
+  {
+    "id": "x17750779979083j5h2",
+    "type": "decision",
+    "reason": "manual",
+    "archived_at": "2026-04-01T21:13:17.908Z",
+    "archived_month": 3,
+    "archived_year": 2026,
+    "data": {
+      "id": "x17750649338395zg68",
+      "notes": "",
+      "title": "موظفات جوزاء — وقف دانيا — وش وقفك؟",
+      "impact": "medium",
+      "status": "pending",
+      "brandId": "b1",
+      "context": "",
+      "options": [
+        {
+          "id": "x1775064933839od0ln",
+          "cons": [],
+          "pros": [],
+          "title": "ميزانية",
+          "estimatedCost": null,
+          "estimatedRevenue": null
+        },
+        {
+          "id": "x17750649338396ey21",
+          "cons": [],
+          "pros": [],
+          "title": "شخص",
+          "estimatedCost": null,
+          "estimatedRevenue": null
+        },
+        {
+          "id": "x17750649338390txnn",
+          "cons": [],
+          "pros": [],
+          "title": "وقت",
+          "estimatedCost": null,
+          "estimatedRevenue": null
+        }
+      ],
+      "deadline": null,
+      "decidedAt": null,
+      "decidedBy": "غازي",
+      "projectId": null,
       "chosenOptionId": null
     },
     "updated_at": "2026-04-04T20:35:00.167253+00:00"
